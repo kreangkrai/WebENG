@@ -1,0 +1,304 @@
+﻿@{ 
+    ViewData["Title"] = "Users";
+}
+<div class="row p-3">
+    <div class="col-xl-1 col-lg-4 col-md-4 pb-3">
+        <button id="btn_add" type="button" class="btn btn-primary form-control elevation-1">
+            <i class="fas fa-plus"></i> Create User
+        </button>
+    </div>
+    <div class="col-xl-1 col-lg-4 col-md-4 pb-3" hidden>
+        <button id="btn_import" type="button" class="btn btn-primary form-control elevation-1">
+            <i class="fas fa-upload"></i> Import
+        </button>
+    </div>
+    <div class="col-xl-1 col-lg-4 col-md-4 pb-3" hidden>
+        <button id="btn_export" type="button" class="btn btn-primary form-control elevation-1">
+            <i class="fas fa-download"></i> Export
+        </button>
+    </div>
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header bg-dark">
+                <span class="card-title">Users</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <table id="table_user" class="table table-sm compact border text-center table-striped table-hover w-100">
+                            <thead class="text-center">
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Allow Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot class="text-center">
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Allow Edit</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_user" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title">Create User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="user_name">User Name</label>
+                        <select id="user_name" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">User ID</label>
+                        <input id="user_id" type="text" class="form-control" placeholder="Firstname.L"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input id="department" type="text" class="form-control" placeholder="Department" />
+                    </div>
+                    <div class="form-group">
+                        <label for="allow_edit">Allow Edit Data</label>
+                        <select id="allow_edit" class="form-control">
+                            <option value="0">Not Allow</option>
+                            <option value="1">Allow</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button id="btn_save" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        //Variable Declaration
+        var table;
+        var users = [];
+        var engineers = [];
+        var update = false;
+
+        //Change these variables to true to show response
+        var debug_user = false;
+        var debug_engineer = false;
+        var debug_user_string = false;
+
+        $(document).ready(function () {
+            GetEngineerUsers();
+        });
+
+        async function GetUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetUsers", "EngUser")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    users = response;
+                    if (debug_user)
+                        console.log(users);
+                }
+            });
+        }
+
+        function GenerateUserOptions() {
+            var added_users = [];
+            for (var i = 0; i < engineers.length; i++) {
+                added_users.push(engineers[i].user_id);
+            }
+            var user_str = '<option value="" selected disabled>Please Select User to Add</option>';
+            for (var i = 0; i < users.length; i++) {
+                if (added_users.indexOf(users[i].user_id) === -1)
+                    user_str += '<option value="' + users[i].user_name + '">' + users[i].user_name + '</option>';
+            }
+            $('#user_name').empty();
+            $('#user_name').append(user_str);
+        }
+
+        async function GetEngineerUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetEngineerUsers", "EngUser")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    engineers = response;
+                    if (debug_engineer)
+                        console.log(engineers);
+                    GenerateTable(engineers);
+                }
+            });
+        }
+
+        function GenerateTable(engineers) {
+            var datas = [];
+
+            if (table !== undefined)
+                table.DataTable().destroy();
+
+            for (var i = 0; i < engineers.length; i++) {
+                datas.push([
+                    engineers[i].user_id,
+                    engineers[i].user_name,
+                    engineers[i].department,
+                    engineers[i].allow_edit,
+                ]);
+            }
+
+            table = $('#table_user').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
+
+        $('#btn_add').on('click', async function () {
+            await GetUsers();
+            await GenerateUserOptions();
+            await PrepmodalCreateUser();
+        });
+
+        function PrepmodalCreateUser() {
+            update = false;
+            $('#modal_user').modal();
+            $('#modal_title').text("Create User");
+            $('#user_name').attr('disabled', false);
+            $('#user_name').val(null);
+            $('#user_id').attr('disabled', true);
+            $('#user_id').val(null);
+            $('#department').attr('disabled', true);
+            $('#department').val(null);
+            $('#btn_save').attr('disabled', true);
+        }
+
+        $('#user_name').on('change', function () {
+            var user = users.filter(f => f.user_name === $('#user_name').val());
+            $('#user_id').val(user[0].user_id);
+            $('#department').val(user[0].department);
+            var user_name = $('#user_name').val();
+            var enable_save = 1;
+            enable_save *= (user_name !== "") ? 1 : 0;
+            $('#btn_save').attr('disabled', !enable_save);
+        });
+
+        $('#btn_import').on('click', function () {
+            alert("Button Import Click");
+        });
+
+        $('#btn_export').on('click', function () {
+            alert("Button Export Click");
+        });
+
+        $('#table_user tbody').on('click', 'tr', async function () {
+            await GetUsers();
+            var user_str = '<option value="" selected disabled>Please Select User to Add</option>';
+            for (var i = 0; i < users.length; i++) {
+                user_str += '<option value="' + users[i].user_name + '">' + users[i].user_name + '</option>';
+            }
+            $('#user_name').empty();
+            $('#user_name').append(user_str);
+            EditUser(table.row(this).data());
+        });
+
+        function EditUser(data) {
+            update = true;
+            $('#modal_user').modal();
+            $('#modal_title').text("Edit User");
+            $('#user_name').attr('disabled', true);
+            $('#user_name').val(data[1]);
+            $('#user_id').attr('disabled', true);
+            $('#user_id').val(data[0]);
+            $('#department').attr('disabled', true);
+            $('#department').val(data[2]);
+            var allow = data[3] === true ? 1 : 0;
+            $('#allow_edit').val(allow);
+        }
+
+        $('#btn_save').on('click', function () {
+            var user_id = $('#user_id').val();
+            var user_name = $('#user_name').val();
+            var department = $('#department').val();
+            var allow_edit = $('#allow_edit').val() === "1" ? true : false;
+            if (update) {
+                var user_string = JSON.stringify({
+                    "user_id": user_id,
+                    "user_name": user_name,
+                    "department": department,
+                    "allow_edit": allow_edit
+                });
+                if (debug_user_string)
+                    console.log(user_string);
+                UpdateEngineerUser(user_string);
+            }
+            else {
+                var user_string = JSON.stringify({
+                    "user_id": user_id,
+                    "user_name": user_name,
+                    "department": department,
+                    "allow_edit": allow_edit
+                });
+                if (debug_user_string)
+                    console.log(user_string);
+                CreateEngineerUser(user_string);
+            }
+        });
+
+        async function CreateEngineerUser(user_string) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("CreateEngineerUser", "EngUser")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        }
+
+        async function UpdateEngineerUser(user_string) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateEngineerUser", "EngUser")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        }
+
+    </script>
+}

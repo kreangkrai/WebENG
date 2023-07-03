@@ -1,0 +1,302 @@
+﻿@{ 
+    ViewData["title"] = "Weekly Summary";
+}
+<div class="row p-4 d-flex justify-content-end" style="row-gap:20px">
+    <div class="col-xl-3">
+        <input id="week" type="week" class="form-control" />
+    </div>
+    <div class="col-xl-1">
+        <button id="btn_prev" type="button" class="btn btn-primary form-control">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </div>
+    <div class="col-xl-1">
+        <button id="btn_next" type="button" class="btn btn-primary form-control">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-body">
+                <canvas id="chart" style="height:350px" />
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Engineers' Note</span>
+            </div>
+            <div class="card-body">
+                <table id="table_note" class="table table-bordered table-hover table-sm compact text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Job</th>
+                            <th>Engineer</th>
+                            <th>Date</th>
+                            <th>Start</th>
+                            <th>Stop</th>
+                            <th>Task</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Weekly Summary</span>
+            </div>
+            <div class="card-body">
+                <table id="table" class="table table-bordered table-hover table-sm compact text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Job</th>
+                            <th>Engineer</th>
+                            <th>Task</th>
+                            <th>Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        var table;
+        var table_note;
+        var chart;
+        var summaries = [];
+        var notes = [];
+
+        $(document).ready(function () {
+            var today = new Date();
+            var year = today.getFullYear();
+            var first_jan = new Date(year, 0, 1);
+            var days = Math.floor((today - first_jan) / (24 * 60 * 60 * 1000));
+            var week = Math.ceil((today.getDay() + 1 + days) / 7) - 1;
+            var week_str = `${year}-W${week}`;
+            $('#week').val(week_str);
+            UpdateView(week_str);
+        });
+
+        async function UpdateView(week_str) {
+            var year = week_str.split("-")[0];
+            var week = week_str.split("W")[1];
+            await GetWorkingHours(week_str);
+            await GetNotes();
+            GenerateChart(year, week);
+            GenerateNote();
+            GenerateTable();
+        }
+
+        async function GetWorkingHours(week) {
+            await $.ajax({
+                method: "GET",
+                url: '@Url.Action("GetWorkingHours", "WeeklySummary")',
+                data: { week },
+                success: function(response) {
+                    summaries = response;
+                }
+            });
+        }
+
+        async function GetNotes() {
+            await $.ajax({
+                method: "GET",
+                url: '@Url.Action("GetNotes", "WeeklySummary")',
+                data: { },
+                success: function(response) {
+                    notes = response;
+                }
+            });
+        }
+
+        function GenerateChart(year, week) {
+            var ds = [];
+            var jobs = [];
+            var tasks = [];
+            jobs = summaries.map(m => m.job_id);
+            jobs = [...new Set(jobs)];
+
+            tasks = summaries.map(m => m.task_id);
+            tasks = [...new Set(tasks)];
+
+            var colors = [
+                '#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',  //A500 RED, PINK, PURPLE, DEEP PURPLE, INDIGO
+                '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50',  //A500 BLUE, LIGHT BLUE, CYAN, TEAL, GREEN
+                '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800',  //A500 LIGHT GREEN, LIME, YELLOW, AMBER, ORANGE
+                '#ff5722', '#795548', '#9e9e9e', '#607d8b',             //A500 DEEP ORANGE, BROWN, GREY, BLUE GREY
+                '#ef5350', '#ec407a', '#ab47bc', '#7e57c2', '#5c6bc0',  //A400 RED, PINK, PURPLE, DEEP PURPLE, INDIGO
+                '#42a5f5', '#29b6f6', '#26c6da', '#26a69a', '#66bb6a',  //A400 BLUE, LIGHT BLUE, CYAN, TEAL, GREEN
+                '#9ccc65', '#d4e157', '#ffee58', '#ffca28', '#ffa726',  //A400 LIGHT GREEN, LIME, YELLOW, AMBER, ORANGE
+                '#ff7043', '#8d6e63', '#bdbdbd', '#78909c'              //A400 DEEP ORANGE, BROWN, GREY, BLUE GREY
+            ];
+
+            if (chart !== undefined) {
+                chart.destroy();
+            }
+
+            for (var i = 0; i < tasks.length; i++) {
+                var datas = [];
+                for (var j = 0; j < jobs.length; j++) {
+                    var hours = summaries.filter(f => f.task_id === tasks[i] && f.job_id === jobs[j]).map(m => m.hours).reduce((a, b) => a + b, 0);
+                    datas.push(hours);
+                };
+                ds.push({
+                    label: tasks[i] + " - " + summaries.filter(f => f.task_id === tasks[i]).map(m => m.task_name)[0],
+                    data: datas,
+                    backgroundColor: colors[i],
+                    borderColor: colors[i]
+                });
+            }
+
+            const ctx = document.getElementById('chart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: jobs,
+                    datasets: ds
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                text: "Jobs",
+                                display: true
+                            },
+                            stacked: true
+                        },
+                        y: {
+                            title: {
+                                text: "Hours",
+                                display: true
+                            },
+                            stacked: true,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `Job Tasks Distribution Week ${week} - ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function GenerateTable() {
+            var jobs = summaries.map(m => m.job_id);
+            jobs = [...new Set(jobs)];
+
+            $('#table tbody').empty();
+            for (var i = 0; i < jobs.length; i++) {
+                var whs = summaries.filter(f => f.job_id === jobs[i] && f.hours > 0);
+                for (var j = 0; j < whs.length; j++) {
+                    var str = '<tr>';
+                    if (j === 0) {
+                        str += '<td rowspan="' + (whs.length + 1) + '" style="vertical-align:middle">' + (i + 1) + '</td>';
+                        var job_str = jobs[i] + ": " + whs.filter(f => f.job_id=== jobs[i]).map(m => m.job_name)[0];
+                        str += '<td rowspan="' + (whs.length + 1) + '" style="vertical-align:middle;text-align:left">' + job_str + '</td>';
+                        str += '<td style="text-align:left">' + whs[j].user_name + '</td>';
+                        str += '<td style="text-align:left">' + whs[j].task_id + " - " + whs[j].task_name + '</td>';
+                        str += '<td>' + whs[j].hours + '</td>';
+                    } else {
+                        str += '<td style="text-align:left">' + whs[j].user_name  + '</td>';
+                        str += '<td style="text-align:left">' + whs[j].task_id + " - " + whs[j].task_name + '</td>';
+                        str += '<td>' + whs[j].hours + '</td>';
+                    }
+                    str += '</tr>';
+                    if (j === (whs.length - 1)) {
+                        str += '<tr class="bg-secondary">';
+                        str += '<td colspan="2"><b>Total</b></td>';
+                        str += '<td><b>' + whs.map(m => m.hours).reduce((a, b) => a + b, 0) + '</b></td>';
+                        str += '</tr>';
+                    }
+                    $('#table tbody').append(str);
+                }
+            }
+        }
+
+        function GenerateNote() {
+            notes = notes.filter(f => f.note != "");
+
+            var jobs = notes.map(m => m.job_id);
+            jobs = [...new Set(jobs)];
+            jobs.sort((a, b) => (a.job_id > b.job_id) ? 1 : ((b.job_id > a.job_id) ? -1 : 0));
+            var str = ``;
+            for (var i = 0; i < jobs.length; i++) {
+                var engs = notes.filter(f => f.job_id === jobs[i]).map(m => m.user_id);
+                engs = [...new Set(engs)];
+                engs.sort((a, b) => (a.user_id > b.user_id) ? 1 : ((b.user_id > a.user_id) ? -1 : 0));
+
+                for (var j = 0; j < engs.length; j++) {
+                    var tks = notes.filter(f => f.job_id === jobs[i] && f.user_id === engs[j]);
+                    tks.sort((a, b) => (a.working_date > b.working_date) ? 1 : ((b.working_date > a.working_date) ? -1 : 0));
+                    for (var k = 0; k < tks.length; k++) {
+                        str += `<tr>`;
+                        str += `<td style="text-align:left">${tks[k].job_id}: ${tks[k].job_name}</td>`;
+                        str += `<td style="text-align:left">${tks[k].user_name}</td>`;
+                        str += `<td>${tks[k].working_date.split("T")[0]}</td>`;
+                        str += `<td>${tks[k].start_time.substring(0,5)}</td>`;
+                        str += `<td>${tks[k].stop_time.substring(0,5)}</td>`;
+                        str += `<td style="text-align:left">${tks[k].task_id}: ${tks[k].task_name}</td>`;
+                        str += `<td style="text-align:left">${tks[k].note}</td>`;
+                        str += `</tr>`;
+                    }
+                }
+            }
+
+            $('#table_note tbody').empty();
+            $('#table_note tbody').append(str);
+        }
+
+        $('#btn_prev').on('click', function () {
+            var week = parseInt($('#week').val().split("W")[1]);
+            var year = parseInt($('#week').val().split("-")[0]);
+            week = week - 1;
+            if (week < 1) {
+                week = 52;
+                year = year - 1;
+            }
+            $('#week').val(`${year}-W${week.toString().padStart(2, '0')}`);
+            $('#btn_next').attr('disabled', false);
+            UpdateView($('#week').val());
+        });
+
+        $('#btn_next').on('click', async function () {
+            var today = new Date();
+            var yy = today.getFullYear();
+            var first_jan = new Date(yy, 0, 1);
+            var days = Math.floor((today - first_jan) / (24 * 60 * 60 * 1000));
+            var ww = Math.ceil((today.getDay() + 1 + days) / 7);
+            var week = parseInt($('#week').val().split("W")[1]);
+            var year = parseInt($('#week').val().split("-")[0]);
+            if (week < ww && year <= yy) {
+                week = week + 1;
+                if (week > 52) {
+                    week = 1;
+                    year = year + 1;
+                }
+            }
+            if (week >= ww && year >= yy) {
+                $('#btn_next').attr('disabled', true);
+            }
+            $('#week').val(`${year}-W${week.toString().padStart(2, '0')}`);
+            UpdateView($('#week').val());
+        });
+    </script>
+}

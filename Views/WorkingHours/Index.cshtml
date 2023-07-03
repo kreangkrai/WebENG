@@ -1,0 +1,545 @@
+﻿@using Microsoft.AspNetCore.Http
+@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Monthly Working Hours";
+}
+<div class="row px-3 pt-3">
+    @if (Model.role == "Admin")
+    {
+        <div class="col-xl-2 col-lg-3 col-md-3 pb-3">
+            <select id="user_id" class="form-control"></select>
+        </div>
+    }
+    else
+    {
+        <div class="col-xl-2 col-lg-3 col-md-3 pb-3" hidden>
+            <select id="user_id" class="form-control"></select>
+        </div>
+    }
+    <div class="col-xl-2 col-lg-3 col-md-3 pb-3">
+        <input id="whs_month" type="month" class="form-control" />
+    </div>
+    <div class="col-xl-1 col-lg-3 col-md-3 pb-3">
+        <button id="btn_load" type="button" class="btn btn-primary form-control elevation-1">
+            <i class="fas fa-sync"></i> Load
+        </button>
+    </div>
+    <div class="col-xl-1 col-lg-3 col-md-3 pb-3">
+        <button id="btn_print" type="button" class="btn btn-primary form-control elevation-1">
+            <i class="fas fa-print"></i> Print
+        </button>
+    </div>
+    
+    <div class="col-xl-1 col-lg-3 col-md-3 pb-3" hidden>
+        <button id="btn_export" type="button" class="btn btn-success form-control elevation-1">
+            <i class="fas fa-file-excel"></i> Export
+        </button>
+    </div>
+</div>
+<div class="row px-3">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span id="report_title" class="card-title"></span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <table id="table_whs" class="table table-sm nowrap compact table-hover border-bottom text-center w-100">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Job</th>
+                                    <th>Location</th>
+                                    <th>Task</th>
+                                    <th>Start</th>
+                                    <th>Stop</th>
+                                    <th>Lunch</th>
+                                    <th>Break</th>
+                                    <th>Normal</th>
+                                    <th>OT1.5</th>
+                                    <th>OT3.0</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Job</th>
+                                    <th>Location</th>
+                                    <th>Task</th>
+                                    <th>Start</th>
+                                    <th>Stop</th>
+                                    <th>Lunch</th>
+                                    <th>Break</th>
+                                    <th>Normal</th>
+                                    <th>OT1.5</th>
+                                    <th>OT3.0</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Summary</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <span>Summary of Working Hours by Jobs</span>
+                    </div>
+                    <div class="form-group">
+                        <table id="table_summary" class="table table-sm compact table-striped table-hover text-center w-100">
+                            <thead>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>Job Name</th>
+                                    <th>Normal</th>
+                                    <th>OT 1.5</th>
+                                    <th>OT 3.0</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>Job ID</th>
+                                    <th>Job Name</th>
+                                    <th>Normal</th>
+                                    <th>OT 1.5</th>
+                                    <th>OT 3.0</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        <span>Total working hours</span>
+                    </div>
+                    <dl class="form-group row">
+                        <dt class="col-6 text-left pl-3">1. Normal</dt>
+                        <dd id="monthly_regular" class="col-6 text-right pr-3">0 Hours</dd>
+                        <dt class="col-6 text-left pl-3">2. OT 1.5</dt>
+                        <dd id="monthly_ot15" class="col-6 text-right pr-3">0 Hours</dd>
+                        <dt class="col-6 text-left pl-3">3. OT 3.0</dt>
+                        <dd id="monthly_ot3" class="col-6 text-right pr-3">0 Hours</dd>
+                        <dt class="col-6 text-left pl-3">4. Total</dt>
+                        <dd id="monthly_total" class="col-6 text-right pr-3">0 Hours</dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_task" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title">Edit Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input id="date" type="date" class="form-control" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="job">Job</label>
+                        <input id="job" type="text" class="form-control" disabled />
+                    </div>
+                    <div class="form-group" hidden>
+                        <label for="task_id">Location</label>
+                        <input id="task_id" type="text" class="form-control" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label for="task_name">Task</label>
+                        <input id="task_name" type="text" class="form-control" disabled />
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <label for="start_time">From</label>
+                            <input id="start_time" type="time" class="form-control" disabled />
+                        </div>
+                        <div class="col-6">
+                            <label for="stop_time">To</label>
+                            <input id="stop_time" type="time" class="form-control" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input id="lunch" class="form-check-input" type="checkbox" />
+                            <label class="form-check-label">Lunch</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input id="dinner" class="form-check-input" type="checkbox" />
+                            <label class="form-check-label">Break</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button id="btn_save" type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        //Variable Declaration
+        var table;
+        var table_sum;
+        var users = [];
+        var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+        //Debug parameters
+        var debug_user = false;
+        var debug_whs = false;
+        var debug_summary = false;
+        var debug_edit = false;
+        var debug_save = false;
+
+        $(document).ready(async function () {
+            var today = new Date();
+            await GetUsers();
+            await GenerateUsersOption();
+            await GetWorkingHours("@Model.fullname.ToLower()", today.toISOString().substring(0, 7));
+            await GetWorkingHoursSummary();
+            $('#user_id').val("@Model.name");
+            $('#whs_month').val(today.getFullYear() + "-" + (today.getMonth()+1).toString().padStart(2,0));
+        });
+
+        async function GetUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetUsers", "EngUser")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    users = response;
+                    if (debug_user)
+                        console.log(users);
+                }
+            });
+        }
+
+        function GenerateUsersOption() {
+            $('#user_id').empty();
+            var user_str = '<option value="">Please Select User</option>';
+            for (var i = 0; i < users.length; i++) {
+                user_str += '<option value="' + users[i].user_id + '">' + users[i].user_name + '</option>';
+            }
+            $('#user_id').append(user_str);
+        }
+
+        $('#user_id').on('change', function () {
+            var user_id = $('#user_id').val();
+            var month = $('#whs_month').val();
+            var enable_btn = 1;
+            enable_btn *= user_id !== "" ? 1 : 0;
+            enable_btn *= month !== "" ? 1 : 0;
+            $('#btn_load').attr('disabled', !enable_btn);
+            $('#btn_export').attr('disabled', !enable_btn);
+        });
+
+        $('#whs_month').on('change', function () {
+            var user_id = $('#user_id').val();
+            var month = $('#whs_month').val();
+            var enable_btn = 1;
+            enable_btn *= user_id !== "" ? 1 : 0;
+            enable_btn *= month !== "" ? 1 : 0;
+            $('#btn_load').attr('disabled', !enable_btn);
+            $('#btn_export').attr('disabled', !enable_btn);
+        });
+
+        $('#btn_load').on('click', function () {
+            var load_enable = 1;
+            var user_name = $('#user_id option:selected').text().toLowerCase();
+            var month = $('#whs_month').val();
+            load_enable *= user_name !== "" ? 1 : 0;
+            load_enable *= month !== "" ? 1 : 0;
+            if (load_enable) {
+                GetWorkingHours(user_name, month).then(() => GetWorkingHoursSummary());
+            }
+        });
+
+        async function GetWorkingHours(user_name, month) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetWorkingHours", "WorkingHours")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    user_name, month
+                },
+                success: function (response) {
+                    if (debug_whs) {
+                        console.log("Working Hours Data");
+                        console.log(response);
+                    }
+                    GenerateTable(response);
+                }
+            });
+        }
+
+        function GenerateTable(whs) {
+            var report_month = new Date(whs[0].working_date.split("T")[0]);
+            var report_name = report_month.getFullYear() + " " + months[report_month.getUTCMonth()] + " - Working Hours Report";
+            $('#report_title').text(report_name);
+            var datas = [];
+            for (var i = 0; i < whs.length; i++) {
+                datas.push([
+                    whs[i].working_date.split("T")[0],
+                    whs[i].job_id,
+                    whs[i].task_id,
+                    whs[i].task_name,
+                    whs[i].start_time.substring(0, 5),
+                    whs[i].stop_time.substring(0, 5),
+                    whs[i].lunch,
+                    whs[i].dinner,
+                    whs[i].normal.substring(0, 5),
+                    whs[i].ot1_5.substring(0, 5),
+                    whs[i].ot3_0.substring(0, 5),
+                ]);
+            }
+
+            if (table !== undefined)
+                table.destroy();
+
+            table = $('#table_whs').DataTable({
+                iDisplayLength: -1,
+                info: false,
+                paging: false,
+                searching: false,
+                ordering: false,
+                data: datas,
+                rowCallback: function (row, data) {
+                    var date = new Date(data[0].split("-")[0], data[0].split("-")[1] - 1, data[0].split("-")[2]);
+
+                    if (date.toString().split(" ")[0] == "Sat" || date.toString().split(" ")[0] == "Sun") {
+                        $('td', row).addClass("bg-gray disable");
+                    }
+
+                    if (data[2] !== "") {
+                        data[2].substring(0, 1) === "O" ? $('td:eq(2)', row).html("Office") :
+                        data[2].substring(0, 1) === "S" ? $('td:eq(2)', row).html("Site") :
+                        data[2].substring(0, 1) === "H" ? $('td:eq(2)', row).html("Home") :
+                        $('td:eq(2)', row).html("Travel");
+                    }
+
+                    $('td:eq(3)', row).addClass('text-left');
+
+                    if (data[4] === "00:00" && data[5] === "00:00") {
+                        $('td:eq(4)', row).html("");
+                        $('td:eq(5)', row).html("");
+                    }
+
+                    data[6] === true ? $('td:eq(6)', row).html("✓") : $('td:eq(6)', row).html("");
+                    data[7] === true ? $('td:eq(7)', row).html("✓") : $('td:eq(7)', row).html("");
+
+                    if (data[8] === "00:00") {
+                        $('td:eq(8)', row).html("");
+                    }
+
+                    if (data[9] === "00:00") {
+                        $('td:eq(9)', row).html("");
+                    }
+
+                    if (data[10] === "00:00") {
+                        $('td:eq(10)', row).html("");
+                    }
+                }
+            });
+        }
+
+        async function GetWorkingHoursSummary() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetMonthlySummary", "WorkingHours")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    if(debug_summary)
+                        console.log(response);
+                    GenerateSummaryTable(response);
+                }
+            });
+        }
+
+        function GenerateSummaryTable(jobs) {
+            var datas = [];
+            var monthly_regular = 0;
+            var monthly_ot15 = 0;
+            var monthly_ot3 = 0;
+            var monthly_total = 0;
+            for (var i = 0; i < jobs.length; i++) {
+                var normal_hours = Math.floor(jobs[i].normal / 60);
+                var normal_min = jobs[i].normal - (normal_hours * 60);
+                var ot15_hours = Math.floor(jobs[i].ot1_5 / 60);
+                var ot15_min = jobs[i].ot1_5 - (ot15_hours * 60);
+                var ot3_hours = Math.floor(jobs[i].ot3_0 / 60);
+                var ot3_min = jobs[i].ot3_0 - (ot3_hours * 60);
+                var normal_string = normal_hours + " Hours " + normal_min + " Min";
+                var ot1_5_string = ot15_hours + " Hours " + ot15_min + " Min";
+                var ot3_0_string = ot3_hours + " Hours " + ot3_min + " Min";
+
+                monthly_regular += jobs[i].normal;
+                monthly_ot15 += jobs[i].ot1_5;
+                monthly_ot3 += jobs[i].ot3_0;
+
+                datas.push([
+                    jobs[i].job_id,
+                    jobs[i].job_name,
+                    normal_string,
+                    ot1_5_string,
+                    ot3_0_string,
+                ]);
+            }
+            monthly_total += (monthly_regular + monthly_ot15 + monthly_ot3);
+
+            if (table_sum !== undefined)
+                table_sum.destroy();
+
+            table_sum = $('#table_summary').DataTable({
+                iDisplayLength: -1,
+                info: false,
+                paging: false,
+                searching: false,
+                ordering: false,
+                data: datas,
+            });
+
+            var total_reg_hours = Math.floor(monthly_regular/60);
+            var total_reg_minutes = monthly_regular - (total_reg_hours * 60);
+            var total_ot15_hours = Math.floor(monthly_ot15/60);
+            var total_ot15_minutes = monthly_ot15 - (total_ot15_hours * 60);
+            var total_ot3_hours = Math.floor(monthly_ot3/60);
+            var total_ot3_minutes = monthly_ot3 - (total_ot3_hours * 60);
+            var total_hours = Math.floor(monthly_total/60);
+            var total_minutes = monthly_total - (total_hours * 60);
+            var reg_str = total_reg_hours + " Hours";
+            reg_str += (total_reg_minutes > 0) ? " " + total_reg_minutes + " Minutes" : "";
+            var ot15_str = total_ot15_hours + " Hours";
+            ot15_str += (total_ot15_minutes > 0) ? " " + total_ot15_minutes + " Minutes" : "";
+            var ot3_str = total_ot3_hours + " Hours";
+            ot3_str += (total_ot3_minutes > 0) ? " " + total_ot3_minutes + " Minutes" : "";
+            var total_str = total_hours + " Hours";
+            total_str += (total_minutes > 0) ? " " + total_minutes + " Minutes" : "";
+            $('#monthly_regular').text(reg_str);
+            $('#monthly_ot15').text(ot15_str);
+            $('#monthly_ot3').text(ot3_str);
+            $('#monthly_total').text(total_str);
+
+        }
+
+        $('#table_whs').on('click', 'tr', function () {
+            var task = table.row(this).data();
+            if (task[1] !== "") {
+                ShowModal(task);
+            }
+        });
+
+        function ShowModal(data) {
+            var date = data[0];
+            var job = data[1];
+            var task_id = data[2];
+            var task_name = data[3];
+            var start_time = data[4];
+            var stop_time = data[5];
+            var lunch = (data[6] === true) ? true : false;
+            var dinner = (data[7] === true) ? true : false;
+
+            if (debug_edit) {
+                console.log(`Date: ${date}`);
+                console.log(`Job: ${job}`);
+                console.log(`Task ID: ${task_id}`);
+                console.log(`Task Name: ${task_name}`);
+                console.log(`Start: ${start_time}`);
+                console.log(`Stop: ${stop_time}`);
+                console.log(`Lunch: ${lunch}`);
+                console.log(`Break: ${dinner}`);
+            }
+
+            $('#date').val(date);
+            $('#job').val(job);
+            $('#task_id').val(task_id);
+            $('#task_name').val(task_name);
+            $('#start_time').val(start_time);
+            $('#stop_time').val(stop_time);
+            $('#lunch').prop('checked', lunch);
+            $('#dinner').prop('checked', dinner);
+            $('#modal_task').modal();
+        }
+
+        $('#btn_save').on('click', function () {
+            var user = $('#user_id').val();
+            var date = $('#date').val();
+            var job = $('#job').val();
+            var task_id = $('#task_id').val();
+            var task_name = $('#task_name').val();
+            var start_time = $('#start_time').val();
+            var stop_time = $('#stop_time').val();
+            var lunch = ($('#lunch').prop('checked') === true) ? true : false;
+            var dinner = ($('#dinner').prop('checked') === true) ? true : false;
+
+            if (debug_save) {
+                console.log(`User: ${user}`);
+                console.log(`Date: ${date}`);
+                console.log(`Job: ${job}`);
+                console.log(`Task ID: ${task_id}`);
+                console.log(`Task Name: ${task_name}`);
+                console.log(`Start: ${start_time}`);
+                console.log(`Stop: ${stop_time}`);
+                console.log(`Lunch: ${lunch}`);
+                console.log(`Break: ${dinner}`);
+            }
+
+            var task_str = JSON.stringify({
+                "user_id": user,
+                "working_date": date,
+                "job_id": job,
+                "task_id": task_id,
+                "task_name": task_name,
+                "start_time": start_time,
+                "stop_time": stop_time,
+                "lunch": lunch,
+                "dinner": dinner
+            });
+            UpdateRestTime(task_str);
+        });
+
+        async function UpdateRestTime(task_str) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateRestTime", "WorkingHours")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { task_str },
+                success: async function (response) {
+                    if (response === "Success") {
+                        $('#modal_task').modal('toggle');
+                        var user_name = $('#user_id option:selected').text().toLowerCase();
+                        await GetWorkingHours(user_name, $('#whs_month').val());
+                        await GetWorkingHoursSummary();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+
+        $('#btn_print').on('click', function () {
+            var url = '@Url.Action("FormOvertime","WorkingHours")';
+            window.location.href = url;
+        });
+
+    </script>
+}

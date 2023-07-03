@@ -1,0 +1,227 @@
+﻿@{ 
+    ViewData["Title"] = "Task By Week";
+}
+<style>
+    * {
+        vertical-align:middle !important;
+    }
+
+    td {
+        text-wrap:none !important;
+    }
+</style>
+<div class="row p-3">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title"><i class="fas fa-calendar-week"></i> Tasks By Week</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <div class="form-group row">
+                            <div class="col-5">
+                                <input id="week" type="week" class="form-control" />
+                            </div>
+                            <div class="col-1">
+                                <button id="btn_load" type="button" class="btn btn-primary form-control elevation-1">
+                                    <i class="fas fa-sync"></i> Load
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <table id="table_task" class="table table-sm table-bordered text-center w-100">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="vertical-align:middle;width:15%">Name</th>
+                                    <th rowspan="2" style="vertical-align:middle;width:15%">Job</th>
+                                    <th style="width:10%">MON</th>
+                                    <th style="width:10%">TUE</th>
+                                    <th style="width:10%">WED</th>
+                                    <th style="width:10%">THU</th>
+                                    <th style="width:10%">FRI</th>
+                                    <th style="width:10%">SAT</th>
+                                    <th style="width:10%">SUN</th>
+                                </tr>
+                                <tr>
+                                    <th id="date1">Date 1</th>
+                                    <th id="date2">Date 2</th>
+                                    <th id="date3">Date 3</th>
+                                    <th id="date4">Date 4</th>
+                                    <th id="date5">Date 5</th>
+                                    <th id="date6">Date 6</th>
+                                    <th id="date7">Date 7</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        //Variable Declaration
+        var table;
+        var tasks = [];
+        var dates = [];
+
+        //Debug Variable
+        var debug_task = true;
+
+        $(document).ready(async function () {
+            var today = new Date();
+            var year = today.getFullYear();
+            var first_jan = new Date(year, 0, 1);
+            var days = Math.floor((today - first_jan) / (24 * 60 * 60 * 1000));
+            var week = Math.ceil((today.getDay() + 1 + days) / 7);
+            var week_str = `${year}-W${week}`;
+            $('#week').val(week_str);
+            await GetTasksByWeek(year, week);
+            await GenerateDates();
+            GenerateTable();
+        });
+
+        async function GetTasksByWeek(year, week) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTasksByWeek", "TasksByWeek")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year, week },
+                success: function (response) {
+                    tasks = response;
+                    if (debug_task) {
+                        console.log(tasks);
+                    }
+                }
+            });
+        }
+
+        function GenerateDates() {
+            var week_str = $('#week').val();
+            var year = week_str.split("-W")[0];
+            var week = week_str.split("-W")[1];
+            var day = (1 + (week) * 7);
+            var offset = new Date(year, 0, 1).getDay();
+
+            offset--;
+            dates = [];
+
+            for (var i = 0; i < 7; i++) {
+                dates.push(new Date(year, 0, day - offset + i + 1));
+            }
+
+            $('#date1').text(dates[0].toISOString().split("T")[0]);
+            $('#date2').text(dates[1].toISOString().split("T")[0]);
+            $('#date3').text(dates[2].toISOString().split("T")[0]);
+            $('#date4').text(dates[3].toISOString().split("T")[0]);
+            $('#date5').text(dates[4].toISOString().split("T")[0]);
+            $('#date6').text(dates[5].toISOString().split("T")[0]);
+            $('#date7').text(dates[6].toISOString().split("T")[0]);
+        }
+
+        function GenerateTable() {
+            var datas = [];
+
+            var users = [];
+            users = tasks.map(m => m.user_id);
+            users = [...new Set(users)];
+
+            var jobs = [];
+            jobs = tasks.map(m => m.job_id);
+            jobs = [...new Set(jobs)];
+
+            var loop = [];
+            for (var i = 0; i < users.length; i++) {
+                for (var j = 0; j < jobs.length; j++) {
+                    loop.push([users[i], jobs[j]]);
+                }
+            }
+
+            for (var i = 0; i < loop.length; i++) {
+                var date1 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date1').text()).map(m => m.task_name);
+                var date2 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date2').text()).map(m => m.task_name);
+                var date3 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date3').text()).map(m => m.task_name);
+                var date4 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date4').text()).map(m => m.task_name);
+                var date5 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date5').text()).map(m => m.task_name);
+                var date6 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date6').text()).map(m => m.task_name);
+                var date7 = tasks.filter(f => f.user_id === loop[i][0] && f.job_id === loop[i][1] && f.working_date.split("T")[0] === $('#date7').text()).map(m => m.task_name);
+
+                date1 = [...new Set(date1)];
+                date2 = [...new Set(date2)];
+                date3 = [...new Set(date3)];
+                date4 = [...new Set(date4)];
+                date5 = [...new Set(date5)];
+                date6 = [...new Set(date6)];
+                date7 = [...new Set(date7)];
+
+                var skip = 1;
+                skip *= date1 == "" ? 1 : 0;
+                skip *= date2 == "" ? 1 : 0;
+                skip *= date3 == "" ? 1 : 0;
+                skip *= date4 == "" ? 1 : 0;
+                skip *= date5 == "" ? 1 : 0;
+                skip *= date6 == "" ? 1 : 0;
+                skip *= date7 == "" ? 1 : 0;
+                if (skip) {
+                    continue;
+                }
+
+                datas.push([
+                    loop[i][0],
+                    loop[i][1],
+                    date1.join(", "),
+                    date2.join(", "),
+                    date3.join(", "),
+                    date4.join(", "),
+                    date5.join(", "),
+                    date6.join(", "),
+                    date7.join(", "),
+                ]);
+            }
+
+            if (table !== undefined) {
+                table.destroy();
+            }
+
+            table = $('#table_task').DataTable({
+                data: datas,
+                aLengthMenu: [
+                    [25, 50, 100, 200, -1],
+                    [25, 50, 100, 200, "All"]
+                ],
+                iDisplayLength: -1,
+                ordering: false,
+                info: false,
+                paging: false,
+                rowCallback: function (row, data) {
+                    var name = tasks.filter(f => f.user_id === data[0]).map(m => m.user_name);
+                    name = [...new Set(name)];
+                    $('td:eq(0)', row).html(`${name[0]}`);
+
+                    var customer = tasks.filter(f => f.job_id === data[1]).map(m => m.customer);
+                    customer = [...new Set(customer)];
+                    if (customer[0] !== "") {
+                        $('td:eq(1)', row).html(`${data[1]} : ${customer[0]}`);
+                    }
+
+                    $('td:eq(0)', row).addClass("text-left");
+                    $('td:eq(1)', row).addClass("text-left");
+                }
+            });
+        }
+
+        $('#btn_load').on('click', async function () {
+            var week_str = $('#week').val();
+            var year = week_str.split("-W")[0];
+            var week = week_str.split("-W")[1];
+            await GetTasksByWeek(year, week);
+            await GenerateDates();
+            GenerateTable();
+        });
+
+    </script>
+}

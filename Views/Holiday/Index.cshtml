@@ -1,0 +1,135 @@
+﻿@{ 
+    ViewData["Title"] = "Holidays";
+}
+<div class="row p-3 d-flex align-items-center">
+    <div class="col-xl-2 col-md-6 pb-3">
+        <select id="year" class="form-control">
+            <option value="">Please Select Year</option>
+        </select>
+    </div>
+    <div class="col-xl-1 col-md-3 pb-3">
+        <button id="btn_load" type="button" class="btn btn-primary form-control elevation-1">
+            <i class="fas fa-sync"></i> Load
+        </button>
+    </div>
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Holidays</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <table id="table_holiday" class="table table-sm border compact table-striped table-hover w-100">
+                            <thead class="text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th style="width:15%">Date</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot class="text-center">
+                                <tr>
+                                    <th>No</th>
+                                    <th>Date</th>
+                                    <th>Name</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{ 
+    <script type="text/javascript">
+        //Variable Declaration
+        var table;
+        var holidays;
+
+        //Debug Variable
+        var debug_holiday = false;
+
+        $(document).ready(async function () {
+            GenerateYearOption();
+            var today = new Date();
+            var year = today.getFullYear();
+            $('#year').val(today.getFullYear());
+            await GetHolidays(year);
+        });
+
+        function GenerateYearOption() {
+            var today = new Date();
+            var year = today.getFullYear();
+
+            $('#year').empty();
+            var year_str = '<option value="" selected disabled>Please Select Year</option>';
+            for (var i = 0; i < 15; i++) {
+                year_str += '<option value="' + (year - i) + '">' + (year - i) + '</option>';
+            }
+            $('#year').append(year_str);
+        }
+
+        async function GetHolidays(year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetHolidays", "Holiday")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    holidays = response;
+                    if (debug_holiday) {
+                        console.log("Holidays");
+                        console.log(holidays);
+                    }
+                    GenerateTable(holidays);
+                }
+            });
+        }
+
+        function GenerateTable(holidays) {
+            var datas = [];
+
+            for (var i = 0; i < holidays.length; i++) {
+                datas.push([
+                    i+1,
+                    holidays[i].date.split("T")[0],
+                    holidays[i].name
+                ]);
+            }
+
+            if (table !== undefined) {
+                table.destroy();
+            }
+
+            table = $('#table_holiday').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [1, 2],
+                        className: "border-left",
+                    },
+                    {
+                        targets: [0],
+                        visible: false
+                    }
+                ],
+                ordering: false,
+                rowCallback: function (row, data) {
+                    $('td:eq(0)', row).addClass("text-center");
+                }
+            });
+        }
+
+        $('#btn_load').on('click', function () {
+            var year = $('#year').val();
+            GetHolidays(year);
+        });
+        
+    </script>
+}

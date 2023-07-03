@@ -1,0 +1,415 @@
+﻿@using Microsoft.AspNetCore.Http
+@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Jobs";
+}
+<div class="row p-3">
+    @if (Model.role == "Admin")
+    {
+        <div class="col-xl-1 pb-3">
+            <button id="btn_create" type="button" class="btn btn-primary form-control elevation-1">
+                <i class="fas fa-plus"></i> Create Job
+            </button>
+        </div>
+    }
+    <div class="col-xl-1 pb-3">
+        <button id="btn_import" type="button" class="btn btn-primary form-control elevation-1" hidden>
+            <i class="fas fa-upload"></i> Import
+        </button>
+    </div>
+    <div class="col-xl-1 pb-3">
+        <button id="btn_export" type="button" class="btn btn-primary form-control elevation-1" hidden>
+            <i class="fas fa-download"></i> Export
+        </button>
+    </div>
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Jobs</span>
+            </div>
+            <div class="card-body">
+                <table id="table_job" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quotation</th>
+                            <th>Customer</th>
+                            <th>End User</th>
+                            <th>Sale Name</th>
+                            <th>Department</th>
+                            <th>Process</th>
+                            <th>System</th>
+                            <th>Cost</th>
+                            <th>MD</th>
+                            <th>PD</th>
+                            <th>FT</th>
+                            <th>MP</th>
+                            <th>Cost/MP</th>
+                            <th>OT MP</th>
+                            <th>Status</th>
+                            <th>C SAT.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot class="text-center">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quotation</th>
+                            <th>Customer</th>
+                            <th>End User</th>
+                            <th>Sale Name</th>
+                            <th>Department</th>
+                            <th>Process</th>
+                            <th>System</th>
+                            <th>Cost</th>
+                            <th>MD</th>
+                            <th>PD</th>
+                            <th>FT</th>
+                            <th>MP</th>
+                            <th>Cost/MP</th>
+                            <th>OT MP</th>
+                            <th>Status</th>
+                            <th>C SAT.</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_job" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title">Create Job</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="job_id">Job Number</label>
+                        <input id="job_id" type="text" class="form-control" placeholder="JYYXXXX" />
+                    </div>
+                    <div class="form-group">
+                        <label for="job_name">Job Name</label>
+                        <input id="job_name" type="text" class="form-control" placeholder="Job Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="quotation_no">Quotation Number</label>
+                        <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
+                        <datalist id="quotations"></datalist>
+                    </div>
+                    <div class="form-group">
+                        <label for="cost">Cost</label>
+                        <div class="input-group">
+                            <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">THB</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="md_rate">Market Develop</label>
+                        <div class="input-group">
+                            <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">X</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        <label for="pd_rate">Product Develop</label>
+                        <div class="input-group">
+                            <input id="pd_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">X</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" class="form-control">
+                            <option value="" selected disabled>Please Select Status</option>
+                            <option value="1">In Progress</option>
+                            <option value="0">Finished</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        //Variable Declaration
+        let table;
+        let update = false;
+        let jobs = [];
+        let users = [];
+        let quots = [];
+
+        //Change these parameters to true to show result
+        let debug_jobs = false;
+        let debug_user = false;
+        let debug_job_string = false;
+        let debug_quots = false;
+
+        $(document).ready(function () {
+            GetJobs();
+        });
+
+        async function GetJobs() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobs", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    jobs = response;
+                    if (debug_jobs) {
+                        console.log(jobs);
+                    }
+                    GenerateTable(jobs);
+                }
+            });
+        };
+
+        async function GetUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetUsers", "EngUser")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    users = response;
+                    if (debug_user) {
+                        console.log(users);
+                    }
+                }
+            });
+        }
+
+        async function GetQuotations() {
+            let today = new Date();
+            let year = today.getFullYear().toString().substring(2, 4);
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetQuotations", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    quots = response;
+                    if (debug_quots) {
+                        console.log(quots);
+                    }
+                }
+            });
+        }
+
+        function GenerateTable(jobs) {
+            let datas = [];
+
+            if (table !== null)
+                $('#table_job').DataTable().destroy();
+
+            for (let i = 0; i < jobs.length; i++) {
+                datas.push([
+                    jobs[i].job_id,
+                    jobs[i].job_name,
+                    jobs[i].quotation_no,
+                    jobs[i].customer,
+                    jobs[i].enduser,
+                    jobs[i].sale_name,
+                    jobs[i].department,
+                    "", //Process
+                    "", //System
+                    jobs[i].cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobs[i].md_rate,
+                    jobs[i].pd_rate,
+                    jobs[i].md_rate * jobs[i].pd_rate, //Factor
+                    jobs[i].manpower,
+                    jobs[i].cost_per_manpower,
+                    jobs[i].ot_manpower,
+                    jobs[i].status,
+                    "" //Customer Satisfaction
+                ]);
+            }
+
+            table = $('#table_job').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        targets: [4, 5, 6, 10, 11, 13, 14, 15],
+                        visible: false
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    $('td:eq(1)', row).addClass("text-left");
+                    $('td:eq(3)', row).addClass("text-left");
+                    let status_str = '';
+                    if (data[16] === "1") {
+                        status_str = `<span class="badge badge-warning">IN PROGRESS</span>`;
+                    }
+                    else if (data[16] === "0") {
+                        status_str = `<span class="badge badge-success">FINISHED</span>`;
+                    }
+                    else {
+                        status_str = '';
+                    }
+                    $('td:eq(8)', row).html(status_str);
+                }
+            });
+        };
+
+        function GenerateQuotationOptions() {
+            let quots_str = '';
+            for (let i = 0; i < quots.length; i++) {
+                quots_str += `<option value="${quots[i].quotation_no}">${quots[i].quotation_no} - ${quots[i].customer}</option>`;
+            }
+            $('#quotations').empty();
+            $('#quotations').append(quots_str);
+        }
+
+        $('#btn_create').on('click', async function () {
+            await GetQuotations();
+            await GenerateQuotationOptions();
+            Prepmodal();
+        });
+
+        function Prepmodal() {
+            update = false;
+            $('#modal_job').modal();
+            $('#modal_title').text("Create Job");
+            $('#job_id').val(null);
+            $('#job_name').val(null);
+            $('#quotation_no').val(null);
+            $('#cost').val(0);
+            $('#md').val(1);
+            $('#pd').val(1);
+            $('#status').val(1);
+        };
+
+        $('#table_job tbody').on('click', 'tr', async function () {
+            let admin = '@Model.role' == "Admin" ? true : false;
+            if (admin) {
+                await GetQuotations();
+                await GenerateQuotationOptions();
+                await EditJob(table.row(this).data());
+            }
+        });
+
+        function EditJob(data) {
+            update = true;
+            $('#modal_job').modal();
+            $('#modal_title').text("Edit Job");
+
+            let job_id = data[0];
+            let job_name = data[1];
+            let quotation_no = data[2];
+            let cost = data[9].replaceAll(",","");
+            let md = data[10];
+            let pd = data[11];
+            let status = data[16];
+
+            $('#job_id').val(job_id);
+            $('#job_id').attr('disabled', true);
+            $('#job_name').val(job_name);
+            $('#quotation_no').val(quotation_no);
+            $('#cost').val(cost);
+            $('#md').val(md);
+            $('#pd').val(pd);
+            $('#status').val(status);
+        }
+
+        $('#btn_save').on('click', function () {
+            let job_id = $('#job_id').val();
+            let job_name = $('#job_name').val();
+            let quotation_no = $('#quotation_no').val();
+            let cost = $('#cost').val();
+            let md_rate = $('#md_rate').val();
+            let pd_rate = $('#pd_rate').val();
+            let status = $('#status').val();
+            if (status === null) {
+                status = 1;
+            }
+
+            let job_string = JSON.stringify({
+                "job_id": job_id,
+                "job_name": job_name,
+                "quotation_no": quotation_no,
+                "cost": cost,
+                "md_rate": md_rate,
+                "pd_rate": pd_rate,
+                "status": status
+            });
+
+            if (debug_job_string) {
+                console.log(job_string);
+            }
+
+            if (update) {
+                UpdateJob(job_string);
+            }
+            else {
+                AddJob(job_string);
+            }
+
+        });
+
+        async function AddJob(job_string) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddJob", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_string
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        };
+
+        async function UpdateJob(job_string) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateJob", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_string
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+
+    </script>
+}
