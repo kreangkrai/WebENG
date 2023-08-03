@@ -7,6 +7,7 @@ using WebENG.Interface;
 using WebENG.Service;
 using Microsoft.AspNetCore.Http;
 using WebENG.Models;
+using Newtonsoft.Json;
 
 namespace WebENG.Controllers
 {
@@ -46,6 +47,14 @@ namespace WebENG.Controllers
         {
             List<HolidayModel> holidays = HolidayService.GetHolidays(year);
             return Json(holidays);
+        }
+
+        [HttpPost]
+        public string CreateHoliday(string str)
+        {
+            HolidayModel h = JsonConvert.DeserializeObject<HolidayModel>(str);
+            string result = HolidayService.CreateHoliday(h);
+            return result;
         }
     }
 }
