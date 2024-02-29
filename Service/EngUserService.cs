@@ -79,7 +79,7 @@ namespace WebENG.Service
                     ConnectSQL.Close_db_gps_Connect();
                 }
             }
-            return users.GroupBy(g => g.user_id).Select(s => s.FirstOrDefault()).ToList();
+            return users.GroupBy(g => g.user_name).Select(s => s.FirstOrDefault()).ToList();
         }
 
         public List<EngUserModel> GetEngineerUsers()

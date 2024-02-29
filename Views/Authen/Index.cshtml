@@ -1,0 +1,557 @@
+﻿@{
+    ViewData["Title"] = "Authen";
+}
+<div class="row p-4" style="row-gap:20px">
+    <div class="col-xl-6">
+        <div class="card shadow">
+            <div class="card-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <div class="row d-flex justify-content-between">
+                    <span class="card-title pt-2">
+                        <i class="fas fa-user"></i> Users
+                    </span>
+                    <button id="btnAdd" type="button" class="btn btn-primary" style="background-color:green;height:40px">
+                        <i class="fas fa-plus"></i> Add Users
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="table_user" class="table table-sm table-hover table-striped text-center w-100">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card shadow">
+            <div class="card-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <span class="card-title">
+                    <i class="fas fa-user-shield"></i> Admins
+                </span>
+            </div>
+            <div class="card-body">
+                <table id="table_admin" class="table table-sm table-hover table-striped text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow">
+            <div class="card-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <span class="card-title">
+                    <i class="fas fa-user-injured"></i> Sales
+                </span>
+            </div>
+            <div class="card-body">
+                <table id="table_sale" class="table table-sm table-hover table-striped text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow">
+            <div class="card-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <span class="card-title">
+                    <i class="fas fa-user-tie"></i> Manager
+                </span>
+            </div>
+            <div class="card-body">
+                <table id="table_manager" class="table table-sm table-hover table-striped text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>    
+</div>
+
+<div class="modal fade" id="modal_user" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Create User</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="user_name">User Name</label>
+                        <select id="user_name" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input id="department" type="text" class="form-control" placeholder="Department" disabled />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button id="btn_add" type="button" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalAuthen" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-edit"></i> Edit Role
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color:white">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="userName">User Name</label>
+                        <input id="userName" type="text" class="form-control" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Department">Department</label>
+                        <input id="Department" type="text" class="form-control" readonly/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btnToAdmin" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
+                    <i class="fas fa-user-shield"></i> To Admin
+                </button>
+                <button id="btnToSale" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
+                    <i class="fas fa-user"></i> To Sale
+                </button>
+                <button id="btnToManager" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
+                    <i class="fas fa-user"></i> To Manager
+                </button>
+                <button id="btnToUser" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
+                    <i class="fas fa-user"></i> To User
+                </button>
+                <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var table_user;
+        var table_admin;
+        var table_sale;
+        var table_manager;
+        var users = [];
+        var engineers = [];
+
+        var toUser = false;
+        var toAdmin = false;
+        var toSale = false;
+        var toManager = false;
+
+        $(document).ready(async function () {
+            await GetAuthenUsers();
+            await GetAuthenAdmin();
+            await GetAuthenSale();
+            await GetAuthenManager();
+        });
+        async function GetUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetUsers", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    users = response;
+                }
+            });
+        }
+        function GenerateUserOptions() {
+            var user_str = '<option value="" selected disabled>Please Select User to Add</option>';
+            for (var i = 0; i < users.length; i++) {
+               user_str += '<option value="' + users[i].user_name + '">' + users[i].user_name + '</option>';
+            }
+            $('#user_name').empty();
+            $('#user_name').append(user_str);
+        };
+        $('#btnAdd').on('click', async function () {
+            await GetUsers();
+            await GenerateUserOptions();
+
+            $('#btn_add').attr('disabled', true);
+            $('#modal_user').modal();
+        });
+
+        $('#user_name').on('change', function () {
+            var user = users.filter(f => f.user_name === $('#user_name').val());
+            $('#user_name').val(user[0].user_name);
+            $('#department').val(user[0].department);
+            var user_name = $('#user_name').val();
+            $('#btn_add').attr('disabled', false);
+        });
+
+        $('#btn_add').on('click', function () {
+            var user_name = $('#user_name').val();
+            var department = $('#department').val();
+
+            var user_string = JSON.stringify({
+                "name": user_name,
+                "department": department,
+                "role" : "User"
+            });
+            CreateAuthen(user_string);
+            
+        });
+
+        async function CreateAuthen(user_string) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("CreateAuthen", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        }
+        async function GetAuthenUsers() {
+            var _users = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAuthenUsers", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    _users = response;
+                    GenerateTableUser(_users);
+                }
+            });
+        }
+
+        function GenerateTableUser(users) {
+            var datas = [];
+
+            if (table_user !== undefined)
+                table_user.DataTable().destroy();
+
+            for (var i = 0; i < users.length; i++) {
+                datas.push([
+                    users[i].name,
+                    users[i].department
+                ]);
+            }
+
+            table_user = $('#table_user').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
+
+        async function GetAuthenAdmin() {
+            var _admin = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAuthenAdmin", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    _admin = response;
+                    GenerateTableAdmin(_admin);
+                }
+            });
+        }
+
+        function GenerateTableAdmin(admins) {
+            var datas = [];
+
+            if (table_admin !== undefined)
+                table_admin.DataTable().destroy();
+
+            for (var i = 0; i < admins.length; i++) {
+                datas.push([
+                    admins[i].name,
+                    admins[i].department
+                ]);
+            }
+
+            table_admin = $('#table_admin').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
+
+        async function GetAuthenSale() {
+            var _sale = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAuthenSale", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    _sale = response;
+                    GenerateTableSale(_sale);
+                }
+            });
+        }
+
+        function GenerateTableSale(sales) {
+            var datas = [];
+
+            if (table_sale !== undefined)
+                table_sale.DataTable().destroy();
+
+            for (var i = 0; i < sales.length; i++) {
+                datas.push([
+                    sales[i].name,
+                    sales[i].department
+                ]);
+            }
+
+            table_sale = $('#table_sale').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
+
+        async function GetAuthenManager() {
+            var _manager = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAuthenManager", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    _manager = response;
+                    GenerateTableManager(_manager);
+                }
+            });
+        }
+
+        function GenerateTableManager(managers) {
+            var datas = [];
+
+            if (table_manager !== undefined)
+                table_manager.DataTable().destroy();
+
+            for (var i = 0; i < managers.length; i++) {
+                datas.push([
+                    managers[i].name,
+                    managers[i].department
+                ]);
+            }
+
+            table_manager = $('#table_manager').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
+
+        function ShowModal(data) {
+            if (toUser === false) {
+                $('#btnToUser').hide();
+                $('#btnToAdmin').show();
+                $('#btnToSale').show();
+                $('#btnToManager').show();
+            }
+            if (toAdmin === false) {
+                $('#btnToUser').show();
+                $('#btnToAdmin').hide();
+                $('#btnToSale').show();
+                $('#btnToManager').show();
+            }
+            if (toSale === false) {
+                $('#btnToUser').show();
+                $('#btnToAdmin').show();
+                $('#btnToSale').hide();
+                $('#btnToManager').show();
+            }
+
+            if (toManager === false) {
+                $('#btnToUser').show();
+                $('#btnToAdmin').show();
+                $('#btnToSale').show();
+                $('#btnToManager').hide();
+            }
+            $('#userName').val(data[0]);
+            $('#Department').val(data[1]);
+            $('#modalAuthen').modal();
+        }
+
+        $('#table_user tbody').on('click', 'tr', function () {
+            toUser = false;
+            toAdmin = true;
+            toSale = true;
+            toManager = true;
+
+            let data = table_user.row(this).data();
+            ShowModal(data);
+        });
+         $('#table_admin tbody').on('click', 'tr', function () {
+            toUser = true;
+            toAdmin = false;
+            toSale = true;
+            toManager = true;
+
+            let data = table_admin.row(this).data();
+            ShowModal(data);
+        });
+         $('#table_sale tbody').on('click', 'tr', function () {
+            toUser = true;
+            toAdmin = true;
+            toSale = false;
+            toManager = true;
+
+            let data = table_sale.row(this).data();
+            ShowModal(data);
+        });
+        $('#table_manager tbody').on('click', 'tr', function () {
+            toUser = true;
+            toAdmin = true;
+            toSale = true;
+            toManager = false;
+
+            let data = table_manager.row(this).data();
+            ShowModal(data);
+        });
+
+        $('#btnToUser').on('click',async function(){
+            var user = document.getElementById("userName").value;
+            var department = document.getElementById("Department").value;
+            var user_string = JSON.stringify({
+                "name": user,
+                "department": department,
+                "role" : "User"
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateRole", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        });
+
+        $('#btnToAdmin').on('click',async function(){
+            var user = document.getElementById("userName").value;
+            var department = document.getElementById("Department").value;
+            var user_string = JSON.stringify({
+                "name": user,
+                "department": department,
+                "role" : "Admin"
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateRole", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        });
+
+        $('#btnToSale').on('click',async function(){
+            var user = document.getElementById("userName").value;
+            var department = document.getElementById("Department").value;
+            var user_string = JSON.stringify({
+                "name": user,
+                "department": department,
+                "role" : "Sale"
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateRole", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        });
+
+        $('#btnToManager').on('click',async function(){
+            var user = document.getElementById("userName").value;
+            var department = document.getElementById("Department").value;
+            var user_string = JSON.stringify({
+                "name": user,
+                "department": department,
+                "role" : department
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateRole", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        });
+    </script>
+}
