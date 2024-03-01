@@ -212,10 +212,10 @@
             var today = new Date();
             await GetUsers();
             await GenerateUsersOption();
-            await GetWorkingHours("@Model.fullname.ToLower()", today.toISOString().substring(0, 7));
+            await GetWorkingHours("@Model.name.ToLower()", today.toISOString().substring(0, 7));
             await GetWorkingHoursSummary();
-            $('#user_id').val("@Model.name");
-            $('#whs_month').val(today.getFullYear() + "-" + (today.getMonth()+1).toString().padStart(2,0));
+            $('#user_id').val("@Model.user_id");
+            $('#whs_month').val(today.getFullYear() + "-" + (today.getMonth()+1).toString().padStart(2,0));           
         });
 
         async function GetUsers() {
@@ -234,7 +234,7 @@
 
         function GenerateUsersOption() {
             $('#user_id').empty();
-            var user_str = '<option value="">Please Select User</option>';
+            var user_str = '<option value="" disabled>Please Select User</option>';
             for (var i = 0; i < users.length; i++) {
                 user_str += '<option value="' + users[i].user_id + '">' + users[i].user_name + '</option>';
             }
@@ -538,7 +538,7 @@
 
         $('#btn_print').on('click', function () {
             var url = '@Url.Action("FormOvertime","WorkingHours")';
-            window.location.href = url;
+            window.open(url);
         });
 
     </script>

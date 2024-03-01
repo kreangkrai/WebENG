@@ -16,7 +16,7 @@ namespace WebENG.Service
             SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
-                string strCmd = string.Format($@"SElECT name,department,role FROM Authen ORDER BY name");
+                string strCmd = string.Format($@"SElECT user_id,name,department,role FROM Authen ORDER BY name");
                 SqlCommand command = new SqlCommand(strCmd, connection);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -25,6 +25,7 @@ namespace WebENG.Service
                     {
                         AuthenModel authen = new AuthenModel()
                         {
+                            user_id = dr["user_id"].ToString(),
                             name = dr["name"].ToString(),
                             department = dr["department"].ToString(),
                             role = dr["role"].ToString()
@@ -50,10 +51,12 @@ namespace WebENG.Service
                 IF (SELECT COUNT(name) FROM Authen WHERE name ='{authen.name}') = 0
                 BEGIN
                     INSERT INTO Authen (
+                        user_id,
                         name,
                         department,
                         role ) 
                     VALUES (
+                        @user_id,
                         @name, 
                         @department,
                         @role
@@ -61,7 +64,8 @@ namespace WebENG.Service
                 END");
                 SqlCommand command = new SqlCommand(string_command, connection);
                 command.CommandType = System.Data.CommandType.Text;
-                command.Parameters.AddWithValue("@name", authen.name);
+                command.Parameters.AddWithValue("@user_id", authen.user_id);
+                command.Parameters.AddWithValue("@name", authen.name.ToLower());
                 command.Parameters.AddWithValue("@department", authen.department);
                 command.Parameters.AddWithValue("@role", authen.role);
                 command.ExecuteNonQuery();
@@ -90,7 +94,7 @@ namespace WebENG.Service
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@role", authen.role);
-                    cmd.Parameters.AddWithValue("@name", authen.name);
+                    cmd.Parameters.AddWithValue("@name", authen.name.ToLower());
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();

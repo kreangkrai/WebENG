@@ -33,11 +33,10 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.fullname.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, section = "Eng" }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
-                HttpContext.Session.SetString("Section", u.section);
                 return View(u);
             }
             else
@@ -53,11 +52,10 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.fullname.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, section = "Eng" }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
-                HttpContext.Session.SetString("Section", u.section);
                 return View(u);
             }
             else
@@ -73,11 +71,10 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.fullname.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, section = "Eng" }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
-                HttpContext.Session.SetString("Section", u.section);
                 return View(u);
             }
             else
@@ -93,11 +90,10 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.fullname.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, section = "Eng" }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
-                HttpContext.Session.SetString("Section", u.section);
                 return View(u);
             }
             else
@@ -113,11 +109,10 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.fullname.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, section = "Eng" }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
-                HttpContext.Session.SetString("Section", u.section);
                 return View(u);
             }
             else

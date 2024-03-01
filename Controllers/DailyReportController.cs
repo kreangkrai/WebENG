@@ -35,13 +35,13 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.fullname.ToLower() == user.ToLower()).Select(s => new UserModel { 
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { 
                     name = s.name, 
-                    fullname = s.fullname,
                     department = s.department, 
-                    role = s.role }).FirstOrDefault();
+                    role = s.role,
+                    user_id = s.user_id
+                }).FirstOrDefault();
                 HttpContext.Session.SetString("Name", u.name);
-                HttpContext.Session.SetString("Fullname", u.fullname);
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Department", u.department);
                 return View(u);

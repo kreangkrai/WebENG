@@ -36,28 +36,11 @@ namespace WebENG.Controllers
                     bool check = ActiveDirectoryAuthenticate(model.user, model.password);
                     if (check)
                     {
-                        bool b = true;
-                        //SqlCommand cmd = new SqlCommand("SELECT * FROM Authen_TripExpenseWeb WHERE Names='" + user + "'", ConnectSQL.OpenConnect());
-                        //SqlDataReader dr = cmd.ExecuteReader();
-                        //if (dr.HasRows)
-                        //{
-                        //    b = true;
-                        //}
-                        //dr.Close();
-                        //ConnectSQL.CloseConnect();
-                        if (b)
-                        {
-                            HttpContext.Session.SetString("userId", user);
-                            HttpContext.Session.SetString("Department", dep);
-                            HttpContext.Session.Set("Image", image);
-                            HttpContext.Session.SetString("Login_ENG", "1234");
-                            return RedirectToAction("Index", "Calendar");
-                        }
-                        else
-                        {
-                            ModelState.AddModelError("Password", "Not Authorization!!!");
-                            return View("Index");
-                        }
+                        HttpContext.Session.SetString("userId", user);
+                        HttpContext.Session.SetString("Department", dep);
+                        HttpContext.Session.Set("Image", image);
+                        HttpContext.Session.SetString("Login_ENG", "1234");
+                        return RedirectToAction("Index", "Calendar");
                     }
                     else
                     {

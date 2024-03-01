@@ -239,8 +239,9 @@
         GenerateUserOption();
         GenerateYearOption();
         let date = new Date();
-        $('#user_id').val('@Model.name');
+        $('#user_id').val('@Model.user_id');
         $('#year').val(date.getFullYear());
+        
         let user_id = $('#user_id').val();
         let year = $('#year').val();
         await GetScores(user_id,year);

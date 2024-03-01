@@ -168,7 +168,7 @@
             var stop_date = new Date(year, month + 1, 1);
             $('#start_date').val(start_date.toISOString().split("T")[0]);
             $('#stop_date').val(stop_date.toISOString().split("T")[0]);
-            $('#user_name').val('@Model.fullname.ToLower()');
+            $('#user_name').val('@Model.name.ToLower()');
             table = $('#table_activity').DataTable();
             EnablePrint();
             EnableExport();
@@ -341,7 +341,7 @@
 
         $('#btn_print').on('click', function () {
             var url = '@Url.Action("FormDailyReport", "DailyReport")';
-            window.location.href = url;
+            window.open(url);
         });
 
         $('#btn_export').on('click', async function () {

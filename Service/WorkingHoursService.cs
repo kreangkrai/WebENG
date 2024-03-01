@@ -20,8 +20,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.user_id,
-                        Users.Name,
-                        Users.Department2,
+                        Authen.name,
+                        Authen.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -34,7 +34,7 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN gps_sale_tracking.dbo.Sale_User Users ON WorkingHours.user_id = Users.Login
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
@@ -52,8 +52,8 @@ namespace WebENG.Service
                         {
                             index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString() : "",
-                            department = dr["Department2"] != DBNull.Value ? dr["Department2"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -90,8 +90,8 @@ namespace WebENG.Service
                     SELECT 
                         WorkingHours.ind,
                         WorkingHours.user_id,
-                        Users.Name,
-                        Users.Department2,
+                        Authen.name,
+                        Authen.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -104,10 +104,10 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN gps_sale_tracking.dbo.Sale_User Users ON WorkingHours.user_id = Users.Login 
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id 
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
-                    WHERE LOWER(Users.Name) = '{user_name}'");
+                    WHERE LOWER(Authen.name) = '{user_name}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -123,8 +123,8 @@ namespace WebENG.Service
                         {
                             index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString() : "",
-                            department = dr["Department2"] != DBNull.Value ? dr["Department2"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -161,8 +161,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.user_id,
-                        Users.Name,
-                        Users.Department2,
+                        Authen.name,
+                        Authen.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -175,11 +175,11 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN gps_sale_tracking.dbo.Sale_User Users ON WorkingHours.user_id = Users.Login 
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id 
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     WHERE WorkingHours.working_date like '{year}-{month}%' 
-                    AND LOWER(Users.Name) ='{user_name}'");
+                    AND LOWER(Authen.name) ='{user_name}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -195,8 +195,8 @@ namespace WebENG.Service
                         {
                             index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString() : "",
-                            department = dr["Department2"] != DBNull.Value ? dr["Department2"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -233,7 +233,7 @@ namespace WebENG.Service
                     SELECT
                         ind,
                         WorkingHours.user_id,
-                        Users.Name,
+                        Authen.name,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -246,10 +246,10 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN gps_sale_tracking.dbo.Sale_User Users ON WorkingHours.user_id = Users.Login 
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id 
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
-                    WHERE LOWER(Users.Name) = '{user_name}'
+                    WHERE LOWER(Authen.name) = '{user_name}'
                     AND WorkingHours.working_date LIKE '{working_date.ToString("yyyy-MM-dd")}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -266,7 +266,7 @@ namespace WebENG.Service
                         {
                             index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -603,8 +603,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.user_id,
-                        Users.Name,
-                        Users.Department2,
+                        Authen.name,
+                        Authen.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -620,7 +620,7 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN gps_sale_tracking.dbo.Sale_User Users ON WorkingHours.user_id = Users.Login
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     WHERE WorkingHours.working_date LIKE '{year}%' AND WorkingHours.week_number = {week}");
@@ -639,8 +639,8 @@ namespace WebENG.Service
                         {
                             index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString() : "",
-                            department = dr["Department2"] != DBNull.Value ? dr["Department2"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",

@@ -19,6 +19,7 @@
                     <thead class="text-center">
                         <tr>
                             <th>Name</th>
+                            <th>User ID</th>
                             <th>Department</th>
                         </tr>
                     </thead>
@@ -39,6 +40,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>User ID</th>
                             <th>Department</th>
                         </tr>
                     </thead>
@@ -57,6 +59,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>User ID</th>
                             <th>Department</th>
                         </tr>
                     </thead>
@@ -75,6 +78,7 @@
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>User ID</th>
                             <th>Department</th>
                         </tr>
                     </thead>
@@ -99,6 +103,10 @@
                     <div class="form-group">
                         <label for="user_name">User Name</label>
                         <select id="user_name" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">User ID</label>
+                        <input id="user_id" type="text" class="form-control" placeholder="User ID" disabled />
                     </div>
                     <div class="form-group">
                         <label for="department">Department</label>
@@ -129,8 +137,12 @@
             <div class="modal-body">
                 <form>
                     <div class="form-group">
-                        <label for="userName">User Name</label>
-                        <input id="userName" type="text" class="form-control" readonly/>
+                        <label for="UserName">User Name</label>
+                        <input id="UserName" type="text" class="form-control" readonly/>
+                    </div>
+                    <div class="form-group">
+                        <label for="UserID">User ID</label>
+                        <input id="UserID" type="text" class="form-control" readonly/>
                     </div>
                     <div class="form-group">
                         <label for="Department">Department</label>
@@ -143,10 +155,10 @@
                     <i class="fas fa-user-shield"></i> To Admin
                 </button>
                 <button id="btnToSale" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
-                    <i class="fas fa-user"></i> To Sale
+                    <i class="fas fa-user-injured"></i> To Sale
                 </button>
                 <button id="btnToManager" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
-                    <i class="fas fa-user"></i> To Manager
+                    <i class="fas fa-user-tie"></i> To Manager
                 </button>
                 <button id="btnToUser" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
                     <i class="fas fa-user"></i> To User
@@ -210,16 +222,19 @@
         $('#user_name').on('change', function () {
             var user = users.filter(f => f.user_name === $('#user_name').val());
             $('#user_name').val(user[0].user_name);
+            $('#user_id').val(user[0].user_id);
             $('#department').val(user[0].department);
             var user_name = $('#user_name').val();
             $('#btn_add').attr('disabled', false);
         });
 
         $('#btn_add').on('click', function () {
+            var user_id = $('#user_id').val();
             var user_name = $('#user_name').val();
             var department = $('#department').val();
 
             var user_string = JSON.stringify({
+                "user_id": user_id,
                 "name": user_name,
                 "department": department,
                 "role" : "User"
@@ -265,6 +280,7 @@
             for (var i = 0; i < users.length; i++) {
                 datas.push([
                     users[i].name,
+                    users[i].user_id,
                     users[i].department
                 ]);
             }
@@ -274,7 +290,7 @@
                 data: datas,
                 columnDefs: [
                     {
-                        targets: [0, 1],
+                        targets: [0, 1, 2],
                         className: "border-left"
                     }
                 ],
@@ -304,6 +320,7 @@
             for (var i = 0; i < admins.length; i++) {
                 datas.push([
                     admins[i].name,
+                    admins[i].user_id,
                     admins[i].department
                 ]);
             }
@@ -313,7 +330,7 @@
                 data: datas,
                 columnDefs: [
                     {
-                        targets: [0, 1],
+                        targets: [0, 1, 2],
                         className: "border-left"
                     }
                 ],
@@ -341,8 +358,9 @@
                 table_sale.DataTable().destroy();
 
             for (var i = 0; i < sales.length; i++) {
-                datas.push([
+                datas.push([ 
                     sales[i].name,
+                    sales[i].user_id,
                     sales[i].department
                 ]);
             }
@@ -352,7 +370,7 @@
                 data: datas,
                 columnDefs: [
                     {
-                        targets: [0, 1],
+                        targets: [0, 1, 2],
                         className: "border-left"
                     }
                 ],
@@ -382,6 +400,7 @@
             for (var i = 0; i < managers.length; i++) {
                 datas.push([
                     managers[i].name,
+                     managers[i].user_id,
                     managers[i].department
                 ]);
             }
@@ -391,7 +410,7 @@
                 data: datas,
                 columnDefs: [
                     {
-                        targets: [0, 1],
+                        targets: [0, 1, 2],
                         className: "border-left"
                     }
                 ],
@@ -424,8 +443,9 @@
                 $('#btnToSale').show();
                 $('#btnToManager').hide();
             }
-            $('#userName').val(data[0]);
-            $('#Department').val(data[1]);
+            $('#UserName').val(data[0]);
+            $('#UserID').val(data[1]);
+            $('#Department').val(data[2]);
             $('#modalAuthen').modal();
         }
 
@@ -467,10 +487,12 @@
         });
 
         $('#btnToUser').on('click',async function(){
-            var user = document.getElementById("userName").value;
+            var user_id = document.getElementById("UserID").value;
+            var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var user_string = JSON.stringify({
-                "name": user,
+                "user_id": user_id,
+                "name": name,
                 "department": department,
                 "role" : "User"
             });
@@ -489,10 +511,12 @@
         });
 
         $('#btnToAdmin').on('click',async function(){
-            var user = document.getElementById("userName").value;
+            var user_id = document.getElementById("UserID").value;
+            var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var user_string = JSON.stringify({
-                "name": user,
+                "user_id":user_id,
+                "name": name,
                 "department": department,
                 "role" : "Admin"
             });
@@ -511,10 +535,12 @@
         });
 
         $('#btnToSale').on('click',async function(){
-            var user = document.getElementById("userName").value;
+            var user_id = document.getElementById("UserID").value;
+            var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var user_string = JSON.stringify({
-                "name": user,
+                "user_id":user_id,
+                "name": name,
                 "department": department,
                 "role" : "Sale"
             });
@@ -533,10 +559,12 @@
         });
 
         $('#btnToManager').on('click',async function(){
-            var user = document.getElementById("userName").value;
+            var user_id = document.getElementById("UserID").value;
+            var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var user_string = JSON.stringify({
-                "name": user,
+                "user_id":user_id,
+                "name": name,
                 "department": department,
                 "role" : department
             });

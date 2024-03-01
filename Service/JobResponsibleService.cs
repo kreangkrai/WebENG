@@ -21,16 +21,16 @@ namespace WebENG.Service
 	                    Jobs.job_name,
                         Quotation.customer,
 	                    JobResponsible.user_id,
-	                    Sale_User.Name AS user_name,
-	                    Sale_User.Department2 AS department,
+	                    Authen.name AS user_name,
+	                    Authen.department AS department,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
 	                    JobResponsible.assign_date
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
-                        LEFT JOIN [gps_sale_tracking].[dbo].Sale_User AS Sale_User ON JobResponsible.user_id = Sale_User.Login
+                        LEFT JOIN Authen AS Authen ON JobResponsible.user_id = Authen.user_id
                         LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
-                    WHERE LOWER(Sale_User.Name) = '{user_name}'
+                    WHERE LOWER(Authen.name) = '{user_name}'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -81,10 +81,10 @@ namespace WebENG.Service
                         Jobs.job_name,
                         Quotation.customer,
 	                    JobResponsible.user_id,
-                        Sale_User.Name
+                        Authen.name
                     FROM Jobs
                     LEFT JOIN JobResponsible ON Jobs.job_id = JobResponsible.job_id
-                    LEFT JOIN [gps_sale_tracking].dbo.Sale_User ON JobResponsible.user_id = Sale_User.Login
+                    LEFT JOIN Authen ON JobResponsible.user_id = Authen.user_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     ORDER BY Jobs.job_id, JobResponsible.user_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
@@ -178,14 +178,14 @@ namespace WebENG.Service
 	                    Jobs.job_name,
                         Quotation.customer,
 	                    JobResponsible.user_id,
-	                    Sale_User.Name AS user_name,
-	                    Sale_User.Department2 AS department,
+	                    Authen.name AS user_name,
+	                    Authen.department AS department,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
                         JobResponsible.assign_date
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
-                        LEFT JOIN [gps_sale_tracking].[dbo].Sale_User AS Sale_User ON JobResponsible.user_id = Sale_User.Login
+                        LEFT JOIN Authen ON JobResponsible.user_id = Authen.user_id
                         LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     WHERE  JobResponsible.job_id = '{job_id}'
                     ORDER BY JobResponsible.job_id");

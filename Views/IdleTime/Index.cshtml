@@ -58,8 +58,13 @@
         let table;
 
         $(document).ready(function () {
-            $('#startDate').val("2022-01-01");
-            $('#stopDate').val("2022-12-31");
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = today.getMonth();
+            var start_date = new Date(year, month, 2);
+            var stop_date = new Date(year, month + 1, 1);
+            $('#startDate').val(start_date.toISOString().split("T")[0]);
+            $('#stopDate').val(stop_date.toISOString().split("T")[0]);
             UpdateView();
         });
 
