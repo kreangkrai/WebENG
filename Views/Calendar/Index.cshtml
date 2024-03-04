@@ -57,6 +57,16 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-6">
+                            <label for="process">Process</label>
+                            <select id="process" class="form-control"></select>
+                        </div>
+                        <div class="col-6">
+                            <label for="system">System</label>
+                            <select id="system" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-6">
                             <label for="location">Location</label>
                             <select id="location" class="form-control"></select>
                         </div>
@@ -153,6 +163,8 @@
         //Variable Declaration
         let users = [];
         let jobs = [];
+        let processes = [];
+        let systems = [];
         let quotations = [];
         let tasks = [];
         let holidays = [];
@@ -186,6 +198,28 @@
             await GetTasks();
         });
 
+        async function GetProcess() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProcesses", "EngProcess")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    processes = response;                   
+                }
+            });
+        }
+        async function GetSystem() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetSystems", "EngSystem")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    systems = response;                   
+                }
+            });
+        }
         async function GetUsers() {
             await $.ajax({
                 type: "GET",
@@ -327,8 +361,12 @@
                             "user_id": whs[i].user_id,
                             "user_name": whs[i].user_name,
                             "working_date": whs[i].working_date,
-                            "job_id": whs[i].job_id,
+                            "job_id": whs[i].job_id,                           
                             "job_name": whs[i].job_name,
+                            "process_id": whs[i].process_id,
+                            "process_name":whs[i].process_name,
+                            "system_id":whs[i].system_id,
+                            "system_name":whs[i].system_name,
                             "task_id": whs[i].task_id,
                             "task_name": whs[i].task_name,
                             "start_time": whs[i].start_time,
@@ -450,6 +488,28 @@
             calendar.render();
         }
 
+        function GenerateProcessOption() {
+            let process = $('#process').val();
+            $('#process').empty();
+            $('#process').append(`<option value="" selected disabled>Please Select Process</option>`);
+            for (let i = 0; i < processes.length; i++) {
+                if (processes[i].process_name === process || process === "" || process === null) {
+                    $('#process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
+                }
+            }
+        }
+
+        function GenerateSystemOption() {
+            let system = $('#system').val();
+            $('#system').empty();
+            $('#system').append(`<option value="" selected disabled>Please Select System</option>`);
+            for (let i = 0; i < systems.length; i++) {
+                if (systems[i].system_name === system || system === "" || system === null) {
+                    $('#system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
+                }
+            }
+        }
+
         function GenerateUsersOption() {
             $('#user_id').empty();
             let user_string = `<option value="" selected disabled>Please Select User</option>`;
@@ -536,6 +596,8 @@
                 if (wh_day !== null) {
                     wh_day = [];
                 }
+                await GetProcess();
+                await GetSystem();
                 await GetUsers();
                 await GenerateUsersOption();
                 await GetWorkingHoursByDate("@Model.name.ToLower()", date_start);
@@ -547,6 +609,8 @@
                 await GetTasks();
                 await GenerateTasksOption();
                 await PrepmodalTask(date_start);
+                await GenerateProcessOption();
+                await GenerateSystemOption();
             }
         }
 
@@ -565,6 +629,8 @@
 
             if (show_modal) {
                 update = false;
+                await GetProcess();
+                await GetSystem();
                 await GetUsers();
                 await GenerateUsersOption();
                 await GetJobs();
@@ -575,6 +641,9 @@
                 await GetTasks();
                 await GenerateTasksOption();
                 PrepmodalTasks(date_start, date_end);
+                await GenerateProcessOption();
+                await GenerateSystemOption();
+
             }
         }
 
@@ -685,6 +754,9 @@
             let stop_date = $('#stop_date').val();
 
             let job_id = $('#job_id').val();
+            let process = $('#process').val();
+            let system = $('#system').val();
+
             let task_id = $('#task_id').val();
             let start_time = $('#start_time').val();
             let stop_time = $('#stop_time').val();
@@ -707,6 +779,8 @@
                     "user_id": user_id,
                     "working_date": working_date,
                     "job_id": job_id,
+                    "process_id": process,
+                    "system_id": system,
                     "task_id": task_id,
                     "start_time": start_time,
                     "stop_time": stop_time,
@@ -737,6 +811,8 @@
                         "user_id": user_id,
                         "working_date": working_date,
                         "job_id": job_id,
+                        "process_id": process,
+                        "system_id": system,
                         "task_id": task_id,
                         "start_time": start_time,
                         "stop_time": stop_time,
@@ -754,6 +830,8 @@
                             "user_id": user_id,
                             "working_date": cur_date,
                             "job_id": job_id,
+                            "process_id": process,
+                            "system_id": system,
                             "task_id": task_id,
                             "start_time": start_time,
                             "stop_time": stop_time,
@@ -778,6 +856,8 @@
             let working_date = $('#working_date').val();
 
             let job_id = $('#job_id').val();
+            let process = $('#process').val();
+            let system = $('#system').val();
             let task_id = $('#task_id').val();
             let start_time = $('#start_time').val();
             let stop_time = $('#stop_time').val();
@@ -792,6 +872,8 @@
                 "user_id": user_id,
                 "working_date": working_date,
                 "job_id": job_id,
+                "process_id": process,
+                "system_id": system,
                 "task_id": task_id,
                 "start_time": start_time,
                 "stop_time": stop_time,
@@ -946,6 +1028,8 @@
             let user_name = users.filter(f => f.user_id === user_id).map(m => m.user_name.toLowerCase());
             let date = event.extendedProps.working_date;
             await GetUsers();
+            await GetProcess();
+            await GetSystem();
             await GenerateUsersOption();
             await GetWorkingHoursByDate(user_name, date.split("T")[0]);
             await GetJobs();
@@ -953,7 +1037,10 @@
             await GenerateCustomerOptions();
             await GenerateJobsOption();
             await GenerateLocationOption();
+            await GenerateProcessOption();
+            await GenerateSystemOption();
             PrepmodalEditTask(event.extendedProps);
+
         }
 
         function DropTask(event) {
@@ -984,6 +1071,8 @@
             await GenerateTasksOption();
             $('#location').val(task.task_id[0]);
             $('#task_id').val(task.task_id);
+            $('#process').val(task.process_id);
+            $('#system').val(task.system_id);
             if (debug_edit) {
                 console.log(task);
             }

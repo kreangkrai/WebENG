@@ -14,6 +14,10 @@ namespace WebENG.Models
         public DateTime working_date { get; set; }
         public int week_number { get; set; }
         public string job_id { get; set; }
+        public string process_id { get; set; }
+        public string process_name { get; set; }
+        public string system_id { get; set; }
+        public string system_name { get; set; }
         public string job_name { get; set; }
         public string task_id { get; set; }
         public string task_name { get; set; }

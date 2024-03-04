@@ -80,6 +80,7 @@
 @section Scripts
 {
     <script type="text/javascript">
+        let statuses = [];
         let table;
         let trs = [];
         let tds = [];
@@ -92,9 +93,34 @@
         let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff'];
 
         $(document).ready(async function () {
+            
+            await GetStatus();
+            await GenerateStatusOption();
             GenerateTable(await GetJobsSummary());
         });
+        async function GetStatus() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetStatus", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    statuses = response;
+                    console.log(statuses);
+                }
+            });
+        };
 
+        function GenerateStatusOption() {
+            let status = $('#status').val();
+            $('#status').empty();
+            $('#status').append(`<option value="" selected disabled>Please Select Status</option>`);
+            for (let i = 0; i < statuses.length; i++) {
+                if (statuses[i].status_name === status || status === "" || status === null) {
+                    $('#status').append(`<option value="${statuses[i].status_id}">${statuses[i].status_id}: ${statuses[i].status_name}</option>`);
+                }
+            }
+        }
         async function GetJobsSummary() {
             let jobsSummary = [];
             await $.ajax({
@@ -139,14 +165,22 @@
                 ],
                 paging: false,
                 rowCallback: function (row, data) {
-                    let job_status = data[7];
-                    if (job_status === "0") {
-                        $('td:eq(7)', row).html(`<span class="badge badge-success">FINISHED</span>`);
-                    } else if (job_status === "1") {
-                        $('td:eq(7)', row).html(`<span class="badge badge-warning">IN PROGRESS</span>`);
-                    } else {
-                        $('td:eq(7)');
+                    let code_status = data[7];
+                    let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
+                    let status_str =  '';
+                    if (code_status === "STA001"){
+                        status_str = `<span class="badge badge-warning">${status}</span>`;
+                    }else if(code_status === "STA002"){
+                        status_str = `<span class="badge badge-success">${status}</span>`;
+                    }else if(code_status === "STA003"){
+                        status_str = `<span class="badge badge-Primary">${status}</span>`;
+                    }else if(code_status === "STA004"){
+                        status_str = `<span class="badge badge-Info">${status}</span>`;
+                    }else{
+                        status_str = `<span class="badge badge-Secondary">${status}</span>`;
                     }
+
+                    $('td:eq(7)', row).html(status_str);
                 }
             });
         }

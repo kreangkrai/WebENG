@@ -25,6 +25,10 @@ namespace WebENG.Service
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
                         Jobs.job_name,
                         WorkingHours.task_id,
                         Tasks.task_name,
@@ -36,7 +40,9 @@ namespace WebENG.Service
                     FROM WorkingHours
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
-                        LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id");
+                        LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -57,6 +63,10 @@ namespace WebENG.Service
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            process_name = dr["process_name"] != DBNull.Value ? dr["process_name"].ToString() : "",
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                            system_name = dr["system_name"] != DBNull.Value ? dr["system_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
@@ -87,7 +97,7 @@ namespace WebENG.Service
             try
             {
                 string string_command = string.Format($@"
-                    SELECT 
+                    SELECT
                         WorkingHours.ind,
                         WorkingHours.user_id,
                         Authen.name,
@@ -95,6 +105,10 @@ namespace WebENG.Service
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
                         Jobs.job_name,
                         WorkingHours.task_id,
                         Tasks.task_name,
@@ -104,9 +118,11 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id 
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE LOWER(Authen.name) = '{user_name}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -128,6 +144,10 @@ namespace WebENG.Service
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            process_name = dr["process_name"] != DBNull.Value ? dr["process_name"].ToString() : "",
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                            system_name = dr["system_name"] != DBNull.Value ? dr["system_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
@@ -166,6 +186,10 @@ namespace WebENG.Service
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
                         Jobs.job_name,
                         WorkingHours.task_id,
                         Tasks.task_name,
@@ -175,9 +199,11 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id 
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE WorkingHours.working_date like '{year}-{month}%' 
                     AND LOWER(Authen.name) ='{user_name}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
@@ -200,6 +226,10 @@ namespace WebENG.Service
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            process_name = dr["process_name"] != DBNull.Value ? dr["process_name"].ToString() : "",
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                            system_name = dr["system_name"] != DBNull.Value ? dr["system_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
@@ -231,12 +261,17 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     SELECT
-                        ind,
+                        WorkingHours.ind,
                         WorkingHours.user_id,
                         Authen.name,
+                        Authen.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
                         Jobs.job_name,
                         WorkingHours.task_id,
                         Tasks.task_name,
@@ -246,9 +281,11 @@ namespace WebENG.Service
                         WorkingHours.dinner,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id 
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE LOWER(Authen.name) = '{user_name}'
                     AND WorkingHours.working_date LIKE '{working_date.ToString("yyyy-MM-dd")}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
@@ -271,6 +308,10 @@ namespace WebENG.Service
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            process_name = dr["process_name"] != DBNull.Value ? dr["process_name"].ToString() : "",
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                            system_name = dr["system_name"] != DBNull.Value ? dr["system_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
@@ -300,15 +341,17 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO WorkingHours(
-                        user_id, working_date, week_number, job_id, task_id, start_time, stop_time, lunch, dinner, note)
+                        user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch, dinner, note)
                     VALUES (
-                        @user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id, @task_id, @start_time, @stop_time, @lunch, @dinner, @note)");
+                        @user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch, @dinner, @note)");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
+                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
@@ -348,6 +391,8 @@ namespace WebENG.Service
                         working_date = @working_date,
                         week_number = (SELECT DATEPART(ISO_WEEK,@working_date)),
                         job_id = @job_id,
+                        process_id = @process_id,
+                        system_id = @system_id,
                         task_id = @task_id,
                         start_time = @start_time,
                         stop_time = @stop_time,
@@ -359,6 +404,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
+                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
@@ -398,6 +445,8 @@ namespace WebENG.Service
                         AND working_date = @working_date 
                         AND job_id = @job_id
                         AND task_id = @task_id
+                        AND process_id = @process_id
+                        AND system_id = @system_id
                         AND start_time = @start_time
                         AND stop_time = @stop_time");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
@@ -408,6 +457,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
+                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
@@ -443,6 +494,8 @@ namespace WebENG.Service
                     WHERE user_id = @user_id
                         AND working_date = @working_date
                         AND job_id = @job_id
+                        AND process_id = @process_id
+                        AND system_id = @system_id
                         AND task_id = @task_id
                         AND start_time = @start_time
                         AND stop_time = @stop_time");
@@ -452,6 +505,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
+                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
@@ -608,14 +663,15 @@ namespace WebENG.Service
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
                         Jobs.job_name,
                         WorkingHours.task_id,
                         Tasks.task_name,
                         WorkingHours.start_time,
-                        CASE 
-                            WHEN WorkingHours.stop_time LIKE '00:00:00%' THEN '23:59:59'
-                            ELSE WorkingHours.stop_time
-                        END as stop_time,
+                        WorkingHours.stop_time,
                         WorkingHours.lunch,
                         WorkingHours.dinner,
                         WorkingHours.note
@@ -623,6 +679,8 @@ namespace WebENG.Service
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE WorkingHours.working_date LIKE '{year}%' AND WorkingHours.week_number = {week}");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -645,6 +703,10 @@ namespace WebENG.Service
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            process_name = dr["process_name"] != DBNull.Value ? dr["process_name"].ToString() : "",
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                            system_name = dr["system_name"] != DBNull.Value ? dr["system_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),

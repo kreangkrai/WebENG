@@ -15,11 +15,12 @@ namespace WebENG.Controllers
     {
         readonly IJob JobService;
         readonly IAccessory Accessory;
-
+        readonly IStatus Status;
         public JobController()
         {
             JobService = new JobService();
             Accessory = new AccessoryService();
+            Status = new EngStatusService();
         }
 
         public IActionResult Index()
@@ -65,6 +66,13 @@ namespace WebENG.Controllers
         {
             List<JobModel> jobs = JobService.GetAllJobs();
             return Json(jobs);
+        }
+
+        [HttpGet]
+        public JsonResult GetStatus()
+        {
+            List<EngStatusModel> statuses = Status.GetStatuses();
+            return Json(statuses);
         }
 
         [HttpGet]
