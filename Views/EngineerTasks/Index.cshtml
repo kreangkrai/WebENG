@@ -54,17 +54,29 @@
                         <label for="user_name">User</label>
                         <input id="user_name" type="text" class="form-control" readonly />
                     </div>
-                    <div class="form-group">
-                        <label for="working_date">Date</label>
-                        <input id="working_date" type="date" class="form-control" readonly />
-                    </div>
-                    <div class="form-group">
-                        <label for="job_id">Job</label>
-                        <input id="job_id" type="text" class="form-control" readonly />
+                    <div class="form-group row">
+                       <div class="col-6">
+                            <label for="working_date">Date</label>
+                            <input id="working_date" type="date" class="form-control" readonly />
+                        </div>
+                        <div class="col-6">
+                            <label for="job_id">Job</label>
+                            <input id="job_id" type="text" class="form-control" readonly />
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="job_name">Job Name</label>
                         <input id="job_name" type="text" class="form-control" readonly />
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <label for="process">Process</label>
+                            <input id="process" type="text" class="form-control" readonly/>
+                        </div>
+                        <div class="col-6">
+                            <label for="system">System</label>
+                            <input id="system" type="text" class="form-control" readonly/>
+                        </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-6">
@@ -212,6 +224,10 @@
                             "working_date": whs[i].working_date,
                             "job_id": whs[i].job_id,
                             "job_name": whs[i].job_name,
+                            "process_id": whs[i].process_id,
+                            "process_name":whs[i].process_name,
+                            "system_id":whs[i].system_id,
+                            "system_name":whs[i].system_name,
                             "task_id": whs[i].task_id,
                             "task_name": whs[i].task_name,
                             "start_time": whs[i].start_time,
@@ -283,6 +299,10 @@
             var working_date = task.working_date.split("T")[0];
             var job_id = task.job_id;
             var job_name = task.job_name;
+            var process_id = task.process_id;
+            var process_name = task.process_name;
+            var system_id = task.system_id;
+            var system_name = task.system_name;
             var location = (task.task_id.substring(0, 1) === "O") ? "Office" : "Site";
             var task_name = task.task_name;
             var start_time = task.start_time;
@@ -296,6 +316,8 @@
             $('#working_date').val(working_date);
             $('#job_id').val(job_id);
             $('#job_name').val(job_name);
+            $('#process').val(process_name);
+            $('#system').val(system_name);
             $('#location').val(location);
             $('#task_name').val(task_name);
             $('#start_time').val(start_time);

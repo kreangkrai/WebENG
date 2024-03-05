@@ -144,7 +144,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT 
 	                    WorkingHours.user_id,
-	                    gps_sale_tracking.[dbo].Sale_User.name,
+	                    Authen.name,
 	                    WorkingHours.job_id,
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
@@ -160,11 +160,11 @@ namespace WebENG.Service
 			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) > 0 THEN DATEDIFF(HOUR, start_time, stop_time) ELSE 0 END
 	                    END) as hours
                     FROM WorkingHours
-                    LEFT JOIN gps_sale_tracking.[dbo].Sale_User ON WorkingHours.user_id = gps_sale_tracking.[dbo].Sale_User.Login
+                    LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     WHERE WorkingHours.job_id = '{job_id}'
-                    GROUP BY WorkingHours.user_id, gps_sale_tracking.[dbo].Sale_User.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
+                    GROUP BY WorkingHours.user_id, Authen.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
                     ORDER BY user_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -209,7 +209,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT 
 	                    WorkingHours.user_id,
-	                    gps_sale_tracking.[dbo].Sale_User.name,
+	                    Authen.name,
 	                    WorkingHours.job_id,
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
@@ -225,11 +225,11 @@ namespace WebENG.Service
 			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) > 0 THEN DATEDIFF(HOUR, start_time, stop_time) ELSE 0 END
 	                    END) as hours
                     FROM WorkingHours
-                    LEFT JOIN gps_sale_tracking.[dbo].Sale_User ON WorkingHours.user_id = gps_sale_tracking.[dbo].Sale_User.Login
+                    LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     WHERE WorkingHours.job_id = '{job_id}'
-                    GROUP BY WorkingHours.user_id, gps_sale_tracking.[dbo].Sale_User.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
+                    GROUP BY WorkingHours.user_id, Authen.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
                     ORDER BY user_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

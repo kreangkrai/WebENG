@@ -24,5 +24,8 @@ namespace WebENG.Models
         public string enduser { get; set; }
         public string sale_name { get; set; }
         public string department { get; set; }
+        public string process { get; set; }
+        public string system { get; set; }
+        public DateTime finished_date { get; set; }
     }
 }

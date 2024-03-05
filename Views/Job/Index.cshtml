@@ -100,42 +100,66 @@
                         <label for="job_name">Job Name</label>
                         <input id="job_name" type="text" class="form-control" placeholder="Job Name" />
                     </div>
-                    <div class="form-group">
-                        <label for="quotation_no">Quotation Number</label>
-                        <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
-                        <datalist id="quotations"></datalist>
-                    </div>
-                    <div class="form-group">
-                        <label for="cost">Cost</label>
-                        <div class="input-group">
-                            <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
-                            <div class="input-group-append">
-                                <span class="input-group-text">THB</span>
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="quotation_no">Quotation Number</label>
+                            <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
+                            <datalist id="quotations"></datalist>
+                        </div>
+                        <div class="col-6">
+                            <label for="cost">Cost</label>
+                            <div class="input-group">
+                                <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="md_rate">Market Develop</label>
-                        <div class="input-group">
-                            <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
-                            <div class="input-group-append">
-                                <span class="input-group-text">X</span>
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="md_rate">Market Develop</label>
+                            <div class="input-group">
+                                <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">X</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group ">
+                                <label for="pd_rate">Product Develop</label>
+                                <div class="input-group">
+                                    <input id="pd_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">X</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group ">
-                        <label for="pd_rate">Product Develop</label>
-                        <div class="input-group">
-                            <input id="pd_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
-                            <div class="input-group-append">
-                                <span class="input-group-text">X</span>
-                            </div>
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="process">Process</label>
+                            <select id="process" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="system">System</label>
+                             <select id="system" class="form-control">
+                            </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select id="status" class="form-control">
-                        </select>
+                    <div class="form-row">
+                        <div class="col-6">
+                            <label for="status">Status</label>
+                            <select id="status" class="form-control">
+                            </select>
+                        </div>
+                        <div class="col-6" id="group_finished_date">
+                            <label for="finished_date">Date Finished</label>
+                            <input id="finished_date"type="date"  class="form-control" />
+                        </div>
                     </div>
                 </form>
             </div>
@@ -157,6 +181,8 @@
         let users = [];
         let quots = [];
         let statuses = [];
+        let processes = [];
+        let systems = [];
 
         //Change these parameters to true to show result
         let debug_jobs = false;
@@ -165,9 +191,14 @@
         let debug_quots = false;
 
         $(document).ready(async function () {
-            GetJobs();
+            
             await GetStatus();
             await GenerateStatusOption();
+            await GetProcess();
+            await GetSystem();
+            await GenerateProcessOption();
+            await GenerateSystemOption();
+            GetJobs();
         });
 
         async function GetJobs() {
@@ -218,6 +249,51 @@
             });
         }
 
+        async function GetProcess() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProcesses", "EngProcess")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    processes = response;                   
+                }
+            });
+        }
+        async function GetSystem() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetSystems", "EngSystem")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    systems = response;                   
+                }
+            });
+        }
+
+        function GenerateProcessOption() {
+            let process = $('#process').val();
+            $('#process').empty();
+            $('#process').append(`<option value="" selected disabled>Please Select Process</option>`);
+            for (let i = 0; i < processes.length; i++) {
+                if (processes[i].process_name === process || process === "" || process === null) {
+                    $('#process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
+                }
+            }
+        }
+
+        function GenerateSystemOption() {
+            let system = $('#system').val();
+            $('#system').empty();
+            $('#system').append(`<option value="" selected disabled>Please Select System</option>`);
+            for (let i = 0; i < systems.length; i++) {
+                if (systems[i].system_name === system || system === "" || system === null) {
+                    $('#system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
+                }
+            }
+        }
+
         async function GetStatus() {
             await $.ajax({
                 type: "GET",
@@ -236,6 +312,8 @@
                 $('#table_job').DataTable().destroy();
 
             for (let i = 0; i < jobs.length; i++) {
+                let process = processes.filter(f=> f.process_id === jobs[i].process).map(m=> m.process_name);
+                let system = systems.filter(f=> f.system_id === jobs[i].system).map(m=> m.system_name);
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
@@ -244,8 +322,8 @@
                     jobs[i].enduser,
                     jobs[i].sale_name,
                     jobs[i].department,
-                    "", //Process
-                    "", //System
+                    process,
+                    system,
                     jobs[i].cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     jobs[i].md_rate,
                     jobs[i].pd_rate,
@@ -314,7 +392,7 @@
             $('#quotations').append(quots_str);
         }
 
-        $('#btn_create').on('click', async function () {
+        $('#btn_create').on('click', async function () {            
             await GetQuotations();
             await GenerateQuotationOptions();           
             Prepmodal();
@@ -331,6 +409,8 @@
             $('#md').val(1);
             $('#pd').val(1);
             $('#status').val(1);
+
+            $('#group_finished_date').hide();
         };
 
         $('#table_job tbody').on('click', 'tr', async function () {
@@ -350,29 +430,68 @@
             let job_id = data[0];
             let job_name = data[1];
             let quotation_no = data[2];
+            let process = "";
+            let _process = processes.filter(f=>f.process_name === data[7][0]).map(m=>m.process_id);
+            let system = ""
+            let _system = systems.filter(f=>f.system_name === data[8][0]).map(m=>m.system_id);
+            if (_process.length > 0){
+                process = _process;
+            }else{
+                process = processes[0].process_id;
+            }
+            if (_system.length > 0){
+                system = _system;
+            }else{
+                system = systems[0].system_id;
+            }
+
             let cost = data[9].replaceAll(",","");
             let md = data[10];
             let pd = data[11];
             let status = data[16];
+            let finished_date = jobs.filter(f=>f.job_id === job_id).map(m=>m.finished_date)[0];
 
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
             $('#job_name').val(job_name);
             $('#quotation_no').val(quotation_no);
+            $('#process').val(process);
+            $('#system').val(system);
             $('#cost').val(cost);
             $('#md').val(md);
             $('#pd').val(pd);
             $('#status').val(status);
+            $('#finished_date').val(finished_date.split('T')[0]);
+
+            let finish_status = statuses.filter(f=>f.status_id === status).map(m=> m.status_name);
+            if (finish_status[0] === "Finished"){
+                $('#group_finished_date').show();
+            }else{
+                $('#group_finished_date').hide();
+            }
         }
+
+        $('#status').on('change',function(){
+            let status = $('#status').val();
+            let finish_status = statuses.filter(f=>f.status_id === status).map(m=> m.status_name);
+            if (finish_status[0] === "Finished"){
+                $('#group_finished_date').show();
+            }else{
+                $('#group_finished_date').hide();
+            }
+        });
 
         $('#btn_save').on('click', function () {
             let job_id = $('#job_id').val();
             let job_name = $('#job_name').val();
             let quotation_no = $('#quotation_no').val();
             let cost = $('#cost').val();
+            let process = $('#process').val();
+            let system = $('#system').val();
             let md_rate = $('#md_rate').val();
             let pd_rate = $('#pd_rate').val();
             let status = $('#status').val();
+            let finished_date = $('#finished_date').val();
             if (status === null) {
                 status = 1;
             }
@@ -382,9 +501,12 @@
                 "job_name": job_name,
                 "quotation_no": quotation_no,
                 "cost": cost,
+                "process":process,
+                "system": system,
                 "md_rate": md_rate,
                 "pd_rate": pd_rate,
-                "status": status
+                "status": status,
+                "finished_date": finished_date
             });
 
             if (debug_job_string) {

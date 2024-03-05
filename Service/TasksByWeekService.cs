@@ -18,7 +18,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT
 	                    WorkingHours.user_id,
-	                    gps_sale_tracking.[dbo].Sale_User.Name as user_name,
+	                    Authen.name as user_name,
 	                    WorkingHours.week_number,
 	                    WorkingHours.working_date,
 	                    WorkingHours.job_id,
@@ -31,7 +31,7 @@ namespace WebENG.Service
 	                    WorkingHours.lunch,
 	                    WorkingHours.dinner
                     FROM WorkingHours
-                    LEFT JOIN gps_sale_tracking.[dbo].Sale_User ON Sale_User.login = WorkingHours.user_id
+                    LEFT JOIN Authen ON Authen.user_id = WorkingHours.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id

@@ -21,10 +21,13 @@ namespace WebENG.Service
                         Jobs.job_id,
                         Jobs.job_name,
                         Jobs.cost,
+                        Jobs.process_id,
+                        Jobs.system_id,
                         Jobs.md_rate,
                         Jobs.pd_rate,
                         Jobs.status,
                         Jobs.quotation_no,
+                        Jobs.finished_date,
                         Quotation.customer,
 	                    Quotation.enduser,
 	                    Quotation.sale_name,
@@ -48,6 +51,8 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
+                            process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            system = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
                             md_rate = dr["md_rate"] != DBNull.Value ? Convert.ToDouble(dr["md_rate"]) : 1,
                             pd_rate = dr["pd_rate"] != DBNull.Value ? Convert.ToDouble(dr["pd_rate"]) : 1,
                             factor = 0,
@@ -60,6 +65,7 @@ namespace WebENG.Service
                             enduser = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
                             sale_name = dr["sale_name"] != DBNull.Value ? dr["sale_name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         jobs.Add(job);
@@ -158,8 +164,8 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO 
-                        Jobs(job_id, job_name, quotation_no, cost, md_rate, pd_rate, status)
-                        VALUES(@job_id, @job_name, @quotation_no, @cost, @md_rate, @pd_rate, @status)");
+                        Jobs(job_id, job_name, quotation_no, cost,process_id,system_id, md_rate, pd_rate, status)
+                        VALUES(@job_id, @job_name, @quotation_no, @cost,@process_id,@system_id, @md_rate, @pd_rate, @status)");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
@@ -167,6 +173,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_name", job.job_name);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@cost", job.cost);
+                    cmd.Parameters.AddWithValue("@process_id", job.process);
+                    cmd.Parameters.AddWithValue("@system_id", job.system);
                     cmd.Parameters.AddWithValue("@md_rate", job.md_rate);
                     cmd.Parameters.AddWithValue("@pd_rate", job.pd_rate);
                     cmd.Parameters.AddWithValue("@status", job.status);
@@ -198,9 +206,12 @@ namespace WebENG.Service
                         job_name = @job_name,
                         quotation_no = @quotation_no,
                         cost = @cost,
+                        process_id = @process_id,
+                        system_id = @system_id,
                         md_rate = @md_rate,
                         pd_rate = @pd_rate,
-                        status = @status 
+                        status = @status,
+                        finished_date = @finished_date
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -209,9 +220,12 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_name", job.job_name);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@cost", job.cost);
+                    cmd.Parameters.AddWithValue("@process_id", job.process);
+                    cmd.Parameters.AddWithValue("@system_id", job.system);
                     cmd.Parameters.AddWithValue("@md_rate", job.md_rate);
                     cmd.Parameters.AddWithValue("@pd_rate", job.pd_rate);
                     cmd.Parameters.AddWithValue("@status", job.status);
+                    cmd.Parameters.AddWithValue("@finished_date", job.finished_date);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();

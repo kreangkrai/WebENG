@@ -1,6 +1,12 @@
 ﻿@{
     ViewData["title"] = "Jobs Summary";
 }
+<style>
+    #tableJobs tr td:nth-of-type(6){
+        cursor: pointer;
+    }
+</style>
+
 <div class="row p-4" style="row-gap:5px">
     <div class="col-xl-12">
         <div class="card card-dark">
@@ -106,7 +112,6 @@
                 data: {  },
                 success: function (response) {
                     statuses = response;
-                    console.log(statuses);
                 }
             });
         };
