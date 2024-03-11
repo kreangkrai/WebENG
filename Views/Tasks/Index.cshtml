@@ -83,7 +83,7 @@
     <div class="col-xl-4">
         <div class="card card-dark">
             <div class="card-header">
-                <span class="card-title"><i class="fas fa-car"></i> Traveling</span>
+                <span class="card-title"><i class="fas fa-car"></i> Other</span>
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                 </div>
@@ -91,7 +91,7 @@
             <div class="card-body">
                 <form>
                     <div class="form-group">
-                        <table id="table_travel" class="table table-sm compact table-striped table-hover w-100">
+                        <table id="table_other" class="table table-sm compact table-striped table-hover w-100">
                             <thead class="text-center">
                                 <tr>
                                     <th style="width:20%">Task ID</th>
@@ -153,10 +153,10 @@
         var tasks = [];
         var office_tasks = [];
         var site_tasks = [];
-        var travel_tasks = [];
+        var other_tasks = [];
         var table_office;
         var table_site;
-        var table_travel;
+        var table_other;
         var update = false;
 
         //Change these variable to true for log response
@@ -170,7 +170,7 @@
             await GetAllTasks();
             await GetOfficeTasks();
             await GetSiteTasks();
-            await GetTravelTasks();
+            await GetOtherTasks();
         });
 
         async function GetAllTasks() {
@@ -223,19 +223,19 @@
             });
         };
 
-        async function GetTravelTasks() {
+        async function GetOtherTasks() {
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetTravelTasks", "Tasks")',
+                url: '@Url.Action("GetOtherTasks", "Tasks")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    travel_tasks = response;
+                    other_tasks = response;
                     if (debug_travel_tasks) {
                         console.log("Travel Tasks");
-                        console.log(travel_tasks);
+                        console.log(other_tasks);
                     }
-                    GenerateTravelTable(travel_tasks);
+                    GenerateOtherTable(other_tasks);
                 }
             });
         };
@@ -300,11 +300,11 @@
             });
         };
 
-        function GenerateTravelTable(tasks) {
+        function GenerateOtherTable(tasks) {
             var datas = [];
 
-            if (table_travel != null) {
-                table_travel.destroy();
+            if (table_other != null) {
+                table_other.destroy();
             }
 
             for (var i = 0; i < tasks.length; i++) {
@@ -314,7 +314,7 @@
                 ]);
             }
 
-            table_travel = $('#table_travel').DataTable({
+            table_other = $('#table_other').DataTable({
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 data: datas,
                 iDisplayLength: -1,
@@ -339,6 +339,7 @@
             var loc_str = '<option value="" selected disabled>Please Select Location</option>';
             loc_str += '<option value="O">Office</option>';
             loc_str += '<option value="S">Site</option>';
+            loc_str += '<option value="T">Other</option>';
             $('#task_location').append(loc_str);
             $('#task_id').attr('disabled', true);
             $('#task_id').val(null);
@@ -371,8 +372,8 @@
             EditTask(table_site.row(this).data());
         });
 
-        $('#table_travel tbody').on('click', 'tr', function () {
-            EditTask(table_site.row(this).data());
+        $('#table_other tbody').on('click', 'tr', function () {
+            EditTask(table_other.row(this).data());
         });
 
         function EditTask(data) {

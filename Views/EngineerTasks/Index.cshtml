@@ -303,7 +303,18 @@
             var process_name = task.process_name;
             var system_id = task.system_id;
             var system_name = task.system_name;
-            var location = (task.task_id.substring(0, 1) === "O") ? "Office" : "Site";
+            var location = "";
+            var _location = task.task_id.substring(0, 1);
+            if (_location === "O"){
+                location = "Office";
+            }
+            if (_location === "S"){
+                location = "Site";
+            }
+            if (_location === "T"){
+                location = "Other";
+            }
+
             var task_name = task.task_name;
             var start_time = task.start_time;
             var stop_time = task.stop_time;

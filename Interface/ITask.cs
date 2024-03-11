@@ -11,7 +11,7 @@ namespace WebENG.Interface
         List<TaskModel> GetAllTasks();
         List<TaskModel> GetOfficeTasks();
         List<TaskModel> GetSiteTasks();
-        List<TaskModel> GetTravelTasks();
+        List<TaskModel> GetOtherTasks();
         string CreateTask(TaskModel task);
         string UpdateTask(TaskModel task);
 

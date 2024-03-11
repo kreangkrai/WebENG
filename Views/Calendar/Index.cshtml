@@ -29,7 +29,7 @@
                         <label for="ind">Index</label>
                         <input id="ind" type="text" class="form-control" />
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" hidden>
                         <label for="user_id">User</label>
                         <select id="user_id" class="form-control" disabled></select>
                     </div>
@@ -47,11 +47,15 @@
                             <input id="stop_date" type="date" class="form-control" />
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group form-check">                       
+                        <input id="leave" class="form-check-input" type="checkbox" />
+                        <label for="leave">Leave</label>
+                    </div>
+                    <div id="form_customers" class="form-group">
                         <label for="customers">Filter By Customers</label>
                         <select id="customers" class="form-control"></select>
                     </div>
-                    <div class="form-group">
+                    <div id="form_job" class="form-group">
                         <label for="job_id">Job</label>
                         <select id="job_id" class="form-control"></select>
                     </div>
@@ -652,7 +656,7 @@
             let location_str = '<option value="" selected disabled>Please Select Location</option>';
             location_str += '<option value="O">Office</option>';
             location_str += '<option value="S">Site</option>';
-            location_str += '<option value="T">Travel</option>';
+            location_str += '<option value="T">Other</option>';
             location_str += '<option value="H">Home</option>';
             $('#location').append(location_str);
         }
@@ -694,6 +698,35 @@
             $('#note').val(null);
             $('#btn_delete').hide();
         }
+        $('#leave').on('change',function(){
+            let status_leave = document.getElementById("leave").checked;
+            if (status_leave){
+                $('#form_customers').hide();
+                $('#form_job').hide();
+
+                document.getElementById("job_id").value = "J999999";
+                document.getElementById("process").value = "PRO000";
+                document.getElementById("system").value = "SYS000";
+                document.getElementById("location").value = "T";
+                document.getElementById("task_id").value = "T002";
+                document.getElementById("start_time").value = "08:30";
+                document.getElementById("stop_time").value = "17:30";
+
+                document.getElementById("leave").checked = true;
+            }else{
+                $('#form_customers').show();
+                $('#form_job').show();
+
+                document.getElementById("job_id").selectedIndex = 0;
+                document.getElementById("process").selectedIndex = 0;
+                document.getElementById("system").selectedIndex = 0;
+                document.getElementById("location").selectedIndex = 0;
+                document.getElementById("task_id").selectedIndex = 0;
+                document.getElementById("start_time").value = null;
+                document.getElementById("stop_time").value = null;
+                document.getElementById("leave").checked = false;
+            }
+        });
 
         $('#job_id').on('change', function () {
             let job_id = $('#job_id').val();
@@ -752,8 +785,13 @@
 
             let start_date = $('#start_date').val();
             let stop_date = $('#stop_date').val();
-
-            let job_id = $('#job_id').val();
+            let job_id = "";
+            let status_leave = document.getElementById("leave").checked;
+            if (status_leave){
+                job_id = "J999999";
+            }else{
+                job_id = $('#job_id').val();
+            }
             let process = $('#process').val();
             let system = $('#system').val();
 
@@ -847,6 +885,7 @@
             }
         });
 
+
         $('#btn_delete').on('click', function () {
             $('#modal_delete').modal();
         });
@@ -854,8 +893,14 @@
         $('#btn_confirm_delete').on('click', async function () {
             let user_id = $('#user_id').val();
             let working_date = $('#working_date').val();
+            let job_id = "";
+            let status_leave = document.getElementById("leave").checked;
+            if (status_leave){
+                job_id = "J999999";
+            }else{
+                job_id = $('#job_id').val();
+            }
 
-            let job_id = $('#job_id').val();
             let process = $('#process').val();
             let system = $('#system').val();
             let task_id = $('#task_id').val();
@@ -1065,6 +1110,30 @@
         }
 
         async function PrepmodalEditTask(task) {
+            let status_leave = task.task_name;
+            if (status_leave === "Leave"){
+                $('#form_customers').hide();
+                $('#form_job').hide();
+                document.getElementById("job_id").value = "J999999";
+                document.getElementById("process").value = "PRO000";
+                document.getElementById("system").value = "SYS000";
+                document.getElementById("location").value = "T";
+                document.getElementById("task_id").value = "T002";
+                document.getElementById("leave").checked = true;
+            }else{
+
+                $('#form_customers').show();
+                $('#form_job').show();
+
+                document.getElementById("job_id").selectedIndex = 0;
+                document.getElementById("process").selectedIndex = 0;
+                document.getElementById("system").selectedIndex = 0;
+                document.getElementById("location").selectedIndex = 0;
+                document.getElementById("task_id").selectedIndex = 0;
+
+                document.getElementById("leave").checked = false;
+            }
+
             wh_index = task.index;
             $('#job_id').val(task.job_id);
             await GetTasks();

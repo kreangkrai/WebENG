@@ -63,9 +63,9 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetTravelTasks()
+        public JsonResult GetOtherTasks()
         {
-            List<TaskModel> tasks = TaskService.GetTravelTasks();
+            List<TaskModel> tasks = TaskService.GetOtherTasks();
             return Json(tasks);
         }
 

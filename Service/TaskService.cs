@@ -122,7 +122,7 @@ namespace WebENG.Service
             return tasks;
         }
 
-        public List<TaskModel> GetTravelTasks()
+        public List<TaskModel> GetOtherTasks()
         {
             List<TaskModel> tasks = new List<TaskModel>();
             try
