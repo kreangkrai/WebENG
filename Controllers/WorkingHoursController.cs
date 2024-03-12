@@ -196,6 +196,7 @@ namespace WebENG.Controllers
                         wh.ot1_5 = ot15;
                         wh.ot3_0 = ot3;
 
+                        //var last_ot15 = monthly.Where(w => w.working_date.Date == date.Date).ToList();
                         monthly.Add(wh);
                     }
                 }

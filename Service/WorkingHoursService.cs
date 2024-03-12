@@ -445,8 +445,6 @@ namespace WebENG.Service
                         AND working_date = @working_date 
                         AND job_id = @job_id
                         AND task_id = @task_id
-                        AND process_id = @process_id
-                        AND system_id = @system_id
                         AND start_time = @start_time
                         AND stop_time = @stop_time");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
@@ -457,8 +455,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
-                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
-                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);

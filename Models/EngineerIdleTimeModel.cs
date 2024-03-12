@@ -12,5 +12,6 @@ namespace WebENG.Models
         public int idle { get; set; }
         public int normal { get; set; }
         public int overtime { get; set; }
+        public int leave { get; set; }
     }
 }

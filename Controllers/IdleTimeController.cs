@@ -115,6 +115,7 @@ namespace WebENG.Controllers
                 TimeSpan normal = zeroHour;
                 TimeSpan overtime = zeroHour;
                 TimeSpan businessHours = zeroHour;
+                TimeSpan leaveTime = zeroHour;
 
                 for (DateTime date = startDate; date <= stopDate; date = date.AddDays(1))
                 {
@@ -126,8 +127,23 @@ namespace WebENG.Controllers
                     //Check if Running Date is Weekend or Not
                     bool workingDay = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)? false : true;
 
+                    //Check Leave
+                    WorkingHoursModel leave = whs.Where(w => w.working_date.ToString("yyyy-MM-dd") == date.ToString("yyyy-MM-dd") && w.user_name == users[i] && w.task_name.Contains("Leave")).FirstOrDefault();
+                    if (leave != null)
+                    {
+                        TimeSpan time = leave.stop_time.Subtract(leave.start_time);
+                        if (time.Hours > 8)
+                        {
+                            leaveTime = leaveTime.Add(eightHours);
+                        }
+                        else
+                        {
+                            leaveTime = leaveTime.Add(time);
+                        }
+                        
+                    }
                     //Add 8 Hours to Business Working Hours
-                    if(!holiday && workingDay)
+                    if (!holiday && workingDay)
                     {
                         businessHours = businessHours.Add(eightHours);
                     }
@@ -186,19 +202,13 @@ namespace WebENG.Controllers
                     if(!holiday && workingDay)
                     {
                         TimeSpan remain = zeroHour;
-                        //If Working Hours is Less Than 8 Hours, Add Remaining Hours to Idle
-                        if(hours < eightHours)
+                        //Over Time
+                        if(hours > eightHours)
                         {
-                            remain = eightHours - hours;
-                            normal = hours;
-                            idleTime = idleTime.Add(remain);
-                        }
-                        else
-                        {
-                            remain = hours - eightHours;
-                            normal = normal.Add(eightHours);
+                            remain = hours - eightHours;                           
                             overtime = overtime.Add(remain);
                         }
+                        normal = normal.Add(eightHours);
                     }
                     //Weekend and Holiday
                     else
@@ -207,11 +217,19 @@ namespace WebENG.Controllers
                     }
                 }
 
-                int hoursIdle = (int)(idleTime.TotalMinutes / 60);
+                normal = normal.Subtract(leaveTime);
+
                 int hoursNormal = (int)(normal.TotalMinutes / 60);
                 int hoursOvertime = (int)(overtime.TotalMinutes / 60);
                 int hoursBusiness = (int)(businessHours.TotalMinutes / 60);
+                int hoursLeave = (int)(leaveTime.TotalMinutes / 60);
 
+                int hoursIdle = 0;
+                int total_Work = hoursNormal + hoursOvertime + hoursLeave;
+                if (total_Work < hoursBusiness)
+                {
+                    hoursIdle = (int)(hoursBusiness - total_Work);
+                }
                 EngineerIdleTimeModel idle = new EngineerIdleTimeModel()
                 {
                     userName = users[i],
@@ -219,6 +237,7 @@ namespace WebENG.Controllers
                     idle = hoursIdle,
                     normal = hoursNormal,
                     overtime = hoursOvertime,
+                    leave = hoursLeave
                 };
                 idles.Add(idle);
             }

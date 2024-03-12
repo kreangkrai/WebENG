@@ -39,10 +39,9 @@
                             <th>User</th>
                             <th>Idle (Hours)</th>
                             <th>Normal (Hours)</th>
-                            <th>OT 1.5 (Hours)</th>
-                            <th>OT 3 (Hours)</th>
-                            <th>Working Hours</th>
-                            <th>Leave (Hours)</th>                           
+                            <th>OverTime (Hours)</th>
+                            <th>Leave (Hours)</th>
+                            <th>Working Hours</th>                                                      
                             <th>Total (Hours)</th>
                         </tr>
                     </thead>
@@ -98,7 +97,7 @@
 
         function GenerateChart(idles) {
 
-            let colors = ['#CAE9FF', '#5FA8D3', '#1B4965'];
+            let colors = ['#CAE9FF', '#5FA8D3', '#1B4965','#291F7D'];
 
             let users = [];
             users = idles.map(m => m.userName).filter(f => f !== "");
@@ -107,11 +106,13 @@
             let hoursIdle = [];
             let hoursNormal = [];
             let hoursOvertime = [];
+            let hoursLeave = [];
             for (let i = 0; i < users.length; i++) {
                 let datas = idles.filter(f => f.userName === users[i]);
                 hoursIdle.push(datas.map(m => m.idle)[0]);
                 hoursNormal.push(datas.map(m => m.normal)[0]);
                 hoursOvertime.push(datas.map(m => m.overtime)[0]);
+                hoursLeave.push(datas.map(m => m.leave)[0]);
             }
 
             if (chart !== undefined) {
@@ -138,6 +139,11 @@
                             label: 'Overtime',
                             data: hoursOvertime,
                             backgroundColor: colors[2]
+                        },
+                        {
+                            label: 'Leave',
+                            data: hoursLeave,
+                            backgroundColor: colors[3]
                         }
                     ]
                 },
@@ -184,9 +190,10 @@
                         <td style="text-align:left">${datas[i].userName}</td>
                         <td>${datas[i].idle}</td>
                         <td>${datas[i].normal}</td>
-                        <td>${datas[i].workingHours}</td>
                         <td>${datas[i].overtime}</td>
-                        <td>${datas[i].normal + datas[i].overtime}</td>
+                        <td>${datas[i].leave}</td>
+                        <td>${datas[i].workingHours}</td>                        
+                        <td>${datas[i].normal + datas[i].leave + datas[i].overtime}</td>
                     </tr>
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);
