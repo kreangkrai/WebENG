@@ -79,7 +79,7 @@ namespace WebENG.Controllers
             {
                 DateTime date = new DateTime(yy, mm, i + 1);
                 List<WorkingHoursModel> whd = whs.Where(w => w.working_date == date).ToList();
-                if(whd.Count > 0)
+                if (whd.Count > 0)
                 {
                     TimeSpan substraction = new TimeSpan(8, 0, 0);
                     TimeSpan anHour = new TimeSpan(1, 0, 0);
@@ -109,16 +109,16 @@ namespace WebENG.Controllers
                         wh.lunch = whd[j].lunch;
                         wh.dinner = whd[j].dinner;
 
-                        if(isHoliday || isWeekend)
+                        if (isHoliday || isWeekend)
                         {
                             ot15 += wh.stop_time - wh.start_time;
 
-                            if(wh.lunch)
+                            if (wh.lunch)
                             {
                                 ot15 -= anHour;
                             }
 
-                            if(wh.dinner)
+                            if (wh.dinner)
                             {
                                 ot15 -= anHour;
                             }
@@ -136,13 +136,13 @@ namespace WebENG.Controllers
                         else
                         {
                             //Check Start and Stop Time to calculate hours
-                            if(wh.start_time < evening && wh.stop_time > evening)
+                            if (wh.start_time < evening && wh.stop_time > evening)
                             {
                                 //Start before 17.30 and stop after 17.30
                                 regular += evening - wh.start_time;
 
                                 //Check if task is not equal to travel
-                                if(wh.task_id[0] != 'T')
+                                if (wh.task_id[0] != 'T')
                                 {
                                     //Add hours to overtime 1.5 if task is not travel
                                     ot15 += wh.stop_time - evening;
@@ -152,9 +152,9 @@ namespace WebENG.Controllers
                                     //Add hours to regular if task is travel
                                     regular += wh.stop_time - evening;
                                 }
-                                
+
                             }
-                            else if(wh.start_time < evening && wh.stop_time <= evening)
+                            else if (wh.start_time < evening && wh.stop_time <= evening)
                             {
                                 //Start before 17.30 and stop before 17.30
                                 regular += wh.stop_time - wh.start_time;
@@ -186,17 +186,103 @@ namespace WebENG.Controllers
                             }
                         }
 
-                        if((ot15 > substraction) && (isHoliday || isWeekend))
+                        if ((ot15 > substraction) && (isHoliday || isWeekend))
                         {
                             ot3 += ot15 - substraction;
                             ot15 -= ot15 - substraction;
                         }
 
-                        wh.normal = regular;
-                        wh.ot1_5 = ot15;
-                        wh.ot3_0 = ot3;
+                        List<WorkingHoursModel> lastDays = monthly.Where(w => w.working_date.Date == date.Date).ToList();
+                        TimeSpan lastOT15 = TimeSpan.Zero;
+                        TimeSpan lastNormal = TimeSpan.Zero;
+                        for (int k = 0; k < lastDays.Count; k++)
+                        {
+                            lastOT15 += lastDays[k].ot1_5;
+                            lastNormal += lastDays[k].normal;
+                        }
 
-                        //var last_ot15 = monthly.Where(w => w.working_date.Date == date.Date).ToList();
+                        bool isTaskT = wh.task_id[0] == 'T';
+                        if (!isTaskT)
+                        {
+                            wh.normal = TimeSpan.Zero;
+                            TimeSpan remain_ot15 = TimeSpan.Zero;
+                            remain_ot15 = substraction - lastOT15;
+
+                            if (isWeekend || isHoliday)
+                            {
+                                if (lastOT15.TotalHours >= 8)
+                                {
+                                    wh.ot1_5 = TimeSpan.Zero;
+                                    wh.ot3_0 = ot15 - remain_ot15;
+                                }
+                                else
+                                {
+                                    if (remain_ot15.TotalHours >= 8)
+                                    {
+                                        wh.ot1_5 = ot15;
+                                        wh.ot3_0 = ot3;
+                                    }
+                                    else
+                                    {
+                                        wh.ot1_5 = remain_ot15;
+                                        wh.ot3_0 = ot3;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (lastNormal.TotalHours >= 8)
+                                {
+                                    if (remain_ot15 < regular)
+                                    {
+                                        wh.ot1_5 = remain_ot15;
+                                        wh.ot3_0 = regular - remain_ot15;
+                                    }
+                                    else
+                                    {
+                                        if (remain_ot15.TotalHours >= 8)
+                                        {
+                                            wh.ot1_5 = ot15;
+                                            wh.ot3_0 = TimeSpan.Zero;
+                                        }
+                                        else
+                                        {
+                                            wh.ot1_5 = remain_ot15;
+                                            wh.ot3_0 = TimeSpan.Zero;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    wh.normal = regular;
+                                    wh.ot1_5 = ot15;
+                                    wh.ot3_0 = ot3;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (wh.task_name == "Leave")
+                            {
+                                wh.normal = TimeSpan.Zero;
+                                wh.ot1_5 = TimeSpan.Zero;
+                                wh.ot3_0 = TimeSpan.Zero;
+                            }
+                            if (wh.task_name == "Traveling")
+                            {
+                                if (regular.TotalHours >= 8)
+                                {
+                                    wh.normal = new TimeSpan(8, 0, 0);
+                                }
+                                else
+                                {
+                                    wh.normal = regular;
+                                }
+                                
+                                wh.ot1_5 = TimeSpan.Zero;
+                                wh.ot3_0 = TimeSpan.Zero;
+                            }
+                        }
                         monthly.Add(wh);
                     }
                 }
@@ -287,8 +373,19 @@ namespace WebENG.Controllers
                 }
                 else
                 {
-                    data.location = monthly[i].task_id.Substring(0, 1) == "O" ? "Office" : 
-                        monthly[i].task_id.Substring(0, 1) == "S" ? "Site" : "Travel";
+                    if (monthly[i].task_id.Substring(0, 1) == "O")
+                    {
+                        data.location = "Office";
+                    }
+                    if (monthly[i].task_id.Substring(0, 1) == "S")
+                    {
+                        data.location = "Site";
+                    }
+                    if (monthly[i].task_id.Substring(0, 1) == "T")
+                    {
+                        data.location = "Other";
+                    }
+
                     data.start_time = monthly[i].start_time.ToString().Substring(0,5) != "00:00" || monthly[i].stop_time.ToString().Substring(0, 5) != "00:00" ? 
                         monthly[i].start_time.ToString().Substring(0, 5) : "";
                     data.stop_time = monthly[i].stop_time.ToString().Substring(0, 5) != "00:00" || monthly[i].start_time.ToString().Substring(0, 5) != "00:00" ? 

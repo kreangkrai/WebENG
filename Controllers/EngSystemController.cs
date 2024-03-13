@@ -15,11 +15,12 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         ISystem System;
-
+        IJob Job;
         public EngSystemController()
         {
             this.Accessory = new AccessoryService();
             this.System = new SystemService();
+            Job = new JobService();
         }
 
         public IActionResult Index()
@@ -45,6 +46,13 @@ namespace WebENG.Controllers
         public List<EngSystemModel> GetSystems()
         {
             List<EngSystemModel> systems = System.GetSystems();
+            return systems;
+        }
+
+        [HttpGet]
+        public List<EngSystemModel> GetSystemsByJob(string job_id)
+        {
+            List<EngSystemModel> systems = Job.GetSystemByJob(job_id);
             return systems;
         }
 

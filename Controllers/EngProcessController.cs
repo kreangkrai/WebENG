@@ -15,11 +15,13 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         IProcess Process;
+        IJob Job;
 
         public EngProcessController()
         {
             this.Accessory = new AccessoryService();
             this.Process = new ProcessService();
+            Job = new JobService();
         }
 
         public IActionResult Index()
@@ -45,6 +47,13 @@ namespace WebENG.Controllers
         public List<EngProcessModel> GetProcesses()
         {
             List<EngProcessModel> processes = Process.GetProcesses();
+            return processes;
+        }
+
+        [HttpGet]
+        public List<EngProcessModel> GetProcessesByJob(string job_id)
+        {
+            List<EngProcessModel> processes = Job.GetProcessByJob(job_id);
             return processes;
         }
 

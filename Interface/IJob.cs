@@ -13,5 +13,9 @@ namespace WebENG.Interface
         string CreateJob(JobModel job);
         string UpdateJob(JobModel job);
         List<JobQuotationModel> GetJobQuotations(string year);
+
+        List<EngProcessModel> GetProcessByJob(string job);
+        List<EngSystemModel> GetSystemByJob(string job);
+
     }
 }

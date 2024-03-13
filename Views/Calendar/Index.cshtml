@@ -202,23 +202,25 @@
             await GetTasks();
         });
 
-        async function GetProcess() {
+        async function GetProcess(job_id) {
+            //let job = document.getElementById("job_id").value;
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetProcesses", "EngProcess")',
+                url: '@Url.Action("GetProcessesByJob", "EngProcess")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { },
+                data: { job_id },
                 success: function (response) {
                     processes = response;                   
                 }
             });
         }
-        async function GetSystem() {
+        async function GetSystem(job_id) {
+            //let job = document.getElementById("job_id").value;
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetSystems", "EngSystem")',
+                url: '@Url.Action("GetSystemsByJob", "EngSystem")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { },
+                data: { job_id },
                 success: function (response) {
                     systems = response;                   
                 }
@@ -455,7 +457,7 @@
                         AddTasks(date_start,date_end)
                     }
                 },
-                eventClick: function (info) {
+                eventClick: async function (info) {
                     EditTask(info.event);
                 },
             });
@@ -600,8 +602,6 @@
                 if (wh_day !== null) {
                     wh_day = [];
                 }
-                await GetProcess();
-                await GetSystem();
                 await GetUsers();
                 await GenerateUsersOption();
                 await GetWorkingHoursByDate("@Model.name.ToLower()", date_start);
@@ -633,8 +633,6 @@
 
             if (show_modal) {
                 update = false;
-                await GetProcess();
-                await GetSystem();
                 await GetUsers();
                 await GenerateUsersOption();
                 await GetJobs();
@@ -728,10 +726,16 @@
             }
         });
 
-        $('#job_id').on('change', function () {
+        $('#job_id').on('change', async function () {
             let job_id = $('#job_id').val();
             let enable_location = (job_id !== "") ? 1 : 0;
             $('#location').attr('disabled', !enable_location);
+            
+            await GetProcess(job_id);
+            await GetSystem(job_id);
+
+            await GenerateProcessOption();
+            await GenerateSystemOption();
         });
 
         $('#location').on('change', function () {
@@ -1072,9 +1076,11 @@
             let user_id = event.extendedProps.user_id;
             let user_name = users.filter(f => f.user_id === user_id).map(m => m.user_name.toLowerCase());
             let date = event.extendedProps.working_date;
+
+            let job_id = $('#job_id').val();
+            await GetProcess(job_id);
+            await GetSystem(job_id);           
             await GetUsers();
-            await GetProcess();
-            await GetSystem();
             await GenerateUsersOption();
             await GetWorkingHoursByDate(user_name, date.split("T")[0]);
             await GetJobs();
