@@ -200,6 +200,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (job.finished_date.Day == new DateTime(1, 1, 1).Day)
+                {
+                    job.finished_date = new DateTime(1900, 1, 1);
+                }
                 string string_command = string.Format($@"
                     UPDATE Jobs 
                     SET
@@ -290,17 +294,12 @@ namespace WebENG.Service
         public List<EngProcessModel> GetProcessByJob(string job)
         {
             List<EngProcessModel> processes = new List<EngProcessModel>();
-            processes.Add(new EngProcessModel()
-            {
-                process_id = "PRO000",
-                process_name = ""
-            });
             try
             {
                 string string_command = string.Format($@"
-                    SELECT  job_id, Jobs.process_id,Eng_Process.Process_Name as process_name FROM Jobs
+                    SELECT  job_id, value as process_id,Eng_Process.Process_Name as process_name FROM Jobs
                     CROSS APPLY STRING_SPLIT(process_id,',')
-                    LEFT JOIN Eng_Process ON Eng_Process.Process_ID = Jobs.process_id
+                    LEFT JOIN Eng_Process ON Eng_Process.Process_ID = value
                     WHERE job_id ='{job}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -336,17 +335,12 @@ namespace WebENG.Service
         public List<EngSystemModel> GetSystemByJob(string job)
         {
             List<EngSystemModel> systems = new List<EngSystemModel>();
-            systems.Add(new EngSystemModel
-            {
-                system_id = "SYS000",
-                system_name = ""
-            });
             try
             {
                 string string_command = string.Format($@"
-                    SELECT  job_id, Jobs.system_id,Eng_System.System_Name as system_name FROM Jobs
+                    SELECT  job_id, value as system_id,Eng_System.System_Name as system_name FROM Jobs
                     CROSS APPLY STRING_SPLIT(system_id,',')
-                    LEFT JOIN Eng_System ON Eng_System.System_ID = Jobs.system_id
+                    LEFT JOIN Eng_System ON Eng_System.System_ID = value
                     WHERE job_id ='{job}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
