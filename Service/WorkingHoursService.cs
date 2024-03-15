@@ -56,7 +56,7 @@ namespace WebENG.Service
                     {
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
-                            index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
+                            index = dr["ind"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -137,7 +137,7 @@ namespace WebENG.Service
                     {
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
-                            index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
+                            index = dr["ind"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -219,7 +219,7 @@ namespace WebENG.Service
                     {
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
-                            index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
+                            index = dr["ind"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -301,7 +301,7 @@ namespace WebENG.Service
                     {
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
-                            index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
+                            index = dr["ind"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -341,17 +341,27 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO WorkingHours(
-                        user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch, dinner, note)
+                        ind,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch, dinner, note)
                     VALUES (
-                        @user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch, @dinner, @note)");
+                        @ind,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch, @dinner, @note)");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@ind", wh.index);
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
-                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
-                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                    if (wh.job_id == "J999999")
+                    {
+                        cmd.Parameters.AddWithValue("@process_id", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@system_id", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                        cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                    }
+                    
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
@@ -396,6 +406,8 @@ namespace WebENG.Service
                         task_id = @task_id,
                         start_time = @start_time,
                         stop_time = @stop_time,
+                        lunch = @lunch,
+                        dinner = @dinner,
                         note = @note
                     WHERE ind = @ind");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
@@ -404,11 +416,22 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
-                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
-                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+
+                    if (wh.job_id == "J999999")
+                    {
+                        cmd.Parameters.AddWithValue("@process_id", DBNull.Value);
+                        cmd.Parameters.AddWithValue("@system_id", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                        cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                    }
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
+                    cmd.Parameters.AddWithValue("@lunch", wh.lunch);
+                    cmd.Parameters.AddWithValue("@dinner", wh.dinner);
                     cmd.Parameters.AddWithValue("@note", wh.note);
                     cmd.Parameters.AddWithValue("@ind", wh.index);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -488,24 +511,12 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     DELETE FROM WorkingHours
                     WHERE user_id = @user_id
-                        AND working_date = @working_date
-                        AND job_id = @job_id
-                        AND process_id = @process_id
-                        AND system_id = @system_id
-                        AND task_id = @task_id
-                        AND start_time = @start_time
-                        AND stop_time = @stop_time");
+                        AND ind = @ind");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
-                    cmd.Parameters.AddWithValue("@working_date", wh.working_date);
-                    cmd.Parameters.AddWithValue("@job_id", wh.job_id);
-                    cmd.Parameters.AddWithValue("@process_id", wh.process_id);
-                    cmd.Parameters.AddWithValue("@system_id", wh.system_id);
-                    cmd.Parameters.AddWithValue("@task_id", wh.task_id);
-                    cmd.Parameters.AddWithValue("@start_time", wh.start_time);
-                    cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
+                    cmd.Parameters.AddWithValue("@ind", wh.index);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -691,7 +702,7 @@ namespace WebENG.Service
                     {
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
-                            index = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"]) : default(Int32),
+                            index = dr["ind"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -724,6 +735,38 @@ namespace WebENG.Service
                 }
             }
             return whs;
+        }
+
+        public int GetLastWorkingHoursID()
+        {
+            int id = 0;
+            try
+            {
+                string string_command = string.Format($@"SELECT TOP 1 ind FROM WorkingHours WHERE ind LIKE 'WH%' ORDER BY ind DESC");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        id = dr["ind"] != DBNull.Value ? Convert.ToInt32(dr["ind"].ToString().Substring(2)) : 0;
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return id;
         }
     }
 }

@@ -33,6 +33,7 @@ namespace WebENG.Service
 							 end
 						end ) AS total_manpower 
 	                    FROM WorkingHours
+                        WHERE WorkingHours.job_id <> 'J999999'
 	                    GROUP BY job_id
 					),
 					t3 as (

@@ -107,6 +107,7 @@ namespace WebENG.Service
 							 end
 						end ) AS total_manpower 
 	                    FROM WorkingHours
+                        WHERE WorkingHours.job_id <> 'J999999'
 	                    GROUP BY job_id
 					)
                     SELECT
@@ -120,6 +121,7 @@ namespace WebENG.Service
                     FROM Jobs
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
+                    WHERE Jobs.job_id <> 'J999999'
                     ORDER BY Jobs.job_id");
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

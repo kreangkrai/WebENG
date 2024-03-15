@@ -26,16 +26,24 @@
             <div class="modal-body">
                 <form>
                     <div class="form-group" hidden>
-                        <label for="ind">Index</label>
-                        <input id="ind" type="text" class="form-control" />
-                    </div>
-                    <div class="form-group" hidden>
                         <label for="user_id">User</label>
                         <select id="user_id" class="form-control" disabled></select>
                     </div>
-                    <div id="working_date_group" class="form-group">
-                        <label for="working_date">Date</label>
-                        <input id="working_date" type="date" class="form-control" disabled/>
+                    <div id="working_date_group" class="form-group row">
+                        <div class="col-4">
+                            <label for="working_hour_id">Working Hours ID</label>
+                            <input id="working_hour_id" type="text" class="form-control" disabled />
+                        </div>
+                        <div class="col-4">
+                            <label for="working_date">Date</label>
+                            <input id="working_date" type="date" class="form-control" disabled/>
+                        </div>
+                        <div class="col-4 pt-5">
+                            <div class="form-check">
+                                <input id="leave" class="form-check-input" type="checkbox" />
+                                <label for="leave">Leave</label>
+                            </div>
+                        </div>
                     </div>
                     <div id="date_group" class="form-group row">
                         <div class="col-6">
@@ -46,10 +54,6 @@
                             <label for="stop_date">To</label>
                             <input id="stop_date" type="date" class="form-control" />
                         </div>
-                    </div>
-                    <div class="form-group form-check">                       
-                        <input id="leave" class="form-check-input" type="checkbox" />
-                        <label for="leave">Leave</label>
                     </div>
                     <div id="form_customers" class="form-group">
                         <label for="customers">Filter By Customers</label>
@@ -87,6 +91,20 @@
                         <div class="col-6">
                             <label for="stop_time">To</label>
                             <input id="stop_time" type="time" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input id="lunch" class="form-check-input" type="checkbox" checked/>
+                                <label class="form-check-label">Lunch</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check">
+                                <input id="dinner" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label">Break</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -179,6 +197,7 @@
         let drag = false;
         let overlap = true;
         let eng;
+        let last_id = 0;
 
         //Change these variable to true for show data response
         let debug_user = false;
@@ -193,7 +212,7 @@
         let debug_edit = false;
         let debug_drop = false;
 
-        $(document).ready(async function () {
+        $(document).ready(async function () {            
             await GetHolidays();
             await GetEngineerUser("@Model.name.ToLower()");
             await GetWorkingHours("@Model.name.ToLower()");
@@ -202,6 +221,17 @@
             await GetTasks();
         });
 
+        async function GetLastWorkingHoursID() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetLastWorkingHoursID", "WorkingHours")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    last_id = response;
+                }
+            });
+        }
         async function GetProcess(job_id) {
             //let job = document.getElementById("job_id").value;
             await $.ajax({
@@ -602,6 +632,7 @@
                 if (wh_day !== null) {
                     wh_day = [];
                 }
+                await GetLastWorkingHoursID();
                 await GetUsers();
                 await GenerateUsersOption();
                 await GetWorkingHoursByDate("@Model.name.ToLower()", date_start);
@@ -633,6 +664,7 @@
 
             if (show_modal) {
                 update = false;
+                await GetLastWorkingHoursID();
                 await GetUsers();
                 await GenerateUsersOption();
                 await GetJobs();
@@ -664,6 +696,7 @@
             $('#modal_task_title').text("Add Task");
             let user_name = '@Model.name.ToLower()';
             let user_id = users.filter(f => f.user_name.toLowerCase() === user_name).map(m => m.user_id);
+            $('#working_hour_id').val(last_id);
             $('#user_id').val(user_id);
             $('#working_date_group').show();
             $('#working_date').attr('disabled', true);
@@ -682,6 +715,7 @@
             $('#modal_task_title').text("Add Tasks");
             let user_name = '@Model.name.ToLower()';
             let user_id = users.filter(f => f.user_name.toLowerCase() === user_name).map(m => m.user_id);
+            $('$working_hour_id').val(last_id);
             $('#user_id').val(user_id);
             $('#working_date_group').hide();
             $('#working_date').attr('disabled', true);
@@ -786,6 +820,7 @@
         $('#btn_accept').on('click', async function () {
             let user_id = $('#user_id').val();
             let working_date = $('#working_date').val();
+            let wh_index = $('#working_hour_id').val();
 
             let start_date = $('#start_date').val();
             let stop_date = $('#stop_date').val();
@@ -802,6 +837,8 @@
             let task_id = $('#task_id').val();
             let start_time = $('#start_time').val();
             let stop_time = $('#stop_time').val();
+            let lunch = $('#lunch').prop('checked');
+            let dinner = $('#dinner').prop('checked');
             let note = $('#note').val();
 
             if (debug_accept) {
@@ -826,6 +863,8 @@
                     "task_id": task_id,
                     "start_time": start_time,
                     "stop_time": stop_time,
+                    "lunch":lunch,
+                    "dinner":dinner,
                     "note": note,
                 });
 
@@ -850,6 +889,7 @@
             else {
                 if (working_date !== "") {
                     let wh_string = JSON.stringify({
+                        "index": wh_index,
                         "user_id": user_id,
                         "working_date": working_date,
                         "job_id": job_id,
@@ -858,6 +898,8 @@
                         "task_id": task_id,
                         "start_time": start_time,
                         "stop_time": stop_time,
+                        "lunch":lunch,
+                        "dinner":dinner,
                         "note": note,
                     });
                     await AddWorkingHours(wh_string);
@@ -869,6 +911,7 @@
                     for (let cur_date = date_start; cur_date <= date_stop; cur_date.setDate(cur_date.getDate() + 1)){
                         let task_overlap = false;
                         let wh_string = JSON.stringify({
+                            "index": wh_index,
                             "user_id": user_id,
                             "working_date": cur_date,
                             "job_id": job_id,
@@ -877,6 +920,8 @@
                             "task_id": task_id,
                             "start_time": start_time,
                             "stop_time": stop_time,
+                            "lunch":lunch,
+                            "dinner":dinner,
                             "note": note,
                         });
                         task_overlap = await CheckAddTasksOverlap(wh_string);
@@ -896,6 +941,7 @@
 
         $('#btn_confirm_delete').on('click', async function () {
             let user_id = $('#user_id').val();
+            let wh_index = $('#working_hour_id').val();
             let working_date = $('#working_date').val();
             let job_id = "";
             let status_leave = document.getElementById("leave").checked;
@@ -1070,7 +1116,6 @@
             });
         }
 
-        let wh_index;
         async function EditTask(event) {
             update = true;
             let user_id = event.extendedProps.user_id;
@@ -1140,7 +1185,6 @@
                 document.getElementById("leave").checked = false;
             }
 
-            wh_index = task.index;
             $('#job_id').val(task.job_id);
             await GetTasks();
             await GenerateTasksOption();
@@ -1153,6 +1197,7 @@
             }
             $('#modal_task').modal();
             $('#modal_task_title').text("Edit Task");
+            $('#working_hour_id').val(task.index);
             $('#user_id').val(task.user_id);
             $('#working_date_group').show();
             $('#working_date').val(task.working_date.split("T")[0]);
@@ -1161,6 +1206,8 @@
             $('#stop_date').val(null);
             $('#start_time').val(task.start_time);
             $('#stop_time').val(task.stop_time);
+            $('#lunch').prop('checked',task.lunch);
+            $('#dinner').prop('checked',task.dinner);
             $('#note').val(task.note);
             $('#btn_delete').show();
         }

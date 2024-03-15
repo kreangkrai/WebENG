@@ -18,8 +18,8 @@ namespace WebENG.Models
         public string total_normal { get; set; }
         public string total_ot1_5 { get; set; }
         public string total_ot3_0 { get; set; }
-        public double hours_normal { get; set; }
-        public double hours_1_5 { get; set; }
-        public double hours_3_0 { get; set; }
+        public string hours_normal { get; set; }
+        public string hours_1_5 { get; set; }
+        public string hours_3_0 { get; set; }
     }
 }

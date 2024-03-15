@@ -55,6 +55,14 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
+        
+        [HttpGet]
+        public string GetLastWorkingHoursID()
+        {
+            int id = WorkingHoursService.GetLastWorkingHoursID() + 1;
+            string wh = "WH" + id.ToString().PadLeft(6, '0');
+            return wh;
+        }
 
         [HttpGet]
         public JsonResult GetWorkingHours(string user_name, string month)
@@ -111,8 +119,15 @@ namespace WebENG.Controllers
 
                         if (isHoliday || isWeekend)
                         {
-                            ot15 += wh.stop_time - wh.start_time;
-
+                            if (wh.stop_time == new TimeSpan(23, 59, 0))
+                            {
+                                ot15 += (wh.stop_time - wh.start_time).Add(new TimeSpan (0,1,0));
+                            }
+                            else
+                            {
+                                ot15 += wh.stop_time - wh.start_time;
+                            }
+                            
                             if (wh.lunch)
                             {
                                 ot15 -= anHour;
@@ -145,19 +160,40 @@ namespace WebENG.Controllers
                                 if (wh.task_id[0] != 'T')
                                 {
                                     //Add hours to overtime 1.5 if task is not travel
-                                    ot15 += wh.stop_time - evening;
+                                    if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                    {
+                                        ot15 += (wh.stop_time - evening).Add(new TimeSpan(0, 1, 0));
+                                    }
+                                    else
+                                    {
+                                        ot15 += wh.stop_time - evening;
+                                    }
                                 }
                                 else
                                 {
                                     //Add hours to regular if task is travel
-                                    regular += wh.stop_time - evening;
+                                    if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                    {
+                                        regular += (wh.stop_time - evening).Add(new TimeSpan(0, 1, 0));
+                                    }
+                                    else
+                                    {
+                                        regular += wh.stop_time - evening;
+                                    }
                                 }
 
                             }
                             else if (wh.start_time < evening && wh.stop_time <= evening)
                             {
                                 //Start before 17.30 and stop before 17.30
-                                regular += wh.stop_time - wh.start_time;
+                                if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                {
+                                    regular += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
+                                }
+                                else
+                                {
+                                    regular += wh.stop_time - wh.start_time;
+                                }
                             }
                             else
                             {
@@ -165,13 +201,29 @@ namespace WebENG.Controllers
                                 //Check if task is not equal to travel
                                 if (wh.task_id[0] != 'T')
                                 {
-                                    //Add hours to overtime 1.5 if task is not travel
-                                    ot15 += wh.stop_time - wh.start_time;
+                                    //Add hours to overtime 1.5 if task is not travel        
+
+                                    if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                    {
+                                        ot15 += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
+                                    }
+                                    else
+                                    {
+                                        ot15 += wh.stop_time - wh.start_time;
+                                    }
                                 }
                                 else
                                 {
                                     //Add hours to regular if task is travel
-                                    regular += wh.stop_time - wh.start_time;
+
+                                    if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                    {
+                                        regular += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
+                                    }
+                                    else
+                                    {
+                                        regular += wh.stop_time - wh.start_time;
+                                    }
                                 }
                             }
 
@@ -313,7 +365,7 @@ namespace WebENG.Controllers
         public JsonResult GetMonthlySummary()
         {
             List<WorkingHoursSummaryModel> whs = new List<WorkingHoursSummaryModel>();
-            string[] jobs = monthly.Where(w => w.job_id != "").Select(s => s.job_id).Distinct().ToArray();
+            string[] jobs = monthly.Where(w => w.job_id != "" && w.job_id != "J999999").Select(s => s.job_id).Distinct().ToArray();
             for(int i = 0; i < jobs.Count(); i++)
             {
                 WorkingHoursSummaryModel js = new WorkingHoursSummaryModel();
@@ -398,7 +450,7 @@ namespace WebENG.Controllers
             }
 
             List<WorkingHoursModel> summaries = new List<WorkingHoursModel>();
-            string[] jobs = monthly.Select(s => s.job_id).Where(w => w != "").Distinct().ToArray();
+            string[] jobs = monthly.Select(s => s.job_id).Where(w => w != "" && w != "J999999").Distinct().ToArray();
             for(int i = 0; i < jobs.Count(); i++)
             {
                 WorkingHoursModel summary = new WorkingHoursModel()
@@ -422,13 +474,13 @@ namespace WebENG.Controllers
                 month = form_month,
                 datas = datas,
                 summary = summaries,
-                total_working_hours = Convert.ToInt32(twhs.TotalHours).ToString().PadLeft(2,'0') + ":" + twhs.Minutes.ToString().PadLeft(2,'0'),
-                total_normal = Convert.ToInt32(sum_normal.TotalHours).ToString().PadLeft(2, '0') + ":" + sum_normal.Minutes.ToString().PadLeft(2, '0'),
-                total_ot1_5 = Convert.ToInt32(sum_ot1_5.TotalHours).ToString().PadLeft(2, '0') + ":" + sum_ot1_5.Minutes.ToString().PadLeft(2, '0'),
-                total_ot3_0 = Convert.ToInt32(sum_ot3_0.TotalHours).ToString().PadLeft(2, '0') + ":" + sum_ot3_0.Minutes.ToString().PadLeft(2, '0'),
-                hours_normal = Convert.ToDouble(sum_normal.TotalHours),
-                hours_1_5 = Convert.ToDouble(sum_ot1_5.TotalHours),
-                hours_3_0 = Convert.ToDouble(sum_ot3_0.TotalHours)
+                total_working_hours = ((int)(twhs.TotalHours)).ToString().PadLeft(2,'0') + ":" + twhs.Minutes.ToString().PadLeft(2,'0'),
+                total_normal = ((int)(sum_normal.TotalHours)).ToString().PadLeft(2, '0') + ":" + sum_normal.Minutes.ToString().PadLeft(2, '0'),
+                total_ot1_5 = ((int)(sum_ot1_5.TotalHours)).ToString().PadLeft(2, '0') + ":" + sum_ot1_5.Minutes.ToString().PadLeft(2, '0'),
+                total_ot3_0 = ((int)(sum_ot3_0.TotalHours)).ToString().PadLeft(2, '0') + ":" + sum_ot3_0.Minutes.ToString().PadLeft(2, '0'),
+                hours_normal = ((int)(sum_normal.TotalHours)).ToString().PadLeft(2, '0') + ":" + sum_normal.Minutes.ToString().PadLeft(2, '0'),
+                hours_1_5 = ((int)(sum_ot1_5.TotalHours)).ToString().PadLeft(2, '0') + ":" + sum_ot1_5.Minutes.ToString().PadLeft(2, '0'),
+                hours_3_0 = ((int)(sum_ot3_0.TotalHours)).ToString().PadLeft(2, '0') + ":" + sum_ot3_0.Minutes.ToString().PadLeft(2, '0')
             };
             var form_overtime = new ViewAsPdf("FormOvertime")
             {

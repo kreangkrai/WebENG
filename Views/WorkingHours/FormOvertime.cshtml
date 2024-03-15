@@ -318,19 +318,19 @@
                             </tr>
                             <tr>
                                 <td>1</td>
-                                <td>@Model.hours_normal.ToString("#.#")</td>
+                                <td>@Model.hours_normal</td>
                                 <td>1</td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>2</td>
-                                <td>@Model.hours_1_5.ToString("#.#")</td>
+                                <td>@Model.hours_1_5</td>
                                 <td>1.5</td>
                                 <td></td>
                             </tr>
                             <tr>
                                 <td>3</td>
-                                <td>@Model.hours_3_0.ToString("#.#")</td>
+                                <td>@Model.hours_3_0</td>
                                 <td>3</td>
                                 <td></td>
                             </tr>
@@ -364,16 +364,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (int i = 0; i < 10; i++)
+                            @for (int i = 0; i < @Model.summary.Count; i++)
                             {
                                 @if (i < Model.summary.Count())
                                 {
+                                    string normal = ((int)(Model.summary[i].normal.TotalHours)).ToString().PadLeft(2, '0') + ":" + Model.summary[i].normal.Minutes.ToString().PadLeft(2, '0');
+                                    string ot1_5 = ((int)(Model.summary[i].ot1_5.TotalHours)).ToString().PadLeft(2, '0') + ":" + Model.summary[i].ot1_5.Minutes.ToString().PadLeft(2, '0');
+                                    string ot3_0 = ((int)(Model.summary[i].ot3_0.TotalHours)).ToString().PadLeft(2, '0') + ":" + Model.summary[i].ot3_0.Minutes.ToString().PadLeft(2, '0');
+                                    
+                                    normal = normal != "00:00" ? normal : "";
+                                    ot1_5 = ot1_5 != "00:00" ? ot1_5 : "";
+                                    ot3_0 = ot3_0 != "00:00" ? ot3_0 : "";
                                     <tr>
                                         <td>@(i + 1)</td>
                                         <td>@Model.summary[i].job_id</td>
-                                        <td>@Convert.ToDouble(Model.summary[i].normal.TotalHours).ToString("0.0")</td>
-                                        <td>@Convert.ToDouble(Model.summary[i].ot1_5.TotalHours).ToString("0.0")</td>
-                                        <td>@Convert.ToDouble(Model.summary[i].ot3_0.TotalHours).ToString("0.0")</td>
+                                        <td>@normal</td>
+                                        <td>@ot1_5</td>
+                                        <td>@ot3_0</td>
                                     </tr>
                                 }
                                 else

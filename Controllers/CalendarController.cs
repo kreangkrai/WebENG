@@ -101,30 +101,6 @@ namespace WebENG.Controllers
             try
             {
                 WorkingHoursModel wh = JsonConvert.DeserializeObject<WorkingHoursModel>(wh_string);
-                
-                TimeSpan noon = new TimeSpan(12, 0, 0);
-                TimeSpan after_noon = new TimeSpan(13, 0, 0);
-                
-                if(wh.start_time < noon && wh.stop_time > after_noon)
-                {
-                    wh.lunch = true;
-                }
-                else
-                {
-                    wh.lunch = false;
-                }
-
-                TimeSpan evening = new TimeSpan(17, 30, 0);
-                TimeSpan stop_break = new TimeSpan(18, 30, 0);
-                if(wh.start_time <= evening && wh.stop_time > stop_break)
-                {
-                    wh.dinner = true;
-                }
-                else
-                {
-                    wh.dinner = false;
-                }
-
                 var result = WorkingHoursService.AddWorkingHours(wh);
                 return Json(result);
             }
@@ -141,30 +117,6 @@ namespace WebENG.Controllers
             for (int i = 0; i < wh_strings.Count(); i++)
             {
                 WorkingHoursModel wh = JsonConvert.DeserializeObject<WorkingHoursModel>(wh_strings[i]);
-
-                TimeSpan noon = new TimeSpan(12, 0, 0);
-                TimeSpan after_noon = new TimeSpan(13, 0, 0);
-
-                if (wh.start_time < noon && wh.stop_time > after_noon)
-                {
-                    wh.lunch = true;
-                }
-                else
-                {
-                    wh.lunch = false;
-                }
-
-                TimeSpan evening = new TimeSpan(17, 30, 0);
-                TimeSpan stop_break = new TimeSpan(18, 30, 0);
-                if (wh.start_time <= evening && wh.stop_time > stop_break)
-                {
-                    wh.dinner = true;
-                }
-                else
-                {
-                    wh.dinner = false;
-                }
-
                 var result = WorkingHoursService.AddWorkingHours(wh);
             }
             return Json("Success");

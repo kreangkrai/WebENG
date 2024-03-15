@@ -19,5 +19,7 @@ namespace WebENG.Interface
         List<JobWeeklyWorkingHoursModel> GetAllJobWorkingHours(int year, int week);
         List<EngWeeklyWorkingHoursModel> GetAllEngWorkingHours(int year, int week);
         List<WorkingHoursModel> GetWorkingHours(int year, int week);
+
+        int GetLastWorkingHoursID();
     }
 }
