@@ -21,5 +21,8 @@ namespace WebENG.Interface
         List<WorkingHoursModel> GetWorkingHours(int year, int week);
 
         int GetLastWorkingHoursID();
+
+        List<WorkingHoursModel> CalculateWorkingHours(string user_name, string month);
+        List<WorkingHoursSummaryModel> CalculateMonthlySummary(List<WorkingHoursModel> workings);
     }
 }

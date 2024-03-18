@@ -28,16 +28,10 @@
                             </div>
                         }
                         <div class="col-xl-1 d-flex align-items-center">
-                            <span>Start Date</span>
+                            <span>Month</span>
                         </div>
                         <div class="col-xl-2">
-                            <input id="start_date" type="date" class="form-control" />
-                        </div>
-                        <div class="col-xl-1 d-flex align-items-center">
-                            <span>Stop Date</span>
-                        </div>
-                        <div class="col-xl-2">
-                            <input id="stop_date" type="date" class="form-control" />
+                            <input id="month" type="month" class="form-control" />
                         </div>
                         <div class="col-xl-1">
                             <button id="btn_load" type="button" class="btn btn-primary form-control elevation-1">
@@ -164,10 +158,8 @@
             var today = new Date();
             var year = today.getFullYear();
             var month = today.getMonth();
-            var start_date = new Date(year, month, 2);
-            var stop_date = new Date(year, month + 1, 1);
-            $('#start_date').val(start_date.toISOString().split("T")[0]);
-            $('#stop_date').val(stop_date.toISOString().split("T")[0]);
+            $('#month').val(year + "-" + (today.getMonth()+1).toString().padStart(2,0));
+
             $('#user_name').val('@Model.name.ToLower()');
             table = $('#table_activity').DataTable();
             EnablePrint();
@@ -197,20 +189,19 @@
 
         $('#btn_load').on('click', async function () {
             var username = $('#user_name').val();
-            var start_date = $('#start_date').val();
-            var stop_date = $('#stop_date').val();
-            await GetDailyActivities(username, start_date, stop_date);
+            var month = $('#month').val();
+            await GetDailyActivities(username, month);
             EnablePrint();
             EnableExport();
             GenerateTableActivity();
         });
 
-        async function GetDailyActivities(user_name, start_date, stop_date) {
+        async function GetDailyActivities(user_name, month) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetDailyActivities", "DailyReport")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name, start_date, stop_date },
+                data: { user_name, month },
                 success: function (response) {
                     drs = response;
                 }

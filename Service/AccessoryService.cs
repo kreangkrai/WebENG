@@ -43,5 +43,44 @@ namespace WebENG.Service
             }
             return users;
         }
+
+        public List<UserModel> getWorkingUser()
+        {
+            List<UserModel> users = new List<UserModel>();
+            try
+            {
+                SqlCommand cmd = new SqlCommand(@"SELECT DISTINCT Authen.user_id,
+				                                                    Authen.name,
+				                                                    Authen.department,
+				                                                    Authen.role 
+                                                    FROM WorkingHours 
+                                                    LEFT JOIN Authen ON Authen.user_id = WorkingHours.user_id 
+                                                    ORDER BY Authen.name", ConnectSQL.OpenConnect());
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        UserModel u = new UserModel()
+                        {
+                            user_id = dr["user_id"].ToString(),
+                            name = dr["name"].ToString().ToLower(),
+                            department = dr["department"].ToString(),
+                            role = dr["role"].ToString()
+                        };
+                        users.Add(u);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return users;
+        }
     }
 }

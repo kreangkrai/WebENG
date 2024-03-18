@@ -6,14 +6,11 @@
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-6">
+                    <div class="col-xl-8">
 
                     </div>
                     <div class="col-xl-2">
-                        <input id="startDate" type="date" class="form-control" />
-                    </div>
-                    <div class="col-xl-2">
-                        <input id="stopDate" type="date" class="form-control" />
+                        <input id="month" type="month" class="form-control" />
                     </div>
                     <div class="col-xl-2">
                         <button id="btnUpdate" type="button" class="btn btn-primary form-control">
@@ -39,7 +36,8 @@
                             <th>User</th>
                             <th>Idle (Hours)</th>
                             <th>Normal (Hours)</th>
-                            <th>OverTime (Hours)</th>
+                            <th>OT 1.5 (Hours)</th>
+                            <th>OT 3.0 (Hours)</th>
                             <th>Leave (Hours)</th>
                             <th>Working Hours</th>                                                      
                             <th>Total (Hours)</th>
@@ -62,10 +60,7 @@
             var today = new Date();
             var year = today.getFullYear();
             var month = today.getMonth();
-            var start_date = new Date(year, month, 2);
-            var stop_date = new Date(year, month + 1, 1);
-            $('#startDate').val(start_date.toISOString().split("T")[0]);
-            $('#stopDate').val(stop_date.toISOString().split("T")[0]);
+            $('#month').val(year + "-" + (today.getMonth()+1).toString().padStart(2,0));
             UpdateView();
         });
 
@@ -74,20 +69,20 @@
         });
 
         async function UpdateView() {
-            let startDate = new Date($('#startDate').val());
-            let stopDate = new Date($('#stopDate').val());
-            let idles = await GetIdleTimes(startDate.toJSON(), stopDate.toJSON());
+            let month = new Date($('#month').val());
+            //let stopDate = new Date($('#stopDate').val());
+            let idles = await GetIdleTimes(month.toJSON());
             GenerateChart(idles);
             GenerateTable(idles);
         }
 
-        async function GetIdleTimes(startDate, stopDate) {
+        async function GetIdleTimes(month) {
             let idles = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetIdleTimes", "IdleTime")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { startDate, stopDate },
+                data: { month },
                 success: function (response) {
                     idles = response;
                 }
@@ -97,7 +92,7 @@
 
         function GenerateChart(idles) {
 
-            let colors = ['#CAE9FF', '#5FA8D3', '#1B4965','#291F7D'];
+            let colors = ['#CAE9FF', '#5FA8D3', '#1B4965','#291F7D','#209F7D'];
 
             let users = [];
             users = idles.map(m => m.userName).filter(f => f !== "");
@@ -105,13 +100,15 @@
 
             let hoursIdle = [];
             let hoursNormal = [];
-            let hoursOvertime = [];
+            let hoursOT1_5 = [];
+            let hoursOT3_0 = [];
             let hoursLeave = [];
             for (let i = 0; i < users.length; i++) {
                 let datas = idles.filter(f => f.userName === users[i]);
                 hoursIdle.push(datas.map(m => m.idle)[0]);
                 hoursNormal.push(datas.map(m => m.normal)[0]);
-                hoursOvertime.push(datas.map(m => m.overtime)[0]);
+                hoursOT1_5.push(datas.map(m => m.ot1_5)[0]);
+                hoursOT3_0.push(datas.map(m => m.ot3_0)[0]);
                 hoursLeave.push(datas.map(m => m.leave)[0]);
             }
 
@@ -136,14 +133,19 @@
                             backgroundColor: colors[1]
                         },
                         {
-                            label: 'Overtime',
-                            data: hoursOvertime,
+                            label: 'OT 1.5',
+                            data: hoursOT1_5,
                             backgroundColor: colors[2]
+                        },
+                        {
+                            label: 'OT 3.0',
+                            data: hoursOT3_0,
+                            backgroundColor: colors[3]
                         },
                         {
                             label: 'Leave',
                             data: hoursLeave,
-                            backgroundColor: colors[3]
+                            backgroundColor: colors[4]
                         }
                     ]
                 },
@@ -190,10 +192,11 @@
                         <td style="text-align:left">${datas[i].userName}</td>
                         <td>${datas[i].idle}</td>
                         <td>${datas[i].normal}</td>
-                        <td>${datas[i].overtime}</td>
+                        <td>${datas[i].ot1_5}</td>
+                        <td>${datas[i].ot3_0}</td>
                         <td>${datas[i].leave}</td>
                         <td>${datas[i].workingHours}</td>                        
-                        <td>${datas[i].normal + datas[i].leave + datas[i].overtime}</td>
+                        <td>${datas[i].normal + datas[i].leave + datas[i].ot1_5 + + datas[i].ot3_0}</td>
                     </tr>
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);

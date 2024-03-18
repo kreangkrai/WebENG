@@ -298,11 +298,117 @@ namespace WebENG.Service
             List<EngProcessModel> processes = new List<EngProcessModel>();
             try
             {
-                string string_command = string.Format($@"
-                    SELECT  job_id, value as process_id,Eng_Process.Process_Name as process_name FROM Jobs
-                    CROSS APPLY STRING_SPLIT(process_id,',')
-                    LEFT JOIN Eng_Process ON Eng_Process.Process_ID = value
-                    WHERE job_id ='{job}'");
+                string string_command = string.Format($@"SELECT Jobs.process_id FROM Jobs WHERE job_id ='{job}'");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        EngProcessModel process = new EngProcessModel()
+                        {
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                        };
+                        processes.Add(process);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+
+            List<EngProcessModel> new_processes = new List<EngProcessModel>();
+            if (processes.Count > 0)
+            {
+                List<EngProcessModel> _processes = GetProcesses();
+
+                int count = processes[0].process_id.Count(c => c == ',');
+
+                for (int i = 0; i <= count; i++)
+                {
+                    string process = processes[0].process_id.Split(',')[i];
+                    new_processes.Add(new EngProcessModel()
+                    {
+                        process_id = process,
+                        process_name = _processes.Where(w => w.process_id == process).Select(s => s.process_name).FirstOrDefault()
+                    }) ;
+                }
+            }
+
+            return new_processes;
+        }
+
+        public List<EngSystemModel> GetSystemByJob(string job)
+        {
+            List<EngSystemModel> systems = new List<EngSystemModel>();
+            try
+            {
+                string string_command = string.Format($@"SELECT Jobs.system_id FROM Jobs WHERE job_id ='{job}'");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        EngSystemModel system = new EngSystemModel()
+                        {
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                        };
+                        systems.Add(system);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+
+            List<EngSystemModel> new_systems = new List<EngSystemModel>();
+            if (systems.Count > 0)
+            {
+                List<EngSystemModel> _systems = GetSystems();
+
+                int count = systems[0].system_id.Count(c => c == ',');
+
+                for (int i = 0; i <= count; i++)
+                {
+                    string system = systems[0].system_id.Split(',')[i];
+                    new_systems.Add(new EngSystemModel()
+                    {
+                        system_id = system,
+                        system_name = _systems.Where(w => w.system_id == system).Select(s => s.system_name).FirstOrDefault()
+                    });
+                }
+            }
+
+            return new_systems;
+        }
+
+        public List<EngProcessModel> GetProcesses()
+        {
+            List<EngProcessModel> processes = new List<EngProcessModel>();
+            try
+            {
+                string string_command = string.Format($@"SELECT process_id,process_name FROM Eng_Process");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -334,16 +440,12 @@ namespace WebENG.Service
             return processes;
         }
 
-        public List<EngSystemModel> GetSystemByJob(string job)
+        public List<EngSystemModel> GetSystems()
         {
             List<EngSystemModel> systems = new List<EngSystemModel>();
             try
             {
-                string string_command = string.Format($@"
-                    SELECT  job_id, value as system_id,Eng_System.System_Name as system_name FROM Jobs
-                    CROSS APPLY STRING_SPLIT(system_id,',')
-                    LEFT JOIN Eng_System ON Eng_System.System_ID = value
-                    WHERE job_id ='{job}'");
+                string string_command = string.Format($@"SELECT system_id,system_name FROM Eng_System");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {

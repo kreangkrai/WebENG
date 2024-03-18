@@ -80,6 +80,12 @@ namespace WebENG.Controllers
             return Json(whs);
         }
 
+        [HttpGet]
+        public JsonResult GetWorkingUser()
+        {
+            List<UserModel> users = Accessory.getWorkingUser();
+            return Json(users);
+        }
         [HttpGet] 
         public JsonResult GetEngineerUser(string user_name)
         {

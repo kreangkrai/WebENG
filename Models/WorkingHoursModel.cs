@@ -30,5 +30,6 @@ namespace WebENG.Models
         public TimeSpan normal { get; set; }
         public TimeSpan ot1_5 { get; set; }
         public TimeSpan ot3_0 { get; set; }
+        public TimeSpan leave { get; set; }
     }
 }

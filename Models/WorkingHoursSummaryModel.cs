@@ -14,5 +14,6 @@ namespace WebENG.Models
         public int normal { get; set; }
         public int ot1_5 { get; set; }
         public int ot3_0 { get; set; }
+        public int leave { get; set; }
     }
 }

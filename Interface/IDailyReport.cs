@@ -8,7 +8,7 @@ namespace WebENG.Interface
 {
     interface IDailyReport
     {
-        List<DailyActivityModel> GetDailyActivities(string user_name, DateTime start_date, DateTime stop_date);
+        List<DailyActivityModel> GetDailyActivities(string user_name, string month);
         string EditDailyReport(DailyActivityModel dlr);
     }
 }

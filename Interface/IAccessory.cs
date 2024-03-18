@@ -9,5 +9,6 @@ namespace WebENG.Interface
     interface IAccessory
     {
         List<UserModel> getAllUser();
+        List<UserModel> getWorkingUser();
     }
 }

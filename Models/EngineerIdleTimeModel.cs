@@ -11,7 +11,8 @@ namespace WebENG.Models
         public int workingHours { get; set; }
         public int idle { get; set; }
         public int normal { get; set; }
-        public int overtime { get; set; }
+        public int ot1_5 { get; set; }
+        public int ot3_0 { get; set; }
         public int leave { get; set; }
     }
 }

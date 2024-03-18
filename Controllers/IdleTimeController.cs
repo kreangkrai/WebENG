@@ -99,145 +99,53 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public List<EngineerIdleTimeModel> GetIdleTimes(DateTime startDate, DateTime stopDate)
+        public List<EngineerIdleTimeModel> GetIdleTimes(string month)
         {
-            List<WorkingHoursModel> whs = WorkingHours.GetWorkingHours().OrderBy(o => o.user_name).ThenBy(t => t.working_date).ThenBy(t => t.start_time).ToList();
-            List<HolidayModel> holidays = Holiday.GetHolidays(startDate.ToString("yyyy"));
+            int yy = Convert.ToInt32(month.Split("-")[0]);
+            int mm = Convert.ToInt32(month.Split("-")[1]);
+            List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
+
             List<EngineerIdleTimeModel> idles = new List<EngineerIdleTimeModel>();
-            string[] users = whs.Select(s => s.user_name).Distinct().ToArray();
-            for (int i = 0;i<users.Length;i++)
+            string[] users = Accessory.getWorkingUser().Select(s => s.name).Distinct().ToArray();
+            int end = DateTime.DaysInMonth(yy, mm);
+            DateTime start = new DateTime(yy, mm, 1);
+            DateTime stop = new DateTime(yy, mm, end);
+
+            int working_hours = 0;
+            for (DateTime date = start; date != stop; date = date.AddDays(1))
             {
-                TimeSpan zeroHour = new TimeSpan(0, 0, 0, 0, 0);
-                TimeSpan anHour = new TimeSpan(0, 1, 0, 0, 0);
-                TimeSpan eightHours = new TimeSpan(0, 8, 0, 0, 0);
-                TimeSpan aDay = new TimeSpan(0, 24, 0, 0, 0);
-                TimeSpan idleTime = zeroHour;
-                TimeSpan normal = zeroHour;
-                TimeSpan overtime = zeroHour;
-                TimeSpan businessHours = zeroHour;
-                TimeSpan leaveTime = zeroHour;
-
-                for (DateTime date = startDate; date <= stopDate; date = date.AddDays(1))
+                bool isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
+                bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
+                if (!isHoliday && !isWeekend)
                 {
-                    List<WorkingHoursModel> daily = whs.Where(w => w.working_date.ToString("yyyy-MM-dd") == date.ToString("yyyy-MM-dd") && w.user_name == users[i]).ToList();
-                    
-                    //Check if Running Date is Holiday or Not
-                    bool holiday = holidays.Where(w => w.date.ToString("yyyy-MM-dd") == date.ToString("yyyy-MM-dd")).Count() > 0 ? true : false;
-                    
-                    //Check if Running Date is Weekend or Not
-                    bool workingDay = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)? false : true;
-
-                    //Check Leave
-                    WorkingHoursModel leave = whs.Where(w => w.working_date.ToString("yyyy-MM-dd") == date.ToString("yyyy-MM-dd") && w.user_name == users[i] && w.task_name.Contains("Leave")).FirstOrDefault();
-                    if (leave != null)
-                    {
-                        TimeSpan time = leave.stop_time.Subtract(leave.start_time);
-                        if (time.Hours > 8)
-                        {
-                            leaveTime = leaveTime.Add(eightHours);
-                        }
-                        else
-                        {
-                            leaveTime = leaveTime.Add(time);
-                        }
-                        
-                    }
-                    //Add 8 Hours to Business Working Hours
-                    if (!holiday && workingDay)
-                    {
-                        businessHours = businessHours.Add(eightHours);
-                    }
-                    
-                    //If no WorkingHours Add 8 Hours to Idle Time
-                    if (daily.Count() == 0)
-                    {
-                        if (!holiday && workingDay) idleTime = idleTime.Add(eightHours);
-                        continue;
-                    }
-                    
-                    bool lunch = false;
-                    bool dinner = false;
-                    TimeSpan hours = zeroHour;
-                    
-                    for(int j = 0;j<daily.Count;j++)
-                    {
-                        //Add 24 Hours to Stop Time if Stop Time is Less Than Start Time
-                        /*if (daily[j].stop_time < daily[j].start_time)
-                        {
-                            daily[j].stop_time.Add(aDay);
-                        }
-                        hours = hours.Add(daily[j].stop_time - daily[j].start_time);*/
-                        TimeSpan duration = zeroHour;
-                        if(daily[j].stop_time > daily[j].start_time)
-                        {
-                            duration = daily[j].stop_time - daily[j].start_time;
-                        } else
-                        {
-                            duration = daily[j].start_time - daily[j].stop_time;
-                        }
-                        hours = hours.Add(duration);
-                        lunch = (lunch || daily[j].lunch);
-                        dinner = (dinner || daily[j].dinner);
-                    }
-
-                    //Minus 1 Hour if Lunch
-                    if (lunch)
-                    {
-                        hours = hours.Subtract(anHour);
-                    }
-
-                    //Minus 1 Hour if Dinner
-                    if (dinner)
-                    {
-                        hours = hours.Subtract(anHour);
-                    }
-
-                    //Set Hours to 0
-                    if (hours < zeroHour)
-                    {
-                        hours = zeroHour;
-                    }
-
-                    //Normal Working Day
-                    if(!holiday && workingDay)
-                    {
-                        TimeSpan remain = zeroHour;
-                        //Over Time
-                        if(hours > eightHours)
-                        {
-                            remain = hours - eightHours;                           
-                            overtime = overtime.Add(remain);
-                        }
-                        normal = normal.Add(eightHours);
-                    }
-                    //Weekend and Holiday
-                    else
-                    {
-                        overtime = overtime.Add(hours);
-                    }
+                    working_hours++;
                 }
+            }
+            
 
-                normal = normal.Subtract(leaveTime);
+            for (int i = 0; i < users.Length; i++)
+            {
+                List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users[i], month);
+                List<WorkingHoursSummaryModel> summaries = WorkingHours.CalculateMonthlySummary(monthly);
 
-                int hoursNormal = (int)(normal.TotalMinutes / 60);
-                int hoursOvertime = (int)(overtime.TotalMinutes / 60);
-                int hoursBusiness = (int)(businessHours.TotalMinutes / 60);
-                int hoursLeave = (int)(leaveTime.TotalMinutes / 60);
-
-                int hoursIdle = 0;
-                int total_Work = hoursNormal + hoursOvertime + hoursLeave;
-                if (total_Work < hoursBusiness)
+                int normal = summaries.Select(s => s.normal).Sum() / 60;
+                int ot1_5 = summaries.Select(s => s.ot1_5).Sum() / 60;
+                int ot3_0 = summaries.Select(s => s.ot3_0).Sum() / 60;
+                int leave = summaries.Select(s => s.leave).Sum() / 60;
+                int idleTime = (working_hours * 8) - (normal + leave);
+                if (idleTime < 0)
                 {
-                    hoursIdle = (int)(hoursBusiness - total_Work);
+                    idleTime = 0;
                 }
                 EngineerIdleTimeModel idle = new EngineerIdleTimeModel()
                 {
                     userName = users[i],
-                    workingHours = hoursBusiness,
-                    idle = hoursIdle,
-                    normal = hoursNormal,
-                    overtime = hoursOvertime,
-                    leave = hoursLeave
+                    workingHours = (working_hours * 8),
+                    idle = idleTime,
+                    normal = normal,
+                    ot1_5 = ot1_5,
+                    ot3_0 = ot3_0,
+                    leave = leave
                 };
                 idles.Add(idle);
             }

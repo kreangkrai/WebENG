@@ -8,8 +8,7 @@ namespace WebENG.Models
     public class Form_DailyReportModel
     {
         public string name { get; set; }
-        public DateTime start_date { get; set; }
-        public DateTime stop_date { get; set; }
+        public string month { get; set; }
         public List<DailyActivityModel> datas { get; set; }
     }
 }

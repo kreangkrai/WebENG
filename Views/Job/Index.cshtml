@@ -616,37 +616,38 @@
                 `);
             }
             for (let i = 0; i < processes.length; i++) {
-
                 let str = "";
-                let check = process.filter(f=>f == processes[i].process_id);
-                if (check.length > 0){
-                    str += `<div class="col-6">
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input
-                                                id="${processes[i].process_id}" type="checkbox" class="form-check-input" checked
-                                                onchange="ProcessChange()"/>${processes[i].process_name}
-                                        </label>
-                                    </div>
-                             </div>`
-                }else{
-                    str += `<div class="col-6">
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input
-                                                id="${processes[i].process_id}" type="checkbox" class="form-check-input"
-                                                onchange="ProcessChange()"/>${processes[i].process_name}
-                                        </label>
-                                    </div>
-                             </div>`
+                if (processes[i].process_name !== ""){
+                    let check = process.filter(f=>f == processes[i].process_id);
+                    if (check.length > 0){                   
+                        str += `<div class="col-6">
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input
+                                                    id="${processes[i].process_id}" type="checkbox" class="form-check-input" checked
+                                                    onchange="ProcessChange()"/>${processes[i].process_name}
+                                            </label>
+                                        </div>
+                                 </div>`
+                    }else{
+                        str += `<div class="col-6">
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input
+                                                    id="${processes[i].process_id}" type="checkbox" class="form-check-input"
+                                                    onchange="ProcessChange()"/>${processes[i].process_name}
+                                            </label>
+                                        </div>
+                                 </div>`
+                    }
+                    $('#process').append(`
+                        <li class="list-group-item">
+                            <div class="row">
+                                ${str}
+                            </div>
+                        </li>
+                    `);
                 }
-                $('#process').append(`
-                    <li class="list-group-item">
-                        <div class="row">
-                            ${str}
-                        </div>
-                    </li>
-                `);
             }
         }
 
@@ -669,22 +670,24 @@
             for (let i = 0; i < processes.length; i++) {
 
                 let str = "";
-                str += `<div class="col-6">
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input
-                                            id="${processes[i].process_id}" type="checkbox" class="form-check-input"
-                                            onchange="ProcessChange()"/>${processes[i].process_name}
-                                    </label>
-                                </div>
-                         </div>`
-                $('#process').append(`
-                    <li class="list-group-item">
-                        <div class="row">
-                            ${str}
-                        </div>
-                    </li>
-                `);
+                if (processes[i].process_name !== ""){
+                    str += `<div class="col-6">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input
+                                                id="${processes[i].process_id}" type="checkbox" class="form-check-input"
+                                                onchange="ProcessChange()"/>${processes[i].process_name}
+                                        </label>
+                                    </div>
+                             </div>`
+                    $('#process').append(`
+                        <li class="list-group-item">
+                            <div class="row">
+                                ${str}
+                            </div>
+                        </li>
+                    `);
+                }
             }
         }
 
@@ -706,35 +709,37 @@
             for (let i = 0; i < systems.length; i++) {
 
                 let str = "";
-                let check = system.filter(f=>f == systems[i].system_id);
-                if (check.length > 0){
-                    str += `<div class="col-6">
+                if (systems[i].system_name !== ""){
+                    let check = system.filter(f=>f == systems[i].system_id);
+                    if (check.length > 0){
+                        str += `<div class="col-6">
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input
+                                                    id="${systems[i].system_id}" type="checkbox" class="form-check-input" checked
+                                                    onchange="SystemChange()"/>${systems[i].system_name}
+                                            </label>
+                                        </div>
+                        </div>`
+                    }else{
+                        str += `<div class="col-6">
                                     <div class="form-check">
                                         <label class="form-check-label">
                                             <input
-                                                id="${systems[i].system_id}" type="checkbox" class="form-check-input" checked
+                                                id="${systems[i].system_id}" type="checkbox" class="form-check-input"
                                                 onchange="SystemChange()"/>${systems[i].system_name}
                                         </label>
                                     </div>
-                    </div>`
-                }else{
-                    str += `<div class="col-6">
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input
-                                            id="${systems[i].system_id}" type="checkbox" class="form-check-input"
-                                            onchange="SystemChange()"/>${systems[i].system_name}
-                                    </label>
-                                </div>
-                    </div>`
+                        </div>`
+                    }
+                    $('#system').append(`
+                        <li class="list-group-item">
+                            <div class="row">
+                                ${str}
+                            </div>
+                        </li>
+                    `);
                 }
-                $('#system').append(`
-                    <li class="list-group-item">
-                        <div class="row">
-                            ${str}
-                        </div>
-                    </li>
-                `);
             }
         }
 
@@ -756,22 +761,24 @@
             for (let i = 0; i < systems.length; i++) {
 
                 let str = "";
-                str += `<div class="col-6">
-                                <div class="form-check">
-                                    <label class="form-check-label">
-                                        <input
-                                            id="${systems[i].system_id}" type="checkbox" class="form-check-input"
-                                            onchange="SystemChange()"/>${systems[i].system_name}
-                                    </label>
-                                </div>
-                         </div>`
-                $('#system').append(`
-                    <li class="list-group-item">
-                        <div class="row">
-                            ${str}
-                        </div>
-                    </li>
-                `);
+                if (systems[i].system_name !== ""){
+                    str += `<div class="col-6">
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input
+                                                id="${systems[i].system_id}" type="checkbox" class="form-check-input"
+                                                onchange="SystemChange()"/>${systems[i].system_name}
+                                        </label>
+                                    </div>
+                             </div>`
+                    $('#system').append(`
+                        <li class="list-group-item">
+                            <div class="row">
+                                ${str}
+                            </div>
+                        </li>
+                    `);
+                }
             }
         }
 
