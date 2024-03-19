@@ -171,7 +171,7 @@
         async function GetEngineers() {
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetUsers", "EngineerTasks")',
+                url: '@Url.Action("GetWorkingUser", "EngineerTasks")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
@@ -196,7 +196,7 @@
             var department = $('#department').val();
             for (var i = 0; i < users.length; i++) {
                 if(department === "" || department === users[i].department)
-                    user_str += '<option value="' + users[i].user_id + '">' + users[i].user_name + '</option>';
+                    user_str += '<option value="' + users[i].user_id + '">' + users[i].name + '</option>';
             }
             $('#user_id').empty();
             $('#user_id').append(user_str);

@@ -112,7 +112,7 @@ namespace WebENG.Controllers
             DateTime stop = new DateTime(yy, mm, end);
 
             int working_hours = 0;
-            for (DateTime date = start; date != stop; date = date.AddDays(1))
+            for (DateTime date = start; date <= stop; date = date.AddDays(1))
             {
                 bool isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
                 bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;

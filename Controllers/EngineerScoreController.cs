@@ -46,5 +46,13 @@ namespace WebENG.Controllers
             List<EngineerScoreModel> scores = ScoreService.GetScores(user_id,year);
             return Json(scores);
         }
+
+        [HttpGet]
+        public JsonResult GetWorkingUser()
+        {
+            List<UserModel> users = Accessory.getWorkingUser();
+
+            return Json(users);
+        }
     }
 }

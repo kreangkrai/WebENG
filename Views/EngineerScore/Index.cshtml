@@ -261,7 +261,7 @@
     async function GetEngineers() {
         await $.ajax({
             type: "GET",
-            url: '@Url.Action("GetUsers", "EngineerTasks")',
+            url: '@Url.Action("GetWorkingUser", "EngineerScore")',
             contentType: 'application/x-www-form-urlencoded',
             data: { },
             success: function (response) {
@@ -342,13 +342,13 @@
         let department = $('#departments').val();
         if (department === "ALL") {
             for (let i = 0; i < users.length; i++) {
-                $('#user_id').append(`<option value="${users[i].user_id}">${users[i].user_name}</option>`);
+                $('#user_id').append(`<option value="${users[i].user_id}">${users[i].name}</option>`);
             }
         }
         else {
             let employees = users.filter(f => f.department === department);
             for (let i = 0; i < employees.length; i++) {
-                $('#user_id').append(`<option value="${employees[i].user_id}">${employees[i].user_name}</option>`);
+                $('#user_id').append(`<option value="${employees[i].user_id}">${employees[i].name}</option>`);
             }
         }
     }

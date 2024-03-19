@@ -53,6 +53,14 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
+        public JsonResult GetWorkingUser()
+        {
+            List<UserModel> users = Accessory.getWorkingUser();
+
+            return Json(users);
+        }
+
+        [HttpGet]
         public List<DailyActivityModel> GetDailyActivities(string user_name, string month)
         {
             List<DailyActivityModel> drs = DailyReport.GetDailyActivities(user_name, month);
@@ -91,96 +99,5 @@ namespace WebENG.Controllers
             };
             return form_dailyreport;
         }
-
-        //[HttpGet]
-        //public ActionResult Export(string user_name, DateTime start_date, DateTime stop_date)
-        //{
-        //    List<DailyActivityModel> drs = DailyReport.GetDailyActivities(user_name, start_date, stop_date);
-        //    string sFileName = @"DailyReport.xlsx";
-
-        //    IWorkbook workbook = new XSSFWorkbook();
-        //    ISheet excelSheet = workbook.CreateSheet("DailyReport");
-
-        //    ICellStyle HeaderStyle = workbook.CreateCellStyle();
-        //    HeaderStyle.Alignment = HorizontalAlignment.Center;
-        //    HeaderStyle.VerticalAlignment = VerticalAlignment.Center;
-        //    HeaderStyle.FillForegroundColor = IndexedColors.LightOrange.Index;
-        //    HeaderStyle.FillPattern = FillPattern.SolidForeground;
-        //    IFont bold_font = workbook.CreateFont();
-        //    bold_font.IsBold = true;
-        //    HeaderStyle.SetFont(bold_font);
-
-        //    IRow row = excelSheet.CreateRow(0);
-
-        //    ICell Header = row.CreateCell(0, CellType.String);
-        //    Header.SetCellValue("Date");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(1, CellType.String);
-        //    Header.SetCellValue("Start");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(2, CellType.String);
-        //    Header.SetCellValue("Stop");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(3, CellType.String);
-        //    Header.SetCellValue("Activity");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(4, CellType.String);
-        //    Header.SetCellValue("Problem");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(5, CellType.String);
-        //    Header.SetCellValue("Solution");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(6, CellType.String);
-        //    Header.SetCellValue("Tomorrow Plan");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(7, CellType.String);
-        //    Header.SetCellValue("Action By");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    Header = row.CreateCell(8, CellType.String);
-        //    Header.SetCellValue("Customer");
-        //    Header.CellStyle = HeaderStyle;
-
-        //    for (int i = 0; i < drs.Count(); i++)
-        //    {
-        //        row = excelSheet.CreateRow(i + 1);
-        //        row.CreateCell(0, CellType.Numeric).SetCellValue("999");
-        //        row.CreateCell(1, CellType.Numeric).SetCellValue("111");
-        //        row.CreateCell(2, CellType.Numeric).SetCellValue("333");
-                
-        //        /*row.CreateCell(0, CellType.String).SetCellValue(Convert.ToString(drs[i].date));
-        //        row.CreateCell(1, CellType.String).SetCellValue(Convert.ToString(drs[i].start_time));
-        //        row.CreateCell(2, CellType.String).SetCellValue(Convert.ToString(drs[i].stop_time));
-        //        row.CreateCell(3, CellType.String).SetCellValue(drs[i].job_id + " " + drs[i].task_name);
-        //        row.CreateCell(4, CellType.String).SetCellValue(drs[i].problem);
-        //        row.CreateCell(5, CellType.String).SetCellValue(drs[i].solution);
-        //        row.CreateCell(6, CellType.String).SetCellValue(drs[i].tomorrow_plan);
-        //        row.CreateCell(7, CellType.String).SetCellValue(drs[i].user_id);
-        //        row.CreateCell(8, CellType.String).SetCellValue(drs[i].customer);*/
-        //    }
-
-        //    using (var fs = new FileStream(Path.Combine("wwwroot/files/", sFileName), FileMode.Create, FileAccess.Write))
-        //    {
-        //        workbook.Write(fs);
-        //    }
-
-        //    var memory = new MemoryStream();
-        //    using (var stream = new FileStream(Path.Combine("wwwroot/files/", sFileName), FileMode.Open))
-        //    {
-        //        stream.CopyTo(memory);
-        //    }
-        //    memory.Position = 0;
-
-        //    string files = "wwwroot/files/DailyReport.xlsx";
-        //    byte[] fileBytes = System.IO.File.ReadAllBytes(files);
-        //    return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, "DailyReport.xlsx");
-        //}
     }
 }

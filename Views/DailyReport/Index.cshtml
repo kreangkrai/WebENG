@@ -169,7 +169,7 @@
         async function GetUsers() {
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetUsers", "EngUser")',
+                url: '@Url.Action("GetWorkingUser", "DailyReport")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
@@ -181,7 +181,7 @@
         function GenerateUsers() {
             var user_string = '';
             for (var i = 0; i < users.length; i++) {
-                user_string += `<option value="${users[i].user_name.toLowerCase()}">${users[i].user_name}</option>`;
+                user_string += `<option value="${users[i].name.toLowerCase()}">${users[i].name}</option>`;
             }
             $('#user_name').empty();
             $('#user_name').append(user_string);
@@ -335,15 +335,15 @@
             window.open(url);
         });
 
-        $('#btn_export').on('click', async function () {
+       @* $('#btn_export').on('click', async function () {
             alert("This function is under development");
             @*var username = $('#user_name').val();
             var start_date = $('#start_date').val();
             var stop_date = $('#stop_date').val();
-            await ExportAsExcel(username, start_date, stop_date);*@
-        });
+            await ExportAsExcel(username, start_date, stop_date);
+        });*@
 
-        async function ExportAsExcel(user_name, start_date, stop_date) {
+        @*async function ExportAsExcel(user_name, start_date, stop_date) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("Export", "DailyReport")',
@@ -353,7 +353,7 @@
                     window.location = '@Url.Action("Export", "DailyReport")';
                 }
             });
-        }
+        }*@
 
     </script>
 }

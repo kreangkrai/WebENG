@@ -64,5 +64,13 @@ namespace WebENG.Controllers
             List<JobResponsibleModel> jrs = JobResponsibleService.GetJobResponsible(user_id);
             return jrs;
         }
+
+        [HttpGet]
+        public JsonResult GetWorkingUser()
+        {
+            List<UserModel> users = Accessory.getWorkingUser();
+
+            return Json(users);
+        }
     }
 }

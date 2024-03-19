@@ -38,7 +38,7 @@
 </div>
 <div class="row px-3">
     <div class="col-xl-12">
-        <div class="card card-dark">
+        <div class="card card-primary">
             <div class="card-header">
                 <span id="report_title" class="card-title"></span>
             </div>
@@ -83,7 +83,7 @@
         </div>
     </div>
     <div class="col-xl-12">
-        <div class="card card-dark">
+        <div class="card card-primary">
             <div class="card-header">
                 <span class="card-title">Summary</span>
             </div>
@@ -316,10 +316,11 @@
                         whs[i].normal.substring(0, 5),
                         whs[i].ot1_5.substring(0, 5),
                         whs[i].ot3_0.substring(0, 5),
+                        whs[i].day
                     ]);
                 
             }
-
+           
             if (table !== undefined)
                 table.destroy();
 
@@ -332,8 +333,11 @@
                 data: datas,
                 rowCallback: function (row, data) {
                     var date = new Date(data[0].split("-")[0], data[0].split("-")[1] - 1, data[0].split("-")[2]);
-
-                    if (date.toString().split(" ")[0] == "Sat" || date.toString().split(" ")[0] == "Sun") {
+                    //Day index 11
+                    if (data[11] == "Saturday" || data[11] == "Sunday") {
+                        $('td', row).addClass("bg-dark disable");
+                    }
+                    if (data[11] == "Holiday") {
                         $('td', row).addClass("bg-gray disable");
                     }
 

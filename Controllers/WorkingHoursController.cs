@@ -25,7 +25,7 @@ namespace WebENG.Controllers
         static string form_start_time;
         static string form_month;
         static Form_OvertimeModel form_data;
-        
+        static List<UserModel> users;
         public WorkingHoursController()
         {
             Accessory = new AccessoryService();
@@ -38,7 +38,7 @@ namespace WebENG.Controllers
             if (HttpContext.Session.GetString("Login_ENG") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<UserModel> users = new List<UserModel>();
+                users = new List<UserModel>();
                 users = Accessory.getAllUser();
                 UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { 
                     name = s.name,
@@ -68,12 +68,18 @@ namespace WebENG.Controllers
         public JsonResult GetWorkingUser()
         {
             List<UserModel> users = Accessory.getWorkingUser();
+            
             return Json(users);
         }
 
         [HttpGet]
         public JsonResult GetWorkingHours(string user_name, string month)
         {
+            form_employee_name = user_name;
+            form_month = month;
+            form_department = users.Where(w => w.name.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
+            form_phone_number = "";
+            form_start_time = "08:30";
             monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
             return Json(monthly);
         }

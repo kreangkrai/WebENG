@@ -61,14 +61,17 @@ namespace WebENG.Service
                 {
                     while (dr.Read())
                     {
-                        UserModel u = new UserModel()
+                        if (dr["user_id"] != DBNull.Value && dr["user_id"].ToString() != "")
                         {
-                            user_id = dr["user_id"].ToString(),
-                            name = dr["name"].ToString().ToLower(),
-                            department = dr["department"].ToString(),
-                            role = dr["role"].ToString()
-                        };
-                        users.Add(u);
+                            UserModel u = new UserModel()
+                            {
+                                user_id = dr["user_id"].ToString(),
+                                name = dr["name"].ToString().ToLower(),
+                                department = dr["department"].ToString(),
+                                role = dr["role"].ToString()
+                            };
+                            users.Add(u);
+                        }
                     }
                     dr.Close();
                 }

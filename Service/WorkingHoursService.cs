@@ -777,7 +777,8 @@ namespace WebENG.Service
         public List<WorkingHoursModel> CalculateWorkingHours(string user_name, string month)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
-   
+
+            string day = "";
             int yy = Convert.ToInt32(month.Split("-")[0]);
             int mm = Convert.ToInt32(month.Split("-")[1]);
 
@@ -790,6 +791,19 @@ namespace WebENG.Service
             {
                 DateTime date = new DateTime(yy, mm, i + 1);
                 List<WorkingHoursModel> whd = whs.Where(w => w.working_date == date).ToList();
+
+                bool _isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
+               
+                // Check Holiday and Get day
+                if (_isHoliday)
+                {
+                    day = "Holiday";
+                }
+                else
+                {
+                    day = date.DayOfWeek.ToString();
+                }
+
                 if (whd.Count > 0)
                 {
                     TimeSpan substraction = new TimeSpan(8, 0, 0);
@@ -801,10 +815,10 @@ namespace WebENG.Service
                     TimeSpan evening = new TimeSpan(17, 30, 0);
                     TimeSpan end_evening = new TimeSpan(18, 30, 0);
                     TimeSpan leave = TimeSpan.Zero;
-
-                    bool isHoliday = holidays.Where(w => w.date == whd[0].working_date).Count() > 0 ? true : false;
-                    bool isWeekend = (whd[0].working_date.DayOfWeek == DayOfWeek.Saturday || whd[0].working_date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
+                    
+                   
                     whd.OrderBy(o => o.start_time);
+                                     
                     for (int j = 0; j < whd.Count; j++)
                     {
                         TimeSpan regular = new TimeSpan();
@@ -820,6 +834,10 @@ namespace WebENG.Service
                         wh.stop_time = whd[j].stop_time;
                         wh.lunch = whd[j].lunch;
                         wh.dinner = whd[j].dinner;
+                        wh.day = day;
+
+                        bool isHoliday = holidays.Where(w => w.date == whd[0].working_date).Count() > 0 ? true : false;
+                        bool isWeekend = (whd[0].working_date.DayOfWeek == DayOfWeek.Saturday || whd[0].working_date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
 
                         if (isHoliday || isWeekend)
                         {
@@ -849,7 +867,11 @@ namespace WebENG.Service
                                 //Start before 08.30 and stop before 08.30
                                 if (wh.task_name == "Traveling")
                                 {
-                                    regular += new TimeSpan(0, 0, 0);
+                                    regular = new TimeSpan(0, 0, 0);
+                                }
+                                else
+                                {
+                                    regular = wh.stop_time - wh.start_time;
                                 }
                             }
                             else if (wh.start_time < morning && wh.stop_time > morning && wh.stop_time <= evening)
@@ -951,6 +973,12 @@ namespace WebENG.Service
                             {
                                 ot15 -= end_evening - evening;
                             }
+
+                            // Regular time <= 8
+                            if (regular.TotalHours > 8)
+                            {
+                                regular = new TimeSpan(8, 0, 0);
+                            }
                         }
 
                         if ((ot15 > substraction) && (isHoliday || isWeekend))
@@ -977,53 +1005,38 @@ namespace WebENG.Service
 
                             if (isWeekend || isHoliday)
                             {
-                                if (lastOT15.TotalHours >= 8)
+                                if ((lastOT15 + ot15).TotalHours >= 8)
                                 {
-                                    wh.ot1_5 = TimeSpan.Zero;
-                                    wh.ot3_0 = ot15 - remain_ot15;
-                                }
-                                else
-                                {
-                                    if (remain_ot15.TotalHours >= 8)
+                                    if (ot3.TotalHours > 0)
                                     {
-                                        wh.ot1_5 = ot15;
+                                        wh.ot1_5 = ot15 - (ot15 - remain_ot15);
                                         wh.ot3_0 = ot3;
                                     }
                                     else
                                     {
-                                        wh.ot1_5 = remain_ot15;
-                                        wh.ot3_0 = ot3;
+                                        wh.ot1_5 = ot15 - (ot15 - remain_ot15);
+                                        wh.ot3_0 = ot15 - remain_ot15;
                                     }
+                                    
+                                }
+                                else
+                                {
+                                    wh.ot1_5 = ot15;
+                                    wh.ot3_0 = ot3;
                                 }
                             }
                             else
                             {
                                 if (lastNormal.TotalHours >= 8)
                                 {
-                                    if (remain_ot15 < regular)
-                                    {
-                                        wh.ot1_5 = remain_ot15;
-                                        wh.ot3_0 = regular - remain_ot15;
-                                    }
-                                    else
-                                    {
-                                        if (remain_ot15.TotalHours >= 8)
-                                        {
-                                            wh.ot1_5 = ot15;
-                                            wh.ot3_0 = TimeSpan.Zero;
-                                        }
-                                        else
-                                        {
-                                            wh.ot1_5 = remain_ot15;
-                                            wh.ot3_0 = TimeSpan.Zero;
-                                        }
-                                    }
+                                    wh.ot1_5 = regular;
+                                    wh.ot3_0 = new TimeSpan(0, 0, 0);
                                 }
                                 else
                                 {
                                     wh.normal = regular;
                                     wh.ot1_5 = ot15;
-                                    wh.ot3_0 = ot3;
+                                    wh.ot3_0 = new TimeSpan(0, 0, 0);
                                 }
                             }
                         }
@@ -1059,6 +1072,7 @@ namespace WebENG.Service
                     WorkingHoursModel wh = new WorkingHoursModel()
                     {
                         working_date = date,
+                        day = day,
                         job_id = "",
                         job_name = "",
                         task_id = "",

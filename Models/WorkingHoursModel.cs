@@ -12,6 +12,7 @@ namespace WebENG.Models
         public string user_name { get; set; }
         public string department { get; set; }
         public DateTime working_date { get; set; }
+        public string day { get; set; }
         public int week_number { get; set; }
         public string job_id { get; set; }
         public string process_id { get; set; }
