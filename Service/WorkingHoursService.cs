@@ -867,11 +867,11 @@ namespace WebENG.Service
                                 //Start before 08.30 and stop before 08.30
                                 if (wh.task_name == "Traveling")
                                 {
-                                    regular = new TimeSpan(0, 0, 0);
+                                    regular += new TimeSpan(0, 0, 0);
                                 }
                                 else
                                 {
-                                    regular = wh.stop_time - wh.start_time;
+                                    regular += wh.stop_time - wh.start_time;
                                 }
                             }
                             else if (wh.start_time < morning && wh.stop_time > morning && wh.stop_time <= evening)
@@ -1029,8 +1029,16 @@ namespace WebENG.Service
                             {
                                 if (lastNormal.TotalHours >= 8)
                                 {
-                                    wh.ot1_5 = regular;
-                                    wh.ot3_0 = new TimeSpan(0, 0, 0);
+                                    if (regular.TotalHours > 0)
+                                    {
+                                        wh.ot1_5 = regular;
+                                        wh.ot3_0 = new TimeSpan(0, 0, 0);
+                                    }
+                                    else
+                                    {
+                                        wh.ot1_5 = ot15;
+                                        wh.ot3_0 = new TimeSpan(0, 0, 0);
+                                    }
                                 }
                                 else
                                 {
