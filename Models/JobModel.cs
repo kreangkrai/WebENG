@@ -26,6 +26,20 @@ namespace WebENG.Models
         public string department { get; set; }
         public string process { get; set; }
         public string system { get; set; }
+        public int down_payment { get; set; }
+        public int document_submit { get; set; }
+        public int instrument_delivered_ctl { get; set; }
+        public int system_delivered_ctl { get; set; }
+        public int fat { get; set; }
+        public int delivery_instrument { get; set; }
+        public int delivery_system { get; set; }
+        public int progress_work { get; set; }
+        public int commissioning { get; set; }
+        public int as_built { get; set; }
+        public int finish { get; set; }
+        public int job_in_hand { get; set; }
+        public int invoice { get; set; }
+        public DateTime due_date { get; set; }
         public DateTime finished_date { get; set; }
     }
 }

@@ -400,17 +400,11 @@
                     let code_status = data[3];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
-                    if (code_status === "STA001"){
-                        status_str = `<span class="badge badge-warning">${status}</span>`;
-                    }else if(code_status === "STA002"){
+                    if(code_status === "STA999"){
                         status_str = `<span class="badge badge-success">${status}</span>`;
-                    }else if(code_status === "STA003"){
-                        status_str = `<span class="badge badge-Primary">${status}</span>`;
-                    }else if(code_status === "STA004"){
-                        status_str = `<span class="badge badge-Info">${status}</span>`;
                     }else{
-                        status_str = `<span class="badge badge-Secondary">${status}</span>`;
-                    }                  
+                        status_str = `<span class="badge badge-warning">${status}</span>`;
+                    }                 
                     $('td:eq(3)', row).html(status_str);
             }
         });

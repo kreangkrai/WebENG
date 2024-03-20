@@ -81,11 +81,11 @@
     </div>
 </div>
 
-<div class="modal fade" id="modal_job" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+<div class="modal fade" id="modal_job" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" style="overflow-y:auto">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 id="modal_title" class="modal-title">Create Job</h5>
+                <h5 id="modal_title" class="modal-title"><b>Create Job</b></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -103,12 +103,12 @@
                         </div>
                     </div>                   
                     <div class="form-row">
-                        <div class="col-6">
+                        <div class="col-3">
                             <label for="quotation_no">Quotation Number</label>
                             <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
                             <datalist id="quotations"></datalist>
                         </div>
-                        <div class="col-6">
+                        <div class="col-3">
                             <label for="cost">Cost</label>
                             <div class="input-group">
                                 <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
@@ -117,9 +117,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-6">
+                        <div class="col-3">
                             <label for="md_rate">Market Develop</label>
                             <div class="input-group">
                                 <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
@@ -128,7 +126,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-3">
                             <div class="form-group ">
                                 <label for="pd_rate">Product Develop</label>
                                 <div class="input-group">
@@ -143,34 +141,96 @@
                     <div class="form-row">
                         <div class="col-6">
                             <div class="card">
-                                <div class="card-header">
-                                    <span style="font-weight:bold">Process</span>
+                                <div class="card-header" style="background-color:#33A8FF">
+                                    <span style="font-weight:bold;">Process</span>
                                 </div>
                                 <div class="card-body">
-                                    <ul id="process" style="width:100%;height:250px;overflow-y:scroll" class="list-group">
+                                    <ul id="process" style="width:100%;height:250px;overflow-y:auto" class="list-group">
                                     </ul> 
                                 </div>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="card">
-                                <div class="card-header">
+                                <div class="card-header" style="background-color:#33A8FF">
                                     <span style="font-weight:bold">System</span>
                                 </div>
                                 <div class="card-body">
-                                    <ul id="system" style="width:100%;height:250px;overflow-y:scroll" class="list-group">
+                                    <ul id="system" style="width:100%;height:250px;overflow-y:auto" class="list-group">
                                     </ul> 
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="col-6">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#33A8FF">
+                                    <span style="font-weight:bold">Term Payment</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row">
+                                         <div class="col-5">
+                                            <label for="select_payment">Term Payment</label>
+                                            <select id="select_payment" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-2 col-md-2">
+                                            <label for="add_payment">Add</label>
+                                            <button id="add_payment" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_payment" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#3380FF">
+                                                    <tr>
+                                                        <th>Mile Stone</th>
+                                                        <th>Percent</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                       
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="cost">Job In Hand</label>
+                            <div class="input-group">
+                                <input id="job_in_hand" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="cost">Invoice</label>
+                            <div class="input-group">
+                                <input id="invoice" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="due_date">Due Date</label>
+                            <input id="due_date"type="date"  class="form-control" value="1900-01-01" />
+                        </div>
+                    </div>
+                    <div class="form-row">                       
+                        <div class="col-4">
                             <label for="status">Status</label>
                             <select id="status" class="form-control">
                             </select>
                         </div>
-                        <div class="col-6" id="group_finished_date">
+                        <div class="col-4" id="group_finished_date">
                             <label for="finished_date">Date Finished</label>
                             <input id="finished_date"type="date"  class="form-control" value="1900-01-01" />
                         </div>
@@ -185,11 +245,46 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal_edit_payment" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Term Payment</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-8">
+                            <label for="edit_payment_name">Term Payment</label>
+                            <input id="edit_payment_name" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-4">
+                            <label for="edit_percent">Percent</label>
+                            <input id="edit_percent" type="number" class="form-control" placeholder="" />
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_payment_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_payment_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
     <script type="text/javascript">
         //Variable Declaration
         let table;
+        let table_payment;
         let update = false;
         let jobs = [];
         let users = [];
@@ -201,7 +296,7 @@
         let list_system = [];
         let str_process = "";
         let str_system = "";
-
+        let payments = [];
         //Change these parameters to true to show result
         let debug_jobs = false;
         let debug_user = false;
@@ -211,10 +306,9 @@
         $(document).ready(async function () {
             await GetStatus();
             await GenerateStatusOption();
+            await GeneratePaymentOption();
             await GetProcess();
             await GetSystem();
-            //await GenerateProcessOption();
-            //await GenerateSystemOption();
             GetJobs();
         });
 
@@ -391,20 +485,52 @@
                     let code_status = data[16];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
-                    if (code_status === "STA001"){
-                        status_str = `<span class="badge badge-warning">${status}</span>`;
-                    }else if(code_status === "STA002"){
+                    if (code_status === "STA999"){
                         status_str = `<span class="badge badge-success">${status}</span>`;
-                    }else if(code_status === "STA003"){
-                        status_str = `<span class="badge badge-Primary">${status}</span>`;
-                    }else if(code_status === "STA004"){
-                        status_str = `<span class="badge badge-Info">${status}</span>`;
                     }else{
-                        status_str = `<span class="badge badge-Secondary">${status}</span>`;
+                        status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
-                    
+                                       
                     $('td:eq(8)', row).html(status_str);
                 }
+            });
+        };
+
+        function GenerateTablePayment(payments) {
+            let datas = [];
+            if (table_payment !== null)
+                $('#table_payment').DataTable().destroy();
+
+            for (let i = 0; i < payments.length; i++) {
+                
+                let payment = payments[i].payment_name;
+                let percent = payments[i].percent;
+             
+                datas.push([
+                    payment,
+                    percent
+                ]);
+            }
+
+            table_payment = $('#table_payment').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
             });
         };
 
@@ -418,7 +544,16 @@
                 }
             }
         }
-
+        function GeneratePaymentOption() {
+            let payment = $('#select_payment').val();
+            $('#select_payment').empty();
+            $('#select_payment').append(`<option value="" selected disabled>Please Select Payment</option>`);
+            for (let i = 0; i < statuses.length; i++) {
+                if (statuses[i].status_name === status || status === "" || status === null) {
+                    $('#select_payment').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
+                }
+            }
+        }
         function GenerateQuotationOptions() {
             let quots_str = '';
             for (let i = 0; i < quots.length; i++) {
@@ -536,6 +671,18 @@
                 status = 1;
             }
 
+            let down_payment = payments.filter(f=>f.payment_id = "STA001").map(m=>m.percent)[0];
+            let document_submit = payments.filter(f=>f.payment_id = "STA002").map(m=>m.percent)[0];
+            let instrument_delivered_ctl = payments.filter(f=>f.payment_id = "STA003").map(m=>m.percent)[0];
+            let system_delivered_ctl = payments.filter(f=>f.payment_id = "STA004").map(m=>m.percent)[0];
+            let fat = payments.filter(f=>f.payment_id = "STA005").map(m=>m.percent)[0];
+            let delivery_instrument = payments.filter(f=>f.payment_id = "STA006").map(m=>m.percent)[0];
+            let delivery_system = payments.filter(f=>f.payment_id = "STA007").map(m=>m.percent)[0];
+            let progress_work = payments.filter(f=>f.payment_id = "STA008").map(m=>m.percent)[0];
+            let commissioning = payments.filter(f=>f.payment_id = "STA009").map(m=>m.percent)[0];
+            let as_built = payments.filter(f=>f.payment_id = "STA010").map(m=>m.percent)[0];
+            let finish = payments.filter(f=>f.payment_id = "STA999").map(m=>m.percent)[0];
+
             let job_string = JSON.stringify({
                 "job_id": job_id,
                 "job_name": job_name,
@@ -554,12 +701,68 @@
             }
 
             if (update) {
-                UpdateJob(job_string);
+                //UpdateJob(job_string);
             }
             else {
-                AddJob(job_string);
+                //AddJob(job_string);
             }
 
+        });
+
+        $('#add_payment').on('click',function(){
+            let _payment = $('#select_payment').val();       
+            let payment = statuses.filter(f=>f.status_id === _payment ).map(m=>m.status_name)[0];
+            let check_payment = payments.find(f=>f.payment_name == payment);
+            if (check_payment == undefined){
+                payments.push({'payment_id': _payment ,'payment_name': payment, 'percent': 0});
+                GenerateTablePayment(payments);
+            }
+        });
+
+        $('#select_payment').on('change',function(){
+            $('#add_payment').attr('disabled',false);
+        });
+
+        $('#table_payment tbody').on('click', 'tr', async function () {
+            let admin = '@Model.role' == "Admin" ? true : false;
+            if (admin) {
+                let data = table_payment.row(this).data();
+                let payment = data[0];
+                let percent = data[1];
+                $('#edit_payment_name').val(payment);
+                $('#edit_percent').val(percent);
+                $('#modal_edit_payment').modal();
+            }
+        });
+
+        $('#btn_payment_save').on('click',function(){
+            let payment = $('#edit_payment_name').val();
+            let payment_id = payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
+            let percent = $('#edit_percent').val();
+
+            let sum_percent = payments.filter(f=>f.payment_id !== payment_id).reduce((total, arg) => Number(total) + Number(arg.percent), 0);
+            if (Number(sum_percent) + Number(percent) > 100){
+                alert('percent more than 100 %');
+            }else{
+                let index = payments.findIndex(f=>f.payment_id == payment_id);
+                payments[index].payment_id = payment_id;
+                payments[index].payment_name = payment;
+                payments[index].percent = percent;
+
+                GenerateTablePayment(payments);
+                $('#modal_edit_payment').modal('hide');
+            }
+
+        });
+
+        $('#btn_payment_delete').on('click',function(){
+            let payment = $('#edit_payment_name').val();
+            let payment_id = payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
+
+            let index = payments.findIndex(f=>f.payment_id == payment_id);
+            payments.splice(index,1);
+            GenerateTablePayment(payments);
+            $('#modal_edit_payment').modal('hide');
         });
 
         async function AddJob(job_string) {
