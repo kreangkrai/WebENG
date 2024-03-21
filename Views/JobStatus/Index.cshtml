@@ -1,3 +1,418 @@
-﻿@{
+﻿@model WebENG.Models.UserModel;
+@{
     ViewData["Title"] = "Job Status";
+}
+<style>
+    td {
+    white-space: nowrap;
+}
+</style>
+<div class="row p-4" style="row-gap:20px">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Job Status</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group row" style="row-gap:20px">
+                        @if (Model.role == "Admin")
+                        {
+                            <div class="col-xl-3">
+                                <select id="user_name" class="form-control">
+                                    <option value="" selected disabled>Please Select User</option>
+                                </select>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-xl-3" hidden>
+                                <select id="user_name" class="form-control">
+                                    <option value="" selected disabled>Please Select User</option>
+                                </select>
+                            </div>
+                        }
+                        <div class="col-xl-1">
+                            <button id="btn_load" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-sync"></i> Load
+                            </button>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <table id="table_job" class="table table-sm compact table-bordered table-hover responsive text-center w-100">
+                            <thead style="background-color:#429DD8">
+                                <tr>
+                                    <th>Job No.</th>
+                                    <th>Project Name</th>
+                                    <th>Customer</th>
+                                    <th>% Invoice</th>
+                                    <th>Cuurent Status</th>
+                                    <th>Down Payment/KOM</th>
+                                    <th>Document Submit</th>
+                                    <th>Instrument Delivered @@ CTL</th>
+                                    <th>System Delivered @@ CTL</th>
+                                    <th>FAT</th>
+                                    <th>Delivery Instrument</th>
+                                    <th>Delivery System</th>
+                                    <th>Progress Work</th>
+                                    <th>Commissioning</th>
+                                    <th>As-Built</th>
+                                    <th>Job In Hand</th>
+                                    <th>Total Invoice</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_job" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" style="overflow-y:auto">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Job Status</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="job_id">Job Number</label>
+                            <input id="job_id" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-8">
+                            <label for="job_name">Job Name</label>
+                            <input id="job_name" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                    </div>                                     
+                    <div class="form-row pt-2">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#42D5D8">
+                                    <span style="font-weight:bold">Term Payment</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_payment" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>Milestone</th>
+                                                        <th>%</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                       
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="cost">Job In Hand</label>
+                            <div class="input-group">
+                                <input id="job_in_hand" type="number" class="form-control" placeholder="0" value="0" disabled/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="cost">Invoice</label>
+                            <div class="input-group">
+                                <input id="invoice" type="number" class="form-control" placeholder="0" value="0" disabled />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="due_date">Due Date</label>
+                            <input id="due_date"type="date"  class="form-control" value="1900-01-01" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-row" id="form_status">                       
+                        <div class="col-5">
+                            <label for="status">Status</label>
+                            <select id="status" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+         let table;
+         let jobs_status = [];
+         $(document).ready(async function (){            
+             await GetUsers();
+             await GenerateUsers();
+             
+             await GetStatus();
+             await GenerateStatusOption();
+            
+             let user = '@Model.user_id.ToLower()';
+             $('#user_name').val(user);
+             
+         });
+
+         async function GetStatus() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetStatus", "JobStatus")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    statuses = response;
+                }
+            });
+        };
+        async function GenerateStatusOption() {
+            let status = $('#status').val();
+            $('#status').empty();
+            for (let i = 0; i < statuses.length; i++) {
+                if (statuses[i].status_name === status || status === "" || status === null) {
+                    $('#status').append(`<option value="${statuses[i].status_id}">${statuses[i].status_id}: ${statuses[i].status_name}</option>`);
+                }
+            }
+        }
+         async function GetUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetWorkingUser", "JobStatus")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    users = response;
+                }
+            });
+        }
+        function GenerateUsers() {
+            var user_string = '';
+            $('#user_name').empty();
+            for (var i = 0; i < users.length; i++) {
+                user_string += `<option value="${users[i].user_id.toLowerCase()}">${users[i].name}</option>`;
+            }          
+            $('#user_name').append(user_string);
+        }
+
+        async function GetJobStatusByUser(user) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobStatusByUser", "JobStatus")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user},
+                success: function (response) {
+                    jobs_status = response;
+                    GenerateTable(jobs_status);
+                }
+            });
+        }
+
+        $('#btn_load').on('click',async function(){            
+            let user = $('#user_name').val();
+            await GetJobStatusByUser(user);
+        });
+
+        function GenerateTable(jobs) {
+            let datas = [];
+            if (table !== null)
+                $('#table_job').DataTable().destroy();
+
+            for (let i = 0; i < jobs.length; i++) {
+                let percent = Math.floor((Number(jobs[i].invoice) / Number(jobs[i].job_in_hand)) * 100);
+                datas.push([
+                    jobs[i].job_id,
+                    jobs[i].job_name,
+                    jobs[i].customer,
+                    percent,
+                    jobs[i].status,
+                    jobs[i].down_payment,
+                    jobs[i].document_submit,
+                    jobs[i].instrument_delivered_ctl,
+                    jobs[i].system_delivered_ctl,
+                    jobs[i].fat,
+                    jobs[i].delivery_instrument,
+                    jobs[i].delivery_system,
+                    jobs[i].progress_work,
+                    jobs[i].commissioning,
+                    jobs[i].as_built,
+                    jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobs[i].invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table = $('#table_job').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+ 
+                },
+                columnDefs: [
+                    {
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    @*$('td:eq(1)', row).addClass("text-left");
+                    $('td:eq(3)', row).addClass("text-left");
+                    let code_status = data[16];
+                    let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
+                    let status_str =  '';
+                    if (code_status === "STA999"){
+                        status_str = `<span class="badge badge-success">${status}</span>`;
+                    }else{
+                        status_str = `<span class="badge badge-warning">${status}</span>`;
+                    }
+                                       
+                    $('td:eq(8)', row).html(status_str);*@
+                },
+                scrollCollapse: true,
+                scrollX: true,
+            });
+        };
+
+        $('#table_job tbody').on('click', 'tr', async function () {
+            let data = table.row(this).data();
+            let job_id = data[0];
+            
+            let data_job = jobs_status.filter(f=>f.job_id == job_id).map(m=>m)[0];
+            let status = statuses.filter(f=>f.status_name == data_job.status).map(m=>m.status_id)[0];
+            let job_name = data_job.job_name;
+            let job_in_hand = data_job.job_in_hand;
+            let invoice = data_job.invoice;
+            let due_date = data_job.due_date;
+
+            let down_payment = data_job.down_payment;
+            let document_submit = data_job.document_submit;
+            let instrument_delivered_ctl = data_job.instrument_delivered_ctl;
+            let system_delivered_ctl = data_job.system_delivered_ctl;
+            let fat = data_job.fat;
+            let delivery_instrument = data_job.delivery_instrument;
+            let delivery_system = data_job.delivery_system;
+            let progress_work = data_job.progress_work;
+            let commissioning = data_job.commissioning;
+            let as_built = data_job.as_built;
+
+            let payments = [];
+            let new_payments = [];
+            payments.push({'payment_id': 'STA001' ,'payment_name': 'Down Payment/KOM', 'percent': down_payment});
+            payments.push({'payment_id': 'STA002' ,'payment_name': 'Document Submit', 'percent': document_submit});
+            payments.push({'payment_id': 'STA003' ,'payment_name': 'Instrument Delivered @@ CTL', 'percent': instrument_delivered_ctl});
+            payments.push({'payment_id': 'STA004' ,'payment_name': 'System Delivered @@ CTL', 'percent': system_delivered_ctl});
+            payments.push({'payment_id': 'STA005' ,'payment_name': 'FAT', 'percent': fat});
+            payments.push({'payment_id': 'STA006' ,'payment_name': 'Delivery Instrument', 'percent': delivery_instrument});
+            payments.push({'payment_id': 'STA007' ,'payment_name': 'Delivery System', 'percent': delivery_system});
+            payments.push({'payment_id': 'STA008' ,'payment_name': 'Progress Work', 'percent': progress_work});
+            payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': commissioning});
+            payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': as_built});
+           
+            for (let i=0;i<payments.length;i++){
+                if (payments[i].percent > 0){
+                    new_payments.push(payments[i]);
+                }
+            }
+            payments = new_payments;
+
+            $('#job_id').val(job_id);
+            $('#job_name').val(job_name);
+            $('#job_in_hand').val(job_in_hand);
+            $('#invoice').val(invoice);
+            $('#due_date').val(due_date.split('T')[0]);
+            $('#status').val(status);
+
+            if (status === undefined){
+                $('#form_status').attr('hidden',true);
+            }else{
+                $('#form_status').attr('hidden',false);
+            }
+            GenerateTablePayment(payments);
+
+            $('#modal_job').modal();
+        });
+
+        function GenerateTablePayment(payments) {
+            let datas = [];
+            if (table_payment !== null)
+                $('#table_payment').DataTable().destroy();
+
+            for (let i = 0; i < payments.length; i++) {
+                
+                let payment = payments[i].payment_name;
+                let percent = payments[i].percent;
+             
+                datas.push([
+                    payment,
+                    percent
+                ]);
+            }
+
+            table_payment = $('#table_payment').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
+
+        $('#btn_save').on('click',async function(){
+           let job = $('#job_id').val();
+           let status = $('#status').val();
+
+           await UpdateJobStatus(job,status);
+
+        });
+
+        async function UpdateJobStatus(job,status) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateJobStatus", "JobStatus")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job,status
+                },
+                success: async function (response) {
+                    if (response === "Success") {
+                        let user = $('#user_name').val();
+                        await GetJobStatusByUser(user);
+                        $('#modal_job').modal('hide');
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+    </script>
 }

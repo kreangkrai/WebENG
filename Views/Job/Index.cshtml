@@ -141,7 +141,7 @@
                     <div class="form-row">
                         <div class="col-6">
                             <div class="card">
-                                <div class="card-header" style="background-color:#33A8FF">
+                                <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold;">Process</span>
                                 </div>
                                 <div class="card-body">
@@ -152,7 +152,7 @@
                         </div>
                         <div class="col-6">
                             <div class="card">
-                                <div class="card-header" style="background-color:#33A8FF">
+                                <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold">System</span>
                                 </div>
                                 <div class="card-body">
@@ -165,7 +165,7 @@
                     <div class="form-row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-header" style="background-color:#33A8FF">
+                                <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold">Term Payment</span>
                                 </div>
                                 <div class="card-body">
@@ -185,10 +185,10 @@
                                     <div class="form-row pt-1">
                                         <div class="col-12">
                                             <table id="table_payment" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
-                                                <thead style="background-color:#3380FF">
+                                                <thead style="background-color:#42B4D8">
                                                     <tr>
-                                                        <th>Mile Stone</th>
-                                                        <th>Percent</th>
+                                                        <th>Milestone</th>
+                                                        <th>%</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -225,7 +225,7 @@
                         </div>
                     </div>
                     <div class="form-row">                       
-                        <div class="col-4">
+                        <div class="col-5">
                             <label for="status">Status</label>
                             <select id="status" class="form-control">
                             </select>
@@ -547,10 +547,12 @@
         function GeneratePaymentOption() {
             let payment = $('#select_payment').val();
             $('#select_payment').empty();
-            $('#select_payment').append(`<option value="" selected disabled>Please Select Payment</option>`);
+            $('#select_payment').append(`<option value="" selected disabled>Please Select Term Payment</option>`);
             for (let i = 0; i < statuses.length; i++) {
                 if (statuses[i].status_name === status || status === "" || status === null) {
-                    $('#select_payment').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
+                    if (statuses[i].status_id !== "STA999"){
+                        $('#select_payment').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
+                    }
                 }
             }
         }
@@ -597,6 +599,8 @@
         });
 
         function EditJob(data) {
+            payments = [];
+
             update = true;
             $('#modal_job').modal();
             $('#modal_title').text("Edit Job");
@@ -611,6 +615,7 @@
                 process.push(_process);
             }
 
+            let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
             let system = []
             let countSystem = (data[8].match(/,/g) || []).length;
             for (let k=0;k<=countSystem;k++){
@@ -624,6 +629,9 @@
             let status = data[16];
             let finished_date = jobs.filter(f=>f.job_id === job_id).map(m=>m.finished_date)[0];
 
+            
+            
+
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
             $('#job_name').val(job_name);
@@ -632,6 +640,10 @@
             $('#md').val(md);
             $('#pd').val(pd);
             $('#status').val(status);
+            $('#job_in_hand').val(job.job_in_hand);
+            $('#invoice').val(job.invoice);
+            $('#due_date').val(job.due_date.split('T')[0]);
+
             $('#finished_date').val(finished_date.split('T')[0]);
 
             let finish_status = statuses.filter(f=>f.status_id === status).map(m=> m.status_name);
@@ -646,6 +658,30 @@
 
             processString(process);
             systemString(system);
+
+            
+
+            payments.push({'payment_id': 'STA001' ,'payment_name': 'Down Payment/KOM', 'percent': job.down_payment});
+            payments.push({'payment_id': 'STA002' ,'payment_name': 'Document Submit', 'percent': job.document_submit});
+            payments.push({'payment_id': 'STA003' ,'payment_name': 'Instrument Delivered @@ CTL', 'percent': job.instrument_delivered_ctl});
+            payments.push({'payment_id': 'STA004' ,'payment_name': 'System Delivered @@ CTL', 'percent': job.system_delivered_ctl});
+            payments.push({'payment_id': 'STA005' ,'payment_name': 'FAT', 'percent': job.fat});
+            payments.push({'payment_id': 'STA006' ,'payment_name': 'Delivery Instrument', 'percent': job.delivery_instrument});
+            payments.push({'payment_id': 'STA007' ,'payment_name': 'Delivery System', 'percent': job.delivery_system});
+            payments.push({'payment_id': 'STA008' ,'payment_name': 'Progress Work', 'percent': job.progress_work});
+            payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': job.commissioning});
+            payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': job.as_built});
+
+            let new_payments = [];
+            for (let i=0;i<payments.length;i++){
+                if (payments[i].percent > 0){
+                    new_payments.push(payments[i]);
+                }
+            }
+
+            payments = new_payments;
+
+            GenerateTablePayment(payments);
         }
 
         $('#status').on('change',function(){
@@ -667,21 +703,23 @@
             let pd_rate = $('#pd_rate').val();
             let status = $('#status').val();
             let finished_date = $('#finished_date').val();
+            let job_in_hand = $('#job_in_hand').val();
+            let invoice = $('#invoice').val();
+            let due_date = $('#due_date').val();
             if (status === null) {
                 status = 1;
             }
 
-            let down_payment = payments.filter(f=>f.payment_id = "STA001").map(m=>m.percent)[0];
-            let document_submit = payments.filter(f=>f.payment_id = "STA002").map(m=>m.percent)[0];
-            let instrument_delivered_ctl = payments.filter(f=>f.payment_id = "STA003").map(m=>m.percent)[0];
-            let system_delivered_ctl = payments.filter(f=>f.payment_id = "STA004").map(m=>m.percent)[0];
-            let fat = payments.filter(f=>f.payment_id = "STA005").map(m=>m.percent)[0];
-            let delivery_instrument = payments.filter(f=>f.payment_id = "STA006").map(m=>m.percent)[0];
-            let delivery_system = payments.filter(f=>f.payment_id = "STA007").map(m=>m.percent)[0];
-            let progress_work = payments.filter(f=>f.payment_id = "STA008").map(m=>m.percent)[0];
-            let commissioning = payments.filter(f=>f.payment_id = "STA009").map(m=>m.percent)[0];
-            let as_built = payments.filter(f=>f.payment_id = "STA010").map(m=>m.percent)[0];
-            let finish = payments.filter(f=>f.payment_id = "STA999").map(m=>m.percent)[0];
+            let down_payment = payments.filter(f=>f.payment_id == "STA001").map(m=>m.percent)[0];
+            let document_submit = payments.filter(f=>f.payment_id == "STA002").map(m=>m.percent)[0];
+            let instrument_delivered_ctl = payments.filter(f=>f.payment_id == "STA003").map(m=>m.percent)[0];
+            let system_delivered_ctl = payments.filter(f=>f.payment_id == "STA004").map(m=>m.percent)[0];
+            let fat = payments.filter(f=>f.payment_id == "STA005").map(m=>m.percent)[0];
+            let delivery_instrument = payments.filter(f=>f.payment_id == "STA006").map(m=>m.percent)[0];
+            let delivery_system = payments.filter(f=>f.payment_id == "STA007").map(m=>m.percent)[0];
+            let progress_work = payments.filter(f=>f.payment_id == "STA008").map(m=>m.percent)[0];
+            let commissioning = payments.filter(f=>f.payment_id == "STA009").map(m=>m.percent)[0];
+            let as_built = payments.filter(f=>f.payment_id == "STA010").map(m=>m.percent)[0];
 
             let job_string = JSON.stringify({
                 "job_id": job_id,
@@ -693,6 +731,19 @@
                 "md_rate": md_rate,
                 "pd_rate": pd_rate,
                 "status": status,
+                "down_payment":down_payment,
+                "document_submit":document_submit,
+                "instrument_delivered_ctl":instrument_delivered_ctl,
+                "system_delivered_ctl":system_delivered_ctl,
+                "fat":fat,
+                "delivery_instrument":delivery_instrument,
+                "delivery_system":delivery_system,
+                "progress_work":progress_work,
+                "commissioning":commissioning,
+                "as_built":as_built,
+                "job_in_hand":job_in_hand,
+                "invoice":invoice,
+                "due_date":due_date,
                 "finished_date": finished_date
             });
 
@@ -701,10 +752,10 @@
             }
 
             if (update) {
-                //UpdateJob(job_string);
+                UpdateJob(job_string);
             }
             else {
-                //AddJob(job_string);
+                AddJob(job_string);
             }
 
         });
@@ -748,7 +799,6 @@
                 payments[index].payment_id = payment_id;
                 payments[index].payment_name = payment;
                 payments[index].percent = percent;
-
                 GenerateTablePayment(payments);
                 $('#modal_edit_payment').modal('hide');
             }

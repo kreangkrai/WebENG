@@ -13,9 +13,13 @@ namespace WebENG.Controllers
     public class JobStatusController : Controller
     {
         readonly IAccessory Accessory;
+        readonly IJobStatus JobStatus;
+        readonly IStatus Status;
         public JobStatusController()
         {
             Accessory = new AccessoryService();
+            JobStatus = new JobStatusService();
+            Status = new EngStatusService();
         }
         public IActionResult Index()
         {
@@ -34,6 +38,36 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        [HttpGet]
+        public JsonResult GetWorkingUser()
+        {
+            List<UserModel> users = Accessory.getWorkingUser();
+
+            return Json(users);
+        }
+
+        [HttpGet]
+        public JsonResult GetJobStatusByUser(string user)
+        {
+            List<JobModel> jobs = JobStatus.GetJobStatusByUser(user);
+            return Json(jobs);
+        }
+
+        [HttpGet]
+        public JsonResult GetStatus()
+        {
+            List<EngStatusModel> statuses = Status.GetStatuses();
+            statuses = statuses.Where(w => w.status_id != "STA999").ToList();
+            return Json(statuses);
+        }
+
+        [HttpPatch]
+        public JsonResult UpdateJobStatus(string job,string status)
+        {
+            var result = JobStatus.UpdateJobStatus(job, status);
+            return Json(result);
         }
     }
 }

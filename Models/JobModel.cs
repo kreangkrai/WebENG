@@ -37,8 +37,8 @@ namespace WebENG.Models
         public int commissioning { get; set; }
         public int as_built { get; set; }
         public int finish { get; set; }
-        public int job_in_hand { get; set; }
-        public int invoice { get; set; }
+        public double job_in_hand { get; set; }
+        public double invoice { get; set; }
         public DateTime due_date { get; set; }
         public DateTime finished_date { get; set; }
     }
