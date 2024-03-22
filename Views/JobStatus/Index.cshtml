@@ -3,9 +3,79 @@
     ViewData["Title"] = "Job Status";
 }
 <style>
-    td {
-    white-space: nowrap;
-}
+
+    .multiselect {
+      width: 300px;
+    }
+
+    .selectBox {
+      position: relative;
+    }
+
+    .selectBox select {
+      width: 100%;
+      font-weight: bold;
+    }
+
+    .overSelect {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+    }
+
+    #checkboxes {
+      display: none;
+      border: 1px #dadada solid;
+    }
+
+    #checkboxes label {
+      display: block;
+    }
+
+    #checkboxes label:hover {
+      background-color: #1e90ff;
+    }
+
+
+    table.dataTable th:nth-child(1),
+    table.dataTable th:nth-child(2),
+    table.dataTable th:nth-child(3),
+    table.dataTable th:nth-child(4),
+    table.dataTable th:nth-child(5),
+    table.dataTable th:nth-child(16),
+    table.dataTable th:nth-child(17){
+        text-align: center;
+        vertical-align:middle;
+    }
+
+    table.dataTable th:nth-child(1),
+    table.dataTable th:nth-child(16),
+    table.dataTable th:nth-child(17){
+        white-space: nowrap;
+    }
+
+    table.dataTable td:nth-child(1),
+    table.dataTable td:nth-child(2),
+    table.dataTable td:nth-child(3),
+    table.dataTable td:nth-child(5){
+        white-space: nowrap;
+    }
+
+    table.dataTable td:nth-child(6),th:nth-child(6),
+    table.dataTable td:nth-child(7),th:nth-child(7),
+    table.dataTable td:nth-child(8),th:nth-child(8),
+    table.dataTable td:nth-child(9),th:nth-child(9),
+    table.dataTable td:nth-child(10),th:nth-child(10),
+    table.dataTable td:nth-child(11),th:nth-child(11),
+    table.dataTable td:nth-child(12),th:nth-child(12),
+    table.dataTable td:nth-child(13),th:nth-child(13),
+    table.dataTable td:nth-child(14),th:nth-child(14),
+    table.dataTable td:nth-child(15),th:nth-child(15){
+      width: 35px;
+      max-width: 35px;      
+    }
 </style>
 <div class="row p-4" style="row-gap:20px">
     <div class="col-xl-12">
@@ -36,6 +106,40 @@
                             <button id="btn_load" type="button" class="btn btn-primary form-control elevation-1">
                                 <i class="fas fa-sync"></i> Load
                             </button>
+                        </div>
+                        <div class="col-xl-3">
+                              <div class="multiselect">
+                                <div class="selectBox" onclick="showCheckboxes()">
+                                  <select class="form-control">
+                                    <option>Select an Term Payment</option>
+                                  </select>
+                                  <div class="overSelect"></div>
+                                </div>
+                                <div id="checkboxes">
+                                  <label for="STA001" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA001" value="Down Payment/KOM" onchange="CheckChange('STA001')" checked/> Down Payment/KOM</label>
+                                  <label for="STA002" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA002" value="Document Submit" onchange="CheckChange('STA002')" checked/> Document Submit</label>
+                                  <label for="STA003" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA003" value="Instrument Delivered @@ CTL" onchange="CheckChange('STA003')" checked/> Instrument Delivered @@ CTL</label>
+                                  <label for="STA004" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA004" value="System Delivered @@ CTL" onchange="CheckChange('STA004')" checked/> System Delivered @@ CTL</label>
+                                  <label for="STA005" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA005" value="FAT" onchange="CheckChange('STA005')" checked/> FAT</label>
+                                  <label for="STA006" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA006" value="Delivery Instrument" onchange="CheckChange('STA006')" checked/> Delivery Instrument</label>
+                                  <label for="STA007" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA007" value="Delivery System" onchange="CheckChange('STA007')" checked/> Delivery System</label>
+                                  <label for="STA008" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA008" value="Progress Work" onchange="CheckChange('STA008')" checked/> Progress Work</label>
+                                  <label for="STA009" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA009" value="Commissioning" onchange="CheckChange('STA009')" checked/> Commissioning</label>
+                                  <label for="STA010" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA010" value="As-Built" onchange="CheckChange('STA010')" checked/> As-Built</label>
+                                  <label for="STA999" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA999" value="Finished" onchange="CheckChange('STA999')" checked/> Finished</label>
+                                </div>
+                              </div>
                         </div>
                     </div>
                     <hr />
@@ -161,16 +265,15 @@
     <script type="text/javascript">
          let table;
          let jobs_status = [];
+         let set_payments = new Set();
          $(document).ready(async function (){            
              await GetUsers();
-             await GenerateUsers();
-             
+             await GenerateUsers();             
              await GetStatus();
              await GenerateStatusOption();
             
              let user = '@Model.user_id.ToLower()';
              $('#user_name').val(user);
-             
          });
 
          async function GetStatus() {
@@ -229,33 +332,71 @@
         $('#btn_load').on('click',async function(){            
             let user = $('#user_name').val();
             await GetJobStatusByUser(user);
+
+            set_payments.add('Down Payment/KOM');
+            set_payments.add('Document Submit');
+            set_payments.add('Instrument Delivered @@ CTL');
+            set_payments.add('System Delivered @@ CTL');
+            set_payments.add('FAT');
+            set_payments.add('Delivery Instrument');
+            set_payments.add('Delivery System');
+            set_payments.add('Progress Work');
+            set_payments.add('Commissioning');
+            set_payments.add('As-Built');
+            set_payments.add('Finished');
         });
 
         function GenerateTable(jobs) {
             let datas = [];
             if (table !== null)
                 $('#table_job').DataTable().destroy();
-
+            let arr = Array.from(set_payments);
+            let new_jobs = [];
+            console.log(jobs);
+            for(let i=0;i<jobs.length;i++){
+                for(let j=0;j<arr.length;j++){
+                    if (jobs[i].status == arr[j]){
+                        new_jobs.push(jobs[i]);
+                        break;
+                    }
+                }               
+            }
+            jobs = new_jobs;
+            console.log(jobs);
             for (let i = 0; i < jobs.length; i++) {
-                let percent = Math.floor((Number(jobs[i].invoice) / Number(jobs[i].job_in_hand)) * 100);
+                
+                let percent = Math.ceil((Number(jobs[i].invoice) / Number(jobs[i].job_in_hand)) * 100);
+                let down_payment = jobs[i].down_payment > 0 ? jobs[i].down_payment : "";
+                let document_submit = jobs[i].document_submit > 0 ? jobs[i].document_submit : "";
+                let instrument_delivered_ctl = jobs[i].instrument_delivered_ctl > 0 ? jobs[i].instrument_delivered_ctl : "";
+                let system_delivered_ctl = jobs[i].system_delivered_ctl > 0 ? jobs[i].system_delivered_ctl : "";
+                let fat = jobs[i].fat > 0 ? jobs[i].fat : "";
+                let delivery_instrument = jobs[i].delivery_instrument > 0 ? jobs[i].delivery_instrument : "";
+                let delivery_system = jobs[i].delivery_system > 0 ? jobs[i].delivery_system : "";
+                let progress_work = jobs[i].progress_work > 0 ? jobs[i].progress_work : "";
+                let commissioning = jobs[i].commissioning > 0 ? jobs[i].commissioning : "";
+                let as_built = jobs[i].as_built > 0 ? jobs[i].as_built : "";
+                let job_in_hand = jobs[i].job_in_hand > 0 ? jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+                let invoice = jobs[i].invoice > 0 ? jobs[i].invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
                     jobs[i].customer,
                     percent,
                     jobs[i].status,
-                    jobs[i].down_payment,
-                    jobs[i].document_submit,
-                    jobs[i].instrument_delivered_ctl,
-                    jobs[i].system_delivered_ctl,
-                    jobs[i].fat,
-                    jobs[i].delivery_instrument,
-                    jobs[i].delivery_system,
-                    jobs[i].progress_work,
-                    jobs[i].commissioning,
-                    jobs[i].as_built,
-                    jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                    jobs[i].invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    down_payment,
+                    document_submit,
+                    instrument_delivered_ctl,
+                    system_delivered_ctl,
+                    fat,
+                    delivery_instrument,
+                    delivery_system,
+                    progress_work,
+                    commissioning,
+                    as_built,
+                    job_in_hand,
+                    invoice,
                 ]);
             }
 
@@ -263,26 +404,72 @@
                 data: datas,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 fixedHeader: true,
-                fixedColumns: {
- 
-                },
+                fixedColumns: true,
                 columnDefs: [
                     {
+                        width: 200, targets: 0
                     },
                 ],
-                rowCallback: function (row, data) {
-                    @*$('td:eq(1)', row).addClass("text-left");
-                    $('td:eq(3)', row).addClass("text-left");
-                    let code_status = data[16];
-                    let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
-                    let status_str =  '';
-                    if (code_status === "STA999"){
-                        status_str = `<span class="badge badge-success">${status}</span>`;
-                    }else{
-                        status_str = `<span class="badge badge-warning">${status}</span>`;
+                rowCallback: function (row, _data) {
+                    $('td:eq(1)', row).addClass("text-left");
+                    $('td:eq(2)', row).addClass("text-left");
+                    let job_id = _data[0];
+                    let data = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                    let percent = Math.ceil((Number(data.invoice) / Number(data.job_in_hand)) * 100);
+                    let current_status = statuses.filter(f=>f.status_name == data.status).map(m=>m.status_id)[0];
+
+                    let payments = [];
+                    let sum_percent = 0;
+                    let start_column = 5;
+                    let check_current_status = false;
+                    payments.push({'payment_id': 'STA001' ,'payment_name': 'Down Payment/KOM', 'percent': data.down_payment});
+                    payments.push({'payment_id': 'STA002' ,'payment_name': 'Document Submit', 'percent': data.document_submit});
+                    payments.push({'payment_id': 'STA003' ,'payment_name': 'Instrument Delivered @@ CTL', 'percent': data.instrument_delivered_ctl});
+                    payments.push({'payment_id': 'STA004' ,'payment_name': 'System Delivered @@ CTL', 'percent': data.system_delivered_ctl});
+                    payments.push({'payment_id': 'STA005' ,'payment_name': 'FAT', 'percent': data.fat});
+                    payments.push({'payment_id': 'STA006' ,'payment_name': 'Delivery Instrument', 'percent': data.delivery_instrument});
+                    payments.push({'payment_id': 'STA007' ,'payment_name': 'Delivery System', 'percent': data.delivery_system});
+                    payments.push({'payment_id': 'STA008' ,'payment_name': 'Progress Work', 'percent': data.progress_work});
+                    payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': data.commissioning});
+                    payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': data.as_built});
+
+                    for(let i=0;i<payments.length;i++){
+                        $(`td:eq(${start_column + i})`, row).css({ "background-color": '#EFECE8'});
+                        if (current_status === undefined){
+                                $(`td`,row).css({ "text-decoration": 'line-through'});
+                                $(`td`,row).css({ "background-color": '#DEE6E5'});
+                                
+                        }else{
+                            if (payments[i].percent > 0){                          
+                                sum_percent += Number(payments[i].percent);
+                                if (current_status === payments[i].payment_id){                          
+                                    if (percent > sum_percent){
+                                        $(`td:eq(${start_column + i})`, row).css({ "background-color": '#42CAD8'});
+                                    }else{
+                                        $(`td:eq(${start_column + i})`, row).css({ "background-color": 'orange'});
+                                    }
+                                    check_current_status = true;
+                                    continue;
+                                }
+
+                                if (check_current_status){
+                                    if (percent >= sum_percent){
+                                        $(`td:eq(${start_column + i})`, row).css({ "background-color": '#42CAD8'});
+                                    }
+                                }else{
+                                    if (percent >= sum_percent){
+                                        $(`td:eq(${start_column + i})`, row).css({ "background-color": '#42D850'});
+                                    }else{
+                                        $(`td:eq(${start_column + i})`, row).css({ "background-color": 'red'});
+                                    }
+                                }
+                            }else{
+                                if (current_status === payments[i].payment_id){
+                                    check_current_status = true;
+                                }
+                            }
+                        }
                     }
-                                       
-                    $('td:eq(8)', row).html(status_str);*@
                 },
                 scrollCollapse: true,
                 scrollX: true,
@@ -413,6 +600,30 @@
                     }
                 }
             });
+        }
+
+
+        var expanded = false;
+        function showCheckboxes() {
+          var checkboxes = document.getElementById("checkboxes");            
+          if (!expanded) {
+            checkboxes.style.display = "block";
+            expanded = true;
+          } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+          }
+        }
+        function CheckChange(status){
+            let chk = $(`#${status}`).prop('checked');
+            let value = $(`#${status}`).val();
+            if (!chk){
+                set_payments.delete(value);
+            }else{
+                set_payments.add(value);
+            }
+
+            GenerateTable(jobs_status);
         }
     </script>
 }
