@@ -145,8 +145,32 @@
                                     <span style="font-weight:bold;">Process</span>
                                 </div>
                                 <div class="card-body">
-                                    <ul id="process" style="width:100%;height:250px;overflow-y:auto" class="list-group">
-                                    </ul> 
+                                    <div class="form-row">
+                                         <div class="col-9">
+                                            <label for="select_process">Process</label>
+                                            <select id="select_process" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="add_process">Add</label>
+                                            <button id="add_process" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_process" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>Process</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div> 
                                 </div>
                             </div>
                         </div>
@@ -156,8 +180,32 @@
                                     <span style="font-weight:bold">System</span>
                                 </div>
                                 <div class="card-body">
-                                    <ul id="system" style="width:100%;height:250px;overflow-y:auto" class="list-group">
-                                    </ul> 
+                                    <div class="form-row">
+                                         <div class="col-9">
+                                            <label for="select_system">System</label>
+                                            <select id="select_system" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="add_system">Add</label>
+                                            <button id="add_system" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_system" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>System</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div>  
                                 </div>
                             </div>
                         </div>
@@ -279,12 +327,72 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal_edit_process" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Process</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="edit_process_name">Process</label>
+                            <input id="edit_process_name" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_process_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_edit_system" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit System</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="edit_system_name">System</label>
+                            <input id="edit_system_name" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_system_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
     <script type="text/javascript">
         //Variable Declaration
         let table;
         let table_payment;
+        let table_process;
+        let table_system;
         let update = false;
         let jobs = [];
         let users = [];
@@ -292,11 +400,10 @@
         let statuses = [];
         let processes = [];
         let systems = [];
-        let list_process = [];
-        let list_system = [];
-        let str_process = "";
-        let str_system = "";
-        let payments = [];
+
+        let set_payments = [];
+        let set_processes = [];
+        let set_systems = [];
         //Change these parameters to true to show result
         let debug_jobs = false;
         let debug_user = false;
@@ -309,6 +416,8 @@
             await GeneratePaymentOption();
             await GetProcess();
             await GetSystem();
+            await GenerateProcessOption();
+            await GenerateSystemOption();
             GetJobs();
         });
 
@@ -378,32 +487,32 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    systems = response;                   
+                    systems = response;               
                 }
             });
         }
 
-        @*function GenerateProcessOption() {
-            let process = $('#process').val();
-            $('#process').empty();
-            $('#process').append(`<option value="" selected disabled>Please Select Process</option>`);
+        function GenerateProcessOption() {
+            let process = $('#select_process').val();
+            $('#select_process').empty();
+            $('#select_process').append(`<option value="" selected disabled>Please Select Process</option>`);
             for (let i = 0; i < processes.length; i++) {
                 if (processes[i].process_name === process || process === "" || process === null) {
-                    $('#process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
+                    $('#select_process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
                 }
             }
-        }*@
+        }
 
-        @*function GenerateSystemOption() {
-            let system = $('#system').val();
-            $('#system').empty();
-            $('#system').append(`<option value="" selected disabled>Please Select System</option>`);
+        function GenerateSystemOption() {
+            let system = $('#select_system').val();
+            $('#select_system').empty();
+            $('#select_system').append(`<option value="" selected disabled>Please Select System</option>`);
             for (let i = 0; i < systems.length; i++) {
                 if (systems[i].system_name === system || system === "" || system === null) {
-                    $('#system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
+                    $('#select_system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
                 }
             }
-        }*@
+        }
 
         async function GetStatus() {
             await $.ajax({
@@ -534,6 +643,77 @@
             });
         };
 
+        function GenerateTableProcess(processes) {
+            let datas = [];
+            if (table_process !== null)
+                $('#table_process').DataTable().destroy();
+
+            for (let i = 0; i < processes.length; i++) {
+                
+                let process = processes[i].process_name;            
+                datas.push([
+                    process
+                ]);
+            }
+
+            table_process = $('#table_process').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
+
+
+        function GenerateTableSystem(systems) {
+            let datas = [];
+            if (table_system !== null)
+                $('#table_system').DataTable().destroy();
+
+            for (let i = 0; i < systems.length; i++) {
+                
+                let system = systems[i].system_name;            
+                datas.push([
+                    system
+                ]);
+            }
+
+            table_system = $('#table_system').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
+
         function GenerateStatusOption() {
             let status = $('#status').val();
             $('#status').empty();
@@ -566,8 +746,6 @@
         }
 
         $('#btn_create').on('click', async function () {   
-            GenerateProcess(processes);
-            GenerateSystem(systems);
             await GetQuotations();
             await GenerateQuotationOptions();  
             Prepmodal();
@@ -599,7 +777,9 @@
         });
 
         function EditJob(data) {
-            payments = [];
+            set_payments = [];
+            set_processes = [];
+            set_systems = [];
 
             update = true;
             $('#modal_job').modal();
@@ -608,29 +788,31 @@
             let job_id = data[0];
             let job_name = data[1];
             let quotation_no = data[2];
-            let process = [];
-            let countProcess = (data[7].match(/,/g) || []).length;
+            let list_process = [];
+            let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
+            let countProcess = (job.process.match(/,/g) || []).length;
+
             for (let k=0;k<=countProcess;k++){
-                let _process = processes.filter(f=>f.process_name === data[7].split(',')[k]).map(m=>m.process_id);
-                process.push(_process);
+                let _process = processes.filter(f=>f.process_id == job.process.split(',')[k]).map(m=>m.process_name)[0];
+                if (_process !== undefined){
+                    list_process.push(_process);
+                }
             }
 
-            let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
-            let system = []
-            let countSystem = (data[8].match(/,/g) || []).length;
+            let list_system = [];
+            let countSystem = (job.system.match(/,/g) || []).length;
             for (let k=0;k<=countSystem;k++){
-                let _system = systems.filter(f=>f.system_name === data[8].split(',')[k]).map(m=>m.system_id);
-                system.push(_system);
+                let _system = systems.filter(f=>f.system_id == job.system.split(',')[k]).map(m=>m.system_name)[0];
+                if (_system !== undefined){
+                    list_system.push(_system);
+                }
             }
-            
+
             let cost = data[9].replaceAll(",","");
             let md = data[10];
             let pd = data[11];
             let status = data[16];
-            let finished_date = jobs.filter(f=>f.job_id === job_id).map(m=>m.finished_date)[0];
-
-            
-            
+            let finished_date = jobs.filter(f=>f.job_id == job_id).map(m=>m.finished_date)[0];
 
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
@@ -646,41 +828,48 @@
 
             $('#finished_date').val(finished_date.split('T')[0]);
 
-            let finish_status = statuses.filter(f=>f.status_id === status).map(m=> m.status_name);
+            let finish_status = statuses.filter(f=>f.status_id == status).map(m=> m.status_name);
             if (finish_status[0] === "Finished"){
                 $('#group_finished_date').show();
             }else{
                 $('#group_finished_date').hide();
             }
 
-            GenerateProcessEdit(process,processes);
-            GenerateSystemEdit(system,systems);
+            set_payments.push({'payment_id': 'STA001' ,'payment_name': 'Down Payment/KOM', 'percent': job.down_payment});
+            set_payments.push({'payment_id': 'STA002' ,'payment_name': 'Document Submit', 'percent': job.document_submit});
+            set_payments.push({'payment_id': 'STA003' ,'payment_name': 'Instrument Delivered @@ CTL', 'percent': job.instrument_delivered_ctl});
+            set_payments.push({'payment_id': 'STA004' ,'payment_name': 'System Delivered @@ CTL', 'percent': job.system_delivered_ctl});
+            set_payments.push({'payment_id': 'STA005' ,'payment_name': 'FAT', 'percent': job.fat});
+            set_payments.push({'payment_id': 'STA006' ,'payment_name': 'Delivery Instrument', 'percent': job.delivery_instrument});
+            set_payments.push({'payment_id': 'STA007' ,'payment_name': 'Delivery System', 'percent': job.delivery_system});
+            set_payments.push({'payment_id': 'STA008' ,'payment_name': 'Progress Work', 'percent': job.progress_work});
+            set_payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': job.commissioning});
+            set_payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': job.as_built});
 
-            processString(process);
-            systemString(system);
-
-
-            payments.push({'payment_id': 'STA001' ,'payment_name': 'Down Payment/KOM', 'percent': job.down_payment});
-            payments.push({'payment_id': 'STA002' ,'payment_name': 'Document Submit', 'percent': job.document_submit});
-            payments.push({'payment_id': 'STA003' ,'payment_name': 'Instrument Delivered @@ CTL', 'percent': job.instrument_delivered_ctl});
-            payments.push({'payment_id': 'STA004' ,'payment_name': 'System Delivered @@ CTL', 'percent': job.system_delivered_ctl});
-            payments.push({'payment_id': 'STA005' ,'payment_name': 'FAT', 'percent': job.fat});
-            payments.push({'payment_id': 'STA006' ,'payment_name': 'Delivery Instrument', 'percent': job.delivery_instrument});
-            payments.push({'payment_id': 'STA007' ,'payment_name': 'Delivery System', 'percent': job.delivery_system});
-            payments.push({'payment_id': 'STA008' ,'payment_name': 'Progress Work', 'percent': job.progress_work});
-            payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': job.commissioning});
-            payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': job.as_built});
-
+            //Term Payment
             let new_payments = [];
-            for (let i=0;i<payments.length;i++){
-                if (payments[i].percent > 0){
-                    new_payments.push(payments[i]);
+            for (let i=0;i<set_payments.length;i++){
+                if (set_payments[i].percent > 0){
+                    new_payments.push(set_payments[i]);
                 }
             }
+            set_payments = new_payments;
+            
+            //Process
+            for (let i=0;i<list_process.length;i++){      
+                let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];         
+                set_processes.push({'process_id': process_id ,'process_name': list_process[i]});               
+            }
+            
+            //System
+            for (let i=0;i<list_system.length;i++){      
+                let system_id = systems.filter(f=>f.system_name == list_system[i] ).map(m=>m.system_id)[0];
+                set_systems.push({'system_id': system_id ,'system_name': list_system[i]});               
+            }
 
-            payments = new_payments;
-
-            GenerateTablePayment(payments);
+            GenerateTablePayment(set_payments);
+            GenerateTableProcess(set_processes);
+            GenerateTableSystem(set_systems);
         }
 
         $('#status').on('change',function(){
@@ -709,16 +898,37 @@
                 status = 1;
             }
 
-            let down_payment = payments.filter(f=>f.payment_id == "STA001").map(m=>m.percent)[0];
-            let document_submit = payments.filter(f=>f.payment_id == "STA002").map(m=>m.percent)[0];
-            let instrument_delivered_ctl = payments.filter(f=>f.payment_id == "STA003").map(m=>m.percent)[0];
-            let system_delivered_ctl = payments.filter(f=>f.payment_id == "STA004").map(m=>m.percent)[0];
-            let fat = payments.filter(f=>f.payment_id == "STA005").map(m=>m.percent)[0];
-            let delivery_instrument = payments.filter(f=>f.payment_id == "STA006").map(m=>m.percent)[0];
-            let delivery_system = payments.filter(f=>f.payment_id == "STA007").map(m=>m.percent)[0];
-            let progress_work = payments.filter(f=>f.payment_id == "STA008").map(m=>m.percent)[0];
-            let commissioning = payments.filter(f=>f.payment_id == "STA009").map(m=>m.percent)[0];
-            let as_built = payments.filter(f=>f.payment_id == "STA010").map(m=>m.percent)[0];
+            let down_payment = set_payments.filter(f=>f.payment_id == "STA001").map(m=>m.percent)[0];
+            let document_submit = set_payments.filter(f=>f.payment_id == "STA002").map(m=>m.percent)[0];
+            let instrument_delivered_ctl = set_payments.filter(f=>f.payment_id == "STA003").map(m=>m.percent)[0];
+            let system_delivered_ctl = set_payments.filter(f=>f.payment_id == "STA004").map(m=>m.percent)[0];
+            let fat = set_payments.filter(f=>f.payment_id == "STA005").map(m=>m.percent)[0];
+            let delivery_instrument = set_payments.filter(f=>f.payment_id == "STA006").map(m=>m.percent)[0];
+            let delivery_system = set_payments.filter(f=>f.payment_id == "STA007").map(m=>m.percent)[0];
+            let progress_work = set_payments.filter(f=>f.payment_id == "STA008").map(m=>m.percent)[0];
+            let commissioning = set_payments.filter(f=>f.payment_id == "STA009").map(m=>m.percent)[0];
+            let as_built = set_payments.filter(f=>f.payment_id == "STA010").map(m=>m.percent)[0];
+
+            let str_process = "";
+            let str_system = "";
+            let list_process = Array.from(set_processes).map(m=>m.process_id);
+            let list_system = Array.from(set_systems).map(m=>m.system_id);
+
+            for(let k=0 ;k<list_process.length;k++){
+                if (k === list_process.length - 1){
+                    str_process += list_process[k];
+                }else{
+                    str_process += list_process[k] + ",";
+                }               
+            }
+
+            for(let k=0 ;k<list_system.length;k++){
+                if (k === list_system.length - 1){
+                    str_system += list_system[k];
+                }else{
+                    str_system += list_system[k] + ",";
+                }               
+            }
 
             let job_string = JSON.stringify({
                 "job_id": job_id,
@@ -762,15 +972,43 @@
         $('#add_payment').on('click',function(){
             let _payment = $('#select_payment').val();       
             let payment = statuses.filter(f=>f.status_id === _payment ).map(m=>m.status_name)[0];
-            let check_payment = payments.find(f=>f.payment_name == payment);
+            let check_payment = set_payments.find(f=>f.payment_name == payment);
             if (check_payment == undefined){
-                payments.push({'payment_id': _payment ,'payment_name': payment, 'percent': 0});
-                GenerateTablePayment(payments);
+                set_payments.push({'payment_id': _payment ,'payment_name': payment, 'percent': 0});
+                GenerateTablePayment(set_payments);
+            }
+        });
+
+        $('#add_process').on('click',function(){
+            let _process = $('#select_process').val();       
+            let process = processes.filter(f=>f.process_id === _process ).map(m=>m.process_name)[0];
+            let check_process = set_processes.find(f=>f.process_name == process);
+            if (check_process == undefined){
+                set_processes.push({'process_id': _process ,'process_name': process});
+                GenerateTableProcess(set_processes);
+            }
+        });
+
+        $('#add_system').on('click',function(){
+            let _system = $('#select_system').val();       
+            let system = systems.filter(f=>f.system_id === _system ).map(m=>m.system_name)[0];
+            let check_system = set_systems.find(f=>f.system_name == system);
+            if (check_system == undefined){
+                set_systems.push({'system_id': _system ,'system_name': system});
+                GenerateTableSystem(set_systems);
             }
         });
 
         $('#select_payment').on('change',function(){
             $('#add_payment').attr('disabled',false);
+        });
+
+        $('#select_process').on('change',function(){
+            $('#add_process').attr('disabled',false);
+        });
+
+        $('#select_system').on('change',function(){
+            $('#add_system').attr('disabled',false);
         });
 
         $('#table_payment tbody').on('click', 'tr', async function () {
@@ -785,20 +1023,40 @@
             }
         });
 
+        $('#table_process tbody').on('click', 'tr', async function () {
+            let admin = '@Model.role' == "Admin" ? true : false;
+            if (admin) {
+                let data = table_process.row(this).data();
+                let process = data[0];
+                $('#edit_process_name').val(process);
+                $('#modal_edit_process').modal();
+            }
+        });
+
+        $('#table_system tbody').on('click', 'tr', async function () {
+            let admin = '@Model.role' == "Admin" ? true : false;
+            if (admin) {
+                let data = table_system.row(this).data();
+                let system = data[0];
+                $('#edit_system_name').val(system);
+                $('#modal_edit_system').modal();
+            }
+        });
+
         $('#btn_payment_save').on('click',function(){
             let payment = $('#edit_payment_name').val();
-            let payment_id = payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
+            let payment_id = set_payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
             let percent = $('#edit_percent').val();
 
-            let sum_percent = payments.filter(f=>f.payment_id !== payment_id).reduce((total, arg) => Number(total) + Number(arg.percent), 0);
+            let sum_percent = set_payments.filter(f=>f.payment_id !== payment_id).reduce((total, arg) => Number(total) + Number(arg.percent), 0);
             if (Number(sum_percent) + Number(percent) > 100){
                 alert('percent more than 100 %');
             }else{
-                let index = payments.findIndex(f=>f.payment_id == payment_id);
-                payments[index].payment_id = payment_id;
-                payments[index].payment_name = payment;
-                payments[index].percent = percent;
-                GenerateTablePayment(payments);
+                let index = set_payments.findIndex(f=>f.payment_id == payment_id);
+                set_payments[index].payment_id = payment_id;
+                set_payments[index].payment_name = payment;
+                set_payments[index].percent = percent;
+                GenerateTablePayment(set_payments);
                 $('#modal_edit_payment').modal('hide');
             }
 
@@ -806,12 +1064,32 @@
 
         $('#btn_payment_delete').on('click',function(){
             let payment = $('#edit_payment_name').val();
-            let payment_id = payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
+            let payment_id = set_payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
 
-            let index = payments.findIndex(f=>f.payment_id == payment_id);
-            payments.splice(index,1);
-            GenerateTablePayment(payments);
+            let index = set_payments.findIndex(f=>f.payment_id == payment_id);
+            set_payments.splice(index,1);
+            GenerateTablePayment(set_payments);
             $('#modal_edit_payment').modal('hide');
+        });
+
+        $('#btn_process_delete').on('click',function(){
+            let process = $('#edit_process_name').val();
+            let process_id = set_processes.filter(f=>f.process_name == process).map(m=>m.process_id)[0];
+
+            let index = set_processes.findIndex(f=>f.process_id == process_id);
+            set_processes.splice(index,1);
+            GenerateTableProcess(set_processes);
+            $('#modal_edit_process').modal('hide');
+        });
+
+        $('#btn_system_delete').on('click',function(){
+            let system = $('#edit_system_name').val();
+            let system_id = set_systems.filter(f=>f.system_name == system).map(m=>m.system_id)[0];
+
+            let index = set_systems.findIndex(f=>f.system_id == system_id);
+            set_systems.splice(index,1);
+            GenerateTableSystem(set_systems);
+            $('#modal_edit_system').modal('hide');
         });
 
         async function AddJob(job_string) {
@@ -850,331 +1128,6 @@
                     }
                 }
             });
-        }
-
-        function GenerateProcessEdit(process,processes) {
-            $('#process').empty();
-            if (processes.length > 0){
-                $('#process').append(`
-                    <li class="list-group-item">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input
-                                    id="process_all" type="checkbox" class="form-check-input"
-                                    onchange="ProcessChangeALL()"/><b>ALL</b>
-                            </label>
-                        </div>
-                    </li>
-                `);
-            }
-            for (let i = 0; i < processes.length; i++) {
-                let str = "";
-                if (processes[i].process_name !== ""){
-                    let check = process.filter(f=>f == processes[i].process_id);
-                    if (check.length > 0){                   
-                        str += `<div class="col-6">
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input
-                                                    id="${processes[i].process_id}" type="checkbox" class="form-check-input" checked
-                                                    onchange="ProcessChange()"/>${processes[i].process_name}
-                                            </label>
-                                        </div>
-                                 </div>`
-                    }else{
-                        str += `<div class="col-6">
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input
-                                                    id="${processes[i].process_id}" type="checkbox" class="form-check-input"
-                                                    onchange="ProcessChange()"/>${processes[i].process_name}
-                                            </label>
-                                        </div>
-                                 </div>`
-                    }
-                    $('#process').append(`
-                        <li class="list-group-item">
-                            <div class="row">
-                                ${str}
-                            </div>
-                        </li>
-                    `);
-                }
-            }
-        }
-
-
-        function GenerateProcess(processes) {
-            $('#process').empty();
-            if (processes.length > 0){
-                $('#process').append(`
-                    <li class="list-group-item">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input
-                                    id="process_all" type="checkbox" class="form-check-input"
-                                    onchange="ProcessChangeALL()"/><b>ALL</b>
-                            </label>
-                        </div>
-                    </li>
-                `);
-            }
-            for (let i = 0; i < processes.length; i++) {
-
-                let str = "";
-                if (processes[i].process_name !== ""){
-                    str += `<div class="col-6">
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input
-                                                id="${processes[i].process_id}" type="checkbox" class="form-check-input"
-                                                onchange="ProcessChange()"/>${processes[i].process_name}
-                                        </label>
-                                    </div>
-                             </div>`
-                    $('#process').append(`
-                        <li class="list-group-item">
-                            <div class="row">
-                                ${str}
-                            </div>
-                        </li>
-                    `);
-                }
-            }
-        }
-
-        function GenerateSystemEdit(system,systems) {
-            $('#system').empty();
-            if (systems.length > 0){
-                $('#system').append(`
-                    <li class="list-group-item">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input
-                                    id="system_all" type="checkbox" class="form-check-input"
-                                    onchange="SystemChangeALL()"/><b>ALL</b>
-                            </label>
-                        </div>
-                    </li>
-                `);
-            }
-            for (let i = 0; i < systems.length; i++) {
-
-                let str = "";
-                if (systems[i].system_name !== ""){
-                    let check = system.filter(f=>f == systems[i].system_id);
-                    if (check.length > 0){
-                        str += `<div class="col-6">
-                                        <div class="form-check">
-                                            <label class="form-check-label">
-                                                <input
-                                                    id="${systems[i].system_id}" type="checkbox" class="form-check-input" checked
-                                                    onchange="SystemChange()"/>${systems[i].system_name}
-                                            </label>
-                                        </div>
-                        </div>`
-                    }else{
-                        str += `<div class="col-6">
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input
-                                                id="${systems[i].system_id}" type="checkbox" class="form-check-input"
-                                                onchange="SystemChange()"/>${systems[i].system_name}
-                                        </label>
-                                    </div>
-                        </div>`
-                    }
-                    $('#system').append(`
-                        <li class="list-group-item">
-                            <div class="row">
-                                ${str}
-                            </div>
-                        </li>
-                    `);
-                }
-            }
-        }
-
-        function GenerateSystem(systems) {
-            $('#system').empty();
-            if (systems.length > 0){
-                $('#system').append(`
-                    <li class="list-group-item">
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input
-                                    id="system_all" type="checkbox" class="form-check-input"
-                                    onchange="SystemChangeALL()"/><b>ALL</b>
-                            </label>
-                        </div>
-                    </li>
-                `);
-            }
-            for (let i = 0; i < systems.length; i++) {
-
-                let str = "";
-                if (systems[i].system_name !== ""){
-                    str += `<div class="col-6">
-                                    <div class="form-check">
-                                        <label class="form-check-label">
-                                            <input
-                                                id="${systems[i].system_id}" type="checkbox" class="form-check-input"
-                                                onchange="SystemChange()"/>${systems[i].system_name}
-                                        </label>
-                                    </div>
-                             </div>`
-                    $('#system').append(`
-                        <li class="list-group-item">
-                            <div class="row">
-                                ${str}
-                            </div>
-                        </li>
-                    `);
-                }
-            }
-        }
-
-        function ProcessChangeALL(){
-            let ch = $('#process_all').prop('checked') === true ? true :false;
-            let _process = processes.map(m => m.process_id);
-            _process = [...new Set(_process)];
-            list_process= new Set();
-            for (let i = 0; i < _process.length; i++) {
-                if (ch){
-                    $('#' + _process[i]).prop("checked", true);
-                    let checked = $('#' + _process[i]).prop('checked');
-                    let lists = processes.filter(f => (f.process_id === _process[i]) && checked);
-                    for (let i = 0; i < lists.length; i++) {
-                        list_process.add(lists[i].process_id);
-                    }
-                }else{
-                    $('#' + _process[i]).prop("checked", false);
-                    let checked = $('#' + _process[i]).prop('checked');
-                    let lists = processes.filter(f => (f.process_id === _process[i]) && checked);
-                    for (let i = 0; i < lists.length; i++) {
-                        list_process.add(lists[i].process_id);
-                    }
-                }
-            }
-            list_process = [...new Set(list_process)];
-
-            processString(list_process);
-        }
-
-        function ProcessChange() {
-            let _process = processes.map(m => m.process_id);
-            _process = [...new Set(_process)];
-            list_process = new Set();
-            for (let i = 0; i < _process.length; i++) {
-                let checked = $('#' + _process[i]).prop('checked') === true ? true : false;
-                if (!checked){
-                     $('#process_all').prop("checked", false);
-                }
-                let lists = processes.filter(f => (f.process_id === _process[i]) && checked);
-                for (let i = 0; i < lists.length; i++) {
-                    list_process.add(lists[i].process_id);
-                }
-            }
-            list_process = [...new Set(list_process)];
-
-            processString(list_process);
-            
-        };
-
-        function SystemChangeALL(){
-            let ch = $('#system_all').prop('checked') === true ? true :false;
-            let _system = systems.map(m => m.system_id);
-            _system = [...new Set(_system)];
-            list_system= new Set();
-            for (let i = 0; i < _system.length; i++) {
-                if (ch){
-                    $('#' + _system[i]).prop("checked", true);
-                    let checked = $('#' + _system[i]).prop('checked');
-                    let lists = systems.filter(f => (f.system_id === _system[i]) && checked);
-                    for (let i = 0; i < lists.length; i++) {
-                        list_system.add(lists[i].system_id);
-                    }
-                }else{
-                    $('#' + _system[i]).prop("checked", false);
-                    let checked = $('#' + _system[i]).prop('checked');
-                    let lists = systems.filter(f => (f.system_id === _system[i]) && checked);
-                    for (let i = 0; i < lists.length; i++) {
-                        listsystem.add(lists[i].system_id);
-                    }
-                }
-            }
-            list_system = [...new Set(list_system)];
-
-            systemString(list_system);
-        }
-
-        function SystemChange() {
-            let _system = systems.map(m => m.system_id);
-            _system = [...new Set(_system)];
-            list_system = new Set();
-            for (let i = 0; i < _system.length; i++) {
-                let checked = $('#' + _system[i]).prop('checked') === true ? true : false;
-                if (!checked){
-                     $('#system_all').prop("checked", false);
-                }
-                let lists = systems.filter(f => (f.system_id === _system[i]) && checked);
-                for (let i = 0; i < lists.length; i++) {
-                    list_system.add(lists[i].system_id);
-                }
-            }
-            list_system = [...new Set(list_system)];
-
-            systemString(list_system);
-            
-        };
-        function systemList (){
-            let _system = systems.map(m => m.system_id);
-            _system = [...new Set(_system)];
-            list_system= new Set();
-            for (let i = 0; i < _system.length; i++) {
-                    let lists = systems.filter(f => (f.system_id === _system[i]));
-                    for (let i = 0; i < lists.length; i++) {
-                        list_system.add(lists[i].system_id);
-                   }
-            }
-            list_system = [...new Set(list_system)];
-
-            systemString(list_system);
-        }
-
-        function processList(){
-            let _process = processes.map(m => m.process_id);
-            _process = [...new Set(_process)];
-            list_process= new Set();
-            for (let i = 0; i < _process.length; i++) {
-                    let lists = processes.filter(f => (f.process_id === _process[i]));
-                    for (let i = 0; i < lists.length; i++) {
-                        list_process.add(lists[i].process_id);
-                    }
-            }
-            list_process = [...new Set(list_process)];
-            processString(list_process);
-        }
-        function processString(list_process){
-            str_process = "";
-            for(let k=0 ;k<list_process.length;k++){
-                if (k === list_process.length - 1){
-                    str_process += list_process[k];
-                }else{
-                    str_process += list_process[k] + ",";
-                }               
-            }
-        }
-
-        function systemString(list_system){
-            str_system = "";
-            for(let k=0 ;k<list_system.length;k++){
-                if (k === list_system.length - 1){
-                    str_system += list_system[k];
-                }else{
-                    str_system += list_system[k] + ",";
-                }               
-            }
         }
     </script>
 }

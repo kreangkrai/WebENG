@@ -38,21 +38,38 @@
       background-color: #1e90ff;
     }
 
+    #checkcolumnboxes {
+      display: none;
+      border: 1px #dadada solid;
+    }
 
+    #checkcolumnboxes label {
+      display: block;
+    }
+
+    #checkcolumnboxes label:hover {
+      background-color: #1e90ff;
+    }
+
+    th,td {
+        text-align:center;
+    }
     table.dataTable th:nth-child(1),
     table.dataTable th:nth-child(2),
     table.dataTable th:nth-child(3),
     table.dataTable th:nth-child(4),
     table.dataTable th:nth-child(5),
     table.dataTable th:nth-child(16),
-    table.dataTable th:nth-child(17){
+    table.dataTable th:nth-child(17),
+    table.dataTable th:nth-child(18){
         text-align: center;
         vertical-align:middle;
     }
 
     table.dataTable th:nth-child(1),
     table.dataTable th:nth-child(16),
-    table.dataTable th:nth-child(17){
+    table.dataTable th:nth-child(17),
+    table.dataTable th:nth-child(18){
         white-space: nowrap;
     }
 
@@ -115,15 +132,26 @@
                                   </select>
                                   <div class="overSelect"></div>
                                 </div>
-                                <div id="checkboxes">
-                                  
+                                <div id="checkboxes">                                 
+                                </div>
+                              </div>
+                        </div>
+                        <div id="form_select_column"class="col-xl-3" hidden>
+                              <div class="multiselect">
+                                <div class="selectBox" onclick="showColumnCheckboxes()">
+                                  <select class="form-control">
+                                    <option>Select Column</option>
+                                  </select>
+                                  <div class="overSelect"></div>
+                                </div>
+                                <div id="checkcolumnboxes">                                 
                                 </div>
                               </div>
                         </div>
                     </div>
                     <hr />
                     <div class="form-group">
-                        <table id="table_job" class="table table-sm compact table-bordered table-hover responsive text-center w-100">
+                        <table id="table_job" class="table-bordered stripe table-striped row-border order-column responsive" style="width:100%">
                             <thead style="background-color:#429DD8">
                                 <tr>
                                     <th>Job No.</th>
@@ -143,8 +171,9 @@
                                     <th>As-Built</th>
                                     <th>Job In Hand</th>
                                     <th>Total Invoice</th>
+                                    <th>Due Date</th>
                                 </tr>
-                            </thead>
+                            </thead>                           
                             <tbody></tbody>
                         </table>
                     </div>
@@ -240,11 +269,16 @@
     </div>
 </div>
 @section Scripts
-{
+{  
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/fixedColumns.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/dataTables.fixedColumns.js"></script>
     <script type="text/javascript">
          let table;
          let jobs_status = [];
          let set_payments = new Set();
+         let set_column = new Set();
+
          $(document).ready(async function (){            
              await GetUsers();
              await GenerateUsers();             
@@ -322,11 +356,19 @@
             set_payments.add('As-Built');
             set_payments.add('Finished');
 
+            set_column = new Set();
+            set_column.add({'title':'Job In Hand','index':15});
+            set_column.add({'title':'Invoice','index':16});
+            set_column.add({'title':'Due Date','index':17});
+
+
             let user = $('#user_name').val();
             await GetJobStatusByUser(user);
             
             GenerateCheckBox();
+            GenerateColumnCheckBox();
             $('#form_select_term_payment').attr('hidden',false);
+            $('#form_select_column').attr('hidden',false);
         });
 
         function GenerateTable(jobs) {
@@ -334,8 +376,18 @@
             if (table !== null)
                 $('#table_job').DataTable().destroy();
             let arr = Array.from(set_payments);
+            let arr_column = Array.from(set_column);
             let new_jobs = [];
 
+            let columns = [];
+            let _columns = [15,16,17];
+            for (let i=0;i<_columns.length;i++){
+                let b = arr_column.map(m=>m.index).find(a=> a == _columns[i]);
+                if (!b){
+                    columns.push(_columns[i]);
+                }               
+            }
+            columns.sort();
             for(let i=0;i<jobs.length;i++){
                 for(let j=0;j<arr.length;j++){
                     if (jobs[i].status == arr[j]){
@@ -361,7 +413,7 @@
                 let as_built = jobs[i].as_built > 0 ? jobs[i].as_built : "";
                 let job_in_hand = jobs[i].job_in_hand > 0 ? jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let invoice = jobs[i].invoice > 0 ? jobs[i].invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
-
+                let due_date = jobs[i].due_date.split('T')[0];
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
@@ -380,6 +432,7 @@
                     as_built,
                     job_in_hand,
                     invoice,
+                    due_date
                 ]);
             }
 
@@ -387,10 +440,13 @@
                 data: datas,
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 fixedHeader: true,
-                fixedColumns: true,
+                fixedColumns: {
+                    leftColumns: 1,
+                },
                 columnDefs: [
                     {
-                        width: 200, targets: 0
+                        targets: columns,
+                        visible: false,
                     },
                 ],
                 rowCallback: function (row, _data) {
@@ -456,6 +512,7 @@
                 },
                 scrollCollapse: true,
                 scrollX: true,
+                paging: false,
             });
         };
 
@@ -539,7 +596,6 @@
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 fixedHeader: true,
                 fixedColumns: {
-                    left: 2
                 },
                 columnDefs: [
                     {
@@ -597,6 +653,19 @@
             expanded = false;
           }
         }
+
+        var expanded = false;
+        function showColumnCheckboxes() {
+          var checkboxes = document.getElementById("checkcolumnboxes");            
+          if (!expanded) {
+            checkboxes.style.display = "block";
+            expanded = true;
+          } else {
+            checkboxes.style.display = "none";
+            expanded = false;
+          }
+        }
+
         function CheckChange(status){
             let chk = $(`#${status}`).prop('checked');
             let value = $(`#${status}`).val();
@@ -607,6 +676,36 @@
             }
 
             GenerateTable(jobs_status);
+        }
+
+        function ColumnCheckChange(column){
+            let chk = $(`#${column}`).prop('checked');
+            let value = $(`#${column}`).val();
+            if (!chk){
+                set_column.forEach(x => x.title === value ? set_column.delete(x) : x)
+            }else{
+                if (value === "Job In Hand"){
+                    set_column.add({'title':'Job In Hand','index':15});
+                }else if (value === "Invoice"){
+                    set_column.add({'title':'Invoice','index':16});
+                }else if (value === "Due Date") {
+                    set_column.add({'title':'Due Date','index':17});
+                }              
+            }
+            GenerateTable(jobs_status);
+        }
+
+        function GenerateColumnCheckBox(){
+            $('#checkcolumnboxes').empty();
+            let str = `<label for="COL15" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL15" value="Job In Hand" onchange="ColumnCheckChange('COL15')" checked/> Job In Hand</label>
+                       <label for="COL16" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL16" value="Invoice" onchange="ColumnCheckChange('COL16')" checked/> Invoice</label>
+                       <label for="COL17" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL17" value="Due Date" onchange="ColumnCheckChange('COL17')" checked/> Due Date</label>
+`;
+            $('#checkcolumnboxes').append(str);
+           
         }
 
         function GenerateCheckBox(){
