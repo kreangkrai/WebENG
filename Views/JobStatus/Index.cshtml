@@ -73,8 +73,8 @@
     table.dataTable td:nth-child(13),th:nth-child(13),
     table.dataTable td:nth-child(14),th:nth-child(14),
     table.dataTable td:nth-child(15),th:nth-child(15){
-      width: 35px;
-      max-width: 35px;      
+      width: 30px;
+      max-width: 30px;      
     }
 </style>
 <div class="row p-4" style="row-gap:20px">
@@ -107,37 +107,16 @@
                                 <i class="fas fa-sync"></i> Load
                             </button>
                         </div>
-                        <div class="col-xl-3">
+                        <div id="form_select_term_payment"class="col-xl-3" hidden>
                               <div class="multiselect">
                                 <div class="selectBox" onclick="showCheckboxes()">
                                   <select class="form-control">
-                                    <option>Select an Term Payment</option>
+                                    <option>Select Term Payment</option>
                                   </select>
                                   <div class="overSelect"></div>
                                 </div>
                                 <div id="checkboxes">
-                                  <label for="STA001" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA001" value="Down Payment/KOM" onchange="CheckChange('STA001')" checked/> Down Payment/KOM</label>
-                                  <label for="STA002" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA002" value="Document Submit" onchange="CheckChange('STA002')" checked/> Document Submit</label>
-                                  <label for="STA003" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA003" value="Instrument Delivered @@ CTL" onchange="CheckChange('STA003')" checked/> Instrument Delivered @@ CTL</label>
-                                  <label for="STA004" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA004" value="System Delivered @@ CTL" onchange="CheckChange('STA004')" checked/> System Delivered @@ CTL</label>
-                                  <label for="STA005" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA005" value="FAT" onchange="CheckChange('STA005')" checked/> FAT</label>
-                                  <label for="STA006" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA006" value="Delivery Instrument" onchange="CheckChange('STA006')" checked/> Delivery Instrument</label>
-                                  <label for="STA007" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA007" value="Delivery System" onchange="CheckChange('STA007')" checked/> Delivery System</label>
-                                  <label for="STA008" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA008" value="Progress Work" onchange="CheckChange('STA008')" checked/> Progress Work</label>
-                                  <label for="STA009" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA009" value="Commissioning" onchange="CheckChange('STA009')" checked/> Commissioning</label>
-                                  <label for="STA010" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA010" value="As-Built" onchange="CheckChange('STA010')" checked/> As-Built</label>
-                                  <label for="STA999" class="form-check-label pl-2">
-                                    <input type="checkbox" id="STA999" value="Finished" onchange="CheckChange('STA999')" checked/> Finished</label>
+                                  
                                 </div>
                               </div>
                         </div>
@@ -151,7 +130,7 @@
                                     <th>Project Name</th>
                                     <th>Customer</th>
                                     <th>% Invoice</th>
-                                    <th>Cuurent Status</th>
+                                    <th>Current Status</th>
                                     <th>Down Payment/KOM</th>
                                     <th>Document Submit</th>
                                     <th>Instrument Delivered @@ CTL</th>
@@ -329,10 +308,8 @@
             });
         }
 
-        $('#btn_load').on('click',async function(){            
-            let user = $('#user_name').val();
-            await GetJobStatusByUser(user);
-
+        $('#btn_load').on('click',async function(){
+            set_payments = new Set();
             set_payments.add('Down Payment/KOM');
             set_payments.add('Document Submit');
             set_payments.add('Instrument Delivered @@ CTL');
@@ -344,6 +321,12 @@
             set_payments.add('Commissioning');
             set_payments.add('As-Built');
             set_payments.add('Finished');
+
+            let user = $('#user_name').val();
+            await GetJobStatusByUser(user);
+            
+            GenerateCheckBox();
+            $('#form_select_term_payment').attr('hidden',false);
         });
 
         function GenerateTable(jobs) {
@@ -352,7 +335,7 @@
                 $('#table_job').DataTable().destroy();
             let arr = Array.from(set_payments);
             let new_jobs = [];
-            console.log(jobs);
+
             for(let i=0;i<jobs.length;i++){
                 for(let j=0;j<arr.length;j++){
                     if (jobs[i].status == arr[j]){
@@ -362,7 +345,7 @@
                 }               
             }
             jobs = new_jobs;
-            console.log(jobs);
+
             for (let i = 0; i < jobs.length; i++) {
                 
                 let percent = Math.ceil((Number(jobs[i].invoice) / Number(jobs[i].job_in_hand)) * 100);
@@ -624,6 +607,34 @@
             }
 
             GenerateTable(jobs_status);
+        }
+
+        function GenerateCheckBox(){
+            $('#checkboxes').empty();
+            let str = `<label for="STA001" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA001" value="Down Payment/KOM" onchange="CheckChange('STA001')" checked/> Down Payment/KOM</label>
+                                  <label for="STA002" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA002" value="Document Submit" onchange="CheckChange('STA002')" checked/> Document Submit</label>
+                                  <label for="STA003" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA003" value="Instrument Delivered @@ CTL" onchange="CheckChange('STA003')" checked/> Instrument Delivered @@ CTL</label>
+                                  <label for="STA004" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA004" value="System Delivered @@ CTL" onchange="CheckChange('STA004')" checked/> System Delivered @@ CTL</label>
+                                  <label for="STA005" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA005" value="FAT" onchange="CheckChange('STA005')" checked/> FAT</label>
+                                  <label for="STA006" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA006" value="Delivery Instrument" onchange="CheckChange('STA006')" checked/> Delivery Instrument</label>
+                                  <label for="STA007" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA007" value="Delivery System" onchange="CheckChange('STA007')" checked/> Delivery System</label>
+                                  <label for="STA008" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA008" value="Progress Work" onchange="CheckChange('STA008')" checked/> Progress Work</label>
+                                  <label for="STA009" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA009" value="Commissioning" onchange="CheckChange('STA009')" checked/> Commissioning</label>
+                                  <label for="STA010" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA010" value="As-Built" onchange="CheckChange('STA010')" checked/> As-Built</label>
+                                  <label for="STA999" class="form-check-label pl-2">
+                                    <input type="checkbox" id="STA999" value="Finished" onchange="CheckChange('STA999')" checked/> Finished</label>`;
+            $('#checkboxes').append(str);
+           
         }
     </script>
 }
