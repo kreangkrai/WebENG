@@ -143,7 +143,9 @@ namespace WebENG.Service
                         Jobs.cost,
                         (Jobs.md_rate * Jobs.pd_rate) as factor,
                         T1.total_manpower,
-                        Jobs.status
+                        Jobs.status,
+                        Jobs.process_id as process,
+						Jobs.system_id as system
                     FROM Jobs
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
@@ -168,7 +170,9 @@ namespace WebENG.Service
                             cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
                             factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 1,
                             totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToInt32(dr["total_manpower"]) : 0,
-                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1"
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1",
+                            process = dr["process"] != DBNull.Value ? dr["process"].ToString() : "",
+                            system = dr["system"] != DBNull.Value ? dr["system"].ToString() : ""
                         };
                         jobSummary.remainingCost = jobSummary.cost - ((jobSummary.totalManhour / 8) * 3200);
                         jobsSummaries.Add(jobSummary);

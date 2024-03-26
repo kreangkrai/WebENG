@@ -107,7 +107,7 @@
                         {
                             <div class="col-xl-3">
                                 <select id="user_name" class="form-control">
-                                    <option value="" selected disabled>Please Select User</option>
+                                    <option value="all" selected>ALL</option>
                                 </select>
                             </div>
                         }
@@ -148,6 +148,11 @@
                                 </div>
                               </div>
                         </div>
+                        <div id="form_export" class="col-xl-2 col-lg-2 col-md-2 pb-2" hidden>
+                            <button id="btn_export" type="button" class="btn btn-success form-control elevation-1">
+                                <i class="fas fa-file-excel"></i> Export
+                            </button>
+                        </div>
                     </div>
                     <hr />
                     <div class="form-group">
@@ -159,16 +164,16 @@
                                     <th>Customer</th>
                                     <th>% Invoice</th>
                                     <th>Current Status</th>
-                                    <th>Down Payment/KOM</th>
-                                    <th>Document Submit</th>
-                                    <th>Instrument Delivered @@ CTL</th>
-                                    <th>System Delivered @@ CTL</th>
-                                    <th>FAT</th>
-                                    <th>Delivery Instrument</th>
-                                    <th>Delivery System</th>
-                                    <th>Progress Work</th>
-                                    <th>Commissioning</th>
-                                    <th>As-Built</th>
+                                    <th style="font-size:12px">Down Payment/KOM</th>
+                                    <th style="font-size:12px">Document Submit</th>
+                                    <th style="font-size:12px">Instrument Delivered @@ CTL</th>
+                                    <th style="font-size:12px">System Delivered @@ CTL</th>
+                                    <th style="font-size:12px">FAT</th>
+                                    <th style="font-size:12px">Delivery Instrument</th>
+                                    <th style="font-size:12px">Delivery System</th>
+                                    <th style="font-size:12px">Progress Work</th>
+                                    <th style="font-size:12px">Commissioning</th>
+                                    <th style="font-size:12px">As-Built</th>
                                     <th>Job In Hand</th>
                                     <th>Total Invoice</th>
                                     <th>Due Date</th>
@@ -270,9 +275,9 @@
 </div>
 @section Scripts
 {  
-    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+    @*<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/fixedColumns.dataTables.js"></script>
-    <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/dataTables.fixedColumns.js"></script>
+    <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/dataTables.fixedColumns.js"></script>*@
     <script type="text/javascript">
          let table;
          let jobs_status = [];
@@ -323,6 +328,7 @@
         function GenerateUsers() {
             var user_string = '';
             $('#user_name').empty();
+            $('#user_name').append(`<option value="all">ALL</option>`);
             for (var i = 0; i < users.length; i++) {
                 user_string += `<option value="${users[i].user_id.toLowerCase()}">${users[i].name}</option>`;
             }          
@@ -369,6 +375,7 @@
             GenerateColumnCheckBox();
             $('#form_select_term_payment').attr('hidden',false);
             $('#form_select_column').attr('hidden',false);
+            $('#form_export').attr('hidden',false);
         });
 
         function GenerateTable(jobs) {
@@ -456,6 +463,7 @@
                     let data = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
                     let percent = Math.ceil((Number(data.invoice) / Number(data.job_in_hand)) * 100);
                     let current_status = statuses.filter(f=>f.status_name == data.status).map(m=>m.status_id)[0];
+                    let due_date = data.due_date;
 
                     let payments = [];
                     let sum_percent = 0;
@@ -472,6 +480,27 @@
                     payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': data.commissioning});
                     payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': data.as_built});
 
+
+                    //Highlight Due Date
+                    let diff_day = Math.round(new Date(due_date).getTime() - new Date(Date.now()).getTime()) / (1000 * 3600 * 24);
+                    if (current_status !== undefined){
+                        if (diff_day <= 0 && diff_day > -10000){
+                            $(`td:eq(0)`, row).css({ "background-color": 'red'});
+                            $(`td:eq(1)`, row).css({ "background-color": 'red'});
+                            $(`td:eq(2)`, row).css({ "background-color": 'red'});
+                        }else{
+                            if (diff_day > 0.0 && diff_day <= 30.0){
+                                $(`td:eq(0)`, row).css({ "background-color": 'orange'});
+                                $(`td:eq(1)`, row).css({ "background-color": 'orange'});
+                                $(`td:eq(2)`, row).css({ "background-color": 'orange'});
+                            }else if (diff_day > 30.0 && diff_day <= 60){
+                                $(`td:eq(0)`, row).css({ "background-color": 'yellow'});
+                                $(`td:eq(1)`, row).css({ "background-color": 'yellow'});
+                                $(`td:eq(2)`, row).css({ "background-color": 'yellow'});
+                            }
+                        }
+                    }
+                    
                     for(let i=0;i<payments.length;i++){
                         $(`td:eq(${start_column + i})`, row).css({ "background-color": '#EFECE8'});
                         if (current_status === undefined){
@@ -735,5 +764,10 @@
             $('#checkboxes').append(str);
            
         }
+
+        $('#btn_export').on('click',function(){
+            let user = $('#user_name').val();
+            location.href = '@Url.Action("ExportData", "JobStatus")?user='+ user;
+        });
     </script>
 }

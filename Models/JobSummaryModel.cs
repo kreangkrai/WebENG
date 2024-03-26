@@ -14,6 +14,8 @@ namespace WebENG.Models
         public double factor { get; set; }
         public int totalManhour { get; set; }
         public string status { get; set; }
+        public string process { get; set; }
+        public string system { get; set; }
         public int remainingCost { get; set; }
     }
 }

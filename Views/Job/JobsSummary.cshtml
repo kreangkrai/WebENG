@@ -24,6 +24,8 @@
                             <th>Factor</th>
                             <th>Total Manhours</th>
                             <th>Remaining Cost</th>
+                            <th>Process</th>
+                            <th>System</th>
                             <th>Job Status</th>
                         </tr>
                     </thead>
@@ -36,6 +38,8 @@
                             <th>Factor</th>
                             <th>Total Manhours</th>
                             <th>Remaining Cost</th>
+                            <th>Process</th>
+                            <th>System</th>
                             <th>Job Status</th>
                         </tr>
                     </tfoot>
@@ -83,9 +87,199 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal_job" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" style="overflow-y:auto">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Process , System</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="job_id">Job Number</label>
+                            <input id="job_id" type="text" class="form-control" placeholder="JYYXXXX" disabled/>
+                        </div>
+                        <div class="col-8">
+                            <label for="job_name">Job Name</label>
+                            <input id="job_name" type="text" class="form-control" placeholder="" disabled />
+                        </div>
+                    </div>                   
+                    <div class="form-row">
+                        <div class="col-8">
+                            <label for="job_customer">Customer</label>
+                            <input id="job_customer" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-4">
+                            <label for="job_cost">Cost</label>
+                            <input id="job_cost" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-row pt-2">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#42D5D8">
+                                    <span style="font-weight:bold;">Process</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row">
+                                         <div class="col-9">
+                                            <label for="select_process">Process</label>
+                                            <select id="select_process" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="add_process">Add</label>
+                                            <button id="add_process" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_process" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>Process</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#42D5D8">
+                                    <span style="font-weight:bold">System</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row">
+                                         <div class="col-9">
+                                            <label for="select_system">System</label>
+                                            <select id="select_system" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="add_system">Add</label>
+                                            <button id="add_system" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_system" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>System</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>                                       
+                    <div class="form-row">
+                        <div class="col-3">
+                            <label for="job_total_man_hours">Total Man Hours</label>
+                            <input id="job_total_man_hours" class="form-control" disabled/>
+                        </div>
+                        <div class="col-3">
+                            <label for="job_remain_cost">Remain Cost</label>
+                            <input id="job_remain_cost" class="form-control" disabled/>
+                        </div>
+                        <div class="col-5">
+                            <label for="job_status">Status</label>
+                            <input id="job_status" class="form-control" disabled/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_edit_process" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Process</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="edit_process_name">Process</label>
+                            <input id="edit_process_name" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_process_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_edit_system" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit System</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="edit_system_name">System</label>
+                            <input id="edit_system_name" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_system_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
+        let processes = [];
+        let systems = [];
+        let set_processes = [];
+        let set_systems = [];
+        let jobsSummary = [];
+
         let statuses = [];
         let table;
         let trs = [];
@@ -102,6 +296,10 @@
             
             await GetStatus();
             await GenerateStatusOption();
+            await GetProcess();
+            await GetSystem();
+            await GenerateProcessOption();
+            await GenerateSystemOption();
             GenerateTable(await GetJobsSummary());
         });
         async function GetStatus() {
@@ -126,8 +324,54 @@
                 }
             }
         }
+
+        async function GetProcess() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProcesses", "EngProcess")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    processes = response;                   
+                }
+            });
+        }
+        async function GetSystem() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetSystems", "EngSystem")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    systems = response;               
+                }
+            });
+        }
+
+        function GenerateProcessOption() {
+            let process = $('#select_process').val();
+            $('#select_process').empty();
+            $('#select_process').append(`<option value="" selected disabled>Please Select Process</option>`);
+            for (let i = 0; i < processes.length; i++) {
+                if (processes[i].process_name === process || process === "" || process === null) {
+                    $('#select_process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
+                }
+            }
+        }
+
+        function GenerateSystemOption() {
+            let system = $('#select_system').val();
+            $('#select_system').empty();
+            $('#select_system').append(`<option value="" selected disabled>Please Select System</option>`);
+            for (let i = 0; i < systems.length; i++) {
+                if (systems[i].system_name === system || system === "" || system === null) {
+                    $('#select_system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
+                }
+            }
+        }
+
         async function GetJobsSummary() {
-            let jobsSummary = [];
+            jobsSummary = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobsSummary", "Job")',
@@ -152,7 +396,9 @@
                     jobsSummary[i].factor,
                     jobsSummary[i].totalManhour,
                     jobsSummary[i].remainingCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                    jobsSummary[i].status,
+                    jobsSummary[i].process,
+                    jobsSummary[i].system,
+                    jobsSummary[i].status
                 ]);
             }
 
@@ -170,7 +416,7 @@
                 ],
                 paging: false,
                 rowCallback: function (row, data) {
-                    let code_status = data[7];
+                    let code_status = data[9];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
                     if(code_status === "STA999"){
@@ -179,7 +425,7 @@
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
 
-                    $('td:eq(7)', row).html(status_str);
+                    $('td:eq(9)', row).html(status_str);
                 }
             });
         }
@@ -188,12 +434,72 @@
             let columnID = table.cell(this)[0][0].column;
             let jobId = table.row(this).data()[0];
             let admin = '@Model.role' == "Admin" ? true : false;
+
             //Column Total Manhours
             if (columnID === 5 && admin) {
                 ShowJobManpowerInfo(jobId);
+            }else{
+                EditJob(table.row(this).data());
+                $('#modal_job').modal();
             }
         });
 
+        function EditJob(data) {
+            set_processes = [];
+            set_systems = [];
+
+            let job_id = data[0];
+            let job = jobsSummary.filter(f=>f.jobId == job_id).map(m=>m)[0];
+            let job_name = job.jobName;
+            let quotation_no = job.quotation_no;
+            let customer = job.customer;
+            let cost = job.cost.toString().replaceAll(",","");
+            let status = statuses.filter(f=>f.status_id == job.status).map(m=>m.status_name)[0];
+            let total_man_hours = job.totalManhour;
+            let remain_cost = job.remainingCost;
+            let list_process = [];
+            
+            let countProcess = (job.process.match(/,/g) || []).length;
+
+            for (let k=0;k<=countProcess;k++){
+                let _process = processes.filter(f=>f.process_id == job.process.split(',')[k]).map(m=>m.process_name)[0];
+                if (_process !== undefined){
+                    list_process.push(_process);
+                }
+            }
+
+            let list_system = [];
+            let countSystem = (job.system.match(/,/g) || []).length;
+            for (let k=0;k<=countSystem;k++){
+                let _system = systems.filter(f=>f.system_id == job.system.split(',')[k]).map(m=>m.system_name)[0];
+                if (_system !== undefined){
+                    list_system.push(_system);
+                }
+            }
+
+            $('#job_id').val(job_id);
+            $('#job_name').val(job_name);
+            $('#job_quotation_no').val(quotation_no);
+            $('#job_cost').val(cost);
+            $('#job_customer').val(customer);
+            $('#job_status').val(status);
+            $('#job_total_man_hours').val(total_man_hours);
+            $('#job_remain_cost').val(remain_cost);
+            //Process
+            for (let i=0;i<list_process.length;i++){      
+                let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];         
+                set_processes.push({'process_id': process_id ,'process_name': list_process[i]});               
+            }
+            
+            //System
+            for (let i=0;i<list_system.length;i++){      
+                let system_id = systems.filter(f=>f.system_name == list_system[i] ).map(m=>m.system_id)[0];
+                set_systems.push({'system_id': system_id ,'system_name': list_system[i]});               
+            }
+
+            GenerateTableProcess(set_processes);
+            GenerateTableSystem(set_systems);
+        }
         async function ShowJobManpowerInfo(jobId) {
             $('#modalJobInfo').modal();
             await GetTaskRatio(jobId);
@@ -405,6 +711,76 @@
             chartManpowerRatio.render();
         }
 
+        function GenerateTableProcess(processes) {
+            let datas = [];
+            if (table_process !== null)
+                $('#table_process').DataTable().destroy();
+
+            for (let i = 0; i < processes.length; i++) {
+                
+                let process = processes[i].process_name;            
+                datas.push([
+                    process
+                ]);
+            }
+
+            table_process = $('#table_process').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
+
+
+        function GenerateTableSystem(systems) {
+            let datas = [];
+            if (table_system !== null)
+                $('#table_system').DataTable().destroy();
+
+            for (let i = 0; i < systems.length; i++) {
+                
+                let system = systems[i].system_name;            
+                datas.push([
+                    system
+                ]);
+            }
+
+            table_system = $('#table_system').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
         async function GetManpowerDistribution(job_id) {
             await $.ajax({
                 type: "GET",
@@ -503,5 +879,126 @@
                 }
             });
         }
+
+        $('#select_process').on('change',function(){
+            $('#add_process').attr('disabled',false);
+        });
+
+        $('#select_system').on('change',function(){
+            $('#add_system').attr('disabled',false);
+        });
+
+        $('#add_process').on('click',function(){
+            let _process = $('#select_process').val();       
+            let process = processes.filter(f=>f.process_id === _process ).map(m=>m.process_name)[0];
+            let check_process = set_processes.find(f=>f.process_name == process);
+            if (check_process == undefined){
+                set_processes.push({'process_id': _process ,'process_name': process});
+                GenerateTableProcess(set_processes);
+            }
+        });
+
+        $('#add_system').on('click',function(){
+            let _system = $('#select_system').val();       
+            let system = systems.filter(f=>f.system_id === _system ).map(m=>m.system_name)[0];
+            let check_system = set_systems.find(f=>f.system_name == system);
+            if (check_system == undefined){
+                set_systems.push({'system_id': _system ,'system_name': system});
+                GenerateTableSystem(set_systems);
+            }
+        });
+
+        $('#table_process tbody').on('click', 'tr', async function () {
+            let admin = '@Model.role' == "Admin" ? true : false;
+            if (admin) {
+                let data = table_process.row(this).data();
+                let process = data[0];
+                $('#edit_process_name').val(process);
+                $('#modal_edit_process').modal();
+            }
+        });
+
+        $('#table_system tbody').on('click', 'tr', async function () {
+            let admin = '@Model.role' == "Admin" ? true : false;
+            if (admin) {
+                let data = table_system.row(this).data();
+                let system = data[0];
+                $('#edit_system_name').val(system);
+                $('#modal_edit_system').modal();
+            }
+        });
+
+        async function UpdateJob(job_string) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateJobByProcessSystem", "JobStatus")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_string
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+
+        $('#btn_save').on('click', function () {
+            let job_id = $('#job_id').val();
+
+            let str_process = "";
+            let str_system = "";
+            let list_process = Array.from(set_processes).map(m=>m.process_id);
+            let list_system = Array.from(set_systems).map(m=>m.system_id);
+            list_process.sort();
+            list_system.sort();
+            for(let k=0 ;k<list_process.length;k++){
+                if (k === list_process.length - 1){
+                    str_process += list_process[k];
+                }else{
+                    str_process += list_process[k] + ",";
+                }               
+            }
+
+            for(let k=0 ;k<list_system.length;k++){
+                if (k === list_system.length - 1){
+                    str_system += list_system[k];
+                }else{
+                    str_system += list_system[k] + ",";
+                }               
+            }
+
+            let job_string = JSON.stringify({
+                "job_id": job_id,               
+                "process":str_process,
+                "system": str_system,
+            });
+
+            UpdateJob(job_string);
+        });
+
+        $('#btn_process_delete').on('click',function(){
+            let process = $('#edit_process_name').val();
+            let process_id = set_processes.filter(f=>f.process_name == process).map(m=>m.process_id)[0];
+
+            let index = set_processes.findIndex(f=>f.process_id == process_id);
+            set_processes.splice(index,1);
+            GenerateTableProcess(set_processes);
+            $('#modal_edit_process').modal('hide');
+        });
+
+        $('#btn_system_delete').on('click',function(){
+            let system = $('#edit_system_name').val();
+            let system_id = set_systems.filter(f=>f.system_name == system).map(m=>m.system_id)[0];
+
+            let index = set_systems.findIndex(f=>f.system_id == system_id);
+            set_systems.splice(index,1);
+            GenerateTableSystem(set_systems);
+            $('#modal_edit_system').modal('hide');
+        });
     </script>
 }
