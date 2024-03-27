@@ -74,7 +74,6 @@ namespace WebENG.Controllers
         public JsonResult GetStatus()
         {
             List<EngStatusModel> statuses = Status.GetStatuses();
-            statuses = statuses.Where(w => w.status_id != "STA999").ToList();
             return Json(statuses);
         }
 

@@ -8,11 +8,11 @@ namespace WebENG.Models
     public class EngineerIdleTimeModel
     {
         public string userName { get; set; }
-        public int workingHours { get; set; }
-        public int idle { get; set; }
-        public int normal { get; set; }
-        public int ot1_5 { get; set; }
-        public int ot3_0 { get; set; }
-        public int leave { get; set; }
+        public double workingHours { get; set; }
+        public double idle { get; set; }
+        public double normal { get; set; }
+        public double ot1_5 { get; set; }
+        public double ot3_0 { get; set; }
+        public double leave { get; set; }
     }
 }

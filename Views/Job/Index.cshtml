@@ -101,14 +101,24 @@
                             <label for="job_name">Job Name</label>
                             <input id="job_name" type="text" class="form-control" placeholder="Job Name" />
                         </div>
-                    </div>                   
+                    </div>
                     <div class="form-row">
-                        <div class="col-3">
+                        <div class="col-4">
+                            <label for="job_date">Job Date</label>
+                            <input id="job_date" type="date" class="form-control"/>
+                        </div>
+                        <div class="col-4">
                             <label for="quotation_no">Quotation Number</label>
                             <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
                             <datalist id="quotations"></datalist>
                         </div>
-                        <div class="col-3">
+                        <div class="col-4">
+                            <label for="job_type">Job Type</label>
+                            <input id="job_type" type="text" class="form-control" placeholder=""/>
+                        </div>
+                    </div>
+                    <div class="form-row">                       
+                        <div class="col-4">
                             <label for="cost">Cost</label>
                             <div class="input-group">
                                 <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
@@ -117,7 +127,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3">
+                        <div class="col-4">
                             <label for="md_rate">Market Develop</label>
                             <div class="input-group">
                                 <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
@@ -126,7 +136,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-3">
+                        <div class="col-4">
                             <div class="form-group ">
                                 <label for="pd_rate">Product Develop</label>
                                 <div class="input-group">
@@ -271,6 +281,42 @@
                             <label for="due_date">Due Date</label>
                             <input id="due_date"type="date"  class="form-control" value="1900-01-01" />
                         </div>
+                    </div>
+                    <div class="form-row pt-2">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#42D5D8">
+                                    <div class="row">
+                                        <div class="col-10 d-flex justify-content-start pt-2">
+                                            <span style="font-weight:bold">Invoice</span>
+                                        </div>
+                                        <div class="col-2 col-md-2 d-flex justify-content-end">
+                                            <button id="add_invoice" type="button" class="btn btn-primary form-control elevation-1">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_invoice" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Invoice</th>
+                                                        <th>Date</th>
+                                                        <th>Note</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                       
                     </div>
                     <div class="form-row">                       
                         <div class="col-5">
@@ -739,7 +785,7 @@
         function GenerateQuotationOptions() {
             let quots_str = '';
             for (let i = 0; i < quots.length; i++) {
-                quots_str += `<option value="${quots[i].quotation_no}">${quots[i].quotation_no} - ${quots[i].customer}</option>`;
+                quots_str += `<option value="${quots[i].quotation_no}">${quots[i].quotation_no} - ${quots[i].customer} - ${quots[i].type}</option>`;
             }
             $('#quotations').empty();
             $('#quotations').append(quots_str);
@@ -787,9 +833,12 @@
 
             let job_id = data[0];
             let job_name = data[1];
+            
             let quotation_no = data[2];
             let list_process = [];
             let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
+            let job_date = job.job_date.split('T')[0];
+            let job_type = job.job_type;
             let countProcess = (job.process.match(/,/g) || []).length;
 
             for (let k=0;k<=countProcess;k++){
@@ -817,7 +866,9 @@
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
             $('#job_name').val(job_name);
+            $('#job_date').val(job_date);
             $('#quotation_no').val(quotation_no);
+            $('#job_type').val(job_type);
             $('#cost').val(cost);
             $('#md').val(md);
             $('#pd').val(pd);
@@ -871,6 +922,12 @@
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
         }
+        $('#quotation_no').on('change',function(){
+            let quo = $('#quotation_no').val();
+            let type = quots.filter(f=>f.quotation_no == quo).map(m=>m.type)[0];
+            $('#job_type').val(type);
+        });
+
 
         $('#status').on('change',function(){
             let status = $('#status').val();
@@ -885,7 +942,9 @@
         $('#btn_save').on('click', function () {
             let job_id = $('#job_id').val();
             let job_name = $('#job_name').val();
+            let job_date = $('#job_date').val();
             let quotation_no = $('#quotation_no').val();
+            let job_type = $('#job_type').val();
             let cost = $('#cost').val();
             let md_rate = $('#md_rate').val();
             let pd_rate = $('#pd_rate').val();
@@ -933,7 +992,9 @@
             let job_string = JSON.stringify({
                 "job_id": job_id,
                 "job_name": job_name,
+                "job_date":job_date,
                 "quotation_no": quotation_no,
+                "job_type":job_type,
                 "cost": cost,
                 "process":str_process,
                 "system": str_system,

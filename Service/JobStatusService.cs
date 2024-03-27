@@ -13,8 +13,34 @@ namespace WebENG.Service
         public List<JobModel> GetJobStatusALL()
         {
             List<JobModel> jobs = new List<JobModel>();
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader dr = null;
             try
             {
+                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date,note FROM Invoice");
+                List<InvoiceModel> invoices = new List<InvoiceModel>();
+                cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        InvoiceModel invoice = new InvoiceModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
+                            invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
+                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : ""
+                        };
+                        invoices.Add(invoice);
+                    }
+                }
+
                 string string_command = string.Format($@"
                     SELECT
                         Jobs.job_id,
@@ -25,16 +51,21 @@ namespace WebENG.Service
                         Jobs.md_rate,
                         Jobs.pd_rate,
                         Eng_Status.Status_Name as status,
-						Jobs.down_payment,
-						Jobs.document_submit,
-						Jobs.instrument_delivered_ctl,
-						Jobs.system_delivered_ctl,
-						Jobs.fat,
-						Jobs.delivery_instrument,
-						Jobs.delivery_system,
-						Jobs.progress_work,
-						Jobs.commissioning,
-						Jobs.as_built,
+						Term_Payment.down_payment,
+						Term_Payment.document_submit,
+						Term_Payment.instrument_vendor,
+						Term_Payment.instrument_delivered_ctl,
+						Term_Payment.system_delivered_ctl,
+						Term_Payment.fat,
+						Term_Payment.delivery_instrument,
+						Term_Payment.delivery_system,
+						Term_Payment.progress_work,
+						Term_Payment.installation_work_complete,
+						Term_Payment.commissioning,
+						Term_Payment.startup,
+						Term_Payment.as_built,
+						Term_Payment.warranty,
+						Term_Payment.finished,
 						Jobs.job_in_hand,
 						Jobs.invoice,
 						Jobs.due_date,
@@ -42,18 +73,42 @@ namespace WebENG.Service
                         Jobs.finished_date
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
+					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
                     ORDER BY Jobs.job_id");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
                     ConnectSQL.CloseConnect();
                     ConnectSQL.OpenConnect();
                 }
-                SqlDataReader dr = cmd.ExecuteReader();
+                dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
+                        List<InvoiceModel> _invoices = new List<InvoiceModel>();
+                        _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
+
+                        Term_PaymentModel term_Payment = new Term_PaymentModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            down_payment = dr["down_payment"] != DBNull.Value ? Convert.ToInt32(dr["down_payment"]) : 0,
+                            document_submit = dr["document_submit"] != DBNull.Value ? Convert.ToInt32(dr["document_submit"]) : 0,
+                            instrument_vendor = dr["instrument_vendor"] != DBNull.Value ? Convert.ToInt32(dr["instrument_vendor"]) : 0,
+                            instrument_delivered_ctl = dr["instrument_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["instrument_delivered_ctl"]) : 0,
+                            system_delivered_ctl = dr["system_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["system_delivered_ctl"]) : 0,
+                            fat = dr["fat"] != DBNull.Value ? Convert.ToInt32(dr["fat"]) : 0,
+                            delivery_instrument = dr["delivery_instrument"] != DBNull.Value ? Convert.ToInt32(dr["delivery_instrument"]) : 0,
+                            delivery_system = dr["delivery_system"] != DBNull.Value ? Convert.ToInt32(dr["delivery_system"]) : 0,
+                            progress_work = dr["progress_work"] != DBNull.Value ? Convert.ToInt32(dr["progress_work"]) : 0,
+                            installation_work_complete = dr["installation_work_complete"] != DBNull.Value ? Convert.ToInt32(dr["installation_work_complete"]) : 0,
+                            commissioning = dr["commissioning"] != DBNull.Value ? Convert.ToInt32(dr["commissioning"]) : 0,
+                            startup = dr["startup"] != DBNull.Value ? Convert.ToInt32(dr["startup"]) : 0,
+                            as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
+                            warranty = dr["warranty"] != DBNull.Value ? Convert.ToInt32(dr["warranty"]) : 0,
+                            finished  = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0,
+                        };
+
                         JobModel job = new JobModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -67,24 +122,15 @@ namespace WebENG.Service
                             manpower = 0,
                             cost_per_manpower = 0,
                             ot_manpower = 0,
-                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
-                            down_payment = dr["down_payment"] != DBNull.Value ? Convert.ToInt32(dr["down_payment"]) : 0,
-                            document_submit = dr["document_submit"] != DBNull.Value ? Convert.ToInt32(dr["document_submit"]) : 0,
-                            instrument_delivered_ctl = dr["instrument_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["instrument_delivered_ctl"]) : 0,
-                            system_delivered_ctl = dr["system_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["system_delivered_ctl"]) : 0,
-                            fat = dr["fat"] != DBNull.Value ? Convert.ToInt32(dr["fat"]) : 0,
-                            delivery_instrument = dr["delivery_instrument"] != DBNull.Value ? Convert.ToInt32(dr["delivery_instrument"]) : 0,
-                            delivery_system = dr["delivery_system"] != DBNull.Value ? Convert.ToInt32(dr["delivery_system"]) : 0,
-                            progress_work = dr["progress_work"] != DBNull.Value ? Convert.ToInt32(dr["progress_work"]) : 0,
-                            commissioning = dr["commissioning"] != DBNull.Value ? Convert.ToInt32(dr["commissioning"]) : 0,
-                            as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
-                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
+                            invoices = _invoices,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
                             finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
                         };
                         job.factor = job.md_rate + job.pd_rate;
+                        job.term_payment = term_Payment;
                         jobs.Add(job);
                     }
                     dr.Close();
@@ -103,8 +149,34 @@ namespace WebENG.Service
         public List<JobModel> GetJobStatusByUser(string user)
         {
             List<JobModel> jobs = new List<JobModel>();
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader dr = null;
             try
             {
+                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date,note FROM Invoice");
+                List<InvoiceModel> invoices = new List<InvoiceModel>();
+                cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        InvoiceModel invoice = new InvoiceModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
+                            invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
+                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : ""
+                        };
+                        invoices.Add(invoice);
+                    }
+                }
+
                 string string_command = string.Format($@"
                     SELECT
                         Jobs.job_id,
@@ -115,16 +187,21 @@ namespace WebENG.Service
                         Jobs.md_rate,
                         Jobs.pd_rate,
                         Eng_Status.Status_Name as status,
-						Jobs.down_payment,
-						Jobs.document_submit,
-						Jobs.instrument_delivered_ctl,
-						Jobs.system_delivered_ctl,
-						Jobs.fat,
-						Jobs.delivery_instrument,
-						Jobs.delivery_system,
-						Jobs.progress_work,
-						Jobs.commissioning,
-						Jobs.as_built,
+						Term_Payment.down_payment,
+						Term_Payment.document_submit,
+						Term_Payment.instrument_vendor,
+						Term_Payment.instrument_delivered_ctl,
+						Term_Payment.system_delivered_ctl,
+						Term_Payment.fat,
+						Term_Payment.delivery_instrument,
+						Term_Payment.delivery_system,
+						Term_Payment.progress_work,
+						Term_Payment.installation_work_complete,
+						Term_Payment.commissioning,
+						Term_Payment.startup,
+						Term_Payment.as_built,
+						Term_Payment.warranty,
+						Term_Payment.finished,
 						Jobs.job_in_hand,
 						Jobs.invoice,
 						Jobs.due_date,
@@ -132,19 +209,43 @@ namespace WebENG.Service
                         Jobs.finished_date
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
-					WHERE Jobs.job_id IN (SELECT job_id FROM JobResponsible WHERE user_id = '{user}')
+					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
+                    WHERE Jobs.job_id IN (SELECT job_id FROM JobResponsible WHERE user_id = '{user}')
                     ORDER BY Jobs.job_id");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
                     ConnectSQL.CloseConnect();
                     ConnectSQL.OpenConnect();
                 }
-                SqlDataReader dr = cmd.ExecuteReader();
+                dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
+                        List<InvoiceModel> _invoices = new List<InvoiceModel>();
+                        _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
+
+                        Term_PaymentModel term_Payment = new Term_PaymentModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            down_payment = dr["down_payment"] != DBNull.Value ? Convert.ToInt32(dr["down_payment"]) : 0,
+                            document_submit = dr["document_submit"] != DBNull.Value ? Convert.ToInt32(dr["document_submit"]) : 0,
+                            instrument_vendor = dr["instrument_vendor"] != DBNull.Value ? Convert.ToInt32(dr["instrument_vendor"]) : 0,
+                            instrument_delivered_ctl = dr["instrument_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["instrument_delivered_ctl"]) : 0,
+                            system_delivered_ctl = dr["system_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["system_delivered_ctl"]) : 0,
+                            fat = dr["fat"] != DBNull.Value ? Convert.ToInt32(dr["fat"]) : 0,
+                            delivery_instrument = dr["delivery_instrument"] != DBNull.Value ? Convert.ToInt32(dr["delivery_instrument"]) : 0,
+                            delivery_system = dr["delivery_system"] != DBNull.Value ? Convert.ToInt32(dr["delivery_system"]) : 0,
+                            progress_work = dr["progress_work"] != DBNull.Value ? Convert.ToInt32(dr["progress_work"]) : 0,
+                            installation_work_complete = dr["installation_work_complete"] != DBNull.Value ? Convert.ToInt32(dr["installation_work_complete"]) : 0,
+                            commissioning = dr["commissioning"] != DBNull.Value ? Convert.ToInt32(dr["commissioning"]) : 0,
+                            startup = dr["startup"] != DBNull.Value ? Convert.ToInt32(dr["startup"]) : 0,
+                            as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
+                            warranty = dr["warranty"] != DBNull.Value ? Convert.ToInt32(dr["warranty"]) : 0,
+                            finished = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0,
+                        };
+
                         JobModel job = new JobModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -159,23 +260,14 @@ namespace WebENG.Service
                             cost_per_manpower = 0,
                             ot_manpower = 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
-                            down_payment = dr["down_payment"] != DBNull.Value ? Convert.ToInt32(dr["down_payment"]) : 0,
-                            document_submit = dr["document_submit"] != DBNull.Value ? Convert.ToInt32(dr["document_submit"]) : 0,
-                            instrument_delivered_ctl = dr["instrument_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["instrument_delivered_ctl"]) : 0,
-                            system_delivered_ctl = dr["system_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["system_delivered_ctl"]) : 0,
-                            fat = dr["fat"] != DBNull.Value ? Convert.ToInt32(dr["fat"]) : 0,
-                            delivery_instrument = dr["delivery_instrument"] != DBNull.Value ? Convert.ToInt32(dr["delivery_instrument"]) : 0,
-                            delivery_system = dr["delivery_system"] != DBNull.Value ? Convert.ToInt32(dr["delivery_system"]) : 0,
-                            progress_work = dr["progress_work"] != DBNull.Value ? Convert.ToInt32(dr["progress_work"]) : 0,
-                            commissioning = dr["commissioning"] != DBNull.Value ? Convert.ToInt32(dr["commissioning"]) : 0,
-                            as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
-                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
+                            invoices = _invoices,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
                             finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
                         };
                         job.factor = job.md_rate + job.pd_rate;
+                        job.term_payment = term_Payment;
                         jobs.Add(job);
                     }
                     dr.Close();

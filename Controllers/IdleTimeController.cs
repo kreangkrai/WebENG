@@ -111,7 +111,7 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(yy, mm, 1);
             DateTime stop = new DateTime(yy, mm, end);
 
-            int working_hours = 0;
+            double working_hours = 0;
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
             {
                 bool isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
@@ -128,11 +128,11 @@ namespace WebENG.Controllers
                 List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users[i], month);
                 List<WorkingHoursSummaryModel> summaries = WorkingHours.CalculateMonthlySummary(monthly);
 
-                int normal = summaries.Select(s => s.normal).Sum() / 60;
-                int ot1_5 = summaries.Select(s => s.ot1_5).Sum() / 60;
-                int ot3_0 = summaries.Select(s => s.ot3_0).Sum() / 60;
-                int leave = summaries.Select(s => s.leave).Sum() / 60;
-                int idleTime = (working_hours * 8) - (normal + leave);
+                double normal = summaries.Select(s => s.normal).Sum() / 60;
+                double ot1_5 = summaries.Select(s => s.ot1_5).Sum() / 60;
+                double ot3_0 = summaries.Select(s => s.ot3_0).Sum() / 60;
+                double leave = summaries.Select(s => s.leave).Sum() / 60;
+                double idleTime = (working_hours * 8) - (normal + leave);
                 if (idleTime < 0)
                 {
                     idleTime = 0;

@@ -9,5 +9,6 @@ namespace WebENG.Models
     {
         public string quotation_no { get; set; }
         public string customer { get; set; }
+        public string type { get; set; }
     }
 }
