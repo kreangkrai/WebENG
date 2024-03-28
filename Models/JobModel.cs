@@ -40,7 +40,6 @@ namespace WebENG.Models
         public string job_id { get; set; }
         public double invoice { get; set; }
         public DateTime invoice_date { get; set; }
-        public string note { get; set; }
     }
     public class Term_PaymentModel
     {

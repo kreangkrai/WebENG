@@ -18,7 +18,7 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
-                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date,note FROM Invoice");
+                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
                 cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -36,7 +36,6 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
                             invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
-                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : ""
                         };
                         invoices.Add(invoice);
                     }
@@ -69,7 +68,6 @@ namespace WebENG.Service
 						Term_Payment.warranty,
 						Term_Payment.finished,
 						Jobs.job_in_hand,
-						Jobs.invoice,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.job_type,
@@ -247,11 +245,11 @@ namespace WebENG.Service
                     INSERT INTO 
                         Jobs(job_id, job_name,job_date,quotation_no,job_type, cost,process_id,
                              system_id, md_rate, pd_rate, status,
-                             job_in_hand,invoice,due_date
+                             job_in_hand,due_date
                         )
                         VALUES(@job_id, @job_name,@job_date, @quotation_no,@job_type, @cost,@process_id,
                                @system_id, @md_rate, @pd_rate, @status,
-                               @job_in_hand,@invoice,@due_date
+                               @job_in_hand,@due_date
                         )");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -268,7 +266,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@pd_rate", job.pd_rate);
                     cmd.Parameters.AddWithValue("@status", job.status);
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
-                    cmd.Parameters.AddWithValue("@invoice", job.invoices);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
@@ -277,6 +274,10 @@ namespace WebENG.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {
@@ -310,7 +311,6 @@ namespace WebENG.Service
                         pd_rate = @pd_rate,
                         status = @status,
                         job_in_hand = @job_in_hand,
-                        invoice = @invoice,
                         due_date = @due_date,
                         finished_date = @finished_date
                     WHERE job_id = @job_id");
@@ -329,7 +329,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@pd_rate", job.pd_rate);
                     cmd.Parameters.AddWithValue("@status", job.status);
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
-                    cmd.Parameters.AddWithValue("@invoice", job.invoices);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     cmd.Parameters.AddWithValue("@finished_date", job.finished_date);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -339,6 +338,9 @@ namespace WebENG.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }catch(Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {
@@ -603,7 +605,6 @@ namespace WebENG.Service
                              finished
                         )
                         VALUES(@job_id,
-                                @job_name,
                                 @down_payment,
                                 @document_submit,
                                 @instrument_vendor,
@@ -646,6 +647,9 @@ namespace WebENG.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }catch(Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {
@@ -706,6 +710,10 @@ namespace WebENG.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {

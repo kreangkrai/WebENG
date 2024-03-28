@@ -42,7 +42,7 @@ namespace WebENG.Service
             List<InvoiceModel> invoices = new List<InvoiceModel>();
             try
             {
-                string string_command = string.Format($@"SELECT job_id,invocie,invoice_date,note FROM Invoice WHERE job_id='{job}'");
+                string string_command = string.Format($@"SELECT job_id,invocie,invoice_date FROM Invoice WHERE job_id='{job}'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -59,7 +59,6 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToInt32(dr["invoice"]) : 0,
                             invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
-                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                         };
                         invoices.Add(invoice);
                     }
@@ -83,15 +82,14 @@ namespace WebENG.Service
                 for (int i = 0; i < invoices.Count; i++)
                 {
                     string string_command = string.Format($@"
-                    INSERT INTO Invoice(job_id, invoice, invoice_date,note)
-                    VALUES(@job_id, @invoice, @invoice_date,@note)");
+                    INSERT INTO Invoice(job_id, invoice, invoice_date)
+                    VALUES(@job_id, @invoice, @invoice_date)");
                     using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                     {
                         cmd.CommandType = System.Data.CommandType.Text;
-                        cmd.Parameters.AddWithValue("@job_id", invoices[i].job_id);
+                        cmd.Parameters.AddWithValue("@job_id", invoices[i].job_id.Replace("-",String.Empty));
                         cmd.Parameters.AddWithValue("@invoice", invoices[i].invoice);
                         cmd.Parameters.AddWithValue("@invoice_date", invoices[i].invoice_date);
-                        cmd.Parameters.AddWithValue("@note", invoices[i].note);
                         if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                         {
                             ConnectSQL.CloseConnect();

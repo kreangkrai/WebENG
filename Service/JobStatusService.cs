@@ -17,7 +17,7 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
-                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date,note FROM Invoice");
+                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
                 cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -35,7 +35,6 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
                             invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
-                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : ""
                         };
                         invoices.Add(invoice);
                     }
@@ -67,7 +66,6 @@ namespace WebENG.Service
 						Term_Payment.warranty,
 						Term_Payment.finished,
 						Jobs.job_in_hand,
-						Jobs.invoice,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.finished_date
@@ -136,6 +134,10 @@ namespace WebENG.Service
                     dr.Close();
                 }
             }
+            catch
+            {
+                return null;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -153,7 +155,7 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
-                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date,note FROM Invoice");
+                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
                 cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -171,7 +173,6 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
                             invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
-                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : ""
                         };
                         invoices.Add(invoice);
                     }
@@ -203,7 +204,6 @@ namespace WebENG.Service
 						Term_Payment.warranty,
 						Term_Payment.finished,
 						Jobs.job_in_hand,
-						Jobs.invoice,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.finished_date
@@ -307,6 +307,10 @@ namespace WebENG.Service
                     cmd.ExecuteNonQuery();
                 }
             }
+            catch(Exception ex)
+            {
+                return ex.Message;
+            }
             finally
             {
                 if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
@@ -338,6 +342,10 @@ namespace WebENG.Service
                     }
                     cmd.ExecuteNonQuery();
                 }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
             finally
             {

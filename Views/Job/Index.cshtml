@@ -269,15 +269,6 @@
                             </div>
                         </div>
                         <div class="col-4">
-                            <label for="cost">Invoice</label>
-                            <div class="input-group">
-                                <input id="invoice" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4">
                             <label for="due_date">Due Date</label>
                             <input id="due_date"type="date"  class="form-control" value="1900-01-01" />
                         </div>
@@ -291,7 +282,7 @@
                                             <span style="font-weight:bold">Invoice</span>
                                         </div>
                                         <div class="col-2 col-md-2 d-flex justify-content-end">
-                                            <button id="add_invoice" type="button" class="btn btn-primary form-control elevation-1">
+                                            <button id="add_invoice" type="button" class="btn btn-primary form-control elevation-1"  style="width:50px">
                                                 <i class="fas fa-plus"></i>
                                             </button>
                                         </div>
@@ -306,7 +297,6 @@
                                                         <th>No</th>
                                                         <th>Invoice</th>
                                                         <th>Date</th>
-                                                        <th>Note</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -314,10 +304,25 @@
                                             </table>
                                         </div>
                                     </div>
+                                    <div class="col-6 pt-1">
+                                        <div class="row">
+                                            <div class="col-2 pt-1">
+                                                <label for="cost">รวม</label>
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="input-group">
+                                                    <input id="invoice" type="text" class="form-control" placeholder="0" value="0" />
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">THB</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>                       
-                    </div>
+                    </div>                   
                     <div class="form-row">                       
                         <div class="col-5">
                             <label for="status">Status</label>
@@ -368,6 +373,44 @@
                 </button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button id="btn_payment_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_edit_invoice" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Invoice</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-2">
+                            <label for="edit_invoice_no">No</label>
+                            <input id="edit_invoice_no" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-5">
+                            <label for="edit_invoice">Invoice</label>
+                            <input id="edit_invoice" type="number" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="col-5">
+                            <label for="edit_invoice_date">Date</label>
+                            <input id="edit_invoice_date" type="date" class="form-control" placeholder="" />
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_invoice_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_invoice_save" type="button" class="btn btn-primary">Save changes</button>
             </div>
         </div>
     </div>
@@ -439,6 +482,8 @@
         let table_payment;
         let table_process;
         let table_system;
+        let table_invoice;
+
         let update = false;
         let jobs = [];
         let users = [];
@@ -450,6 +495,8 @@
         let set_payments = [];
         let set_processes = [];
         let set_systems = [];
+        let set_invoice = [];
+
         //Change these parameters to true to show result
         let debug_jobs = false;
         let debug_user = false;
@@ -776,9 +823,7 @@
             $('#select_payment').append(`<option value="" selected disabled>Please Select Term Payment</option>`);
             for (let i = 0; i < statuses.length; i++) {
                 if (statuses[i].status_name === status || status === "" || status === null) {
-                    if (statuses[i].status_id !== "STA999"){
-                        $('#select_payment').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
-                    }
+                    $('#select_payment').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
                 }
             }
         }
@@ -791,7 +836,17 @@
             $('#quotations').append(quots_str);
         }
 
-        $('#btn_create').on('click', async function () {   
+        $('#btn_create').on('click', async function () {
+            set_payments = [];
+            set_processes = [];
+            set_systems = [];
+            set_invoice = [];
+
+            GenerateTablePayment(set_payments);
+            GenerateTableProcess(set_processes);
+            GenerateTableSystem(set_systems);
+            GenerateTableInvoice(set_invoice);
+
             await GetQuotations();
             await GenerateQuotationOptions();  
             Prepmodal();
@@ -799,18 +854,21 @@
 
         function Prepmodal() {
             $('#job_id').attr('disabled', false);
-            update = false;
-            $('#modal_job').modal();
+            update = false;           
             $('#modal_title').text("Create Job");
             $('#job_id').val(null);
             $('#job_name').val(null);
+            $('#job_date').val(null);
             $('#quotation_no').val(null);
             $('#cost').val(0);
             $('#md').val(1);
             $('#pd').val(1);
             $('#status').val(1);
-
+            $('#job_in_hand').val(0);
+             $('#invoice').val(0);
+            $('#due_date').val(null);
             $('#group_finished_date').hide();
+            $('#modal_job').modal();
         };
 
         $('#table_job tbody').on('click', 'tr', async function () {
@@ -826,6 +884,7 @@
             set_payments = [];
             set_processes = [];
             set_systems = [];
+            set_invoice = [];
 
             update = true;
             $('#modal_job').modal();
@@ -857,6 +916,8 @@
                 }
             }
 
+            let list_invoice = job.invoices;
+
             let cost = data[9].replaceAll(",","");
             let md = data[10];
             let pd = data[11];
@@ -874,7 +935,6 @@
             $('#pd').val(pd);
             $('#status').val(status);
             $('#job_in_hand').val(job.job_in_hand);
-            $('#invoice').val(job.invoice);
             $('#due_date').val(job.due_date.split('T')[0]);
 
             $('#finished_date').val(finished_date.split('T')[0]);
@@ -886,16 +946,26 @@
                 $('#group_finished_date').hide();
             }
 
-            set_payments.push({'payment_id': 'STA001' ,'payment_name': 'Down Payment/KOM', 'percent': job.down_payment});
-            set_payments.push({'payment_id': 'STA002' ,'payment_name': 'Document Submit', 'percent': job.document_submit});
-            set_payments.push({'payment_id': 'STA003' ,'payment_name': 'Instrument Delivered @@ CTL', 'percent': job.instrument_delivered_ctl});
-            set_payments.push({'payment_id': 'STA004' ,'payment_name': 'System Delivered @@ CTL', 'percent': job.system_delivered_ctl});
-            set_payments.push({'payment_id': 'STA005' ,'payment_name': 'FAT', 'percent': job.fat});
-            set_payments.push({'payment_id': 'STA006' ,'payment_name': 'Delivery Instrument', 'percent': job.delivery_instrument});
-            set_payments.push({'payment_id': 'STA007' ,'payment_name': 'Delivery System', 'percent': job.delivery_system});
-            set_payments.push({'payment_id': 'STA008' ,'payment_name': 'Progress Work', 'percent': job.progress_work});
-            set_payments.push({'payment_id': 'STA009' ,'payment_name': 'Commissioning', 'percent': job.commissioning});
-            set_payments.push({'payment_id': 'STA010' ,'payment_name': 'As-Built', 'percent': job.as_built});
+            let datas_percent = [];
+            datas_percent.push(job.term_payment.down_payment);
+            datas_percent.push(job.term_payment.document_submit);
+            datas_percent.push(job.term_payment.instrument_vendor);
+            datas_percent.push(job.term_payment.instrument_delivered_ctl);
+            datas_percent.push(job.term_payment.system_delivered_ctl);
+            datas_percent.push(job.term_payment.fat);
+            datas_percent.push(job.term_payment.delivery_instrument);
+            datas_percent.push(job.term_payment.delivery_system);
+            datas_percent.push(job.term_payment.progress_work);
+            datas_percent.push(job.term_payment.installation_work_complete);
+            datas_percent.push(job.term_payment.commissioning);
+            datas_percent.push(job.term_payment.startup);
+            datas_percent.push(job.term_payment.as_built);
+            datas_percent.push(job.term_payment.warranty);
+            datas_percent.push(job.term_payment.finished);
+
+            for (let i =0;i<statuses.length;i++){
+                set_payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
+            }
 
             //Term Payment
             let new_payments = [];
@@ -918,9 +988,17 @@
                 set_systems.push({'system_id': system_id ,'system_name': list_system[i]});               
             }
 
+            //Invoice
+            for (let i=0;i<list_invoice.length;i++){      
+                let invoice = list_invoice[i].invoice;
+                let date = list_invoice[i].invoice_date;
+                set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});               
+            }
+
             GenerateTablePayment(set_payments);
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
+            GenerateTableInvoice(set_invoice);
         }
         $('#quotation_no').on('change',function(){
             let quo = $('#quotation_no').val();
@@ -951,22 +1029,50 @@
             let status = $('#status').val();
             let finished_date = $('#finished_date').val();
             let job_in_hand = $('#job_in_hand').val();
-            let invoice = $('#invoice').val();
+
             let due_date = $('#due_date').val();
             if (status === null) {
                 status = 1;
             }
 
+            let term_payment = {};
             let down_payment = set_payments.filter(f=>f.payment_id == "STA001").map(m=>m.percent)[0];
             let document_submit = set_payments.filter(f=>f.payment_id == "STA002").map(m=>m.percent)[0];
-            let instrument_delivered_ctl = set_payments.filter(f=>f.payment_id == "STA003").map(m=>m.percent)[0];
-            let system_delivered_ctl = set_payments.filter(f=>f.payment_id == "STA004").map(m=>m.percent)[0];
-            let fat = set_payments.filter(f=>f.payment_id == "STA005").map(m=>m.percent)[0];
-            let delivery_instrument = set_payments.filter(f=>f.payment_id == "STA006").map(m=>m.percent)[0];
-            let delivery_system = set_payments.filter(f=>f.payment_id == "STA007").map(m=>m.percent)[0];
-            let progress_work = set_payments.filter(f=>f.payment_id == "STA008").map(m=>m.percent)[0];
-            let commissioning = set_payments.filter(f=>f.payment_id == "STA009").map(m=>m.percent)[0];
-            let as_built = set_payments.filter(f=>f.payment_id == "STA010").map(m=>m.percent)[0];
+            let instrument_vendor = set_payments.filter(f=>f.payment_id == "STA003").map(m=>m.percent)[0];
+            let instrument_delivered_ctl = set_payments.filter(f=>f.payment_id == "STA004").map(m=>m.percent)[0];
+            let system_delivered_ctl = set_payments.filter(f=>f.payment_id == "STA005").map(m=>m.percent)[0];
+            let fat = set_payments.filter(f=>f.payment_id == "STA006").map(m=>m.percent)[0];
+            let delivery_instrument = set_payments.filter(f=>f.payment_id == "STA007").map(m=>m.percent)[0];
+            let delivery_system = set_payments.filter(f=>f.payment_id == "STA008").map(m=>m.percent)[0];
+            let progress_work = set_payments.filter(f=>f.payment_id == "STA009").map(m=>m.percent)[0];
+            let installation_work_complete = set_payments.filter(f=>f.payment_id == "STA010").map(m=>m.percent)[0];
+            let commissioning = set_payments.filter(f=>f.payment_id == "STA011").map(m=>m.percent)[0];
+            let startup = set_payments.filter(f=>f.payment_id == "STA012").map(m=>m.percent)[0];
+            let as_built = set_payments.filter(f=>f.payment_id == "STA013").map(m=>m.percent)[0];
+            let warranty = set_payments.filter(f=>f.payment_id == "STA014").map(m=>m.percent)[0];
+            let finished = set_payments.filter(f=>f.payment_id == "STA999").map(m=>m.percent)[0];
+
+            term_payment.job_id = job_id;
+            term_payment.down_payment = down_payment;
+            term_payment.document_submit = document_submit;
+            term_payment.instrument_vendor = instrument_vendor;
+            term_payment.instrument_delivered_ctl = instrument_delivered_ctl;
+            term_payment.system_delivered_ctl = system_delivered_ctl;
+            term_payment.fat = fat;
+            term_payment.delivery_instrument = delivery_instrument;
+            term_payment.delivery_system = delivery_system;
+            term_payment.progress_work = progress_work;
+            term_payment.installation_work_complete = installation_work_complete;
+            term_payment.commissioning = commissioning;
+            term_payment.startup = startup;
+            term_payment.as_built = as_built;
+            term_payment.warranty = warranty;
+            term_payment.finished = finished;
+
+            let invoices = [];
+            for(let i=0;i<set_invoice.length;i++){
+                invoices.push({'job_id':job_id,'invoice':set_invoice[i].invoice,'invoice_date': set_invoice[i].date});
+            }
 
             let str_process = "";
             let str_system = "";
@@ -1001,18 +1107,9 @@
                 "md_rate": md_rate,
                 "pd_rate": pd_rate,
                 "status": status,
-                "down_payment":down_payment,
-                "document_submit":document_submit,
-                "instrument_delivered_ctl":instrument_delivered_ctl,
-                "system_delivered_ctl":system_delivered_ctl,
-                "fat":fat,
-                "delivery_instrument":delivery_instrument,
-                "delivery_system":delivery_system,
-                "progress_work":progress_work,
-                "commissioning":commissioning,
-                "as_built":as_built,
+                "term_payment":term_payment,
                 "job_in_hand":job_in_hand,
-                "invoice":invoice,
+                "invoices":invoices,
                 "due_date":due_date,
                 "finished_date": finished_date
             });
@@ -1190,5 +1287,96 @@
                 }
             });
         }
+
+        $('#add_invoice').on('click',function(){     
+            var today = new Date();
+            var year = today.getFullYear();
+            var month = (today.getMonth() + 1).toString().padStart(2,0);
+            var day = today.getDate().toString().padStart(2,0);
+            let date = year + "-" + month + "-" + day;
+
+            set_invoice.sort();
+            let last_id = 0;
+            if (set_invoice.length > 0){
+                last_id = set_invoice[set_invoice.length-1].id;
+                set_invoice.push({'id': Number(last_id + 1) ,'invoice': 0,'date': date});
+            }else{
+                set_invoice.push({'id': 1 ,'invoice': 0,'date': date});
+            }
+                   
+            GenerateTableInvoice(set_invoice);
+        });
+
+        $('#table_invoice tbody').on('click', 'tr', async function () {
+            let data = table_invoice.row(this).data();
+            let no = data[0];
+            let invoice = data[1].replaceAll(',','');
+            let date = data[2];
+            $('#edit_invoice_no').val(no);
+            $('#edit_invoice').val(invoice);
+            $('#edit_invoice_date').val(date);
+            $('#modal_edit_invoice').modal();
+        });
+
+        $('#btn_invoice_save').on('click',function(){
+            let no = $('#edit_invoice_no').val();
+            let invoice = $('#edit_invoice').val();
+            let date = $('#edit_invoice_date').val();
+            let index = set_invoice.findIndex(f=>f.id == no);
+            set_invoice[index].invoice = invoice;
+            set_invoice[index].date = date;
+            GenerateTableInvoice(set_invoice);
+            $('#modal_edit_invoice').modal('hide');
+        });
+
+        $('#btn_invoice_delete').on('click',function(){
+            let no = $('#edit_invoice_no').val();
+
+            let index = set_invoice.findIndex(f=>f.id == no);
+            set_invoice.splice(index,1);
+            GenerateTableInvoice(set_invoice);
+            $('#modal_edit_invoice').modal('hide');
+        });
+
+        function GenerateTableInvoice(invoices) {
+            let datas = [];
+            if (table_invoice !== null)
+                $('#table_invoice').DataTable().destroy();
+
+            for (let i = 0; i < invoices.length; i++) {
+                let no = invoices[i].id;
+                let invoice = invoices[i].invoice; 
+                let date = invoices[i].date;
+                datas.push([
+                    no,
+                    invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    date.toString().split('T')[0]
+                ]);
+            }
+
+            table_invoice = $('#table_invoice').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let sum_invoice = set_invoice.map(m=>Number(m.invoice)).reduce((acc,curr)=> acc+curr);
+                    $('#invoice').val(sum_invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
+
+
     </script>
 }

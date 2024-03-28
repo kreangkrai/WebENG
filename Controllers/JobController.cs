@@ -17,11 +17,13 @@ namespace WebENG.Controllers
         readonly IJob JobService;
         readonly IAccessory Accessory;
         readonly IStatus Status;
+        readonly IInvoice Invoice;
         public JobController()
         {
             JobService = new JobService();
             Accessory = new AccessoryService();
             Status = new EngStatusService();
+            Invoice = new InvoiceService();
         }
 
         public IActionResult Index()
@@ -88,6 +90,14 @@ namespace WebENG.Controllers
         {
             JobModel job = JsonConvert.DeserializeObject<JobModel>(job_string);
             var result = JobService.CreateJob(job);
+            if (result == "Success")
+            {
+                result = JobService.CreateTermPayment(job.term_payment);
+                if (result == "Success")
+                {
+                    result = Invoice.Insert(job.invoices);
+                }
+            }
             return Json(result);
         }
 
@@ -95,7 +105,20 @@ namespace WebENG.Controllers
         public JsonResult UpdateJob(string job_string)
         {
             JobModel job = JsonConvert.DeserializeObject<JobModel>(job_string);
-            var result = JobService.UpdateJob(job);
+            string result = JobService.UpdateJob(job);
+
+            if (result == "Success")
+            {
+                result = JobService.UpdateTermPayment(job.term_payment);
+                if (result == "Success")
+                {
+                    string delete = Invoice.Delete(job.job_id);
+                    if (delete == "Success")
+                    {
+                        result = Invoice.Insert(job.invoices);
+                    }
+                }
+            }
             return Json(result);
         }
 

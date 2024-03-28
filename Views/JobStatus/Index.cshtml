@@ -387,7 +387,7 @@
             let arr = Array.from(set_payments);
             let arr_column = Array.from(set_column);
             let new_jobs = [];
-
+            let sum_invoice = 0;
             let columns = [];
             let _columns = [20,21,22];
             for (let i=0;i<_columns.length;i++){
@@ -408,8 +408,11 @@
             jobs = new_jobs;
 
             for (let i = 0; i < jobs.length; i++) {
-                
-                let percent = Math.ceil((Number(jobs[i].invoice) / Number(jobs[i].job_in_hand)) * 100);
+                for(let j=0;j<jobs[i].invoices.length;j++){
+                    sum_invoice += jobs[i].invoices[j].invoice;
+                }
+
+                let percent = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);
                 let down_payment = jobs[i].term_payment.down_payment > 0 ? jobs[i].term_payment.down_payment : "";
                 let document_submit = jobs[i].term_payment.document_submit > 0 ? jobs[i].term_payment.document_submit : "";
                 let instrument_vendor = jobs[i].term_payment.instrument_vendor > 0 ? jobs[i].term_payment.instrument_vendor : "";
@@ -426,11 +429,6 @@
                 let warranty = jobs[i].term_payment.warranty > 0 ? jobs[i].term_payment.warranty : "";
                 let finished = jobs[i].term_payment.finished > 0 ? jobs[i].term_payment.finished : "";
                 let job_in_hand = jobs[i].job_in_hand > 0 ? jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
-                let invoice = 0;
-                for(let j=0;j<jobs[i].invoices.length;j++){
-                    invoice += jobs[i].invoices[j].invoice;
-                }
-
                 let due_date = jobs[i].due_date.split('T')[0];
                 datas.push([
                     jobs[i].job_id,
@@ -454,7 +452,7 @@
                     warranty,
                     finished,
                     job_in_hand,
-                    invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    sum_invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     due_date
                 ]);
             }
@@ -477,7 +475,11 @@
                     $('td:eq(2)', row).addClass("text-left");
                     let job_id = _data[0];
                     let data = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
-                    let percent = Math.ceil((Number(data.invoice) / Number(data.job_in_hand)) * 100);
+                    let sum_invoice = 0;
+                    for(let j=0;j<data.invoices.length;j++){
+                        sum_invoice += data.invoices[j].invoice;
+                    }
+                    let percent = Math.ceil((Number(sum_invoice) / Number(data.job_in_hand)) * 100);
                     let current_status = statuses.filter(f=>f.status_name == data.status).map(m=>m.status_id)[0];
                     let due_date = data.due_date;
 
@@ -537,7 +539,7 @@
                             if (payments[i].percent > 0){                          
                                 sum_percent += Number(payments[i].percent);
                                 if (current_status === payments[i].payment_id){                          
-                                    if (percent > sum_percent){
+                                    if (percent >= sum_percent){
                                         $(`td:eq(${start_column + i})`, row).css({ "background-color": '#42CAD8'});
                                     }else{
                                         $(`td:eq(${start_column + i})`, row).css({ "background-color": 'orange'});
