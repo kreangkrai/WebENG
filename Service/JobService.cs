@@ -45,6 +45,7 @@ namespace WebENG.Service
                     SELECT
                         Jobs.job_id,
                         Jobs.job_name,
+                        Jobs.customer_name as customer,
                         Jobs.job_date,
                         Jobs.cost,
                         Jobs.process_id,
@@ -116,7 +117,7 @@ namespace WebENG.Service
                         JobModel job = new JobModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
-                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",                           
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
                             process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
@@ -243,11 +244,11 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO 
-                        Jobs(job_id, job_name,job_date,quotation_no,job_type, cost,process_id,
+                        Jobs(job_id, job_name,job_date,customer_name,quotation_no,job_type, cost,process_id,
                              system_id, md_rate, pd_rate, status,
                              job_in_hand,due_date
                         )
-                        VALUES(@job_id, @job_name,@job_date, @quotation_no,@job_type, @cost,@process_id,
+                        VALUES(@job_id, @job_name,@job_date,@customer_name, @quotation_no,@job_type, @cost,@process_id,
                                @system_id, @md_rate, @pd_rate, @status,
                                @job_in_hand,@due_date
                         )");
@@ -257,6 +258,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_id", job.job_id.Replace("-", String.Empty));
                     cmd.Parameters.AddWithValue("@job_name", job.job_name);
                     cmd.Parameters.AddWithValue("@job_date", job.job_date);
+                    cmd.Parameters.AddWithValue("@customer_name", job.customer);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
                     cmd.Parameters.AddWithValue("@cost", job.cost);
@@ -302,6 +304,7 @@ namespace WebENG.Service
                     SET
                         job_name = @job_name,
                         job_date = @job_date,
+                        customer_name = @customer_name,
                         quotation_no = @quotation_no,
                         job_type = @job_type,
                         cost = @cost,
@@ -320,6 +323,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_id", job.job_id.Replace("-", String.Empty));
                     cmd.Parameters.AddWithValue("@job_name", job.job_name);
                     cmd.Parameters.AddWithValue("@job_date", job.job_date);
+                    cmd.Parameters.AddWithValue("@customer_name", job.customer);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
                     cmd.Parameters.AddWithValue("@cost", job.cost);

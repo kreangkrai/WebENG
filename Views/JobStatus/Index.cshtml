@@ -161,29 +161,29 @@
                     </div>
                     <hr />
                     <div class="form-group">
-                        <table id="table_job" class="table-bordered stripe table-striped row-border order-column responsive" style="width:100%">
-                            <thead style="background-color:#429DD8">
+                        <table id="table_job" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:14px">
+                            <thead class="display compact" style="background-color:#429DD8">
                                 <tr>
                                     <th>Job No.</th>
                                     <th>Project Name</th>
                                     <th>Customer</th>
                                     <th>% Invoice</th>
                                     <th>Current Status</th>
-                                    <th style="font-size:12px">Down Payment/KOM</th>
-                                    <th style="font-size:12px">Document Submit</th>
-                                    <th style="font-size:12px">Instrument to Vendor</th>
-                                    <th style="font-size:12px">Instrument Delivered @@ CTL</th>
-                                    <th style="font-size:12px">System Delivered @@ CTL</th>
-                                    <th style="font-size:12px">FAT</th>
-                                    <th style="font-size:12px">Delivery Instrument</th>
-                                    <th style="font-size:12px">Delivery System</th>
-                                    <th style="font-size:12px">Progress Work</th>
-                                    <th style="font-size:12px">Installation work complete</th>
-                                    <th style="font-size:12px">Commissioning</th>
-                                    <th style="font-size:12px">Startup</th>
-                                    <th style="font-size:12px">As-Built</th>
-                                    <th style="font-size:12px">Warranty</th>
-                                    <th style="font-size:12px">Finished</th>
+                                    <th style="font-size:11px">Down Payment/KOM</th>
+                                    <th style="font-size:11px">Document Submit</th>
+                                    <th style="font-size:11px">Instrument to Vendor</th>
+                                    <th style="font-size:11px">Instrument Delivered @@ CTL</th>
+                                    <th style="font-size:11px">System Delivered @@ CTL</th>
+                                    <th style="font-size:11px">FAT</th>
+                                    <th style="font-size:11px">Delivery Instrument</th>
+                                    <th style="font-size:11px">Delivery System</th>
+                                    <th style="font-size:11px">Progress Work</th>
+                                    <th style="font-size:11px">Installation work complete</th>
+                                    <th style="font-size:11px">Commissioning</th>
+                                    <th style="font-size:11px">Startup</th>
+                                    <th style="font-size:11px">As-Built</th>
+                                    <th style="font-size:11px">Warranty</th>
+                                    <th style="font-size:11px">Finished</th>
                                     <th>Job In Hand</th>
                                     <th>Total Invoice</th>
                                     <th>Due Date</th>
@@ -408,6 +408,7 @@
             jobs = new_jobs;
 
             for (let i = 0; i < jobs.length; i++) {
+                sum_invoice = 0;
                 for(let j=0;j<jobs[i].invoices.length;j++){
                     sum_invoice += jobs[i].invoices[j].invoice;
                 }
@@ -509,6 +510,11 @@
                         payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
                     }
 
+                    // Count Project Name
+                    let length_project_name = data.job_name.length;
+                    if (Number(length_project_name) > 50){
+                        $(`td:eq(1)`, row).css({ "font-size": '12px'});
+                    }
                     //Highlight Due Date
                     let diff_day = Math.round(new Date(due_date).getTime() - new Date(Date.now()).getTime()) / (1000 * 3600 * 24);
                     if (data.status !== "Finished"){
@@ -570,6 +576,7 @@
                 scrollCollapse: true,
                 scrollX: true,
                 paging: false,
+                responsive: true
             });
         };
 
@@ -581,7 +588,7 @@
             let status = statuses.filter(f=>f.status_name == data_job.status).map(m=>m.status_id)[0];
             let job_name = data_job.job_name;
             let job_in_hand = data_job.job_in_hand;
-            let invoice = data_job.invoice;
+            let invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
             let due_date = data_job.due_date;
 
             let datas_percent = [];

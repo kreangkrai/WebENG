@@ -103,16 +103,20 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="col-4">
+                        <div class="col-3">
                             <label for="job_date">Job Date</label>
                             <input id="job_date" type="date" class="form-control"/>
                         </div>
-                        <div class="col-4">
-                            <label for="quotation_no">Quotation Number</label>
+                        <div class="col-2">
+                            <label for="quotation_no">Quotation</label>
                             <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
                             <datalist id="quotations"></datalist>
                         </div>
-                        <div class="col-4">
+                        <div class="col-5">
+                            <label for="job_customer">Customer</label>
+                            <input id="job_customer" type="text" class="form-control" placeholder=""/>
+                        </div>
+                        <div class="col-2">
                             <label for="job_type">Job Type</label>
                             <input id="job_type" type="text" class="form-control" placeholder=""/>
                         </div>
@@ -858,6 +862,7 @@
             $('#modal_title').text("Create Job");
             $('#job_id').val(null);
             $('#job_name').val(null);
+            $('#job_customer').val(null);
             $('#job_date').val(null);
             $('#quotation_no').val(null);
             $('#cost').val(0);
@@ -865,7 +870,7 @@
             $('#pd').val(1);
             $('#status').val(1);
             $('#job_in_hand').val(0);
-             $('#invoice').val(0);
+            $('#invoice').val(0);
             $('#due_date').val(null);
             $('#group_finished_date').hide();
             $('#modal_job').modal();
@@ -896,6 +901,7 @@
             let quotation_no = data[2];
             let list_process = [];
             let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
+            let customer = job.customer;
             let job_date = job.job_date.split('T')[0];
             let job_type = job.job_type;
             let countProcess = (job.process.match(/,/g) || []).length;
@@ -927,6 +933,7 @@
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
             $('#job_name').val(job_name);
+            $('#job_customer').val(customer);
             $('#job_date').val(job_date);
             $('#quotation_no').val(quotation_no);
             $('#job_type').val(job_type);
@@ -1002,7 +1009,9 @@
         }
         $('#quotation_no').on('change',function(){
             let quo = $('#quotation_no').val();
+            let customer = quots.filter(f=>f.quotation_no == quo).map(m=>m.customer)[0];
             let type = quots.filter(f=>f.quotation_no == quo).map(m=>m.type)[0];
+            $('#job_customer').val(customer);
             $('#job_type').val(type);
         });
 
@@ -1020,6 +1029,7 @@
         $('#btn_save').on('click', function () {
             let job_id = $('#job_id').val();
             let job_name = $('#job_name').val();
+            let customer = $('#job_customer').val();
             let job_date = $('#job_date').val();
             let quotation_no = $('#quotation_no').val();
             let job_type = $('#job_type').val();
@@ -1098,6 +1108,7 @@
             let job_string = JSON.stringify({
                 "job_id": job_id,
                 "job_name": job_name,
+                "customer":customer,
                 "job_date":job_date,
                 "quotation_no": quotation_no,
                 "job_type":job_type,
@@ -1339,6 +1350,7 @@
         });
 
         function GenerateTableInvoice(invoices) {
+            $('#invoice').val(0);
             let datas = [];
             if (table_invoice !== null)
                 $('#table_invoice').DataTable().destroy();
