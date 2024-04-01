@@ -222,7 +222,7 @@ namespace WebENG.Service
                             process = dr["process"] != DBNull.Value ? dr["process"].ToString() : "",
                             system = dr["system"] != DBNull.Value ? dr["system"].ToString() : ""
                         };
-                        jobSummary.remainingCost = jobSummary.cost - ((jobSummary.totalManhour / 8) * 3200);
+                        jobSummary.remainingCost = jobSummary.cost - (int)((double)(jobSummary.totalManhour / 8.0) * 3200);
                         jobsSummaries.Add(jobSummary);
                     }
                     dr.Close();
@@ -727,6 +727,224 @@ namespace WebENG.Service
                 }
             }
             return "Success";
+        }
+
+        public List<EngProcessModel> GetProcessByUser(string user)
+        {
+            List<EngProcessModel> processes = new List<EngProcessModel>();
+            try
+            {
+                string string_command = string.Format($@"SELECT DISTINCT Jobs.process_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        EngProcessModel process = new EngProcessModel()
+                        {
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                        };
+                        processes.Add(process);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+
+            HashSet<string> _processes = new HashSet<string>();
+            for(int i = 0; i < processes.Count; i++)
+            {
+                if (processes[i].process_id != "")
+                {
+                    int count = processes[i].process_id.Count(c => c == ',');
+                    for (int k = 0; k <= count; k++)
+                    {
+                        _processes.Add(processes[i].process_id.Split(',')[k]);
+                    }
+                }
+            }
+
+            List<string> list_process = _processes.ToList();
+
+            List<EngProcessModel> new_processes = new List<EngProcessModel>();
+            if (processes.Count > 0)
+            {
+                List<EngProcessModel> get_processes = GetProcesses();
+                
+                for (int i = 0; i < list_process.Count; i++)
+                {
+                    new_processes.Add(new EngProcessModel()
+                    {
+                        process_id = list_process[i],
+                        process_name = get_processes.Where(w => w.process_id == list_process[i]).Select(s => s.process_name).FirstOrDefault()
+                    });
+                }
+            }
+
+            return new_processes;
+        }
+
+        public List<EngSystemModel> GetSystemByUser(string user)
+        {
+            List<EngSystemModel> systems = new List<EngSystemModel>();
+            try
+            {
+                string string_command = string.Format($@"SELECT DISTINCT Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        EngSystemModel system = new EngSystemModel()
+                        {
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                        };
+                        systems.Add(system);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+
+            HashSet<string> _systems = new HashSet<string>();
+            for (int i = 0; i < systems.Count; i++)
+            {
+                if (systems[i].system_id != "")
+                {
+                    int count = systems[i].system_id.Count(c => c == ',');
+                    for (int k = 0; k <= count; k++)
+                    {
+                        _systems.Add(systems[i].system_id.Split(',')[k]);
+                    }
+                }
+            }
+
+            List<string> list_system = _systems.ToList();
+
+            List<EngSystemModel> new_systems = new List<EngSystemModel>();
+            if (systems.Count > 0)
+            {
+                List<EngSystemModel> get_systems = GetSystems();
+
+                for (int i = 0; i < list_system.Count; i++)
+                {
+                    new_systems.Add(new EngSystemModel()
+                    {
+                        system_id = list_system[i],
+                        system_name = get_systems.Where(w => w.system_id == list_system[i]).Select(s => s.system_name).FirstOrDefault()
+                    });
+                }
+            }
+
+            return new_systems;
+        }
+
+        public List<JobProcessSystemModel> getsJobprocessSystemByUser(string user)
+        {
+            List<JobProcessSystemModel> jobProcessSystems = new List<JobProcessSystemModel>();
+            List<EngProcessSystemModel> jobs = new List<EngProcessSystemModel>();
+            try
+            {                
+                string string_command = string.Format($@"SELECT Jobs.job_id, Jobs.process_id,Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        EngProcessSystemModel process = new EngProcessSystemModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            system = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                        };
+                        jobs.Add(process);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+
+            List<EngSystemModel> get_systems = GetSystems();
+            List<EngProcessModel> get_process = GetProcesses();
+
+            if (jobs.Count > 0)
+            {
+                for (int i = 0; i < jobs.Count; i++)
+                {
+                    JobProcessSystemModel job = new JobProcessSystemModel();
+                    job.job_id = jobs[i].job_id;
+
+                    List<EngProcessModel> processes = new List<EngProcessModel>();
+                    if (jobs[i].process != "")
+                    {
+                        int count = jobs[i].process.Count(c => c == ',');
+                        for (int k = 0; k <= count; k++)
+                        {
+                            string _process_id = jobs[i].process.Split(',')[k];
+
+                            EngProcessModel process = get_process.Where(w => w.process_id == _process_id).FirstOrDefault();                            
+                            processes.Add(process);
+                        }
+                    }
+
+                    job.processes = processes;
+
+                    List<EngSystemModel> systems = new List<EngSystemModel>();
+                    if (jobs[i].system != "")
+                    {
+                        int count = jobs[i].system.Count(c => c == ',');
+                        for (int k = 0; k <= count; k++)
+                        {
+                            string _system_id = jobs[i].system.Split(',')[k];
+
+                            EngSystemModel system = get_systems.Where(w => w.system_id == _system_id).FirstOrDefault();
+                            systems.Add(system);
+                        }
+                    }
+
+                    job.systems = systems;
+
+                    jobProcessSystems.Add(job);
+                }
+            }
+
+            return jobProcessSystems;
         }
     }
 }

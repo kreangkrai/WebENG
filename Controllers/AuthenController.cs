@@ -97,5 +97,13 @@ namespace WebENG.Controllers
             var result = Authen.UpdateRole(authen);
             return Json(result);
         }
+
+        [HttpPut]
+        public JsonResult UpdateLevel(string user_string)
+        {
+            AuthenModel authen = JsonConvert.DeserializeObject<AuthenModel>(user_string);
+            var result = Authen.UpdateLevel(authen);
+            return Json(result);
+        }
     }
 }

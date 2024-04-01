@@ -58,6 +58,13 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
+        public List<EngProcessModel> GetProcessesByUser(string user)
+        {
+            List<EngProcessModel> processes = Job.GetProcessByUser(user);
+            return processes;
+        }
+
+        [HttpGet]
         public int GetLastProcessID()
         {
             int id = Process.GetLastProcessID();

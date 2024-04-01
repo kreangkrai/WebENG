@@ -57,6 +57,13 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
+        public List<EngSystemModel> GetSystemsByUser(string user)
+        {
+            List<EngSystemModel> systems = Job.GetSystemByUser(user);
+            return systems;
+        }
+
+        [HttpGet]
         public int GetLastSystemID()
         {
             int id = System.GetLastSystemID();

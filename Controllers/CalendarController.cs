@@ -18,6 +18,7 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly IEngUser EngineerService;
         readonly IJobResponsible JobResponsibleService;
+        readonly IJob Job;
 
         public CalendarController()
         {
@@ -25,6 +26,7 @@ namespace WebENG.Controllers
             Accessory = new AccessoryService();
             EngineerService = new EngUserService();
             JobResponsibleService = new JobResponsibleService();
+            Job = new JobService();
         }
 
         public IActionResult Index()
@@ -49,6 +51,13 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        [HttpGet]
+        public List<JobProcessSystemModel> GetProcessSystemByUser(string user)
+        {
+            List<JobProcessSystemModel> jps = Job.getsJobprocessSystemByUser(user);
+            return jps;
         }
 
         [HttpGet]

@@ -9,6 +9,7 @@ namespace WebENG.Interface
     interface IJob
     {
         List<JobModel> GetAllJobs();
+        List<JobProcessSystemModel> getsJobprocessSystemByUser(string user);
         List<JobSummaryModel> GetJobsSummary();
         string CreateJob(JobModel job);
         string CreateTermPayment(Term_PaymentModel term_Payment);
@@ -18,8 +19,10 @@ namespace WebENG.Interface
 
         List<EngProcessModel> GetProcesses();
         List<EngProcessModel> GetProcessByJob(string job);
+        List<EngProcessModel> GetProcessByUser(string user);
         List<EngSystemModel> GetSystems();
         List<EngSystemModel> GetSystemByJob(string job);
+        List<EngSystemModel> GetSystemByUser(string user);
 
     }
 }

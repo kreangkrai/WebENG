@@ -11,6 +11,7 @@ namespace WebENG.Interface
         List<AuthenModel> GetAuthens();
         string Insert(AuthenModel authen);
         string UpdateRole(AuthenModel authen);
-        
+        string UpdateLevel(AuthenModel authen);
+
     }
 }

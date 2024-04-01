@@ -10,6 +10,11 @@ namespace WebENG.Service
 {
     public class JobStatusService : IJobStatus
     {
+        readonly IJob Job;
+        public JobStatusService()
+        {
+            Job = new JobService();
+        }
         public List<JobModel> GetJobStatusALL()
         {
             List<JobModel> jobs = new List<JobModel>();
@@ -39,6 +44,8 @@ namespace WebENG.Service
                         invoices.Add(invoice);
                     }
                 }
+
+                List<JobSummaryModel> jobSummaries = Job.GetJobsSummary();
 
                 string string_command = string.Format($@"
                     SELECT
@@ -90,6 +97,8 @@ namespace WebENG.Service
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
 
+                        JobSummaryModel jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).FirstOrDefault();
+
                         Term_PaymentModel term_Payment = new Term_PaymentModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -129,6 +138,7 @@ namespace WebENG.Service
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
                             invoices = _invoices,
+                            job_summary = jobSummary,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
                             finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
@@ -184,6 +194,8 @@ namespace WebENG.Service
                     }
                 }
 
+                List<JobSummaryModel> jobSummaries = Job.GetJobsSummary();
+
                 string string_command = string.Format($@"
                     SELECT
                         Jobs.job_id,
@@ -235,6 +247,8 @@ namespace WebENG.Service
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
 
+                        JobSummaryModel jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).FirstOrDefault();
+
                         Term_PaymentModel term_Payment = new Term_PaymentModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
@@ -274,6 +288,7 @@ namespace WebENG.Service
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
                             invoices = _invoices,
+                            job_summary = jobSummary,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
                             finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue

@@ -31,6 +31,7 @@ namespace WebENG.Models
         public Term_PaymentModel term_payment { get; set; }
         public double job_in_hand { get; set; }
         public List<InvoiceModel> invoices { get; set; } = new List<InvoiceModel>();
+        public JobSummaryModel job_summary { get; set; }
         public DateTime due_date { get; set; }
         public DateTime finished_date { get; set; }
     }
@@ -59,5 +60,12 @@ namespace WebENG.Models
         public int as_built { get; set; }
         public int warranty { get; set; }
         public int finished { get; set; }
+    }
+
+    public class JobProcessSystemModel
+    {
+        public string job_id { get; set; }
+        public List<EngProcessModel> processes { get; set; } = new List<EngProcessModel>();
+        public List<EngSystemModel> systems { get; set; } = new List<EngSystemModel>();
     }
 }

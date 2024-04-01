@@ -16,7 +16,7 @@ namespace WebENG.Service
             SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
-                string strCmd = string.Format($@"SElECT user_id,name,department,role FROM Authen ORDER BY name");
+                string strCmd = string.Format($@"SElECT user_id,name,department,role,levels FROM Authen ORDER BY name");
                 SqlCommand command = new SqlCommand(strCmd, connection);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -28,7 +28,8 @@ namespace WebENG.Service
                             user_id = dr["user_id"].ToString(),
                             name = dr["name"].ToString(),
                             department = dr["department"].ToString(),
-                            role = dr["role"].ToString()
+                            role = dr["role"].ToString(),
+                            levels = dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"].ToString()): 1
                         };
                         authens.Add(authen);
                     }
@@ -54,12 +55,14 @@ namespace WebENG.Service
                         user_id,
                         name,
                         department,
-                        role ) 
+                        role,
+                        levels) 
                     VALUES (
                         @user_id,
                         @name, 
                         @department,
-                        @role
+                        @role,
+                        @levels
                     )
                 END");
                 SqlCommand command = new SqlCommand(string_command, connection);
@@ -68,6 +71,7 @@ namespace WebENG.Service
                 command.Parameters.AddWithValue("@name", authen.name.ToLower());
                 command.Parameters.AddWithValue("@department", authen.department);
                 command.Parameters.AddWithValue("@role", authen.role);
+                command.Parameters.AddWithValue("@levels", authen.levels);
                 command.ExecuteNonQuery();
             }
             catch (Exception ex)
@@ -81,6 +85,38 @@ namespace WebENG.Service
             return "Success";
         }
 
+        public string UpdateLevel(AuthenModel authen)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+                    UPDATE Authen 
+                    SET
+                        levels = @levels
+                    WHERE name = @name");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@levels", authen.levels);
+                    cmd.Parameters.AddWithValue("@name", authen.name.ToLower());
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+
         public string UpdateRole(AuthenModel authen)
         {
             try
@@ -88,7 +124,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     UPDATE Authen 
                     SET
-                        role = @role 
+                        role = @role
                     WHERE name = @name");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {

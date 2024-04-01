@@ -198,7 +198,7 @@
         let overlap = true;
         let eng;
         let last_id = 0;
-
+        let list_process_system = [];
         //Change these variable to true for show data response
         let debug_user = false;
         let debug_jobs = false;
@@ -216,10 +216,23 @@
             await GetHolidays();
             await GetEngineerUser("@Model.name.ToLower()");
             await GetWorkingHours("@Model.name.ToLower()");
+            await GetProcessSystemByUser("@Model.user_id.ToLower()");
             await GetUsers();
             await GetJobs();
             await GetTasks();
         });
+
+        async function GetProcessSystemByUser(user){
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProcessSystemByUser", "Calendar")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user },
+                success: function (response) {
+                    list_process_system = response;
+                }
+            });
+        }
 
         async function GetLastWorkingHoursID() {
             await $.ajax({
@@ -233,7 +246,6 @@
             });
         }
         async function GetProcess(job_id) {
-            //let job = document.getElementById("job_id").value;
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetProcessesByJob", "EngProcess")',
@@ -245,7 +257,6 @@
             });
         }
         async function GetSystem(job_id) {
-            //let job = document.getElementById("job_id").value;
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetSystemsByJob", "EngSystem")',
@@ -524,25 +535,19 @@
             calendar.render();
         }
 
-        function GenerateProcessOption() {
-            let process = $('#process').val();
+        async function GenerateProcessOption(processes) {
             $('#process').empty();
             $('#process').append(`<option value="" selected disabled>Please Select Process</option>`);
             for (let i = 0; i < processes.length; i++) {
-                if (processes[i].process_name === process || process === "" || process === null) {
-                    $('#process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
-                }
+                $('#process').append(`<option value="${processes[i].process_id}">${processes[i].process_id}: ${processes[i].process_name}</option>`);
             }
         }
 
-        function GenerateSystemOption() {
-            let system = $('#system').val();
+        async function GenerateSystemOption(systems) {
             $('#system').empty();
             $('#system').append(`<option value="" selected disabled>Please Select System</option>`);
             for (let i = 0; i < systems.length; i++) {
-                if (systems[i].system_name === system || system === "" || system === null) {
-                    $('#system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
-                }
+                $('#system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
             }
         }
 
@@ -644,8 +649,6 @@
                 await GetTasks();
                 await GenerateTasksOption();
                 await PrepmodalTask(date_start);
-                await GenerateProcessOption();
-                await GenerateSystemOption();
             }
         }
 
@@ -675,8 +678,6 @@
                 await GetTasks();
                 await GenerateTasksOption();
                 PrepmodalTasks(date_start, date_end);
-                await GenerateProcessOption();
-                await GenerateSystemOption();
 
             }
         }
@@ -737,8 +738,8 @@
                 $('#form_job').hide();
 
                 document.getElementById("job_id").value = "J999999";
-                document.getElementById("process").value = "PRO000";
-                document.getElementById("system").value = "SYS000";
+                document.getElementById("process").value = "PRO999";
+                document.getElementById("system").value = "SYS999";
                 document.getElementById("location").value = "T";
                 document.getElementById("task_id").value = "T002";
                 document.getElementById("start_time").value = "08:30";
@@ -764,12 +765,13 @@
             let job_id = $('#job_id').val();
             let enable_location = (job_id !== "") ? 1 : 0;
             $('#location').attr('disabled', !enable_location);
-            
-            await GetProcess(job_id);
-            await GetSystem(job_id);
 
-            await GenerateProcessOption();
-            await GenerateSystemOption();
+            let job = list_process_system.filter(f=>f.job_id == job_id).map(m=>m)[0];
+            let _processes = job.processes;
+            let _systems = job.systems;
+
+            await GenerateProcessOption(_processes);
+            await GenerateSystemOption(_systems);
         });
 
         $('#location').on('change', function () {
@@ -1122,19 +1124,28 @@
             let user_name = users.filter(f => f.user_id === user_id).map(m => m.user_name.toLowerCase());
             let date = event.extendedProps.working_date;
 
-            let job_id = $('#job_id').val();
-            await GetProcess(job_id);
-            await GetSystem(job_id);           
+            let job_id = event.extendedProps.job_id;
+
+            let job = list_process_system.filter(f=>f.job_id == job_id).map(m=>m)[0];
+            if (job_id !== "J999999"){
+                let _processes = job.processes;
+                let _systems = job.systems;
+         
+                await GenerateProcessOption(_processes);
+                await GenerateSystemOption(_systems);
+            }else{
+                $('#process').empty();
+                $('#system').empty();
+            }
             await GetUsers();
             await GenerateUsersOption();
             await GetWorkingHoursByDate(user_name, date.split("T")[0]);
             await GetJobs();
-            await GetQuotations();
+           // await GetQuotations();
             await GenerateCustomerOptions();
             await GenerateJobsOption();
             await GenerateLocationOption();
-            await GenerateProcessOption();
-            await GenerateSystemOption();
+            
             PrepmodalEditTask(event.extendedProps);
 
         }

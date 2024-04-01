@@ -59,28 +59,30 @@
     table.dataTable th:nth-child(3),
     table.dataTable th:nth-child(4),
     table.dataTable th:nth-child(5),
-    table.dataTable th:nth-child(21),
+    table.dataTable th:nth-child(6),
     table.dataTable th:nth-child(22),
-    table.dataTable th:nth-child(23){
+    table.dataTable th:nth-child(23),
+    table.dataTable th:nth-child(24){
         text-align: center;
         vertical-align:middle;
     }
 
     table.dataTable th:nth-child(1),
-    table.dataTable th:nth-child(21),
     table.dataTable th:nth-child(22),
-    table.dataTable th:nth-child(23){
+    table.dataTable th:nth-child(23),
+    table.dataTable th:nth-child(24){
         white-space: nowrap;
     }
 
     table.dataTable td:nth-child(1),
     table.dataTable td:nth-child(2),
     table.dataTable td:nth-child(3),
-    table.dataTable td:nth-child(5){
+    table.dataTable td:nth-child(4),
+    table.dataTable td:nth-child(5),
+    table.dataTable td:nth-child(6){
         white-space: nowrap;
     }
 
-    table.dataTable td:nth-child(6),th:nth-child(6),
     table.dataTable td:nth-child(7),th:nth-child(7),
     table.dataTable td:nth-child(8),th:nth-child(8),
     table.dataTable td:nth-child(9),th:nth-child(9),
@@ -94,7 +96,8 @@
     table.dataTable td:nth-child(17),th:nth-child(17),
     table.dataTable td:nth-child(18),th:nth-child(18),
     table.dataTable td:nth-child(19),th:nth-child(19),
-    table.dataTable td:nth-child(20),th:nth-child(20){
+    table.dataTable td:nth-child(20),th:nth-child(20),
+    table.dataTable td:nth-child(21),th:nth-child(21){
       width: 30px;
       max-width: 30px;      
     }
@@ -167,6 +170,7 @@
                                     <th>Job No.</th>
                                     <th>Project Name</th>
                                     <th>Customer</th>
+                                    <th>% Eng Cost</th>
                                     <th>% Invoice</th>
                                     <th>Current Status</th>
                                     <th style="font-size:11px">Down Payment/KOM</th>
@@ -413,7 +417,10 @@
                     sum_invoice += jobs[i].invoices[j].invoice;
                 }
 
-                let percent = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);
+                let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.cost : 0;
+                let remain_cost = jobs[i].job_summary.remainingCost !== null ? jobs[i].job_summary.remainingCost : 0;
+                let percent_eng_cost = Math.ceil(((cost-remain_cost) / cost) * 100);
+                let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);
                 let down_payment = jobs[i].term_payment.down_payment > 0 ? jobs[i].term_payment.down_payment : "";
                 let document_submit = jobs[i].term_payment.document_submit > 0 ? jobs[i].term_payment.document_submit : "";
                 let instrument_vendor = jobs[i].term_payment.instrument_vendor > 0 ? jobs[i].term_payment.instrument_vendor : "";
@@ -435,7 +442,8 @@
                     jobs[i].job_id,
                     jobs[i].job_name,
                     jobs[i].customer,
-                    percent,
+                    percent_eng_cost,
+                    percent_invoice,
                     jobs[i].status,
                     down_payment,
                     document_submit,
@@ -486,7 +494,7 @@
 
                     let payments = [];
                     let sum_percent = 0;
-                    let start_column = 5;
+                    let start_column = 6;
                     let check_current_status = false;
 
                     let datas_percent = [];

@@ -363,8 +363,24 @@ namespace WebENG.Service
                     }
                     else
                     {
-                        cmd.Parameters.AddWithValue("@process_id", wh.process_id);
-                        cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                        if (wh.process_id == null)
+                        {
+                            cmd.Parameters.AddWithValue("@process_id", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                        }
+
+                        if (wh.system_id == null)
+                        {
+                            cmd.Parameters.AddWithValue("@system_id", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                        }
+                        
                     }
                     
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
@@ -429,8 +445,23 @@ namespace WebENG.Service
                     }
                     else
                     {
-                        cmd.Parameters.AddWithValue("@process_id", wh.process_id);
-                        cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                        if (wh.process_id == null)
+                        {
+                            cmd.Parameters.AddWithValue("@process_id", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@process_id", wh.process_id);
+                        }
+
+                        if (wh.system_id == null)
+                        {
+                            cmd.Parameters.AddWithValue("@system_id", DBNull.Value);
+                        }
+                        else
+                        {
+                            cmd.Parameters.AddWithValue("@system_id", wh.system_id);
+                        }
                     }
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
