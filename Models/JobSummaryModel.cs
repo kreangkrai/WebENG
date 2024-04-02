@@ -7,12 +7,15 @@ namespace WebENG.Models
 {
     public class JobSummaryModel
     {
+        public string user_id { get; set; }
+        public int levels { get; set; }
         public string jobId { get; set; }
         public string jobName { get; set; }
         public string customer { get; set; }
         public int cost { get; set; }
         public double factor { get; set; }
-        public int totalManhour { get; set; }
+        public double totalManhour { get; set; }
+        public int totalEngCost { get; set; }
         public string status { get; set; }
         public string process { get; set; }
         public string system { get; set; }

@@ -536,9 +536,9 @@
                                 $(`td:eq(1)`, row).css({ "color": 'orange'});
                                 $(`td:eq(2)`, row).css({ "color": 'orange'});
                             }else if (diff_day > 30.0 && diff_day <= 60){
-                                $(`td:eq(0)`, row).css({ "color": 'yellow'});
-                                $(`td:eq(1)`, row).css({ "color": 'yellow'});
-                                $(`td:eq(2)`, row).css({ "color": 'yellow'});
+                                $(`td:eq(0)`, row).css({ "color": '#CACA04'});
+                                $(`td:eq(1)`, row).css({ "color": '#CACA04'});
+                                $(`td:eq(2)`, row).css({ "color": '#CACA04'});
                             }
                         }
                     }
@@ -596,7 +596,11 @@
             let status = statuses.filter(f=>f.status_name == data_job.status).map(m=>m.status_id)[0];
             let job_name = data_job.job_name;
             let job_in_hand = data_job.job_in_hand;
-            let invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
+
+            let invoice = 0;
+            if (data_job.invoices.length > 0){
+                invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
+            }
             let due_date = data_job.due_date;
 
             let datas_percent = [];

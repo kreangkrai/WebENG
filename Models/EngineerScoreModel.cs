@@ -15,9 +15,9 @@ namespace WebENG.Models
         public double md_rate { get; set; }
         public double pd_rate { get; set; }
         public double factor { get; set; }
-        public int total_manpower { get; set; }
+        public double total_manpower { get; set; }
         public double cost_per_tmp { get; set; }
-        public int manpower { get; set; }
+        public double manpower { get; set; }
         public double manpower_per_tmp { get; set; }
         public double score { get; set; }
     }

@@ -124,122 +124,348 @@
                     </thead>
                     <tbody>
                         @for (int i = 0; i < Model.datas.Count(); i++)
-                        {
+                        {                          
                             @if (Model.datas[i].holiday == true)
                             {
-                                <tr style="background-color:darkgray">
-                                    <td>
-                                        @Model.datas[i].date
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].day
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].job
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].location
-                                    </td>
-                                    <td style="text-align:left;padding-left:8px">
-                                        @Model.datas[i].task
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].start_time
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].stop_time
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].lunch
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].dinner
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].ot1_5
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].ot3_0
-                                    </td>
-                                </tr>
+                                if (i == 64)
+                                {
+                                    <tr style="background-color:darkgray">
+                                        <td> 
+                                            .
+                                        </td>
+                                        <td>                                            
+                                        </td>
+                                        <td>                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                           
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:darkgray">
+                                        <td>
+                                            @Model.datas[i].date
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].day
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].job
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].location
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            @Model.datas[i].task
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].start_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].stop_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].lunch
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].dinner
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot1_5
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot3_0
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr style="background-color:darkgray">
+                                        <td>
+                                            @Model.datas[i].date
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].day
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].job
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].location
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            @Model.datas[i].task
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].start_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].stop_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].lunch
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].dinner
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot1_5
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot3_0
+                                        </td>
+                                    </tr>
+                        }
                             }
                             else if (Model.datas[i].weekend == true)
                             {
-                                <tr style="background-color:lightgray">
-                                    <td>
-                                        @Model.datas[i].date
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].day
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].job
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].location
-                                    </td>
-                                    <td style="text-align:left;padding-left:8px">
-                                        @Model.datas[i].task
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].start_time
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].stop_time
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].lunch
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].dinner
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].ot1_5
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].ot3_0
-                                    </td>
-                                </tr>
-                            }
+                                if (i == 64)
+                                {
+                                    <tr style="background-color:lightgray">
+                                        <td>
+                                            .
+                                        </td>
+                                        <td>
+               
+                                        </td>
+                                        <td>
+          
+                                        </td>
+                                        <td>
+      
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+    
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+    
+                                        </td>
+                                        <td>
+ 
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                        <td>
+ 
+                                        </td>
+                                        <td>
+
+                                        </td>
+                                    </tr>
+                                    <tr style="background-color:lightgray">
+                                        <td>
+                                            @Model.datas[i].date
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].day
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].job
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].location
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            @Model.datas[i].task
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].start_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].stop_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].lunch
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].dinner
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot1_5
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot3_0
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr style="background-color:lightgray">
+                                        <td>
+                                            @Model.datas[i].date
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].day
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].job
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].location
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            @Model.datas[i].task
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].start_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].stop_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].lunch
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].dinner
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot1_5
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot3_0
+                                        </td>
+                                    </tr>
+                                }
+                        }
                             else
                             {
-                                <tr>
-                                    <td>
-                                        @Model.datas[i].date
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].day
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].job
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].location
-                                    </td>
-                                    <td style="text-align:left;padding-left:8px">
-                                        @Model.datas[i].task
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].start_time
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].stop_time
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].lunch
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].dinner
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].ot1_5
-                                    </td>
-                                    <td>
-                                        @Model.datas[i].ot3_0
-                                    </td>
-                                </tr>
-                            }
+                                if (i == 64)
+                                {
+                                    <tr>
+                                        <td>
+                                            .
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                           
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                    </tr>
 
+                                    <tr>
+                                        <td>
+                                            @Model.datas[i].date
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].day
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].job
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].location
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            @Model.datas[i].task
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].start_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].stop_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].lunch
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].dinner
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot1_5
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot3_0
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td>
+                                            @Model.datas[i].date
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].day
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].job
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].location
+                                        </td>
+                                        <td style="text-align:left;padding-left:8px">
+                                            @Model.datas[i].task
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].start_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].stop_time
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].lunch
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].dinner
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot1_5
+                                        </td>
+                                        <td>
+                                            @Model.datas[i].ot3_0
+                                        </td>
+                                    </tr>
+                                }
+                            }
                         }
                         <tr>
                             <td colspan="9">Total</td>

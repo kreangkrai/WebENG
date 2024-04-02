@@ -371,7 +371,7 @@
                 scores[i].manpower,
                 parseInt(scores[i].manpower_per_tmp * 100),
                 scores[i].score.toFixed(2),
-                (scores[i].cost - ((scores[i].total_manpower / 8) * 3200)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                parseInt((scores[i].cost - ((scores[i].total_manpower / 8.0) * 3200))).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
             ]);
         }
 

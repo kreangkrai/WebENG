@@ -164,40 +164,62 @@ namespace WebENG.Service
             {
                 string stringCommand = string.Format($@"
                     WITH T1 AS (
-                        SELECT 
-		                    WorkingHours.job_id, 
-		                    SUM(case when lunch = 1
-							 then case when dinner = 1 
-								then 
-									DATEDIFF(HOUR,start_time,stop_time) - 2
-								else 
-									DATEDIFF(HOUR,start_time,stop_time) - 1 
-							 end
-							 else case when dinner = 1 
-								then 
-									DATEDIFF(HOUR,start_time,stop_time) - 1 
-								else 
-									DATEDIFF(HOUR,start_time,stop_time)
-							 end
-						end ) AS total_manpower 
+                        SELECT
+							WorkingHours.user_id,
+		                    WorkingHours.job_id,
+		                    SUM(case when task_id = 'T001' then
+									case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
+										case when lunch = 1 then 
+											case when dinner = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 120
+											else
+												DATEDIFF(MINUTE,start_time,stop_time) - 60
+											end
+										else 
+											case when dinner = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 60										
+											else 
+												DATEDIFF(MINUTE,start_time,stop_time)
+											end
+										end
+									else
+										0
+									end
+								else
+									case when lunch = 1 then 
+											case when dinner = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 120
+											else
+												DATEDIFF(MINUTE,start_time,stop_time) - 60
+											end
+										else 
+											case when dinner = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 60										
+											else 
+												DATEDIFF(MINUTE,start_time,stop_time)
+											end
+										end
+								end ) AS total_manpower 
 	                    FROM WorkingHours
                         WHERE WorkingHours.job_id <> 'J999999'
-	                    GROUP BY job_id
+	                    GROUP BY job_id,user_id
 					)
                     SELECT
+						T1.user_id,
+						case when Authen.levels is null then 1 else Authen.levels end levels,
                         Jobs.job_id,
                         Jobs.job_name,
                         Quotation.customer,
                         Jobs.cost,
                         (Jobs.md_rate * Jobs.pd_rate) as factor,
-                        T1.total_manpower,
+                        FORMAT((T1.total_manpower / 60.0),'N1') as total_manpower ,
                         Jobs.status,
                         Jobs.process_id as process,
 						Jobs.system_id as system
                     FROM Jobs
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
-                    WHERE Jobs.job_id <> 'J999999'
+					LEFT JOIN Authen ON Authen.user_id = T1.user_id
                     ORDER BY Jobs.job_id");
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -212,17 +234,20 @@ namespace WebENG.Service
                     {
                         JobSummaryModel jobSummary = new JobSummaryModel()
                         {
+                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            levels = dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"]) : 1,
                             jobId = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             jobName = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
                             cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
                             factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 1,
-                            totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToInt32(dr["total_manpower"]) : 0,
+                            totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"]) : 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1",
                             process = dr["process"] != DBNull.Value ? dr["process"].ToString() : "",
                             system = dr["system"] != DBNull.Value ? dr["system"].ToString() : ""
                         };
-                        jobSummary.remainingCost = jobSummary.cost - (int)((double)(jobSummary.totalManhour / 8.0) * 3200);
+                        jobSummary.totalEngCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
+                        jobSummary.remainingCost = jobSummary.cost - jobSummary.totalEngCost;
                         jobsSummaries.Add(jobSummary);
                     }
                     dr.Close();
