@@ -1,0 +1,421 @@
+﻿@{
+    ViewData["title"] = "Target";
+}
+<div class="row p-4" style="row-gap:20px">
+    <div class="col-xl-6">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Target Project</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group row" style="row-gap:20px">                        
+                            <div class="col-xl-3">
+                                <select id="project_year" class="form-control">
+                                    <option value="" disabled>Year</option>
+                                </select>
+                            </div>
+                        
+                        <div class="col-xl-2">
+                            <button id="btn_project_load" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-sync"></i> Load
+                            </button>
+                        </div>
+                        <div class="col-xl-2">
+                            <button id="btn_project_add" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-plus"></i> ADD
+                            </button>
+                        </div>                        
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <div class="col-12">
+                            <table id="table_project" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                                <thead class="display compact" style="background-color:#429DD8">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Target (MB)</th>
+                                    </tr>
+                                </thead>                           
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btn_project_save" type="button" class="btn btn-primary form-control elevation-1">
+                            <i class="fas fa-upload"></i> Save
+                        </button>
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Target Service</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group row" style="row-gap:20px">                        
+                            <div class="col-xl-3">
+                                <select id="service_year" class="form-control">
+                                    <option value="" disabled>Year</option>
+                                </select>
+                            </div>
+                        
+                        <div class="col-xl-2">
+                            <button id="btn_service_load" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-sync"></i> Load
+                            </button>
+                        </div>
+                        <div class="col-xl-2">
+                            <button id="btn_service_add" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-plus"></i> ADD
+                            </button>
+                        </div>                        
+                    </div>
+                    <hr />
+                    <div class="form-group">
+                        <table id="table_service" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                            <thead class="display compact" style="background-color:#429DD8">
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Target (MB)</th>
+                                </tr>
+                            </thead>                           
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btn_service_save" type="button" class="btn btn-primary form-control elevation-1">
+                            <i class="fas fa-upload"></i> Save
+                        </button>
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_project" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Project Target</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-5">
+                            <label for="edit_project_month">Month</label>
+                            <input id="edit_project_month" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-5">
+                            <label for="edit_project_target">Target</label>
+                            <input id="edit_project_target" type="number" class="form-control" placeholder="" />
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_edit_project_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_service" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit Service Target</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-5">
+                            <label for="edit_service_month">Month</label>
+                            <input id="edit_service_month" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-5">
+                            <label for="edit_service_target">Target</label>
+                            <input id="edit_service_target" type="number" class="form-control" placeholder="" />
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_edit_service_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{  
+    <script type="text/javascript">
+        var table_project;
+        var table_service;
+        var projects = [];
+        var services = [];
+        $(document).ready(async function (){            
+            getYear();
+         });
+
+         function getYear(){
+            var year_string = "";
+            var today = new Date();
+            var year = today.getFullYear();
+            for (var i = year; i > year - 5; i--) {
+                year_string += `<option value="${i}">${i}</option>`;
+            }
+            $('#project_year').empty();
+            $('#project_year').append(year_string);
+            $('#service_year').empty();
+            $('#service_year').append(year_string);
+        };
+
+        async function GetTargetProject(year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTargetProject", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    projects = response;                   
+                }
+            });
+        }
+        async function GetTargetService(year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTargetService", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    services = response;                   
+                }
+            });
+        }
+
+        $('#btn_project_load').on('click',async function(){
+            let year = $('#project_year').val();
+            await GetTargetProject(year);
+            GenerateTableProject(projects);
+        });
+
+        $('#btn_service_load').on('click',async function(){
+            let year = $('#service_year').val();
+            await GetTargetService(year);
+            GenerateTableService(services);
+        });
+
+        $('#btn_project_add').on('click',async function(){
+            let year = $('#project_year').val();
+            await AddProjectTarget(year);
+            await GetTargetProject(year);
+            GenerateTableProject(projects);
+        });
+
+        $('#btn_service_add').on('click',async function(){
+            let year = $('#service_year').val();
+            await AddServiceTarget(year);
+            await GetTargetService(year);
+            GenerateTableService(services);
+        });
+
+        $('#btn_project_save').on('click',async function(){
+             let datas = [];
+             for(let i=0;i<projects.length;i++){
+                datas.push({'month':projects[i].month,'target':projects[i].target});
+             }
+             await UpdateProjectTarget(JSON.stringify(datas));
+             GenerateTableProject(projects);
+        });
+
+        $('#btn_service_save').on('click',async function(){
+            let datas = [];
+             for(let i=0;i<services.length;i++){
+                 datas.push({'month':services[i].month,'target':services[i].target});
+             }
+             
+             await UpdateServiceTarget(JSON.stringify(datas));
+             GenerateTableService(services);
+        });
+
+         $('#btn_edit_project_save').on('click',function(){
+            let month = $('#edit_project_month').val();
+            let target = $('#edit_project_target').val();
+
+            let index = projects.findIndex(f=>f.month == month);
+            projects[index].target = target;
+            GenerateTableProject(projects);
+            $('#modal_project').modal('hide');
+        });
+
+        $('#btn_edit_service_save').on('click',function(){
+            let month = $('#edit_service_month').val();
+            let target = $('#edit_service_target').val();
+
+            let index = services.findIndex(f=>f.month == month);
+            services[index].target = target;
+            GenerateTableService(services);
+            $('#modal_service').modal('hide');
+        });
+
+        $('#table_project tbody').on('click', 'tr', async function () {           
+            let data = table_project.row(this).data();
+            let month = data[0];
+            let target = data[1];
+            $('#edit_project_month').val(month);
+            $('#edit_project_target').val(target);
+            $('#modal_project').modal();            
+        });
+
+        $('#table_service tbody').on('click', 'tr', async function () {
+            let data = table_service.row(this).data();
+            let month = data[0];
+            let target = data[1];
+            $('#edit_service_month').val(month);
+            $('#edit_service_target').val(target);
+            $('#modal_service').modal();            
+        });
+
+        async function AddProjectTarget(year) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddProjectTarget", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    year
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        //location.reload();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        };
+
+        async function AddServiceTarget(year) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddServiceTarget", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    year
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        //location.reload();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        };
+
+        async function UpdateProjectTarget(datas) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateProjectTarget", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    datas
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        alert(response);
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+        async function UpdateServiceTarget(datas) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateServiceTarget", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    datas
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        alert(response);
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+
+        function GenerateTableProject(targets) {
+            let datas = [];
+            if (table_project !== null)
+                $('#table_project').DataTable().destroy();
+
+            for (let i = 0; i < targets.length; i++) {              
+                datas.push([
+                    targets[i].month,
+                    targets[i].target,
+                ]);
+            }
+
+            table_project = $('#table_project').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    
+                ],
+                rowCallback: function (row, data) {                  
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+
+        function GenerateTableService(targets) {
+            let datas = [];
+            if (table_service !== null)
+                $('#table_service').DataTable().destroy();
+
+            for (let i = 0; i < targets.length; i++) {              
+                datas.push([
+                    targets[i].month,
+                    targets[i].target,
+                ]);
+            }
+
+            table_service = $('#table_service').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    
+                ],
+                rowCallback: function (row, data) {                  
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+    </script>
+}

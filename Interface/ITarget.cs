@@ -8,11 +8,8 @@ namespace WebENG.Interface
 {
     interface ITarget
     {
-        List<TargetModel> getData();
-        string Insert(string year, string department, string name);
-        string Update(TargetModel model);
-        string Delete(string year, string name);
-
-
+        List<TargetModel> getData(string year,string type);
+        string Insert(List<TargetModel> targets, string type);
+        string Update(List<TargetModel> targets, string type);
     }
 }

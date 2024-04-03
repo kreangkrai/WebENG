@@ -30,6 +30,7 @@ namespace WebENG.Models
         public string system { get; set; }
         public Term_PaymentModel term_payment { get; set; }
         public double job_in_hand { get; set; }
+        public double job_eng_in_hand { get; set; }
         public List<InvoiceModel> invoices { get; set; } = new List<InvoiceModel>();
         public JobSummaryModel job_summary { get; set; }
         public DateTime due_date { get; set; }

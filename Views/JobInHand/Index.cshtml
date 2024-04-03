@@ -1,0 +1,303 @@
+﻿@using Microsoft.AspNetCore.Http
+@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Summary Job In hand";
+}
+
+<div class="row p-4" style="row-gap:5px">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-body">
+                <div class="row" style="row-gap:10px">
+                    <div class="col-xl-6">
+
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="year" class="form-control">
+                            <option value="" selected disabled>Please Select Year</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnUpdate" type="button" class="btn btn-primary form-control">
+                            Update
+                        </button>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnExport" type="button" class="btn btn-success form-control">
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-dark">
+            <div class="card-body">
+                <canvas id="chart_acc_job_eng_in_hand" style="height:400px" />
+            </div>
+        </div>
+        <div class="card card-dark">
+            <div class="card-body">
+                <canvas id="chart_project_job_eng_in_hand" style="height:400px" />
+            </div>
+        </div> 
+        <div class="card card-dark">
+            <div class="card-body">
+                <canvas id="chart_service_job_eng_in_hand" style="height:400px" />
+            </div>
+        </div> 
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        let chart_acc;
+        let chart_project;
+        let chart_service;
+        let acc_jobs_eng_in_hand = [];
+        let jobs_eng_in_hand_project = [];
+        let jobs_eng_in_hand_service = [];
+        $(document).ready(async function () {
+            getYear();
+        });
+        function getYear(){
+            var year_string = "";
+            var today = new Date();
+            var year = today.getFullYear();
+            for (var i = year; i > year - 5; i--) {
+                year_string += `<option value="${i}">${i}</option>`;
+            }
+            $('#year').empty();
+            $('#year').append(year_string);
+        };
+        async function GetACCJobInHand(year,type) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAccJobInHand", "JobInHand")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year,type },
+                success: function (response) {
+                    acc_jobs_eng_in_hand = response;
+                }
+            });
+        };
+
+        async function GetJobInHandProject(year,type) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobInHandProject", "JobInHand")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year,type },
+                success: function (response) {
+                    jobs_eng_in_hand_project = response;
+                }
+            });
+        };
+
+        async function GetJobInHandService(year,type) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobInHandService", "JobInHand")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year,type },
+                success: function (response) {
+                    jobs_eng_in_hand_service = response;
+                }
+            });
+        };
+
+        $('#btnUpdate').on('click',async function(){
+            let year = $('#year').val();
+
+            await GetACCJobInHand(year,"ALL");
+            await GetJobInHandProject(year,"project");
+            await GetJobInHandService(year,"Service");
+            GenerateChartAcc(year,acc_jobs_eng_in_hand);
+            GenerateChartProject(year,jobs_eng_in_hand_project);
+            GenerateChartService(year,jobs_eng_in_hand_service);
+        });
+
+        function GenerateChartAcc(year,jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_eng_in_hand);
+
+            if (chart_acc !== undefined) {
+                chart_acc.destroy();
+            }
+
+            const ctx = document.getElementById('chart_acc_job_eng_in_hand').getContext('2d');
+            chart_acc = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND ENG ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+
+        function GenerateChartProject(year,jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_eng_in_hand);
+
+            if (chart_project !== undefined) {
+                chart_project.destroy();
+            }
+
+            const ctx = document.getElementById('chart_project_job_eng_in_hand').getContext('2d');
+            chart_project = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND PROJECT FOR ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+
+        function GenerateChartService(year,jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_eng_in_hand);
+
+            if (chart_service !== undefined) {
+                chart_service.destroy();
+            }
+
+            const ctx = document.getElementById('chart_service_job_eng_in_hand').getContext('2d');
+            chart_service = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND SERVICE FOR ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+    </script>
+}

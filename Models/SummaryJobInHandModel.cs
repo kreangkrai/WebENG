@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace WebENG.Models
 {
-    public class TargetModel
+    public class SummaryJobInHandModel
     {
         public string month { get; set; }
-        public double target { get; set; }
-        
+        public double job_eng_in_hand { get; set; }
+        public double target_month { get; set; }
     }
 }

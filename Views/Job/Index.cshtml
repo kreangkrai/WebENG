@@ -273,6 +273,15 @@
                             </div>
                         </div>
                         <div class="col-4">
+                            <label for="cost">Job ENG In Hand</label>
+                            <div class="input-group">
+                                <input id="job_eng_in_hand" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
                             <label for="due_date">Due Date</label>
                             <input id="due_date"type="date"  class="form-control" value="1900-01-01" />
                         </div>
@@ -870,6 +879,7 @@
             $('#pd').val(1);
             $('#status').val(1);
             $('#job_in_hand').val(0);
+            $('#job_eng_in_hand').val(0);
             $('#invoice').val(0);
             $('#due_date').val(null);
             $('#group_finished_date').hide();
@@ -942,6 +952,7 @@
             $('#pd').val(pd);
             $('#status').val(status);
             $('#job_in_hand').val(job.job_in_hand);
+            $('#job_eng_in_hand').val(job.job_eng_in_hand);
             $('#due_date').val(job.due_date.split('T')[0]);
 
             $('#finished_date').val(finished_date.split('T')[0]);
@@ -1039,7 +1050,7 @@
             let status = $('#status').val();
             let finished_date = $('#finished_date').val();
             let job_in_hand = $('#job_in_hand').val();
-
+            let job_eng_in_hand = $('#job_eng_in_hand').val();
             let due_date = $('#due_date').val();
             if (status === null) {
                 status = 1;
@@ -1120,6 +1131,7 @@
                 "status": status,
                 "term_payment":term_payment,
                 "job_in_hand":job_in_hand,
+                "job_eng_in_hand":job_eng_in_hand,
                 "invoices":invoices,
                 "due_date":due_date,
                 "finished_date": finished_date

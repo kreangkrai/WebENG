@@ -69,6 +69,7 @@ namespace WebENG.Service
 						Term_Payment.warranty,
 						Term_Payment.finished,
 						Jobs.job_in_hand,
+                        Jobs.job_eng_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.job_type,
@@ -130,6 +131,7 @@ namespace WebENG.Service
                             ot_manpower = 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
+                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0,
                             invoices = _invoices,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
@@ -271,11 +273,11 @@ namespace WebENG.Service
                     INSERT INTO 
                         Jobs(job_id, job_name,job_date,customer_name,quotation_no,job_type, cost,process_id,
                              system_id, md_rate, pd_rate, status,
-                             job_in_hand,due_date
+                             job_in_hand,job_eng_in_hand,due_date
                         )
                         VALUES(@job_id, @job_name,@job_date,@customer_name, @quotation_no,@job_type, @cost,@process_id,
                                @system_id, @md_rate, @pd_rate, @status,
-                               @job_in_hand,@due_date
+                               @job_in_hand,@job_eng_in_hand,@due_date
                         )");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -293,6 +295,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@pd_rate", job.pd_rate);
                     cmd.Parameters.AddWithValue("@status", job.status);
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
+                    cmd.Parameters.AddWithValue("@job_eng_in_hand", job.job_eng_in_hand);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
@@ -339,6 +342,7 @@ namespace WebENG.Service
                         pd_rate = @pd_rate,
                         status = @status,
                         job_in_hand = @job_in_hand,
+                        job_eng_in_hand = @job_eng_in_hand,
                         due_date = @due_date,
                         finished_date = @finished_date
                     WHERE job_id = @job_id");
@@ -358,6 +362,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@pd_rate", job.pd_rate);
                     cmd.Parameters.AddWithValue("@status", job.status);
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
+                    cmd.Parameters.AddWithValue("@job_eng_in_hand", job.job_eng_in_hand);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     cmd.Parameters.AddWithValue("@finished_date", job.finished_date);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

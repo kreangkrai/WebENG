@@ -11,50 +11,30 @@ namespace WebENG.Service
 {
     public class TargetService : ITarget
     {
-        public string Delete(string year, string name)
-        {
-            try
-            {
-                string command = "";
-
-                command = "DELETE FROM Target WHERE year='" + year + "' and sale_name='" + name + "'";
-
-                SqlCommand com = new SqlCommand(command, ConnectSQL.OpenConnect());
-                com.ExecuteNonQuery();
-                return "Delete Success";
-            }
-            catch
-            {
-                return "Delete Failed";
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
-        }
-
-        public List<TargetModel> getData()
+        public List<TargetModel> getData(string year, string type)
         {
             try
             {
                 List<TargetModel> targets = new List<TargetModel>();
-                SqlCommand cmd = new SqlCommand("select * from Target order by department,sale_name", ConnectSQL.OpenConnect());
-                SqlDataReader dr = cmd.ExecuteReader();
+                SqlCommand cmd = null;
+                SqlDataReader dr = null;
+                if (type == "Project")
+                {
+                    cmd = new SqlCommand($"select month,target from Target_Project WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
+                }
+                if (type == "Service")
+                {
+                    cmd = new SqlCommand($"select month,target from Target_Service WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
+                }                
+                dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
                         TargetModel p = new TargetModel()
                         {
-                            year = dr["year"].ToString(),
-                            department = dr["department"].ToString(),
-                            sale_name = dr["sale_name"].ToString(),
-                            product = dr["product"].ToString(),
-                            project = dr["project"].ToString(),
-                            service = dr["service"].ToString()
+                            month = dr["month"].ToString(),
+                            target = dr["target"] != DBNull.Value ? Convert.ToDouble(dr["target"].ToString()) : 0,
                         };
                         targets.Add(p);
                     }
@@ -71,43 +51,41 @@ namespace WebENG.Service
             }
         }
 
-        public string Insert(string year, string department, string name)
+        public string Insert(List<TargetModel> targets , string type)
         {
             try
             {
-                bool b = false;
-                string commandchk = "";
-                string command = "";
-
-                commandchk = "select * from Target where year = '" + year + "' and sale_name = '" + name + "'";
-                command = @"INSERT INTO Target(year,department,sale_name,product,project,service) VALUES (@year,@department,@sale_name,@product,@project,@service)";
-
-                SqlCommand cmd1 = new SqlCommand(commandchk, ConnectSQL.OpenConnect());
-                SqlDataReader dr1 = cmd1.ExecuteReader();
-                if (dr1.HasRows)
+                for (int i = 0; i < targets.Count; i++)
                 {
-                    b = true;
-                }
-                if (!b)
-                {
+                    string command = "";
+                    if (type == "Project")
+                    {
+                        command = @"INSERT INTO Target_Project(month,target) VALUES (@month,@target)";
+                    }
+                    if (type == "Service")
+                    {
+                        command = @"INSERT INTO Target_Service(month,target) VALUES (@month,@target)";
+                    }
+                    
                     using (SqlCommand cmd = new SqlCommand(command, ConnectSQL.OpenConnect()))
                     {
                         cmd.CommandType = CommandType.Text;
                         cmd.Connection = ConnectSQL.OpenConnect();
-                        cmd.Parameters.AddWithValue("@year", year);
-                        cmd.Parameters.AddWithValue("@department", department);
-                        cmd.Parameters.AddWithValue("@sale_name", name);
-                        cmd.Parameters.AddWithValue("@product", "0");
-                        cmd.Parameters.AddWithValue("@project", "0");
-                        cmd.Parameters.AddWithValue("@service", "0");
+                        cmd.Parameters.AddWithValue("@month", targets[i].month);
+                        cmd.Parameters.AddWithValue("@target", targets[i].target);
+
+                        if (ConnectSQL.con.State != ConnectionState.Open)
+                        {
+                            ConnectSQL.CloseConnect();
+                            ConnectSQL.OpenConnect();
+                        }
                         cmd.ExecuteNonQuery();
                     }
                 }
-                return "Insert Success";
             }
-            catch
+            catch(Exception ex)
             {
-                return "Insert Failed";
+                return ex.Message;
             }
             finally
             {
@@ -116,30 +94,37 @@ namespace WebENG.Service
                     ConnectSQL.CloseConnect();
                 }
             }
+            return "Success";
         }
-        public string Update(TargetModel model)
+        public string Update(List<TargetModel> targets,string type)
         {
             try
             {
-                string command = "";
-
-                command = @"UPDATE Target SET product = '" + model.product + "'," +
-                                             "project = '" + model.project + "'," +
-                                             "service = '" + model.service + "' " +
-                                             "WHERE year='" + model.year + "' and sale_name='" + model.sale_name + "'";
-
-                SqlDataReader reader;
-                SqlCommand cmd = new SqlCommand(command);
-                cmd.CommandType = CommandType.Text;
-                cmd.Connection = ConnectSQL.OpenConnect();
-                reader = cmd.ExecuteReader();
-                reader.Close();
-
-                return "Update Success";
+                for (int i = 0; i < targets.Count; i++)
+                {
+                    string command = "";
+                    if (type == "Project")
+                    {
+                        command = $@"UPDATE Target_Project SET target = '{targets[i].target}'
+                                     WHERE month='{targets[i].month}'";
+                    }
+                    if (type == "Service")
+                    {
+                        command = $@"UPDATE Target_Service SET target = '{targets[i].target}'
+                                     WHERE month='{targets[i].month}'";
+                    }
+                    
+                    SqlDataReader reader;
+                    SqlCommand cmd = new SqlCommand(command);
+                    cmd.CommandType = CommandType.Text;
+                    cmd.Connection = ConnectSQL.OpenConnect();
+                    reader = cmd.ExecuteReader();
+                    reader.Close();
+                }
             }
             catch
             {
-                return "Update Failed";
+                return "Failed";
             }
             finally
             {
@@ -148,6 +133,7 @@ namespace WebENG.Service
                     ConnectSQL.CloseConnect();
                 }
             }
+            return "Success";
         }
     }
 }
