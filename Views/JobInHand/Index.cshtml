@@ -44,19 +44,111 @@
             <div class="card-body">
                 <canvas id="chart_service_job_eng_in_hand" style="height:400px" />
             </div>
-        </div> 
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <span class="card-title">JOB IN HAND</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" style="row-gap:10px">
+                            <div class="col-md-4">
+                                <label class="d-flex justify-content-center" for="jobinhand_project">Job Project</label>
+                                <div class="input-group">
+                                    <input id="jobinhand_project" type="text" class="form-control"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="d-flex justify-content-center" for="jobinhand_service">Job Service</label>
+                                <div class="input-group">
+                                    <input id="jobinhand_service" type="text" class="form-control"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="d-flex justify-content-center" for="jobinhand_total">Total</label>
+                                <div class="input-group">
+                                    <input id="jobinhand_total" type="text" class="form-control"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>      
+        <div class="card card-primary">
+            <div class="card-header">
+                <span class="card-title">JOB IN HAND PROJECT</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-xl-12" style="overflow-x:auto">
+                        <table id="table_project" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                            <thead class="display compact text-center" style="background-color:#429DD8">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Job No.</th>
+                                    <th>Customer Name</th>
+                                    <th>Project Name</th>
+                                    <th>Remaining Inv.Payment (%)</th>
+                                    <th>Remaining Amount</th>
+                                </tr>
+                            </thead>                           
+                            <tbody></tbody>
+                        </table>
+                    </div>
+               </div>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-header">
+                <span class="card-title">JOB IN HAND SERVICE</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-xl-12" style="overflow-x:auto">
+                        <table id="table_service" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                            <thead class="display compact text-center" style="background-color:#429DD8">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Job No.</th>
+                                    <th>Customer Name</th>
+                                    <th>Project Name</th>
+                                    <th>Remaining Inv.Payment (%)</th>
+                                    <th>Remaining Amount</th>
+                                </tr>
+                            </thead>                           
+                            <tbody></tbody>
+                        </table>
+                    </div>
+               </div>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts
 {
     <script type="text/javascript">
+        var table_project;
+        var table_service;
         let chart_acc;
         let chart_project;
         let chart_service;
         let acc_jobs_eng_in_hand = [];
         let jobs_eng_in_hand_project = [];
         let jobs_eng_in_hand_service = [];
+        let projects_in_hand = [];
+        let services_in_hand = [];
         $(document).ready(async function () {
             getYear();
         });
@@ -70,6 +162,20 @@
             $('#year').empty();
             $('#year').append(year_string);
         };
+
+        function JobInHand(){
+            let sum = 0;
+            let sum_project = 0;
+            let sum_service = 0;
+            sum_project = (projects_in_hand.map(m=>m.job_eng_in_hand).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
+            sum_service = (services_in_hand.map(m=>m.job_eng_in_hand).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
+            sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
+
+            $('#jobinhand_project').val(sum_project);
+            $('#jobinhand_service').val(sum_service);
+            $('#jobinhand_total').val(sum);
+        }
+
         async function GetACCJobInHand(year,type) {            
             await $.ajax({
                 type: "GET",
@@ -106,15 +212,43 @@
             });
         };
 
+        async function GetProjectInHand(year) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProjectInHand", "JobInHand")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    projects_in_hand = response;
+                }
+            });
+        };
+        async function GetServiceInHand(year) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetServiceInHand", "JobInHand")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    services_in_hand = response;
+                }
+            });
+        };
         $('#btnUpdate').on('click',async function(){
             let year = $('#year').val();
 
             await GetACCJobInHand(year,"ALL");
             await GetJobInHandProject(year,"project");
             await GetJobInHandService(year,"Service");
+            await GetProjectInHand(year);
+            await GetServiceInHand(year);
             GenerateChartAcc(year,acc_jobs_eng_in_hand);
             GenerateChartProject(year,jobs_eng_in_hand_project);
             GenerateChartService(year,jobs_eng_in_hand_service);
+            GenerateTableProject(projects_in_hand);
+            GenerateTableService(services_in_hand);
+
+            JobInHand();
         });
 
         function GenerateChartAcc(year,jobs) {
@@ -299,5 +433,93 @@
                 }
             });
         }
+
+        function GenerateTableProject(projects) {
+            let datas = [];
+            if (table_project !== null)
+                $('#table_project').DataTable().destroy();
+
+            for (let i = 0; i < projects.length; i++) {              
+                datas.push([
+                    (i+1),
+                    projects[i].job_id,
+                    projects[i].customer_name,
+                    projects[i].job_name,
+                    projects[i].remaining_percent_invoice,
+                    projects[i].remaining_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_project = $('#table_project').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all", 
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = projects.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                    let remaining_invoice = data.remaining_percent_invoice;
+                    if (remaining_invoice == 0){
+                        $(`td`,row).css({ "text-decoration": 'line-through'});
+                        $(`td`,row).css({ "color": 'blue'});
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+
+        function GenerateTableService(services) {
+            let datas = [];
+            if (table_service !== null)
+                $('#table_service').DataTable().destroy();
+
+            for (let i = 0; i < services.length; i++) {              
+                datas.push([
+                    (i+1),
+                    services[i].job_id,
+                    services[i].customer_name,
+                    services[i].job_name,
+                    services[i].remaining_percent_invoice,
+                    services[i].remaining_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_service = $('#table_service').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all", 
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = services.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                    let remaining_invoice = data.remaining_percent_invoice;
+                    if (remaining_invoice == 0){
+                        $(`td`,row).css({ "text-decoration": 'line-through'});
+                        $(`td`,row).css({ "color": 'blue'});
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
     </script>
 }

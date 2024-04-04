@@ -1,0 +1,140 @@
+﻿@using Microsoft.AspNetCore.Http
+@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Summary Invoice ENG";
+}
+
+<div class="row p-4" style="row-gap:5px">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-body">
+                <div class="row" style="row-gap:10px">
+                    <div class="col-xl-6">
+
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="year" class="form-control">
+                            <option value="" selected disabled>Please Select Year</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnUpdate" type="button" class="btn btn-primary form-control">
+                            Update
+                        </button>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnExport" type="button" class="btn btn-success form-control">
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-dark">
+            <div class="card-body">
+                <canvas id="chart_invoice" style="height:400px" />
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        let chart_invoice;
+        let invoices = [];
+        $(document).ready(async function () {
+            getYear();
+        });
+        function getYear(){
+            var year_string = "";
+            var today = new Date();
+            var year = today.getFullYear();
+            for (var i = year; i > year - 5; i--) {
+                year_string += `<option value="${i}">${i}</option>`;
+            }
+            $('#year').empty();
+            $('#year').append(year_string);
+        };
+        async function GetENGInvoice(year) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetENGInvoice", "Invoice")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    invoices = response;
+                }
+            });
+        };
+
+
+        $('#btnUpdate').on('click',async function(){
+            let year = $('#year').val();
+
+            await GetENGInvoice(year);
+            GenerateChartENGInvoice(year,invoices);
+
+        });
+
+        function GenerateChartENGInvoice(year,invoices) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = invoices.map(m => m.month);
+            let targets = invoices.map(m => m.target_month);
+            let actuals = invoices.map(m => m.invoice);
+
+            if (chart_invoice !== undefined) {
+                chart_invoice.destroy();
+            }
+
+            const ctx = document.getElementById('chart_invoice').getContext('2d');
+            chart_invoice = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY SALE TURNOVER OF JOB ENG OF ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+    </script>
+}

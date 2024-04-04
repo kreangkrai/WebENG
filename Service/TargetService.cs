@@ -11,7 +11,7 @@ namespace WebENG.Service
 {
     public class TargetService : ITarget
     {
-        public List<TargetModel> getData(string year, string type)
+        public List<TargetModel> getData(int year, string type)
         {
             try
             {
@@ -25,7 +25,11 @@ namespace WebENG.Service
                 if (type == "Service")
                 {
                     cmd = new SqlCommand($"select month,target from Target_Service WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
-                }                
+                }
+                if (type == "Invoice")
+                {
+                    cmd = new SqlCommand($"select month,target from Target_Invoice_ENG WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
+                }
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -65,6 +69,10 @@ namespace WebENG.Service
                     if (type == "Service")
                     {
                         command = @"INSERT INTO Target_Service(month,target) VALUES (@month,@target)";
+                    }
+                    if (type == "Invoice")
+                    {
+                        command = @"INSERT INTO Target_Invoice_ENG(month,target) VALUES (@month,@target)";
                     }
                     
                     using (SqlCommand cmd = new SqlCommand(command, ConnectSQL.OpenConnect()))
@@ -113,7 +121,11 @@ namespace WebENG.Service
                         command = $@"UPDATE Target_Service SET target = '{targets[i].target}'
                                      WHERE month='{targets[i].month}'";
                     }
-                    
+                    if(type == "Invoice")
+                    {
+                        command = $@"UPDATE Target_Invoice_ENG SET target = '{targets[i].target}'
+                                     WHERE month='{targets[i].month}'";
+                    }
                     SqlDataReader reader;
                     SqlCommand cmd = new SqlCommand(command);
                     cmd.CommandType = CommandType.Text;

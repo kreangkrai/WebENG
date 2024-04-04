@@ -2,7 +2,7 @@
     ViewData["title"] = "Target";
 }
 <div class="row p-4" style="row-gap:20px">
-    <div class="col-xl-6">
+    <div class="col-xl-4">
         <div class="card card-dark">
             <div class="card-header">
                 <span class="card-title">Target Project</span>
@@ -10,26 +10,29 @@
             <div class="card-body">
                 <form>
                     <div class="form-group row" style="row-gap:20px">                        
-                            <div class="col-xl-3">
+                            <div class="col-xl-4">
                                 <select id="project_year" class="form-control">
                                     <option value="" disabled>Year</option>
                                 </select>
                             </div>
                         
-                        <div class="col-xl-2">
+                        <div class="col-xl-4">
                             <button id="btn_project_load" type="button" class="btn btn-primary form-control elevation-1">
                                 <i class="fas fa-sync"></i> Load
                             </button>
                         </div>
-                        <div class="col-xl-2">
+                        <div class="col-xl-4">
                             <button id="btn_project_add" type="button" class="btn btn-primary form-control elevation-1">
                                 <i class="fas fa-plus"></i> ADD
                             </button>
                         </div>                        
                     </div>
                     <hr />
-                    <div class="form-group">
-                        <div class="col-12">
+                    <div class="form-group row">
+                        <div class="col-2">
+
+                        </div>
+                        <div class="col-8">
                             <table id="table_project" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
                                 <thead class="display compact" style="background-color:#429DD8">
                                     <tr>
@@ -40,17 +43,25 @@
                                 <tbody></tbody>
                             </table>
                         </div>
+                        <div class="col-2">
+                            
+                        </div>
                     </div>
-                    <div class="col-xl-2">
-                        <button id="btn_project_save" type="button" class="btn btn-primary form-control elevation-1">
-                            <i class="fas fa-upload"></i> Save
-                        </button>
+                    <div class="form-group row">
+                         <div class="col-2">
+
+                        </div>
+                        <div class="col-xl-4">
+                            <button id="btn_project_save" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-upload"></i> Save
+                            </button>
+                       </div>
                    </div>
                 </form>
             </div>
         </div>
     </div>
-    <div class="col-xl-6">
+    <div class="col-xl-4">
         <div class="card card-dark">
             <div class="card-header">
                 <span class="card-title">Target Service</span>
@@ -58,39 +69,105 @@
             <div class="card-body">
                 <form>
                     <div class="form-group row" style="row-gap:20px">                        
-                            <div class="col-xl-3">
+                            <div class="col-xl-4">
                                 <select id="service_year" class="form-control">
                                     <option value="" disabled>Year</option>
                                 </select>
                             </div>
                         
-                        <div class="col-xl-2">
+                        <div class="col-xl-4">
                             <button id="btn_service_load" type="button" class="btn btn-primary form-control elevation-1">
                                 <i class="fas fa-sync"></i> Load
                             </button>
                         </div>
-                        <div class="col-xl-2">
+                        <div class="col-xl-4">
                             <button id="btn_service_add" type="button" class="btn btn-primary form-control elevation-1">
                                 <i class="fas fa-plus"></i> ADD
                             </button>
                         </div>                        
                     </div>
                     <hr />
-                    <div class="form-group">
-                        <table id="table_service" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
-                            <thead class="display compact" style="background-color:#429DD8">
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Target (MB)</th>
-                                </tr>
-                            </thead>                           
-                            <tbody></tbody>
-                        </table>
+                    <div class="form-group row">
+                        <div class="col-2">
+
+                        </div>
+                        <div class="col-8">
+                            <table id="table_service" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                                <thead class="display compact" style="background-color:#429DD8">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Target (MB)</th>
+                                    </tr>
+                                </thead>                           
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div class="col-xl-2">
-                        <button id="btn_service_save" type="button" class="btn btn-primary form-control elevation-1">
-                            <i class="fas fa-upload"></i> Save
-                        </button>
+                    <div class="form-group row">
+                        <div class="col-2">
+
+                        </div>
+                        <div class="col-xl-4">
+                            <button id="btn_service_save" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-upload"></i> Save
+                            </button>
+                       </div>
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card card-dark">
+            <div class="card-header">
+                <span class="card-title">Target Invoice ENG</span>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group row" style="row-gap:20px">                        
+                            <div class="col-xl-4">
+                                <select id="invoice_year" class="form-control">
+                                    <option value="" disabled>Year</option>
+                                </select>
+                            </div>
+                        
+                        <div class="col-xl-4">
+                            <button id="btn_invoice_load" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-sync"></i> Load
+                            </button>
+                        </div>
+                        <div class="col-xl-4">
+                            <button id="btn_invoice_add" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-plus"></i> ADD
+                            </button>
+                        </div>                        
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="col-2">
+
+                        </div>
+                        <div class="col-8">
+                            <table id="table_invoice" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                                <thead class="display compact" style="background-color:#429DD8">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Target (MB)</th>
+                                    </tr>
+                                </thead>                           
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-2">
+
+                        </div>
+                        <div class="col-xl-4">
+                            <button id="btn_invoice_save" type="button" class="btn btn-primary form-control elevation-1">
+                                <i class="fas fa-upload"></i> Save
+                            </button>
+                       </div>
                    </div>
                 </form>
             </div>
@@ -157,13 +234,46 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal_invoice" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Edit ENG Invoice Target</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row">
+                        <div class="col-5">
+                            <label for="edit_invoice_month">Month</label>
+                            <input id="edit_invoice_month" type="text" class="form-control" placeholder="" disabled/>
+                        </div>
+                        <div class="col-5">
+                            <label for="edit_invoice_target">Target</label>
+                            <input id="edit_invoice_target" type="number" class="form-control" placeholder="" />
+                        </div>
+                    </div>                                       
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="btn_edit_invoice_save" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {  
     <script type="text/javascript">
         var table_project;
         var table_service;
+        var table_invoice;
         var projects = [];
         var services = [];
+        var invoices = [];
         $(document).ready(async function (){            
             getYear();
          });
@@ -179,6 +289,8 @@
             $('#project_year').append(year_string);
             $('#service_year').empty();
             $('#service_year').append(year_string);
+            $('#invoice_year').empty();
+            $('#invoice_year').append(year_string);
         };
 
         async function GetTargetProject(year) {
@@ -203,7 +315,17 @@
                 }
             });
         }
-
+        async function GetTargetENGInvoice(year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTargetENGInvoice", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    invoices = response;                   
+                }
+            });
+        }
         $('#btn_project_load').on('click',async function(){
             let year = $('#project_year').val();
             await GetTargetProject(year);
@@ -214,6 +336,12 @@
             let year = $('#service_year').val();
             await GetTargetService(year);
             GenerateTableService(services);
+        });
+
+        $('#btn_invoice_load').on('click',async function(){
+            let year = $('#invoice_year').val();
+            await GetTargetENGInvoice(year);
+            GenerateTableENGInvoice(invoices);
         });
 
         $('#btn_project_add').on('click',async function(){
@@ -228,6 +356,13 @@
             await AddServiceTarget(year);
             await GetTargetService(year);
             GenerateTableService(services);
+        });
+
+        $('#btn_invoice_add').on('click',async function(){
+            let year = $('#invoice_year').val();
+            await AddENGInvoiceTarget(year);
+            await GetTargetENGInvoice(year);
+            GenerateTableENGInvoice(invoices);
         });
 
         $('#btn_project_save').on('click',async function(){
@@ -247,6 +382,16 @@
              
              await UpdateServiceTarget(JSON.stringify(datas));
              GenerateTableService(services);
+        });
+
+        $('#btn_invoice_save').on('click',async function(){
+            let datas = [];
+             for(let i=0;i<invoices.length;i++){
+                 datas.push({'month':invoices[i].month,'target':invoices[i].target});
+             }
+             
+             await UpdateENGInvoiceTarget(JSON.stringify(datas));
+             GenerateTableENGInvoice(invoices);
         });
 
          $('#btn_edit_project_save').on('click',function(){
@@ -269,6 +414,16 @@
             $('#modal_service').modal('hide');
         });
 
+        $('#btn_edit_invoice_save').on('click',function(){
+            let month = $('#edit_invoice_month').val();
+            let target = $('#edit_invoice_target').val();
+
+            let index = invoices.findIndex(f=>f.month == month);
+            invoices[index].target = target;
+            GenerateTableENGInvoice(invoices);
+            $('#modal_invoice').modal('hide');
+        });
+
         $('#table_project tbody').on('click', 'tr', async function () {           
             let data = table_project.row(this).data();
             let month = data[0];
@@ -285,6 +440,15 @@
             $('#edit_service_month').val(month);
             $('#edit_service_target').val(target);
             $('#modal_service').modal();            
+        });
+
+        $('#table_invoice tbody').on('click', 'tr', async function () {
+            let data = table_invoice.row(this).data();
+            let month = data[0];
+            let target = data[1];
+            $('#edit_invoice_month').val(month);
+            $('#edit_invoice_target').val(target);
+            $('#modal_invoice').modal();          
         });
 
         async function AddProjectTarget(year) {
@@ -310,6 +474,25 @@
             await $.ajax({
                 type: "POST",
                 url: '@Url.Action("AddServiceTarget", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    year
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        //location.reload();
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        };
+
+        async function AddENGInvoiceTarget(year) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddENGInvoiceTarget", "Target")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: {
                     year
@@ -362,6 +545,25 @@
             });
         }
 
+        async function UpdateENGInvoiceTarget(datas) {
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("UpdateENGInvoiceTarget", "Target")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    datas
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        alert(response);
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+
         function GenerateTableProject(targets) {
             let datas = [];
             if (table_project !== null)
@@ -380,7 +582,10 @@
                 fixedColumns: {
                 },
                 columnDefs: [
-                    
+                    {
+                        "targets": [0,1], 
+                        "className": "text-center",
+                    }
                 ],
                 rowCallback: function (row, data) {                  
                 },
@@ -408,7 +613,41 @@
                 fixedColumns: {
                 },
                 columnDefs: [
-                    
+                    {
+                        "targets": [0,1], 
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, data) {                  
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+
+        function GenerateTableENGInvoice(targets) {
+            let datas = [];
+            if (table_invoice !== null)
+                $('#table_invoice').DataTable().destroy();
+
+            for (let i = 0; i < targets.length; i++) {              
+                datas.push([
+                    targets[i].month,
+                    targets[i].target,
+                ]);
+            }
+
+            table_invoice = $('#table_invoice').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": [0,1], 
+                        "className": "text-center",
+                    }
                 ],
                 rowCallback: function (row, data) {                  
                 },

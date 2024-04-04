@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using WebENG.Interface;
 using WebENG.Models;
 using WebENG.Service;
 
 namespace WebENG.Controllers
 {
-    public class JobInHandController : Controller
+    public class JobBackLogController : Controller
     {
         readonly IAccessory Accessory;
         readonly ISummaryJobInHand SummaryJobInHand;
-        public JobInHandController()
+        public JobBackLogController()
         {
             Accessory = new AccessoryService();
             SummaryJobInHand = new SummaryJobInHandService();
@@ -39,38 +39,17 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAccJobInHand(int year,string type)
+        public JsonResult GetJobBackLogProject(int year)
         {
-            List<SummaryJobInHandModel> jobs = SummaryJobInHand.GetsAccJobInHand(year, type);
-            return Json(jobs);
-        }
-
-        [HttpGet]
-        public JsonResult GetJobInHandProject(int year, string type)
-        {
-            List<SummaryJobInHandModel> jobs = SummaryJobInHand.GetsProjectJobInHand(year, type);
-            return Json(jobs);
-        }
-
-        [HttpGet]
-        public JsonResult GetJobInHandService(int year, string type)
-        {
-            List<SummaryJobInHandModel> jobs = SummaryJobInHand.GetsServiceJobInHand(year, type);
-            return Json(jobs);
-        }
-
-        [HttpGet]
-        public JsonResult GetProjectInHand(int year)
-        {
-            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobInhand(year);
+            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
             jobs = jobs.Where(w => w.job_type == "Project").ToList();
             return Json(jobs);
         }
 
         [HttpGet]
-        public JsonResult GetServiceInHand(int year)
+        public JsonResult GetJobBackLogService(int year)
         {
-            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobInhand(year);
+            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
             jobs = jobs.Where(w => w.job_type == "Service").ToList();
             return Json(jobs);
         }

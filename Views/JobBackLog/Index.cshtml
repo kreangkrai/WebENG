@@ -1,0 +1,280 @@
+﻿@using Microsoft.AspNetCore.Http
+@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "BackLog";
+}
+
+<div class="row p-4" style="row-gap:5px">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-body">
+                <div class="row" style="row-gap:10px">
+                    <div class="col-xl-6">
+
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="year" class="form-control">
+                            <option value="" selected disabled>Please Select Year</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnUpdate" type="button" class="btn btn-primary form-control">
+                            Update
+                        </button>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnExport" type="button" class="btn btn-success form-control">
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <div class="card card-dark">
+                    <div class="card-header">
+                        <span class="card-title">BACKLOG</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" style="row-gap:10px">
+                            <div class="col-md-4">
+                                <label class="d-flex justify-content-center" for="backlog_project">Job Project</label>
+                                <div class="input-group">
+                                    <input id="backlog_project" type="text" class="form-control"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="d-flex justify-content-center" for="backlog_service">Job Service</label>
+                                <div class="input-group">
+                                    <input id="backlog_service" type="text" class="form-control"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="d-flex justify-content-center" for="backlog_total">Total</label>
+                                <div class="input-group">
+                                    <input id="backlog_total" type="text" class="form-control"/>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+        <div class="card card-primary">
+            <div class="card-header">
+                <span class="card-title">PENDING JOB PROJECT BACKLOG</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-xl-12" style="overflow-x:auto">
+                        <table id="table_project" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                            <thead class="display compact text-center" style="background-color:#429DD8">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Job No.</th>
+                                    <th>Customer Name</th>
+                                    <th>Project Name</th>
+                                    <th>Remaining Inv.Payment (%)</th>
+                                    <th>Remaining Amount</th>
+                                </tr>
+                            </thead>                           
+                            <tbody></tbody>
+                        </table>
+                    </div>
+               </div>
+            </div>
+        </div>
+        <div class="card card-success">
+            <div class="card-header">
+                <span class="card-title">PENDING JOB SERVICE BACKLOG</span>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <div class="col-xl-12" style="overflow-x:auto">
+                        <table id="table_service" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:16px">
+                            <thead class="display compact text-center" style="background-color:#429DD8">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Job No.</th>
+                                    <th>Customer Name</th>
+                                    <th>Project Name</th>
+                                    <th>Remaining Inv.Payment (%)</th>
+                                    <th>Remaining Amount</th>
+                                </tr>
+                            </thead>                           
+                            <tbody></tbody>
+                        </table>
+                    </div>
+               </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var table_project;
+        var table_service;
+        let projects_backlog = [];
+        let services_backlog = [];
+        $(document).ready(async function () {
+            getYear();
+        });
+        function getYear(){
+            var year_string = "";
+            var today = new Date();
+            var year = today.getFullYear();
+            for (var i = year; i > year - 5; i--) {
+                year_string += `<option value="${i}">${i}</option>`;
+            }
+            $('#year').empty();
+            $('#year').append(year_string);
+        };
+
+        function backlog(){
+            let sum = 0;
+            let sum_project = 0;
+            let sum_service = 0;
+            sum_project = (projects_backlog.map(m=>m.remaining_amount).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
+            sum_service = (services_backlog.map(m=>m.remaining_amount).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
+            sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
+
+            $('#backlog_project').val(sum_project);
+            $('#backlog_service').val(sum_service);
+            $('#backlog_total').val(sum);
+        }
+        async function GetJobBackLogProject(year) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobBackLogProject", "JobBackLog")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    projects_backlog = response;
+                }
+            });
+        };
+
+        async function GetJobBackLogService(year) {            
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobBackLogService", "JobBackLog")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year },
+                success: function (response) {
+                    services_backlog = response;
+                }
+            });
+        };
+               
+        $('#btnUpdate').on('click',async function(){
+            let year = $('#year').val();
+
+            await GetJobBackLogProject(year);
+            await GetJobBackLogService(year);
+            GenerateTableProject(projects_backlog);
+            GenerateTableService(services_backlog);
+
+            backlog();
+        });
+     
+        function GenerateTableProject(projects) {
+            let datas = [];
+            if (table_project !== null)
+                $('#table_project').DataTable().destroy();
+
+            for (let i = 0; i < projects.length; i++) {              
+                datas.push([
+                    (i+1),
+                    projects[i].job_id,
+                    projects[i].customer_name,
+                    projects[i].job_name,
+                    projects[i].remaining_percent_invoice,
+                    projects[i].remaining_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_project = $('#table_project').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all", 
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = projects.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                    let remaining_invoice = data.remaining_percent_invoice;
+                    if (remaining_invoice == 0){
+                        $(`td`,row).css({ "text-decoration": 'line-through'});
+                        $(`td`,row).css({ "color": 'blue'});
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+
+        function GenerateTableService(services) {
+            let datas = [];
+            if (table_service !== null)
+                $('#table_service').DataTable().destroy();
+
+            for (let i = 0; i < services.length; i++) {              
+                datas.push([
+                    (i+1),
+                    services[i].job_id,
+                    services[i].customer_name,
+                    services[i].job_name,
+                    services[i].remaining_percent_invoice,
+                    services[i].remaining_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_service = $('#table_service').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all", 
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = services.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                    let remaining_invoice = data.remaining_percent_invoice;
+                    if (remaining_invoice == 0){
+                        $(`td`,row).css({ "text-decoration": 'line-through'});
+                        $(`td`,row).css({ "color": 'blue'});
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+    </script>
+}

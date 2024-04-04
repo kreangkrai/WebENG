@@ -40,16 +40,23 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetTargetProject(string year)
+        public JsonResult GetTargetProject(int year)
         {
             List<TargetModel> targets = Target.getData(year,"Project");
             return Json(targets);
         }
 
         [HttpGet]
-        public JsonResult GetTargetService(string year)
+        public JsonResult GetTargetService(int year)
         {
             List<TargetModel> targets = Target.getData(year, "Service");
+            return Json(targets);
+        }
+
+        [HttpGet]
+        public JsonResult GetTargetENGInvoice(int year)
+        {
+            List<TargetModel> targets = Target.getData(year, "Invoice");
             return Json(targets);
         }
 
@@ -87,6 +94,23 @@ namespace WebENG.Controllers
             return Json(result);
         }
 
+        [HttpPost]
+        public JsonResult AddENGInvoiceTarget(int year)
+        {
+            List<TargetModel> targets = new List<TargetModel>();
+            for (int i = 1; i <= 12; i++)
+            {
+                targets.Add(new TargetModel()
+                {
+                    month = new DateTime(year, i, 1).ToString("yyyy-MM"),
+                    target = 0
+                });
+            }
+
+            string result = Target.Insert(targets, "Invoice");
+            return Json(result);
+        }
+
         [HttpPatch]
         public JsonResult UpdateProjectTarget(string datas)
         {
@@ -100,6 +124,14 @@ namespace WebENG.Controllers
         {
             List<TargetModel> targets = JsonConvert.DeserializeObject<List<TargetModel>>(datas);
             string result = Target.Update(targets, "Service");
+            return Json(result);
+        }
+
+        [HttpPatch]
+        public JsonResult UpdateENGInvoiceTarget(string datas)
+        {
+            List<TargetModel> targets = JsonConvert.DeserializeObject<List<TargetModel>>(datas);
+            string result = Target.Update(targets, "Invoice");
             return Json(result);
         }
     }
