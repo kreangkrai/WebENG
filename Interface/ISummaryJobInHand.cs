@@ -14,5 +14,7 @@ namespace WebENG.Interface
         List<SummaryJobInHandModel> GetsServiceJobInHand(int year, string type);
         List<JobInhandModel> GetsJobInhand(int year);
         List<JobInhandModel> GetsJobBackLog(int year);
+
+        List<QuarterModel> GetsSummaryQuarter(int year);
     }
 }

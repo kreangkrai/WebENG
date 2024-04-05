@@ -521,5 +521,10 @@
                 info: false
             });
         };
+
+        $('#btnExport').on('click',function(){
+            let year = $('#year').val();
+            location.href = '@Url.Action("ExportSummaryJobInHand", "JobInHand")?year='+ year;
+        });
     </script>
 }

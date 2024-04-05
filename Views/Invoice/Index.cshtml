@@ -10,7 +10,6 @@
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
                     <div class="col-xl-6">
-
                     </div>
                     <div class="col-xl-2">
                         <select id="year" class="form-control">
@@ -35,106 +34,192 @@
                 <canvas id="chart_invoice" style="height:400px" />
             </div>
         </div>
+        <div class="card card-dark">
+            <div class="card-header">
+                <span id="label_job"class="card-title">JOB IN HAND & SALES TURNOVER ENG FOR</span>
+            </div>
+            <div class="card-body" style="overflow-x:auto">
+                <table id="table" class="table table-sm table-bordered table-hover text-center table-striped nowrap" style="width:100%">
+                    <thead style="color:black;background-color:#0C9DF0">
+                        <tr>
+                            <th colspan="1" rowspan="2" style="text-align:center;vertical-align:middle;"></th>
+                            <th colspan="2" style="text-align:center;vertical-align:middle;">Job In Hand</th>
+                            <th colspan="2" style="text-align:center;vertical-align:middle;">Invoice</th>
+                            <th colspan="2" style="text-align:center;vertical-align:middle;">Pending</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align:center;vertical-align:middle;">Volume (MB)</th>
+                            <th style="text-align:center;vertical-align:middle;">No. Of Job</th>
+                            <th style="text-align:center;vertical-align:middle;">Volume (MB)</th>
+                            <th style="text-align:center;vertical-align:middle;">Complete Job</th>
+                            <th style="text-align:center;vertical-align:middle;">Volume (MB)</th>
+                            <th style="text-align:center;vertical-align:middle;">Incomplete Job</th>
+                        </tr>                    
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 @section Scripts
 {
-    <script type="text/javascript">
-        let chart_invoice;
-        let invoices = [];
-        $(document).ready(async function () {
-            getYear();
-        });
-        function getYear(){
-            var year_string = "";
-            var today = new Date();
-            var year = today.getFullYear();
-            for (var i = year; i > year - 5; i--) {
-                year_string += `<option value="${i}">${i}</option>`;
-            }
-            $('#year').empty();
-            $('#year').append(year_string);
-        };
-        async function GetENGInvoice(year) {            
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetENGInvoice", "Invoice")',
-	            contentType: 'application/x-www-form-urlencoded',
-                data: { year },
-                success: function (response) {
-                    invoices = response;
-                }
-            });
-        };
-
-
-        $('#btnUpdate').on('click',async function(){
-            let year = $('#year').val();
-
-            await GetENGInvoice(year);
-            GenerateChartENGInvoice(year,invoices);
-
-        });
-
-        function GenerateChartENGInvoice(year,invoices) {
-
-            let colors = ['#04CA13', '#F0390C'];
-
-            let months = invoices.map(m => m.month);
-            let targets = invoices.map(m => m.target_month);
-            let actuals = invoices.map(m => m.invoice);
-
-            if (chart_invoice !== undefined) {
-                chart_invoice.destroy();
-            }
-
-            const ctx = document.getElementById('chart_invoice').getContext('2d');
-            chart_invoice = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'Target',
-                            data: targets,
-                            borderWidth: 3,
-                            backgroundColor: colors[0],
-                            borderColor: colors[0]
-                        },
-                        {
-                            label: 'Actual',
-                            data: actuals,
-                            borderWidth: 3,
-                            backgroundColor: colors[1],
-                            borderColor: colors[1]
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            title: {
-                                text: "MB",
-                                display: true
-                            },
-                            stacked: false,
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        title: {
-                            text: `SUMMARY SALE TURNOVER OF JOB ENG OF ${year}`,
-                            display: true
-                        },
-                        legend: {
-                            position: 'bottom',
-                            display: true
-                        }
-                    },
-                }
-            });
+<script type="text/javascript">
+    let table;
+    let chart_invoice;
+    let invoices = [];
+    let summary_quarters = [];
+    $(document).ready(async function () {
+        getYear();
+    });
+    function getYear(){
+        var year_string = "";
+        var today = new Date();
+        var year = today.getFullYear();
+        for (var i = year; i > year - 5; i--) {
+            year_string += `<option value="${i}">${i}</option>`;
         }
-    </script>
+        $('#year').empty();
+        $('#year').append(year_string);
+    };
+    async function GetENGInvoice(year) {
+        await $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetENGInvoice", "Invoice")',
+            contentType: 'application/x-www-form-urlencoded',
+            data: { year },
+            success: function (response) {
+                invoices = response;
+            }
+        });
+    };
+
+    async function GetSummaryQuarter(year){
+        await $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetSummaryQuarter", "Invoice")',
+            contentType: 'application/x-www-form-urlencoded',
+            data: { year },
+            success: function (response) {
+                summary_quarters = response;
+            }
+        });
+    };
+
+    $('#btnUpdate').on('click',async function(){
+        let year = $('#year').val();
+
+        $('#label_job').html(`JOB IN HAND & SALES TURNOVER ENG FOR ${year}`);
+        await GetENGInvoice(year);
+        await GetSummaryQuarter(year);
+        GenerateChartENGInvoice(year,invoices);
+        GenerateTable(summary_quarters);
+    });
+
+    function GenerateChartENGInvoice(year,invoices) {
+
+        let colors = ['#04CA13', '#F0390C'];
+
+        let months = invoices.map(m => m.month);
+        let targets = invoices.map(m => m.target_month);
+        let actuals = invoices.map(m => m.invoice);
+
+        if (chart_invoice !== undefined) {
+            chart_invoice.destroy();
+        }
+
+        const ctx = document.getElementById('chart_invoice').getContext('2d');
+        chart_invoice = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: targets,
+                        borderWidth: 3,
+                        backgroundColor: colors[0],
+                        borderColor: colors[0]
+                    },
+                    {
+                        label: 'Actual',
+                        data: actuals,
+                        borderWidth: 3,
+                        backgroundColor: colors[1],
+                        borderColor: colors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            text: "MB",
+                            display: true
+                        },
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        text: `SUMMARY SALE TURNOVER OF JOB ENG OF ${year}`,
+                        display: true
+                    },
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    }
+                },
+            }
+        });
+    }
+
+    function GenerateTable(items) {
+            if (table !== null)
+                $('#table').DataTable().destroy();
+            
+            let datas = [];
+            for (let i=0;i<items.length;i++){
+                var data = [
+                    items[i].quarter,
+                    Number(items[i].job_in_hand_volume).toFixed(3),
+                    items[i].job_in_hand,
+                    Number(items[i].invoice_volume).toFixed(3),
+                    items[i].invoice,
+                    Number(items[i].pending_volume).toFixed(3),
+                    items[i].pending
+                ];
+                datas.push(data);
+            };
+
+            table = $('#table').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let type = data[0];
+                    if (type === "Summary"){
+                         $('td', row).css("background-color","#0C9DF0");
+                         $('td', row).css("font-weight","600");
+                    }
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
+
+        $('#btnExport').on('click',function(){
+            let year = $('#year').val();
+            location.href = '@Url.Action("ExportSummarySaleTurnOver", "Invoice")?year='+ year;
+        });
+</script>
 }

@@ -19,15 +19,9 @@ namespace WebENG.Service
         {
             List<SummaryJobInHandModel> jobsSummaries = new List<SummaryJobInHandModel>();
             List<string> months = new List<string>();
-            int count = 0;
-            for (DateTime date = new DateTime (year,1,1); date <= DateTime.Now; date = date.AddMonths(1))
+            for (DateTime date = new DateTime (year,1,1); date <= new DateTime(year, 12, 1); date = date.AddMonths(1))
             {
-                if(count == 12)
-                {
-                    break;
-                }
                 months.Add(date.ToString("MMM"));
-                count++;
             }
             List<SummaryJobInHandModel> getSummaries = GetsSummaryJobInHand(year, type);
             List<TargetModel> targets_project = Target.getData(year, "Project");
@@ -70,7 +64,7 @@ namespace WebENG.Service
 		                case when Invoice.invoice is null then 0 else Invoice.invoice end as invoice,	
 	                    CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,2)) as invoice_eng,
 	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,2))) as remaining_percent_invoice,
-	                    CAST((job_in_hand - case when Invoice.invoice is null then 0 else Invoice.invoice end) as decimal(18,2)) as remaining_amount
+	                    CAST((job_eng_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,2))) as decimal(18,2)) as remaining_amount
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 where (status <>'STA999' AND (FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null)) OR (FORMAT(finished_date,'yyyy') = '{year}' AND FORMAT(job_date ,'yyyy') < '{year}')");
@@ -129,7 +123,7 @@ namespace WebENG.Service
 	                    case when Invoice.invoice is null then 0 else Invoice.invoice end as invoice,	
 	                    CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,2)) as invoice_eng,
 	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,2))) as remaining_percent_invoice,
-	                    CAST((job_in_hand - case when Invoice.invoice is null then 0 else Invoice.invoice end) as decimal(18,2)) as remaining_amount
+	                    CAST((job_eng_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,2))) as decimal(18,2)) as remaining_amount
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     where FORMAT(job_date,'yyyy') = '{year}'");
@@ -177,15 +171,9 @@ namespace WebENG.Service
         {
             List<SummaryJobInHandModel> jobsSummaries = new List<SummaryJobInHandModel>();
             List<string> months = new List<string>();
-            int count = 0;
-            for (DateTime date = new DateTime(year, 1, 1); date <= DateTime.Now; date = date.AddMonths(1))
+            for (DateTime date = new DateTime(year, 1, 1); date <= new DateTime(year, 12, 1); date = date.AddMonths(1))
             {
-                if (count == 12)
-                {
-                    break;
-                }
                 months.Add(date.ToString("MMM"));
-                count++;
             }
             List<SummaryJobInHandModel> getSummaries = GetsSummaryJobInHand(year, type);
             List<TargetModel> targets = Target.getData(year, "Project");
@@ -206,15 +194,9 @@ namespace WebENG.Service
         {
             List<SummaryJobInHandModel> jobsSummaries = new List<SummaryJobInHandModel>();
             List<string> months = new List<string>();
-            int count = 0;
-            for (DateTime date = new DateTime(year, 1, 1); date <= DateTime.Now; date = date.AddMonths(1))
+            for (DateTime date = new DateTime(year, 1, 1); date <= new DateTime(year, 12, 1); date = date.AddMonths(1))
             {
-                if (count == 12)
-                {
-                    break;
-                }
                 months.Add(date.ToString("MMM"));
-                count++;
             }
             List<SummaryJobInHandModel> getSummaries = GetsSummaryJobInHand(year, type);
             List<TargetModel> targets = Target.getData(year, "Service");
@@ -277,6 +259,81 @@ namespace WebENG.Service
                             month = dr["month"] != DBNull.Value ? dr["month"].ToString() : "",
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0
                         };                       
+                        jobsSummaries.Add(jobSummary);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return jobsSummaries;
+        }
+
+        public List<QuarterModel> GetsSummaryQuarter(int year)
+        {
+            List<QuarterModel> jobsSummaries = new List<QuarterModel>();
+            try
+            {
+                string stringCommand = string.Format($@"
+                select  Jobs.job_id,
+						job_date,
+                        CASE WHEN FORMAT(job_date,'yyyy') = '{year}' THEN
+							CASE
+								WHEN MONTH(job_date) >= 1 AND MONTH(job_date) <=3
+								THEN
+									1
+								WHEN MONTH(job_date) >= 4 AND MONTH(job_date) <=6
+								THEN
+									2
+								WHEN MONTH(job_date) >= 7 AND MONTH(job_date) <=9
+								THEN
+									3
+								WHEN MONTH(job_date) >= 10 AND MONTH(job_date) <=12
+								THEN
+									4
+								ELSE
+									0
+							END
+						ELSE
+							0						
+						END as quarter,
+						case when FORMAT(job_date,'yyyy') < '{year}' OR job_date is null then 'backlog' else 'now' end as type,
+						CAST((Jobs.job_eng_in_hand / 1000000) as decimal(18,2)) as job_eng_in_hand,
+						CAST((((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) / 1000000) as decimal(18,3)) as invoice_eng,				
+					    Eng_Status.status_name as status,
+				        Jobs.finished_date
+				from Jobs
+
+				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status");
+
+                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        QuarterModel jobSummary = new QuarterModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
+                            quarter = dr["quarter"] != DBNull.Value ? Convert.ToInt32(dr["quarter"].ToString()) : 0,
+                            type = dr["type"] != DBNull.Value ? dr["type"].ToString() : "",
+                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
+                            invoice_eng = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"]) : 0,
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                        };
                         jobsSummaries.Add(jobSummary);
                     }
                     dr.Close();

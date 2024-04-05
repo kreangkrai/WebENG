@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebENG.Interface;
@@ -14,10 +16,14 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly ISummaryJobInHand SummaryJobInHand;
-        public JobInHandController()
+        readonly IExport Export;
+        protected readonly IHostingEnvironment _hostingEnvironment;
+        public JobInHandController(IHostingEnvironment hostingEnvironment)
         {
+            _hostingEnvironment = hostingEnvironment;
             Accessory = new AccessoryService();
             SummaryJobInHand = new SummaryJobInHandService();
+            Export = new ExportService();
         }
         public IActionResult Index()
         {
@@ -73,6 +79,17 @@ namespace WebENG.Controllers
             List<JobInhandModel> jobs = SummaryJobInHand.GetsJobInhand(year);
             jobs = jobs.Where(w => w.job_type == "Service").ToList();
             return Json(jobs);
+        }
+        public IActionResult ExportSummaryJobInHand(int year)
+        {
+            List<SummaryJobInHandModel> all = SummaryJobInHand.GetsAccJobInHand(year, "ALL");
+            List<SummaryJobInHandModel> projects = SummaryJobInHand.GetsProjectJobInHand(year,"Project");
+            List<SummaryJobInHandModel> services = SummaryJobInHand.GetsServiceJobInHand(year, "Service");
+
+            //Download Excel
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
+            var stream = Export.ExportSummaryJobInHand(templateFileInfo, all, projects, services);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
         }
     }
 }

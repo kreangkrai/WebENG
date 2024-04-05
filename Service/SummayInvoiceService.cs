@@ -70,15 +70,9 @@ namespace WebENG.Service
         {
             List<SummaryInvoiceModel> jobsSummaries = new List<SummaryInvoiceModel>();
             List<string> months = new List<string>();
-            int count = 0;
-            for (DateTime date = new DateTime(year, 1, 1); date <= DateTime.Now; date = date.AddMonths(1))
+            for (DateTime date = new DateTime(year, 1, 1); date <= new DateTime(year, 12, 1); date = date.AddMonths(1))
             {
-                if (count == 12)
-                {
-                    break;
-                }
                 months.Add(date.ToString("MMM"));
-                count++;
             }
             List<SummaryInvoiceModel> getSummaries = GetsENGInvoice(year);
             List<TargetModel> targets = Target.getData(year, "Invoice");

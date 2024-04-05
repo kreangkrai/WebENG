@@ -53,5 +53,64 @@ namespace WebENG.Service
             }
             return stream;
         }
+
+        public Stream ExportSummaryJobInHand(FileInfo path, List<SummaryJobInHandModel> all, List<SummaryJobInHandModel> projects, List<SummaryJobInHandModel> services)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["data"];
+
+                    int startRows = 5;
+                    for (int i = 0; i < all.Count; i++)
+                    {
+                        worksheet.Cells["E" + (i + startRows)].Value = all[i].target_month;
+                        worksheet.Cells["F" + (i + startRows)].Value = all[i].job_eng_in_hand;
+                    }
+
+                    startRows = 20;
+                    for (int i = 0; i < projects.Count; i++)
+                    {
+                        worksheet.Cells["E" + (i + startRows)].Value = projects[i].target_month;
+                        worksheet.Cells["F" + (i + startRows)].Value = projects[i].job_eng_in_hand;
+                    }
+
+                    startRows = 35;
+                    for (int i = 0; i < services.Count; i++)
+                    {
+                        worksheet.Cells["E" + (i + startRows)].Value = services[i].target_month;
+                        worksheet.Cells["F" + (i + startRows)].Value = services[i].job_eng_in_hand;
+                    }
+
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
+        public Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> invoices)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["data"];
+
+                    int startRows = 5;
+                    for (int i = 0; i < invoices.Count; i++)
+                    {
+                        worksheet.Cells["E" + (i + startRows)].Value = invoices[i].target_month;
+                        worksheet.Cells["F" + (i + startRows)].Value = invoices[i].invoice;
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
     }
 }
