@@ -66,6 +66,26 @@ namespace WebENG.Service
             return jobsSummaries;
         }
 
+        public List<SummaryInvoiceModel> GetsSummaryAccENGInvoice(int year)
+        {
+            List<SummaryInvoiceModel> jobsSummaries = GetsSummaryENGInvoice(year);
+            List<SummaryInvoiceModel> acc_invoices = new List<SummaryInvoiceModel>();
+            double acc = 0;
+            double acc_target = 0;
+            for (int i = 0; i < jobsSummaries.Count; i++)
+            {
+                acc += jobsSummaries[i].invoice;
+                acc_target += jobsSummaries[i].target_month;
+                acc_invoices.Add(new SummaryInvoiceModel()
+                {
+                    invoice = acc,
+                    month = jobsSummaries[i].month,
+                    target_month = acc_target
+                });
+            }
+            return acc_invoices;
+        }
+
         public List<SummaryInvoiceModel> GetsSummaryENGInvoice(int year)
         {
             List<SummaryInvoiceModel> jobsSummaries = new List<SummaryInvoiceModel>();

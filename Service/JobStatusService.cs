@@ -97,7 +97,7 @@ namespace WebENG.Service
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
 
-                        JobSummaryModel jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).FirstOrDefault();
+                        List<JobSummaryModel> jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).ToList();
 
                         Term_PaymentModel term_Payment = new Term_PaymentModel()
                         {
@@ -247,7 +247,7 @@ namespace WebENG.Service
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
 
-                        JobSummaryModel jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).FirstOrDefault();
+                        List<JobSummaryModel> jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).ToList();
 
                         Term_PaymentModel term_Payment = new Term_PaymentModel()
                         {

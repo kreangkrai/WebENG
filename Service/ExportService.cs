@@ -91,7 +91,7 @@ namespace WebENG.Service
             return stream;
         }
 
-        public Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> invoices)
+        public Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> acc_invoices,List<SummaryInvoiceModel> invoices)
         {
             Stream stream = new MemoryStream();
             if (path.Exists)
@@ -105,6 +105,13 @@ namespace WebENG.Service
                     {
                         worksheet.Cells["E" + (i + startRows)].Value = invoices[i].target_month;
                         worksheet.Cells["F" + (i + startRows)].Value = invoices[i].invoice;
+                    }
+
+                    startRows = 20;
+                    for (int i = 0; i < acc_invoices.Count; i++)
+                    {
+                        worksheet.Cells["E" + (i + startRows)].Value = acc_invoices[i].target_month;
+                        worksheet.Cells["F" + (i + startRows)].Value = acc_invoices[i].invoice;
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;

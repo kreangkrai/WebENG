@@ -9,6 +9,7 @@ namespace WebENG.Interface
     interface ISummaryInvoice
     {
         List<SummaryInvoiceModel> GetsSummaryENGInvoice(int year);
+        List<SummaryInvoiceModel> GetsSummaryAccENGInvoice(int year);
         List<SummaryInvoiceModel> GetsENGInvoice(int year);
     }
 }

@@ -31,6 +31,11 @@
         </div>
         <div class="card card-dark">
             <div class="card-body">
+                <canvas id="chart_acc_invoice" style="height:400px" />
+            </div>
+        </div>
+        <div class="card card-dark">
+            <div class="card-body">
                 <canvas id="chart_invoice" style="height:400px" />
             </div>
         </div>
@@ -67,7 +72,9 @@
 <script type="text/javascript">
     let table;
     let chart_invoice;
+    let chart_acc_invoice;
     let invoices = [];
+    let acc_invoices = [];
     let summary_quarters = [];
     $(document).ready(async function () {
         getYear();
@@ -82,6 +89,7 @@
         $('#year').empty();
         $('#year').append(year_string);
     };
+
     async function GetENGInvoice(year) {
         await $.ajax({
             type: "GET",
@@ -94,6 +102,17 @@
         });
     };
 
+    async function GetAccENGInvoice(year) {
+        await $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetAccENGInvoice", "Invoice")',
+            contentType: 'application/x-www-form-urlencoded',
+            data: { year },
+            success: function (response) {
+                acc_invoices = response;
+            }
+        });
+    };
     async function GetSummaryQuarter(year){
         await $.ajax({
             type: "GET",
@@ -111,8 +130,10 @@
 
         $('#label_job').html(`JOB IN HAND & SALES TURNOVER ENG FOR ${year}`);
         await GetENGInvoice(year);
+        await GetAccENGInvoice(year);
         await GetSummaryQuarter(year);
         GenerateChartENGInvoice(year,invoices);
+        GenerateChartAccENGInvoice(year,acc_invoices);
         GenerateTable(summary_quarters);
     });
 
@@ -176,6 +197,66 @@
             }
         });
     }
+
+    function GenerateChartAccENGInvoice(year,invoices) {
+        let colors = ['#04CA13', '#F0390C'];
+
+        let months = invoices.map(m => m.month);
+        let targets = invoices.map(m => m.target_month);
+        let actuals = invoices.map(m => m.invoice);
+
+        if (chart_acc_invoice !== undefined) {
+            chart_acc_invoice.destroy();
+        }
+
+        const ctx = document.getElementById('chart_acc_invoice').getContext('2d');
+        chart_acc_invoice = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: targets,
+                        borderWidth: 3,
+                        backgroundColor: colors[0],
+                        borderColor: colors[0]
+                    },
+                    {
+                        label: 'Actual',
+                        data: actuals,
+                        borderWidth: 3,
+                        backgroundColor: colors[1],
+                        borderColor: colors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            text: "MB",
+                            display: true
+                        },
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        text: `ACCUMULATE SALE TURNOVER OF JOB ENG OF ${year}`,
+                        display: true
+                    },
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    }
+                },
+            }
+        });           
+   }
 
     function GenerateTable(items) {
             if (table !== null)

@@ -287,6 +287,67 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal_invoice" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" style="overflow-y:auto">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modal_title" class="modal-title"><b>Invoices</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-row pt-2">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#42D5D8">
+                                    <span style="font-weight:bold">Invoice</span>                                
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_invoice" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Invoice</th>
+                                                        <th>Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>                                           
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 pt-1">
+                                        <div class="row">
+                                            <div class="col-2 pt-1">
+                                                <label for="cost">รวม</label>
+                                            </div>
+                                            <div class="col-10">
+                                                <div class="input-group">
+                                                    <input id="sum_invoice" type="text" class="form-control" placeholder="0" value="0" />
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">THB</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                       
+                    </div>                   
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {  
     @*<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
@@ -294,9 +355,11 @@
     <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/dataTables.fixedColumns.js"></script>*@
     <script type="text/javascript">
          let table;
+         let table_invoice;
          let jobs_status = [];
          let set_payments = new Set();
          let set_column = new Set();
+         let set_invoice = [];
 
          $(document).ready(async function (){            
              await GetUsers();
@@ -416,10 +479,10 @@
                 for(let j=0;j<jobs[i].invoices.length;j++){
                     sum_invoice += jobs[i].invoices[j].invoice;
                 }
-
-                let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.cost : 0;
-                let remain_cost = jobs[i].job_summary.remainingCost !== null ? jobs[i].job_summary.remainingCost : 0;
-                let percent_eng_cost = Math.ceil(((cost-remain_cost) / cost) * 100);
+                
+                let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.map(m=>m.cost)[0] : 0;
+                let _eng_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m=>m.totalEngCost).reduce((acc,b) =>  acc + b) : 0;
+                let percent_eng_cost = Math.ceil((Number(_eng_cost) / Number(cost)) * 100);
                 let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);
                 let down_payment = jobs[i].term_payment.down_payment > 0 ? jobs[i].term_payment.down_payment : "";
                 let document_submit = jobs[i].term_payment.document_submit > 0 ? jobs[i].term_payment.document_submit : "";
@@ -461,7 +524,7 @@
                     warranty,
                     finished,
                     job_in_hand,
-                    sum_invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    parseInt(sum_invoice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     due_date
                 ]);
             }
@@ -583,88 +646,142 @@
                 },
                 scrollCollapse: true,
                 scrollX: true,
-                paging: false,
                 responsive: true
             });
         };
 
-        $('#table_job tbody').on('click', 'tr', async function () {
-            let data = table.row(this).data();
-            let job_id = data[0];
-            
-            let data_job = jobs_status.filter(f=>f.job_id == job_id).map(m=>m)[0];
-            let status = statuses.filter(f=>f.status_name == data_job.status).map(m=>m.status_id)[0];
-            let job_name = data_job.job_name;
-            let job_in_hand = data_job.job_in_hand;
+        function GenerateTableInvoice(invoices) {
+            $('#sum_invoice').val(0);
+            let datas = [];
+            if (table_invoice !== null)
+                $('#table_invoice').DataTable().destroy();
 
-            let invoice = 0;
-            if (data_job.invoices.length > 0){
-                invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
+            for (let i = 0; i < invoices.length; i++) {
+                let no = invoices[i].id;
+                let invoice = invoices[i].invoice; 
+                let date = invoices[i].date;
+                datas.push([
+                    no,
+                    invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    date.toString().split('T')[0]
+                ]);
             }
-            let due_date = data_job.due_date;
 
-            let datas_percent = [];
-            let down_payment = data_job.term_payment.down_payment;
-            let document_submit = data_job.term_payment.document_submit;
-            let instrument_vendor = data_job.term_payment.instrument_vendor;
-            let instrument_delivered_ctl = data_job.term_payment.instrument_delivered_ctl;
-            let system_delivered_ctl = data_job.term_payment.system_delivered_ctl;
-            let fat = data_job.term_payment.fat;
-            let delivery_instrument = data_job.term_payment.delivery_instrument;
-            let delivery_system = data_job.term_payment.delivery_system;
-            let progress_work = data_job.term_payment.progress_work;
-            let installation_work_complete = data_job.term_payment.installation_work_complete;
-            let commissioning = data_job.term_payment.commissioning;
-            let startup = data_job.term_payment.startup;
-            let as_built = data_job.term_payment.as_built;
-            let warranty = data_job.term_payment.warranty;
-            let finished = data_job.term_payment.finished;
+            table_invoice = $('#table_invoice').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 2
+                },
+                columnDefs: [
+                    {
+                        
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let sum_invoice = set_invoice.map(m=>Number(m.invoice)).reduce((acc,curr)=> acc+curr);
+                    $('#sum_invoice').val(sum_invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                },
+                searching: false,
+                ordering: false,
+                paging: false,
+                info : false
+            });
+        };
 
-            datas_percent.push(down_payment);
-            datas_percent.push(document_submit);
-            datas_percent.push(instrument_vendor);
-            datas_percent.push(instrument_delivered_ctl);
-            datas_percent.push(system_delivered_ctl);
-            datas_percent.push(fat);
-            datas_percent.push(delivery_instrument);
-            datas_percent.push(delivery_system);
-            datas_percent.push(progress_work);
-            datas_percent.push(installation_work_complete);
-            datas_percent.push(commissioning);
-            datas_percent.push(startup);
-            datas_percent.push(as_built);
-            datas_percent.push(warranty);
-            datas_percent.push(finished);
-
-            let payments = [];
-            let new_payments = [];
-
-            for (let i =0;i<statuses.length;i++){
-                payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
-            }
-          
-            for (let i=0;i<payments.length;i++){
-                if (payments[i].percent > 0){
-                    new_payments.push(payments[i]);
+        $('#table_job tbody').on('click', 'td','tr', async function () {
+            let job_id = table.row(this).data()[0];
+            let columnID = table.cell(this)[0][0].column;
+            let column_name = $("tr").find(`th:eq(${columnID})`).html();
+            if (column_name === "% Invoice"){                             
+                let job = jobs_status.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                let list_invoice = job.invoices;
+                set_invoice = [];
+                for (let i=0;i<list_invoice.length;i++){ 
+                    let invoice = list_invoice[i].invoice;
+                    let date = list_invoice[i].invoice_date;
+                    set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});               
                 }
-            }
-            payments = new_payments;
-
-            $('#job_id').val(job_id);
-            $('#job_name').val(job_name);
-            $('#job_in_hand').val(job_in_hand);
-            $('#invoice').val(invoice);
-            $('#due_date').val(due_date.split('T')[0]);
-            $('#status').val(status);
-
-            if (status === undefined){
-                $('#form_status').attr('hidden',true);
+                GenerateTableInvoice(set_invoice);
+                $('#modal_invoice').modal();   
             }else{
-                $('#form_status').attr('hidden',false);
-            }
-            GenerateTablePayment(payments);
+                let data = table.row(this).data();
+                let job_id = data[0];
+                let data_job = jobs_status.filter(f=>f.job_id == job_id).map(m=>m)[0];
+                let status = statuses.filter(f=>f.status_name == data_job.status).map(m=>m.status_id)[0];
+                let job_name = data_job.job_name;
+                let job_in_hand = data_job.job_in_hand;
 
-            $('#modal_job').modal();
+                let invoice = 0;
+                if (data_job.invoices.length > 0){
+                    invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
+                }
+                let due_date = data_job.due_date;
+
+                let datas_percent = [];
+                let down_payment = data_job.term_payment.down_payment;
+                let document_submit = data_job.term_payment.document_submit;
+                let instrument_vendor = data_job.term_payment.instrument_vendor;
+                let instrument_delivered_ctl = data_job.term_payment.instrument_delivered_ctl;
+                let system_delivered_ctl = data_job.term_payment.system_delivered_ctl;
+                let fat = data_job.term_payment.fat;
+                let delivery_instrument = data_job.term_payment.delivery_instrument;
+                let delivery_system = data_job.term_payment.delivery_system;
+                let progress_work = data_job.term_payment.progress_work;
+                let installation_work_complete = data_job.term_payment.installation_work_complete;
+                let commissioning = data_job.term_payment.commissioning;
+                let startup = data_job.term_payment.startup;
+                let as_built = data_job.term_payment.as_built;
+                let warranty = data_job.term_payment.warranty;
+                let finished = data_job.term_payment.finished;
+
+                datas_percent.push(down_payment);
+                datas_percent.push(document_submit);
+                datas_percent.push(instrument_vendor);
+                datas_percent.push(instrument_delivered_ctl);
+                datas_percent.push(system_delivered_ctl);
+                datas_percent.push(fat);
+                datas_percent.push(delivery_instrument);
+                datas_percent.push(delivery_system);
+                datas_percent.push(progress_work);
+                datas_percent.push(installation_work_complete);
+                datas_percent.push(commissioning);
+                datas_percent.push(startup);
+                datas_percent.push(as_built);
+                datas_percent.push(warranty);
+                datas_percent.push(finished);
+
+                let payments = [];
+                let new_payments = [];
+
+                for (let i =0;i<statuses.length;i++){
+                    payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
+                }
+          
+                for (let i=0;i<payments.length;i++){
+                    if (payments[i].percent > 0){
+                        new_payments.push(payments[i]);
+                    }
+                }
+                payments = new_payments;
+
+                $('#job_id').val(job_id);
+                $('#job_name').val(job_name);
+                $('#job_in_hand').val(job_in_hand);
+                $('#invoice').val(invoice);
+                $('#due_date').val(due_date.split('T')[0]);
+                $('#status').val(status);
+
+                if (status === undefined){
+                    $('#form_status').attr('hidden',true);
+                }else{
+                    $('#form_status').attr('hidden',false);
+                }
+                GenerateTablePayment(payments);
+
+                $('#modal_job').modal();
+            }
         });
 
         function GenerateTablePayment(payments) {

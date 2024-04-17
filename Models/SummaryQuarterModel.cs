@@ -13,6 +13,7 @@ namespace WebENG.Models
         public string type { get; set; }
         public double job_eng_in_hand { get; set; }
         public double invoice_eng { get; set; }
+        public double backlog_invoice_eng { get; set; }
         public string status { get; set; }
         public DateTime finished_date { get; set; }
     }

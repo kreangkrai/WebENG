@@ -238,7 +238,7 @@
             let year = $('#year').val();
 
             await GetACCJobInHand(year,"ALL");
-            await GetJobInHandProject(year,"project");
+            await GetJobInHandProject(year,"Project");
             await GetJobInHandService(year,"Service");
             await GetProjectInHand(year);
             await GetServiceInHand(year);
@@ -247,7 +247,7 @@
             GenerateChartService(year,jobs_eng_in_hand_service);
             GenerateTableProject(projects_in_hand);
             GenerateTableService(services_in_hand);
-
+            console.log(jobs_eng_in_hand_project);
             JobInHand();
         });
 
