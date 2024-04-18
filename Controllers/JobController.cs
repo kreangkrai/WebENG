@@ -137,9 +137,9 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetQuotations(string year)
+        public JsonResult GetQuotations()
         {
-            List<JobQuotationModel> quots = JobService.GetJobQuotations(year);
+            List<JobQuotationModel> quots = JobService.GetJobQuotations();
             return Json(quots);
         }
     }

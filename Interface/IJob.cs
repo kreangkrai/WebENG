@@ -15,7 +15,7 @@ namespace WebENG.Interface
         string CreateTermPayment(Term_PaymentModel term_Payment);
         string UpdateJob(JobModel job);
         string UpdateTermPayment(Term_PaymentModel term_Payment);
-        List<JobQuotationModel> GetJobQuotations(string year);
+        List<JobQuotationModel> GetJobQuotations();
 
         List<EngProcessModel> GetProcesses();
         List<EngProcessModel> GetProcessByJob(string job);

@@ -565,7 +565,7 @@
                 type: "GET",
                 url: '@Url.Action("GetQuotations", "Job")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year },
+                data: { },
                 success: function (response) {
                     quots = response;
                     if (debug_quots) {

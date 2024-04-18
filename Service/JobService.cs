@@ -386,7 +386,7 @@ namespace WebENG.Service
             return "Success";
         }
 
-        public List<JobQuotationModel> GetJobQuotations(string year)
+        public List<JobQuotationModel> GetJobQuotations()
         {
             List<JobQuotationModel> quots = new List<JobQuotationModel>();
             try
@@ -396,9 +396,7 @@ namespace WebENG.Service
                         quotation_no,
                         customer,
                         product_type
-                    FROM Quotation
-                    WHERE quotation_no Like 'Q{year}%' OR 
-                    quotation_no Like 'Q{Convert.ToInt32(year) - 1}%'");
+                    FROM Quotation");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
