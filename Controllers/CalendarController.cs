@@ -19,7 +19,7 @@ namespace WebENG.Controllers
         readonly IEngUser EngineerService;
         readonly IJobResponsible JobResponsibleService;
         readonly IJob Job;
-
+        readonly IAuthen Authen;
         public CalendarController()
         {
             WorkingHoursService = new WorkingHoursService();
@@ -27,6 +27,7 @@ namespace WebENG.Controllers
             EngineerService = new EngUserService();
             JobResponsibleService = new JobResponsibleService();
             Job = new JobService();
+            Authen = new AuthenService();
         }
 
         public IActionResult Index()
@@ -51,6 +52,13 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        [HttpGet]
+        public JsonResult GetUsers()
+        {
+            List<AuthenModel> users = Authen.GetAuthens();
+            return Json(users);
         }
 
         [HttpGet]

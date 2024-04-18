@@ -282,6 +282,7 @@ namespace WebENG.Service
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
+                        job_type,
                         CASE WHEN FORMAT(job_date,'yyyy') = '{year}' THEN
 							CASE
 								WHEN MONTH(job_date) >= 1 AND MONTH(job_date) <=3
@@ -330,6 +331,7 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             quarter = dr["quarter"] != DBNull.Value ? Convert.ToInt32(dr["quarter"].ToString()) : 0,
+                            job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             type = dr["type"] != DBNull.Value ? dr["type"].ToString() : "",
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
                             invoice_eng = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"]) : 0,

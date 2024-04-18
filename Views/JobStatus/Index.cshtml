@@ -348,6 +348,44 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modalJobInfo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="job_title"class="modal-title">Job Manpower Information</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-dark">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="taskRatio" style="height:500px;width:100%"></div>
+                        </div>
+                        <div class="col-12">
+                            <div style="height:500px;width:100%">
+                                <canvas id="taskDistribution"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div id="manpowerRatio" style="height:500px;width:100%"></div>
+                        </div>
+                        <div class="col-12">
+                            <div style="height:500px;width:100%">
+                                <canvas id="manpowerDistribution"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {  
     @*<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
@@ -360,6 +398,13 @@
          let set_payments = new Set();
          let set_column = new Set();
          let set_invoice = [];
+
+         let chartTaskRatio;
+         let chartTaskDistribution;
+         let chartManpowerRatio;
+         let chartManpowerDistribution;
+
+         let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff'];
 
          $(document).ready(async function (){            
              await GetUsers();
@@ -704,7 +749,9 @@
                     set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});               
                 }
                 GenerateTableInvoice(set_invoice);
-                $('#modal_invoice').modal();   
+                $('#modal_invoice').modal();
+            }else if (column_name === "% Eng Cost"){
+                ShowJobManpowerInfo(job_id);
             }else{
                 let data = table.row(this).data();
                 let job_id = data[0];
@@ -783,6 +830,318 @@
                 $('#modal_job').modal();
             }
         });
+
+        async function ShowJobManpowerInfo(jobId) {
+            $('#modalJobInfo').modal();
+            await GetTaskRatio(jobId);
+            await GetTaskDistribution(jobId);
+            await GetManpowerRatio(jobId);
+            await GetManpowerDistribution(jobId);
+
+            $('#job_title').html(`Job Manpower Information : ${jobId}`);
+        }
+
+        async function GetTaskRatio(job_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTaskRatio", "Analysis")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_id
+                },
+                success: function (response) {
+                    trs = response;
+                    GenerateChartTaskRatio();
+                }
+            });
+        }
+
+        async function GetTaskDistribution(job_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTaskDistribution", "Analysis")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_id
+                },
+                success: function (response) {
+                    tds = response;
+                    GenerateChartTaskDistribution();
+                }
+            });
+        }
+
+        async function GetManpowerRatio(job_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetManpowerRatio", "Analysis")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_id
+                },
+                success: function (response) {
+                    mrs = response;
+                    GenerateChartManpowerRatio();
+                }
+            });
+        }
+
+        async function GetManpowerDistribution(job_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetManpowerDistribution", "Analysis")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_id
+                },
+                success: function (response) {
+                    mds = response;
+                    GenerateChartManpowerDistribution();
+                }
+            });
+        }
+
+        function GenerateChartTaskRatio() {
+
+            let trs_data = [];
+            for (let i = 0; i < trs.length; i++) {
+                trs_data.push(
+                    {
+                        y: trs[i].hours,
+                        indexLabel: trs[i].percents.toFixed(2) + " % - " + trs[i].task_name,
+                        indexLabelFontSize: 14,
+                        indexLabelFontFamily: "san-seriff",
+                        indexLabelFontColor: "white",
+                        legendText: trs[i].task_name,
+                    }
+                );
+            }
+
+            chartTaskRatio = new CanvasJS.Chart("taskRatio",
+                {
+                    title: {
+                        text: "Task Ratio",
+                        fontSize: 18,
+                        fontFamily: "san-seriff",
+                        fontWeight: "bold",
+                        fontColor: "white",
+                    },
+                    legend: {
+                        fontSize: 14,
+                        fontFamily: "san-seriff",
+                        fontColor: "white",
+                        fontWeight: "normal",
+                    },
+                    backgroundColor: "transparent",
+                    data: [{
+                        type: "doughnut",
+                        radius: "100%",
+                        startAngle: -90,
+                        showInLegend: true,
+                        toolTipContent: "{y} Hours - {legendText}",
+                        legendText: "{legendText}",
+                        dataPoints: trs_data,
+                    }],
+                }
+            );
+            chartTaskRatio.render();
+        }
+
+         function GenerateChartTaskDistribution() {
+            let task_names = [];
+            let hours = [];
+
+            for (let i = 0; i < tds.length; i++) {
+                task_names.push(tds[i].task_id + ' - ' + tds[i].task_name);
+                hours.push(tds[i].hours);
+            }
+
+            if (chartTaskDistribution !== undefined) {
+                chartTaskDistribution.destroy();
+            }
+
+            let ctx3 = document.getElementById('taskDistribution').getContext('2d');
+            chartTaskDistribution = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: task_names,
+                    datasets: [
+                        {
+                            label: 'Hours',
+                            data: hours,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'rgba(255,255,255,0.8)',
+                            },
+                            title: {
+                                text: 'Hour(s)',
+                                color: 'rgba(255,255,255,0.8)',
+                                display: true
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: 'rgba(255,255,255,0.8)',
+                                align: 'left',
+                            },
+                            title: {
+                                text: 'Tasks',
+                                color: 'rgba(255,255,255,0.8)',
+                                display: true,
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: 'rgba(255,255,255,0.8)'
+                            },
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function GenerateChartManpowerRatio() {
+            let mrs_data = [];
+            for (let i = 0; i < mrs.length; i++) {
+                mrs_data.push(
+                    {
+                        y: mrs[i].hours,
+                        indexLabel: mrs[i].percents.toFixed(2) + " % - " + mrs[i].user_name,
+                        indexLabelFontSize: 14,
+                        indexLabelFontFamily: "san-seriff",
+                        indexLabelFontColor: "white",
+                        legendText: mrs[i].user_name,
+                    }
+                );
+            }
+
+            chartManpowerRatio = new CanvasJS.Chart("manpowerRatio",
+                {
+                    title: {
+                        text: "Manpower Ratio",
+                        fontSize: 18,
+                        fontFamily: "san-seriff",
+                        fontWeight: "bold",
+                        fontColor: "white",
+                    },
+                    legend: {
+                        fontSize: 14,
+                        fontFamily: "san-seriff",
+                        fontColor: "white",
+                        fontWeight: "normal",
+                    },
+                    backgroundColor: "transparent",
+                    data: [{
+                        type: "doughnut",
+                        radius: "100%",
+                        startAngle: -90,
+                        showInLegend: true,
+                        toolTipContent: "{y} Hours - {legendText}",
+                        legendText: "{legendText}",
+                        dataPoints: mrs_data,
+                    }],
+                }
+            );
+            chartManpowerRatio.render();
+        }
+
+        function GenerateChartManpowerDistribution() {
+            let users = mds.map(m => m.user_id);
+            users = [...new Set(users)];
+
+            let tasks = mds.map(m => m.task_id);
+            tasks = [...new Set(tasks)];
+
+            let hours = [];
+            for (let i = 0; i < users.length; i++) {
+                for (let j = 0; j < tasks.length; j++) {
+                    let hrs = [];
+                    hrs = mds.filter(f => f.user_id === users[i] && f.task_id === tasks[j]).map(m => m.hours);
+                    if (hrs[0] === undefined) {
+                        hrs[0] = 0;
+                    }
+                    hours.push([users[i], tasks[j], hrs[0]]);
+                }
+            }
+
+            let ds = [];
+            for (let i = 0; i < tasks.length; i++) {
+                let hrs = [];
+                hrs = hours.filter(f => f[1] === tasks[i]).map(m => m[2]);
+                let tt = mds.filter(f => f.task_id === tasks[i]);
+                ds.push({
+                    label: tt[0].task_id + " - " + tt[0].task_name,
+                    data: hrs,
+                    backgroundColor: colors[i],
+                    borderColor: colors[i],
+                    borderWidth: 1
+                });
+            }
+
+            if (chartManpowerDistribution !== undefined) {
+                chartManpowerDistribution.destroy();
+            }
+
+            let ctx4 = document.getElementById('manpowerDistribution').getContext('2d');
+            chartManpowerDistribution = new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: users,
+                    datasets: ds
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: 'rgba(255,255,255,0.8)'
+                            },
+                            title: {
+                                text: 'Hour(s)',
+                                color: 'rgba(255,255,255,0.8)',
+                                display: true,
+                            },
+                            stacked: true
+                        },
+                        y: {
+                            ticks: {
+                                color: 'rgba(255,255,255,0.8)'
+                            },
+                            title: {
+                                text: 'Name',
+                                color: 'rgba(255,255,255,0.8)',
+                                display: true,
+                            },
+                            stacked: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: 'rgba(255,255,255,0.8)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         function GenerateTablePayment(payments) {
             let datas = [];

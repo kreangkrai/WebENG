@@ -270,7 +270,7 @@
         async function GetUsers() {
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetUsers", "EngUser")',
+                url: '@Url.Action("GetUsers", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
@@ -555,7 +555,7 @@
             $('#user_id').empty();
             let user_string = `<option value="" selected disabled>Please Select User</option>`;
             for (let i = 0; i < users.length; i++) {
-                user_string += `<option value="${users[i].user_id}">${users[i].user_name}</option>`;
+                user_string += `<option value="${users[i].user_id}">${users[i].name}</option>`;
             }
             $('#user_id').append(user_string);
         }
@@ -696,7 +696,7 @@
             $('#modal_task').modal();
             $('#modal_task_title').text("Add Task");
             let user_name = '@Model.name.ToLower()';
-            let user_id = users.filter(f => f.user_name.toLowerCase() === user_name).map(m => m.user_id);
+            let user_id = users.filter(f => f.name.toLowerCase() === user_name).map(m => m.user_id);
             $('#working_hour_id').val(last_id);
             $('#user_id').val(user_id);
             $('#working_date_group').show();
@@ -715,7 +715,7 @@
             $('#modal_task').modal();
             $('#modal_task_title').text("Add Tasks");
             let user_name = '@Model.name.ToLower()';
-            let user_id = users.filter(f => f.user_name.toLowerCase() === user_name).map(m => m.user_id);
+            let user_id = users.filter(f => f.name.toLowerCase() === user_name).map(m => m.user_id);
             $('$working_hour_id').val(last_id);
             $('#user_id').val(user_id);
             $('#working_date_group').hide();
@@ -1121,7 +1121,7 @@
         async function EditTask(event) {
             update = true;
             let user_id = event.extendedProps.user_id;
-            let user_name = users.filter(f => f.user_id === user_id).map(m => m.user_name.toLowerCase());
+            let user_name = users.filter(f => f.user_id === user_id).map(m => m.name.toLowerCase());
             let date = event.extendedProps.working_date;
 
             let job_id = event.extendedProps.job_id;

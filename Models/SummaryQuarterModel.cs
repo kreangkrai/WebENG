@@ -10,6 +10,7 @@ namespace WebENG.Models
         public string job_id { get; set; }
         public DateTime job_date { get; set; }
         public int quarter { get; set; }
+        public string job_type { get; set; }
         public string type { get; set; }
         public double job_eng_in_hand { get; set; }
         public double invoice_eng { get; set; }
