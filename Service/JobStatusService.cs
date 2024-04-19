@@ -76,6 +76,7 @@ namespace WebENG.Service
 						Term_Payment.warranty,
 						Term_Payment.finished,
 						Jobs.job_in_hand,
+                        Jobs.job_eng_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.finished_date
@@ -96,6 +97,9 @@ namespace WebENG.Service
                     {
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
+                        double job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0;
+                        double job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0;
+                        double eng_invoice = (_invoices.Sum(s => s.invoice) / job_in_hand ) * job_eng_in_hand;
 
                         List<JobSummaryModel> jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).ToList();
 
@@ -136,8 +140,10 @@ namespace WebENG.Service
                             cost_per_manpower = 0,
                             ot_manpower = 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
-                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
+                            job_in_hand = job_in_hand,
+                            job_eng_in_hand = job_eng_in_hand,
                             invoices = _invoices,
+                            eng_invoice = eng_invoice,
                             job_summary = jobSummary,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
@@ -225,6 +231,7 @@ namespace WebENG.Service
 						Term_Payment.warranty,
 						Term_Payment.finished,
 						Jobs.job_in_hand,
+                        Jobs.job_eng_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.finished_date
@@ -246,6 +253,10 @@ namespace WebENG.Service
                     {
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
+
+                        double job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0;
+                        double job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0;
+                        double eng_invoice = (_invoices.Sum(s => s.invoice) / job_in_hand) * job_eng_in_hand;
 
                         List<JobSummaryModel> jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).ToList();
 
@@ -286,7 +297,9 @@ namespace WebENG.Service
                             cost_per_manpower = 0,
                             ot_manpower = 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
-                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
+                            job_in_hand = job_in_hand,
+                            job_eng_in_hand = job_eng_in_hand,
+                            eng_invoice = eng_invoice,
                             invoices = _invoices,
                             job_summary = jobSummary,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,

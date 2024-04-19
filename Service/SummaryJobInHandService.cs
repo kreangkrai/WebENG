@@ -11,9 +11,11 @@ namespace WebENG.Service
     public class SummaryJobInHandService : ISummaryJobInHand
     {
         readonly ITarget Target;
+        readonly IJobStatus JobStatus;
         public SummaryJobInHandService()
         {
             Target = new TargetService();
+            JobStatus = new JobStatusService();
         }
         public List<SummaryJobInHandModel> GetsAccJobInHand(int year,string type)
         {
@@ -66,7 +68,7 @@ namespace WebENG.Service
 	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,3))) as remaining_percent_invoice,
 	                    CAST((job_eng_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                 from Jobs
-                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') < '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
@@ -78,20 +80,30 @@ namespace WebENG.Service
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
+                    List<JobModel> _jobs = JobStatus.GetJobStatusALL();
                     while (dr.Read())
                     {
+                        string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
+                        JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
+                        double cost = _job.job_summary.FirstOrDefault().cost;
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / cost * 100);
+                        double invoice_eng = _job.eng_invoice;
+                        double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
+                        double remaining_amount = _job.job_eng_in_hand - invoice_eng;
                         JobInhandModel jobSummary = new JobInhandModel()
                         {
-                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
+                            percent_eng_cost = percent_eng_cost,
+                            percent_invoice = percent_invoice_eng,
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0,
                             invoice_eng = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"]) : 0,
                             remaining_percent_invoice = dr["remaining_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["remaining_percent_invoice"]) : 0,
-                            remaining_amount = dr["remaining_amount"] != DBNull.Value ? Convert.ToDouble(dr["remaining_amount"]) : 0
+                            remaining_amount = Double.IsNaN(remaining_amount) ? 0 : remaining_amount
                         };
                         jobsSummaries.Add(jobSummary);
                     }
@@ -137,20 +149,30 @@ namespace WebENG.Service
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
+                    List<JobModel> _jobs = JobStatus.GetJobStatusALL();
                     while (dr.Read())
                     {
+                        string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
+                        JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
+                        double cost = _job.job_summary.FirstOrDefault().cost;
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / cost * 100);
+                        double invoice_eng = _job.eng_invoice;
+                        double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
+                        double remaining_amount = _job.job_eng_in_hand - invoice_eng;
                         JobInhandModel jobSummary = new JobInhandModel()
                         {
-                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0,
-                            invoice_eng = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"]) : 0,
+                            invoice_eng = invoice_eng,
+                            percent_eng_cost = percent_eng_cost,
+                            percent_invoice = percent_invoice_eng,
                             remaining_percent_invoice = dr["remaining_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["remaining_percent_invoice"]) : 0,
-                            remaining_amount = dr["remaining_amount"] != DBNull.Value ? Convert.ToDouble(dr["remaining_amount"]) : 0
+                            remaining_amount = Double.IsNaN(remaining_amount) ? 0 : remaining_amount
                         };
                         jobsSummaries.Add(jobSummary);
                     }

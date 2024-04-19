@@ -524,7 +524,7 @@
                 for(let j=0;j<jobs[i].invoices.length;j++){
                     sum_invoice += jobs[i].invoices[j].invoice;
                 }
-                
+                let eng_invoice = jobs[i].eng_invoice > 0 ? parseInt(jobs[i].eng_invoice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.map(m=>m.cost)[0] : 0;
                 let _eng_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m=>m.totalEngCost).reduce((acc,b) =>  acc + b) : 0;
                 let percent_eng_cost = Math.ceil((Number(_eng_cost) / Number(cost)) * 100);
@@ -545,6 +545,7 @@
                 let warranty = jobs[i].term_payment.warranty > 0 ? jobs[i].term_payment.warranty : "";
                 let finished = jobs[i].term_payment.finished > 0 ? jobs[i].term_payment.finished : "";
                 let job_in_hand = jobs[i].job_in_hand > 0 ? jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+                let job_eng_in_hand = jobs[i].job_eng_in_hand > 0 ? jobs[i].job_eng_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let due_date = jobs[i].due_date.split('T')[0];
                 datas.push([
                     jobs[i].job_id,
@@ -568,8 +569,8 @@
                     as_built,
                     warranty,
                     finished,
-                    job_in_hand,
-                    parseInt(sum_invoice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    job_eng_in_hand,
+                    eng_invoice,
                     due_date
                 ]);
             }

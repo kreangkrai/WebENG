@@ -42,9 +42,9 @@ namespace WebENG.Service
                         worksheet.Cells["S" + (i + startRows)].Value = jobs[i].term_payment.as_built * 0.01;
                         worksheet.Cells["T" + (i + startRows)].Value = jobs[i].term_payment.warranty * 0.01;
                         worksheet.Cells["U" + (i + startRows)].Value = jobs[i].term_payment.finished * 0.01;
-                        worksheet.Cells["V" + (i + startRows)].Value = jobs[i].job_in_hand;
-                        worksheet.Cells["W" + (i + startRows)].Value = jobs[i].invoices.Sum(s=>s.invoice);
-                        worksheet.Cells["X" + (i + startRows)].Value = (jobs[i].invoices.Sum(s=>s.invoice) / jobs[i].job_in_hand);
+                        worksheet.Cells["V" + (i + startRows)].Value = jobs[i].job_eng_in_hand;
+                        worksheet.Cells["W" + (i + startRows)].Value = jobs[i].eng_invoice;
+                        worksheet.Cells["X" + (i + startRows)].Value = (jobs[i].eng_invoice / jobs[i].job_eng_in_hand);
                         worksheet.Cells["Y" + (i + startRows)].Value = jobs[i].job_date.ToString("dd/MM/yyyy");
                     }
                     p.SaveAs(stream);

@@ -21,7 +21,9 @@ namespace WebENG.Models
         public double job_eng_in_hand { get; set; }
         public double invoice { get; set; }
         public double invoice_eng { get; set; }
-        public double remaining_percent_invoice { get; set; }
+        public double percent_eng_cost { get; set; }
+        public double percent_invoice { get; set; }
+        public double remaining_percent_invoice { get; set; }       
         public double remaining_amount { get; set; }
     }
 }

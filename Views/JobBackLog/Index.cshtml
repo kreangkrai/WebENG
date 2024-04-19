@@ -34,7 +34,7 @@
                     <div class="card-body">
                         <div class="row" style="row-gap:10px">
                             <div class="col-md-4">
-                                <label class="d-flex justify-content-center" for="backlog_project">Job Project</label>
+                                <label class="d-flex justify-content-center" for="backlog_project">Remaining Job Project</label>
                                 <div class="input-group">
                                     <input id="backlog_project" type="text" class="form-control"/>
                                     <div class="input-group-append">
@@ -43,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="d-flex justify-content-center" for="backlog_service">Job Service</label>
+                                <label class="d-flex justify-content-center" for="backlog_service">Remaining Job Service</label>
                                 <div class="input-group">
                                     <input id="backlog_service" type="text" class="form-control"/>
                                     <div class="input-group-append">
@@ -79,7 +79,8 @@
                                     <th>Job No.</th>
                                     <th>Customer Name</th>
                                     <th>Project Name</th>
-                                    <th>Remaining Inv.Payment (%)</th>
+                                    <th>% Eng Cost</th>
+                                    <th>% Invoice</th>
                                     <th>Remaining Amount</th>
                                 </tr>
                             </thead>                           
@@ -103,7 +104,8 @@
                                     <th>Job No.</th>
                                     <th>Customer Name</th>
                                     <th>Project Name</th>
-                                    <th>Remaining Inv.Payment (%)</th>
+                                    <th>% Eng Cost</th>
+                                    <th>% Invoice</th>
                                     <th>Remaining Amount</th>
                                 </tr>
                             </thead>                           
@@ -141,9 +143,9 @@
             let sum = 0;
             let sum_project = 0;
             let sum_service = 0;
-            sum_project = (projects_backlog.map(m=>m.remaining_amount).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
-            sum_service = (services_backlog.map(m=>m.remaining_amount).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
-            sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
+            sum_project = (projects_backlog.map(m=>m.remaining_amount).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(3);
+            sum_service = (services_backlog.map(m=>m.remaining_amount).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(3);
+            sum = (Number(sum_project) + Number(sum_service)).toFixed(3);
 
             $('#backlog_project').val(sum_project);
             $('#backlog_service').val(sum_service);
@@ -195,8 +197,9 @@
                     projects[i].job_id,
                     projects[i].customer_name,
                     projects[i].job_name,
-                    projects[i].remaining_percent_invoice,
-                    projects[i].remaining_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    projects[i].percent_eng_cost,
+                    projects[i].percent_invoice,
+                    parseInt(projects[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -214,12 +217,13 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = projects.filter(f=>f.job_id == job_id).map(m=>m)[0];
-                    let remaining_invoice = data.remaining_percent_invoice;
-                    if (remaining_invoice == 0){
+                    let remaining_amount = data.remaining_amount;
+                    if (remaining_amount == 0){
                         $(`td`,row).css({ "text-decoration": 'line-through'});
                         $(`td`,row).css({ "color": 'blue'});
                         $(`td:eq(4)`, row).text("finished");
                         $(`td:eq(5)`, row).text("finished");
+                        $(`td:eq(6)`, row).text("finished");
                     }
                 },
                 searching: true,
@@ -238,8 +242,9 @@
                     services[i].job_id,
                     services[i].customer_name,
                     services[i].job_name,
-                    services[i].remaining_percent_invoice,
-                    services[i].remaining_amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    services[i].percent_eng_cost,
+                    services[i].percent_invoice,
+                    parseInt(services[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -257,12 +262,13 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = services.filter(f=>f.job_id == job_id).map(m=>m)[0];
-                    let remaining_invoice = data.remaining_percent_invoice;
-                    if (remaining_invoice == 0){
+                    let remaining_amount = data.remaining_amount;
+                    if (remaining_amount == 0){
                         $(`td`,row).css({ "text-decoration": 'line-through'});
                         $(`td`,row).css({ "color": 'blue'});
                         $(`td:eq(4)`, row).text("finished");
                         $(`td:eq(5)`, row).text("finished");
+                        $(`td:eq(6)`, row).text("finished");
                     }
                 },
                 searching: true,
