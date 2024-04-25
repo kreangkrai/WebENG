@@ -391,13 +391,19 @@
     @*<script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/fixedColumns.dataTables.js"></script>
     <script src="https://cdn.datatables.net/fixedcolumns/4.0.1/js/dataTables.fixedColumns.js"></script>*@
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
+         google.charts.load("current", {packages:["corechart"]});
+         google.charts.setOnLoadCallback(GenerateChartTaskRatio);
+         google.charts.setOnLoadCallback(GenerateChartManpowerRatio);
          let table;
          let table_invoice;
          let jobs_status = [];
          let set_payments = new Set();
          let set_column = new Set();
          let set_invoice = [];
+         let trs = [];
+         let mrs = [];
 
          let chartTaskRatio;
          let chartTaskDistribution;
@@ -832,13 +838,13 @@
             }
         });
 
-        async function ShowJobManpowerInfo(jobId) {
+       async function ShowJobManpowerInfo(jobId) {  
             $('#modalJobInfo').modal();
             await GetTaskRatio(jobId);
             await GetTaskDistribution(jobId);
             await GetManpowerRatio(jobId);
             await GetManpowerDistribution(jobId);
-
+            
             $('#job_title').html(`Job Manpower Information : ${jobId}`);
         }
 
@@ -902,7 +908,7 @@
             });
         }
 
-        function GenerateChartTaskRatio() {
+        @*function GenerateChartTaskRatio() {
 
             let trs_data = [];
             for (let i = 0; i < trs.length; i++) {
@@ -946,8 +952,35 @@
                 }
             );
             chartTaskRatio.render();
-        }
+        }*@
 
+        function GenerateChartTaskRatio() {
+            setTimeout(function(){
+                let datas = [];
+                datas.push(["Task","Hours"]);
+                for(let i=0;i<trs.length;i++){
+                    let name = trs[i].task_name;
+                    datas.push([name , trs[i].hours]);
+                }
+                var data = google.visualization.arrayToDataTable(datas);
+
+                var options = {
+                  title: 'Task Ratio',
+                  titleTextStyle:{color:'white',fontSize: 16},
+                  pieHole: 0.65,
+                  colors:colors,
+                  pieSliceText:'percentage',
+                  is3D:false,
+                  backgroundColor:'#343A40',
+                  legend:{position:'bottom',textStyle: {color: 'white', fontSize: 14}},
+                  pieStartAngle:90,
+                  pieSliceBorderColor:'#343A40',
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('taskRatio'));
+                chart.draw(data, options);
+            },300);
+        }
          function GenerateChartTaskDistribution() {
             let task_names = [];
             let hours = [];
@@ -1015,7 +1048,7 @@
             });
         }
 
-        function GenerateChartManpowerRatio() {
+        @*function GenerateChartManpowerRatio() {
             let mrs_data = [];
             for (let i = 0; i < mrs.length; i++) {
                 mrs_data.push(
@@ -1058,6 +1091,34 @@
                 }
             );
             chartManpowerRatio.render();
+        }*@
+
+        function GenerateChartManpowerRatio() {
+            setTimeout(function(){
+                let datas = [];
+                datas.push(["Name","Hours"]);
+                for(let i=0;i<mrs.length;i++){
+                    let name = mrs[i].user_name;
+                    datas.push([name , mrs[i].hours]);
+                }
+                var data = google.visualization.arrayToDataTable(datas);
+
+                var options = {
+                  title: 'Manpower Ratio',
+                  titleTextStyle:{color:'white',fontSize: 16},
+                  pieHole: 0.65,
+                  colors:colors,
+                  pieSliceText:'percentage',
+                  is3D:false,
+                  backgroundColor:'#343A40',
+                  legend:{position:'bottom',textStyle: {color: 'white', fontSize: 14}},
+                  pieStartAngle:90,
+                  pieSliceBorderColor:'#343A40',
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('manpowerRatio'));
+                chart.draw(data, options);
+            },300);
         }
 
         function GenerateChartManpowerDistribution() {
