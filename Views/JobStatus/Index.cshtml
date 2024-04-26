@@ -410,9 +410,9 @@
          let chartManpowerRatio;
          let chartManpowerDistribution;
 
-         let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff'];
+         let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff','#912AB4','#D32D67','#3973DF','#298ED9','#73E5AE','#EFC67A','#CAEF7A','#485E1A','#93A6DA','#0B717A'];
 
-         $(document).ready(async function (){            
+         $(document).ready(async function (){     
              await GetUsers();
              await GenerateUsers();             
              await GetStatus();
@@ -477,7 +477,7 @@
         }
 
         $('#btn_load').on('click',async function(){
-
+            
             set_payments = new Set();
             for (let i =0;i<statuses.length;i++){
                 set_payments.add(statuses[i].status_name);
@@ -495,7 +495,7 @@
             GenerateColumnCheckBox();
             $('#form_select_term_payment').attr('hidden',false);
             $('#form_select_column').attr('hidden',false);
-            $('#form_export').attr('hidden',false);
+            $('#form_export').attr('hidden',false);         
         });
 
         function GenerateTable(jobs) {

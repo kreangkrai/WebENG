@@ -17,6 +17,75 @@ namespace WebENG.Service
             Target = new TargetService();
             JobStatus = new JobStatusService();
         }
+
+        public OrderInTakeModel GetOrderInTake(int year)
+        {
+            OrderInTakeModel orderInTake = new OrderInTakeModel();
+            List<QuarterModel> jobs = new List<QuarterModel>();
+            try
+            {
+                string stringCommand = string.Format($@"
+                select  Jobs.job_id,
+						job_date,
+                        job_type,
+						case when FORMAT(job_date,'yyyy') < {year} OR job_date is null then 'backlog' else 'now' end as type,
+						CAST((Jobs.job_eng_in_hand / 1000000) as decimal(18,3)) as job_eng_in_hand,
+                        CAST((((case when backlog_invoice.invoice is null then 0 else backlog_invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) / 1000000) as decimal(18,3)) as backlog_invoice_eng,
+					    Eng_Status.status_name as status,
+				        Jobs.finished_date
+				from Jobs
+				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
+
+                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        QuarterModel job = new QuarterModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
+                            job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
+                            type = dr["type"] != DBNull.Value ? dr["type"].ToString() : "",
+                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
+                            backlog_invoice_eng = dr["backlog_invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["backlog_invoice_eng"]) : 0,
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                        };
+                        jobs.Add(job);
+                    }
+                    dr.Close();
+                }
+
+                double backlog_volume = jobs.Where(w => w.type == "backlog" && w.job_date.Year < year).Select(s => s.job_eng_in_hand).Sum() - jobs.Where(w => w.type == "backlog").Select(s => s.backlog_invoice_eng).Sum();
+                double job_eng_in_hand_volume = jobs.Where(w => w.type == "now").Select(s => s.job_eng_in_hand).Sum();
+
+                orderInTake = new OrderInTakeModel()
+                {
+                    year = year,
+                    backlog = backlog_volume,
+                    job_eng_in_hand = job_eng_in_hand_volume,
+                    target = 200
+                };
+
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return orderInTake;
+        }
+
         public List<SummaryJobInHandModel> GetsAccJobInHand(int year,string type)
         {
             List<SummaryJobInHandModel> jobsSummaries = new List<SummaryJobInHandModel>();

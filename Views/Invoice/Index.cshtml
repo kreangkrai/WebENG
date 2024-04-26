@@ -41,7 +41,7 @@
         </div>
         <div class="card card-dark">
             <div class="card-header">
-                <span id="label_job"class="card-title">JOB IN HAND & SALES TURNOVER ENG FOR</span>
+                <span id="label_job" class="card-title">JOB IN HAND & SALES TURNOVER ENG FOR</span>
             </div>
             <div class="card-body" style="overflow-x:auto">
                 <table id="table" class="table table-sm table-bordered table-hover text-center table-striped nowrap" style="width:100%">
@@ -59,10 +59,15 @@
                             <th style="text-align:center;vertical-align:middle;">Complete Job</th>
                             <th style="text-align:center;vertical-align:middle;">Volume (MB)</th>
                             <th style="text-align:center;vertical-align:middle;">Incomplete Job</th>
-                        </tr>                    
+                        </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
+            </div>
+        </div>
+        <div class="card card-dark">
+            <div class="card-body">
+                <canvas id="chart_order_in_take" style="height:400px" />
             </div>
         </div>
     </div>
@@ -73,9 +78,11 @@
     let table;
     let chart_invoice;
     let chart_acc_invoice;
+    let chart_order_in_take;
     let invoices = [];
     let acc_invoices = [];
     let summary_quarters = [];
+    let orders_in_take = [];
     $(document).ready(async function () {
         getYear();
     });
@@ -125,6 +132,18 @@
         });
     };
 
+    async function GetOrderInTake(year){
+        await $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetOrderInTake", "Invoice")',
+            contentType: 'application/x-www-form-urlencoded',
+            data: { year },
+            success: function (response) {
+                orders_in_take = response;
+            }
+        });
+    };
+
     $('#btnUpdate').on('click',async function(){
         let year = $('#year').val();
 
@@ -132,9 +151,11 @@
         await GetENGInvoice(year);
         await GetAccENGInvoice(year);
         await GetSummaryQuarter(year);
+        await GetOrderInTake(year);
         GenerateChartENGInvoice(year,invoices);
         GenerateChartAccENGInvoice(year,acc_invoices);
         GenerateTable(summary_quarters);
+        GenerateOrderInTake(year,orders_in_take);
     });
 
     function GenerateChartENGInvoice(year,invoices) {
@@ -187,6 +208,9 @@
                 plugins: {
                     title: {
                         text: `SUMMARY SALE TURNOVER OF JOB ENG OF ${year}`,
+                        font: {
+                            size: 16
+                        },
                         display: true
                     },
                     legend: {
@@ -247,6 +271,9 @@
                 plugins: {
                     title: {
                         text: `ACCUMULATE SALE TURNOVER OF JOB ENG OF ${year}`,
+                        font: {
+                              size: 16
+                        },
                         display: true
                     },
                     legend: {
@@ -255,13 +282,13 @@
                     }
                 },
             }
-        });           
-   }
+        });
+    }
 
     function GenerateTable(items) {
             if (table !== null)
                 $('#table').DataTable().destroy();
-            
+
             let datas = [];
             for (let i=0;i<items.length;i++){
                 var data = [
@@ -281,7 +308,7 @@
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
@@ -296,11 +323,85 @@
                 paging: false,
                 info : false
             });
-        };
+    };
 
-        $('#btnExport').on('click',function(){
-            let year = $('#year').val();
-            location.href = '@Url.Action("ExportSummarySaleTurnOver", "Invoice")?year='+ year;
-        });
+    function GenerateOrderInTake(year,datas){
+            if (chart_order_in_take != null){
+                chart_order_in_take.destroy();
+            }
+            var chartName = "chart_order_in_take";
+            var ctx = document.getElementById(chartName).getContext('2d');
+
+            var years = [];
+            var backlogs = [];
+            var jobs_eng_in_hand = [];
+            var targets = [];
+
+            //get datas
+            for (var i =0; i<datas.length;i++){
+                years.push(datas[i].year);
+                backlogs.push(datas[i].backlog);
+                jobs_eng_in_hand.push(datas[i].job_eng_in_hand);
+                targets.push(datas[i].target);
+            }
+            var labels = years;
+            const data = {
+                              labels: labels,
+                              datasets: [                               
+                                {
+                                  label: 'ENG Job In Hand',
+                                  data: jobs_eng_in_hand,
+                                  backgroundColor: '#203864',
+                                  stack: 'Stack 0',
+                                },
+                                {
+                                  label: 'Backlog',
+                                  data: backlogs,
+                                  backgroundColor: '#1E83C6',
+                                  stack: 'Stack 0',
+                                },
+                                {
+                                  label: 'Target',
+                                  data: targets,
+                                  backgroundColor: '#1FDCEC',
+                                  stack: 'Stack 1',
+                                },
+                              ],
+                        };
+
+                        const options = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                              scales: {
+                                y: {
+                                    title: {
+                                        text: "MB",
+                                        display: true
+                                    },
+                                    stacked: true,
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                title: {
+                                    text: `TREND ORDER IN TAKE ENG JOB OF Y2019 - Y${year}`,
+                                    font: {
+                                            size: 16
+                                    },
+                                    display: true
+                                },
+                                legend: {
+                                    position: 'bottom',
+                                    display: true
+                                }
+                            },
+
+                        };
+                        chart_order_in_take = new Chart(ctx, { type: 'bar', data: data, options: options });             
+        };
+    $('#btnExport').on('click',function(){
+        let year = $('#year').val();
+        location.href = '@Url.Action("ExportSummarySaleTurnOver", "Invoice")?year='+ year;
+    });
 </script>
 }

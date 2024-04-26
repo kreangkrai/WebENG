@@ -16,5 +16,6 @@ namespace WebENG.Interface
         List<JobInhandModel> GetsJobBackLog(int year);
 
         List<QuarterModel> GetsSummaryQuarter(int year);
+        OrderInTakeModel GetOrderInTake(int year);
     }
 }

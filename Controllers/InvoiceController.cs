@@ -170,6 +170,17 @@ namespace WebENG.Controllers
             return Json(quarters);
         }
 
+        [HttpGet]
+        public JsonResult GetOrderInTake(int year)
+        {
+            List<OrderInTakeModel> orderInTakes = new List<OrderInTakeModel>();
+            for (int y = 2019; y <= year; y++)
+            {
+                OrderInTakeModel orderInTake = SummaryJobInHand.GetOrderInTake(y);
+                orderInTakes.Add(orderInTake);
+            }
+            return Json(orderInTakes);
+        }
         public IActionResult ExportSummarySaleTurnOver(int year)
         {
             List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
