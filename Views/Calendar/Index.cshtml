@@ -14,8 +14,8 @@
 </div>
 
 <!-- Task Modal -->
-<div class="modal fade" id="modal_task" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" id="modal_task" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_task_title">Add Tasks</h5>
@@ -31,7 +31,7 @@
                     </div>
                     <div id="working_date_group" class="form-group row">
                         <div class="col-4">
-                            <label for="working_hour_id">Working Hours ID</label>
+                            <label for="working_hour_id">Working Hours</label>
                             <input id="working_hour_id" type="text" class="form-control" disabled />
                         </div>
                         <div class="col-4">
@@ -55,13 +55,17 @@
                             <input id="stop_date" type="date" class="form-control" />
                         </div>
                     </div>
-                    <div id="form_customers" class="form-group">
-                        <label for="customers">Filter By Customers</label>
-                        <select id="customers" class="form-control"></select>
-                    </div>
-                    <div id="form_job" class="form-group">
-                        <label for="job_id">Job</label>
-                        <select id="job_id" class="form-control"></select>
+                    <div class="form-group">
+                        <div class="row">
+                            <div id="form_customers" class="col-6">
+                                <label for="customers">Filter By Customers</label>
+                                <select id="customers" class="form-control"></select>
+                            </div>
+                            <div id="form_job" class="col-6">
+                                <label for="job_id">Job</label>
+                                <select id="job_id" class="form-control"></select>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-6">
@@ -84,33 +88,35 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-6">
+                        <div class="col-4">
                             <label for="start_time">From</label>
                             <input id="start_time" type="time" class="form-control" />
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <label for="stop_time">To</label>
                             <input id="stop_time" type="time" class="form-control" />
                         </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-6">
+                        <div class="col-2 pt-5">
                             <div class="form-check">
                                 <input id="lunch" class="form-check-input" type="checkbox" checked/>
                                 <label class="form-check-label">Lunch</label>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-2 pt-5">
                             <div class="form-check">
                                 <input id="dinner" class="form-check-input" type="checkbox" />
                                 <label class="form-check-label">Break</label>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="note">Note</label>
-                        <textarea id="note" class="form-control" rows="3" placeholder="Note or Description"></textarea>
-                    </div>
+                    <div class="form-group row">                       
+                        <div class="col-12">
+                             <div class="form-group">
+                                <label for="note">Note</label>
+                                <textarea id="note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
+                            </div>
+                        </div>
+                    </div>                  
                 </form>
             </div>
             <div class="modal-footer d-flex">
