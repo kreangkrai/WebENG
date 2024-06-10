@@ -314,7 +314,7 @@ namespace WebENG.Service
                 {
                     stringCommand = string.Format($@"
                     select t1.Month,
-	                    SUM(case when t1.job_eng_in_hand is null then 0.00 else FORMAT((t1.job_eng_in_hand / 1000000),'N3') end) as job_eng_in_hand
+	                    SUM(case when t1.job_eng_in_hand is null then 0.00 else CAST((t1.job_eng_in_hand / 1000000) as decimal(10,3)) end) as job_eng_in_hand
                     from 
 	                    (
 		                    select job_eng_in_hand,FORMAT(job_date,'MMM') as Month 
@@ -326,7 +326,7 @@ namespace WebENG.Service
                 {
                     stringCommand = string.Format($@"
                     select t1.Month,
-	                    SUM(case when t1.job_eng_in_hand is null then 0.00 else FORMAT((t1.job_eng_in_hand / 1000000),'N3') end) as job_eng_in_hand 
+	                    SUM(case when t1.job_eng_in_hand is null then 0.00 else CAST((t1.job_eng_in_hand / 1000000) as decimal(10,3)) end) as job_eng_in_hand 
                     from 
 	                    (
 		                    select job_eng_in_hand,FORMAT(job_date,'MMM') as Month 
