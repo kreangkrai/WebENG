@@ -25,8 +25,10 @@ namespace WebENG.Models
         public TimeSpan start_time { get; set; }
         public TimeSpan stop_time { get; set; }
         public string wh_type { get; set; }
-        public bool lunch { get; set; }
-        public bool dinner { get; set; }
+        public bool lunch_full { get; set; }
+        public bool lunch_half { get; set; }
+        public bool dinner_full { get; set; }
+        public bool dinner_half { get; set; }
         public string note { get; set; }
         public TimeSpan normal { get; set; }
         public TimeSpan ot1_5 { get; set; }

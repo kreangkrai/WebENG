@@ -96,16 +96,24 @@
                             <label for="stop_time">To</label>
                             <input id="stop_time" type="time" class="form-control" />
                         </div>
-                        <div class="col-2 pt-5">
+                        <div class="col-2 pt-4">
                             <div class="form-check">
-                                <input id="lunch" class="form-check-input" type="checkbox" checked/>
-                                <label class="form-check-label">Lunch</label>
+                                <input id="lunch_full" class="form-check-input" type="checkbox" checked/>
+                                <label class="form-check-label">Lunch Full</label>
+                            </div>
+                            <div class="form-check">
+                                <input id="lunch_half" class="form-check-input" type="checkbox"/>
+                                <label class="form-check-label">Lunch Half</label>
                             </div>
                         </div>
-                        <div class="col-2 pt-5">
+                        <div class="col-2 pt-4">
                             <div class="form-check">
-                                <input id="dinner" class="form-check-input" type="checkbox" />
-                                <label class="form-check-label">Break</label>
+                                <input id="dinner_full" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label">Break Full</label>
+                            </div>
+                            <div class="form-check">
+                                <input id="dinner_half" class="form-check-input" type="checkbox" />
+                                <label class="form-check-label">Break Half</label>
                             </div>
                         </div>
                     </div>
@@ -425,8 +433,10 @@
                             "start_time": whs[i].start_time,
                             "stop_time": whs[i].stop_time,
                             "wh_type": whs[i].wh_type,
-                            "lunch": whs[i].lunch,
-                            "dinner": whs[i].dinner,
+                            "lunch_full": whs[i].lunch_full,
+                            "lunch_half": whs[i].lunch_half,
+                            "dinner_full": whs[i].dinner_full,
+                            "dinner_half": whs[i].dinner_half,
                             "note": whs[i].note,
                         }
                     }
@@ -845,8 +855,10 @@
             let task_id = $('#task_id').val();
             let start_time = $('#start_time').val();
             let stop_time = $('#stop_time').val();
-            let lunch = $('#lunch').prop('checked');
-            let dinner = $('#dinner').prop('checked');
+            let lunch_full = $('#lunch_full').prop('checked');
+            let lunch_half = $('#lunch_half').prop('checked');
+            let dinner_full = $('#dinner_full').prop('checked');
+            let dinner_half = $('#dinner_half').prop('checked');
             let note = $('#note').val();
 
             if (debug_accept) {
@@ -871,8 +883,10 @@
                     "task_id": task_id,
                     "start_time": start_time,
                     "stop_time": stop_time,
-                    "lunch":lunch,
-                    "dinner":dinner,
+                    "lunch_full":lunch_full,
+                    "lunch_half":lunch_half,
+                    "dinner_full":dinner_full,
+                    "dinner_half":dinner_half,
                     "note": note,
                 });
 
@@ -906,8 +920,10 @@
                         "task_id": task_id,
                         "start_time": start_time,
                         "stop_time": stop_time,
-                        "lunch":lunch,
-                        "dinner":dinner,
+                        "lunch_full":lunch_full,
+                        "lunch_half":lunch_half,
+                        "dinner_full":dinner_full,
+                        "dinner_half":dinner_half,
                         "note": note,
                     });
                     await AddWorkingHours(wh_string);
@@ -928,8 +944,10 @@
                             "task_id": task_id,
                             "start_time": start_time,
                             "stop_time": stop_time,
-                            "lunch":lunch,
-                            "dinner":dinner,
+                            "lunch_full":lunch_full,
+                            "lunch_half":lunch_half,
+                            "dinner_full":dinner_full,
+                            "dinner_half":dinner_half,
                             "note": note,
                         });
                         task_overlap = await CheckAddTasksOverlap(wh_string);
@@ -966,8 +984,10 @@
             let stop_time = $('#stop_time').val();
             let wh_type = ($('#wh_type').val() === "") ? "REG" : $('#wh_type').val();
 
-            let lunch = $('#lunch').prop('checked');
-            let dinner = $('#dinner').prop('checked');
+            let lunch_full = $('#lunch_full').prop('checked');
+            let lunch_half = $('#lunch_half').prop('checked');
+            let dinner_full = $('#dinner_full').prop('checked');
+            let dinner_half = $('#dinner_half').prop('checked');
             let note = $('#note').val();
 
             let wh_string = JSON.stringify({
@@ -981,8 +1001,10 @@
                 "start_time": start_time,
                 "stop_time": stop_time,
                 "wh_type": wh_type,
-                "lunch": lunch,
-                "dinner": dinner,
+                "lunch_full":lunch_full,
+                "lunch_half":lunch_half,
+                "dinner_full":dinner_full,
+                "dinner_half":dinner_half,
                 "note": note,
             });
             await DeleteWorkingHours(wh_string);
@@ -1169,8 +1191,10 @@
                 "start_time": task.start_time,
                 "stop_time": task.stop_time,
                 "wh_type": task.wh_type,
-                "lunch": task.lunch,
-                "dinner": task.dinner,
+                "lunch_full": task.lunch_full,
+                "lunch_half": task.lunch_half,
+                "dinner_full": task.dinner_full,
+                "dinner_half": task.dinner_half,
                 "note": task.note,
             });
             UpdateWorkingHours(wh_string);
@@ -1223,8 +1247,10 @@
             $('#stop_date').val(null);
             $('#start_time').val(task.start_time);
             $('#stop_time').val(task.stop_time);
-            $('#lunch').prop('checked',task.lunch);
-            $('#dinner').prop('checked',task.dinner);
+            $('#lunch_full').prop('checked',task.lunch_full);
+            $('#lunch_half').prop('checked',task.lunch_half);
+            $('#dinner_full').prop('checked',task.dinner_full);
+            $('#dinner_half').prop('checked',task.dinner_half);
             $('#note').val(task.note);
             $('#btn_delete').show();
         }
@@ -1317,5 +1343,17 @@
             });
         }
 
+        $('#lunch_full').on('click',function(){
+            $('#lunch_half').prop('checked',false);
+        });
+        $('#lunch_half').on('click',function(){
+            $('#lunch_full').prop('checked',false);
+        });
+        $('#dinner_full').on('click',function(){
+            $('#dinner_half').prop('checked',false);
+        });
+        $('#dinner_half').on('click',function(){
+            $('#dinner_full').prop('checked',false);
+        });
     </script>
 }

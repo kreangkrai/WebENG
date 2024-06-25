@@ -17,22 +17,35 @@ namespace WebENG.Service
             try
             {
                 string string_command = string.Format($@"
+                
                     SELECT 
 	                    WorkingHours.job_id,
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
 	                    Tasks.task_name,
-	                    SUM(
-	                    CASE 
-		                    WHEN lunch = 1 AND dinner = 1 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 2 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 2 ELSE 0 END
-		                    WHEN lunch = 1 AND dinner = 0 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    WHEN lunch = 0 AND dinner = 1 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    ELSE 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) > 0 THEN DATEDIFF(HOUR, start_time, stop_time) ELSE 0 END
-	                    END) as hours
+	                    CAST(SUM(
+						case when lunch_full = 1 then 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 120												
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 90
+								else
+									DATEDIFF(MINUTE,start_time,stop_time) - 60
+								end
+							end
+						else 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 60										
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 30
+								else
+									DATEDIFF(MINUTE,start_time,stop_time)
+								end
+							end
+						end
+	                    ) / 60.0 as decimal(18,1))as hours
                     FROM WorkingHours
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
@@ -85,17 +98,29 @@ namespace WebENG.Service
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
 	                    Tasks.task_name,
-	                    SUM(
-	                    CASE 
-		                    WHEN lunch = 1 AND dinner = 1 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 2 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 2 ELSE 0 END
-		                    WHEN lunch = 1 AND dinner = 0 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    WHEN lunch = 0 AND dinner = 1 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    ELSE 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) > 0 THEN DATEDIFF(HOUR, start_time, stop_time) ELSE 0 END
-	                    END) as hours
+	                    CAST(SUM(
+						case when lunch_full = 1 then 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 120												
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 90
+								else
+									DATEDIFF(MINUTE,start_time,stop_time) - 60
+								end
+							end
+						else 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 60										
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 30
+								else
+									DATEDIFF(MINUTE,start_time,stop_time)
+								end
+							end
+						end
+	                    ) / 60.0 as decimal(18,1))as hours
                     FROM WorkingHours
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
@@ -149,16 +174,29 @@ namespace WebENG.Service
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
 	                    Tasks.task_name,
-	                    SUM(CASE
-		                    WHEN lunch = 1 AND dinner = 1 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 2 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 2 ELSE 0 END
-		                    WHEN lunch = 1 AND dinner = 0 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    WHEN lunch = 0 AND dinner = 0 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    ELSE 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) > 0 THEN DATEDIFF(HOUR, start_time, stop_time) ELSE 0 END
-	                    END) as hours
+	                    CAST(SUM(
+						case when lunch_full = 1 then 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 120												
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 90
+								else
+									DATEDIFF(MINUTE,start_time,stop_time) - 60
+								end
+							end
+						else 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 60										
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 30
+								else
+									DATEDIFF(MINUTE,start_time,stop_time)
+								end
+							end
+						end
+	                    ) / 60.0 as decimal(18,1))as hours
                     FROM WorkingHours
                     LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
@@ -214,16 +252,29 @@ namespace WebENG.Service
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
 	                    Tasks.task_name,
-	                    SUM(CASE
-		                    WHEN lunch = 1 AND dinner = 1 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 2 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 2 ELSE 0 END
-		                    WHEN lunch = 1 AND dinner = 0 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    WHEN lunch = 0 AND dinner = 0 THEN 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) - 1 > 0 THEN DATEDIFF(HOUR, start_time, stop_time) - 1 ELSE 0 END
-		                    ELSE 
-			                    CASE WHEN DATEDIFF(HOUR, start_time, stop_time) > 0 THEN DATEDIFF(HOUR, start_time, stop_time) ELSE 0 END
-	                    END) as hours
+	                    CAST(SUM(
+						case when lunch_full = 1 then 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 120												
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 90
+								else
+									DATEDIFF(MINUTE,start_time,stop_time) - 60
+								end
+							end
+						else 
+							case when dinner_full = 1 then
+								DATEDIFF(MINUTE,start_time,stop_time) - 60										
+							else
+								case when dinner_half = 1 then
+									DATEDIFF(MINUTE,start_time,stop_time) - 30
+								else
+									DATEDIFF(MINUTE,start_time,stop_time)
+								end
+							end
+						end
+	                    ) / 60.0 as decimal(18,1))as hours
                     FROM WorkingHours
                     LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
@@ -250,7 +301,7 @@ namespace WebENG.Service
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
-                            hours = dr["hours"] != DBNull.Value ? Convert.ToInt32(dr["hours"].ToString()) : 0,
+                            hours = dr["hours"] != DBNull.Value ? Convert.ToDouble(dr["hours"].ToString()) : 0,
                         };
                         mds.Add(md);
                     }

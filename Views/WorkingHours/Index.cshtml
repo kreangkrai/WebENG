@@ -54,8 +54,10 @@
                                     <th>Task</th>
                                     <th>Start</th>
                                     <th>Stop</th>
-                                    <th>Lunch</th>
-                                    <th>Break</th>
+                                    <th>Lunch Full</th>
+                                    <th>Lunch Half</th>
+                                    <th>Break Full</th>
+                                    <th>Break Half</th>
                                     <th>Normal</th>
                                     <th>OT1.5</th>
                                     <th>OT3.0</th>
@@ -69,8 +71,10 @@
                                     <th>Task</th>
                                     <th>Start</th>
                                     <th>Stop</th>
-                                    <th>Lunch</th>
-                                    <th>Break</th>
+                                    <th>Lunch Full</th>
+                                    <th>Lunch Half</th>
+                                    <th>Break Full</th>
+                                    <th>Break Half</th>
                                     <th>Normal</th>
                                     <th>OT1.5</th>
                                     <th>OT3.0</th>
@@ -178,15 +182,35 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="form-check">
-                            <input id="lunch" class="form-check-input" type="checkbox" />
-                            <label class="form-check-label">Lunch</label>
-                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input id="lunch_full" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">Lunch Full</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input id="lunch_half" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">Lunch Half</label>
+                                </div>
+                           </div>
+                        </div>                       
                     </div>
                     <div class="form-group">
-                        <div class="form-check">
-                            <input id="dinner" class="form-check-input" type="checkbox" />
-                            <label class="form-check-label">Break</label>
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input id="dinner_full" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">Break Full</label>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-check">
+                                    <input id="dinner_half" class="form-check-input" type="checkbox" />
+                                    <label class="form-check-label">Break Half</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -311,8 +335,10 @@
                         whs[i].task_name,
                         whs[i].start_time.substring(0, 5),
                         whs[i].stop_time.substring(0, 5),
-                        whs[i].lunch,
-                        whs[i].dinner,
+                        whs[i].lunch_full,
+                        whs[i].lunch_half,
+                        whs[i].dinner_full,
+                        whs[i].dinner_half,
                         whs[i].normal.substring(0, 5),
                         whs[i].ot1_5.substring(0, 5),
                         whs[i].ot3_0.substring(0, 5),
@@ -333,11 +359,11 @@
                 data: datas,
                 rowCallback: function (row, data) {
                     var date = new Date(data[0].split("-")[0], data[0].split("-")[1] - 1, data[0].split("-")[2]);
-                    //Day index 11
-                    if (data[11] == "Saturday" || data[11] == "Sunday") {
+                    //Day index 13
+                    if (data[13] == "Saturday" || data[13] == "Sunday") {
                         $('td', row).addClass("bg-dark disable");
                     }
-                    if (data[11] == "Holiday") {
+                    if (data[13] == "Holiday") {
                         $('td', row).addClass("bg-gray disable");
                     }
 
@@ -357,17 +383,19 @@
 
                     data[6] === true ? $('td:eq(6)', row).html("✓") : $('td:eq(6)', row).html("");
                     data[7] === true ? $('td:eq(7)', row).html("✓") : $('td:eq(7)', row).html("");
-
-                    if (data[8] === "00:00") {
-                        $('td:eq(8)', row).html("");
-                    }
-
-                    if (data[9] === "00:00") {
-                        $('td:eq(9)', row).html("");
-                    }
+                    data[8] === true ? $('td:eq(8)', row).html("✓") : $('td:eq(8)', row).html("");
+                    data[9] === true ? $('td:eq(9)', row).html("✓") : $('td:eq(9)', row).html("");
 
                     if (data[10] === "00:00") {
                         $('td:eq(10)', row).html("");
+                    }
+
+                    if (data[11] === "00:00") {
+                        $('td:eq(11)', row).html("");
+                    }
+
+                    if (data[12] === "00:00") {
+                        $('td:eq(12)', row).html("");
                     }
                 }
             });
@@ -478,8 +506,10 @@
             var task_name = data[3];
             var start_time = data[4];
             var stop_time = data[5];
-            var lunch = (data[6] === true) ? true : false;
-            var dinner = (data[7] === true) ? true : false;
+            var lunch_full = (data[6] === true) ? true : false;
+            var lunch_half = (data[7] === true) ? true : false;
+            var dinner_full = (data[8] === true) ? true : false;
+            var dinner_half = (data[9] === true) ? true : false;
 
             if (debug_edit) {
                 console.log(`Date: ${date}`);
@@ -498,8 +528,10 @@
             $('#task_name').val(task_name);
             $('#start_time').val(start_time);
             $('#stop_time').val(stop_time);
-            $('#lunch').prop('checked', lunch);
-            $('#dinner').prop('checked', dinner);
+            $('#lunch_full').prop('checked', lunch_full);
+            $('#lunch_half').prop('checked', lunch_half);
+            $('#dinner_full').prop('checked', dinner_full);
+            $('#dinner_half').prop('checked', dinner_half);
             $('#modal_task').modal();
         }
 
@@ -511,8 +543,10 @@
             var task_name = $('#task_name').val();
             var start_time = $('#start_time').val();
             var stop_time = $('#stop_time').val();
-            var lunch = ($('#lunch').prop('checked') === true) ? true : false;
-            var dinner = ($('#dinner').prop('checked') === true) ? true : false;
+            var lunch_full = ($('#lunch_full').prop('checked') === true) ? true : false;
+            var lunch_half = ($('#lunch_half').prop('checked') === true) ? true : false;
+            var dinner_full = ($('#dinner_full').prop('checked') === true) ? true : false;
+            var dinner_half = ($('#dinner_half').prop('checked') === true) ? true : false;
 
             if (debug_save) {
                 console.log(`User: ${user}`);
@@ -534,8 +568,10 @@
                 "task_name": task_name,
                 "start_time": start_time,
                 "stop_time": stop_time,
-                "lunch": lunch,
-                "dinner": dinner
+                "lunch_full": lunch_full,
+                "lunch_half": lunch_half,
+                "dinner_full": dinner_full,
+                "dinner_half": dinner_half
             });
             UpdateRestTime(task_str);
         });
@@ -565,5 +601,17 @@
             window.open(url);
         });
 
+        $('#lunch_full').on('click',function(){
+            $('#lunch_half').prop('checked',false);
+        });
+        $('#lunch_half').on('click',function(){
+            $('#lunch_full').prop('checked',false);
+        });
+        $('#dinner_full').on('click',function(){
+            $('#dinner_half').prop('checked',false);
+        });
+        $('#dinner_half').on('click',function(){
+            $('#dinner_full').prop('checked',false);
+        });
     </script>
 }

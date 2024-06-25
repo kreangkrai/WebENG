@@ -165,42 +165,59 @@ namespace WebENG.Service
             try
             {
                 string stringCommand = string.Format($@"
+                
                     WITH T1 AS (
                         SELECT
 							WorkingHours.user_id,
 		                    WorkingHours.job_id,
 		                    SUM(case when task_id = 'T001' then
 									case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
-										case when lunch = 1 then 
-											case when dinner = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 120
+										case when lunch_full = 1 then 
+											case when dinner_full = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 120												
 											else
-												DATEDIFF(MINUTE,start_time,stop_time) - 60
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 90
+												else
+													DATEDIFF(MINUTE,start_time,stop_time) - 60
+												end
 											end
 										else 
-											case when dinner = 1 then
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 60										
-											else 
-												DATEDIFF(MINUTE,start_time,stop_time)
+											else
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 30
+												else
+													DATEDIFF(MINUTE,start_time,stop_time)
+												end
 											end
 										end
 									else
 										0
 									end
 								else
-									case when lunch = 1 then 
-											case when dinner = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 120
+									case when lunch_full = 1 then 
+										case when dinner_full = 1 then
+											DATEDIFF(MINUTE,start_time,stop_time) - 120												
+										else
+											case when dinner_half = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 90
 											else
 												DATEDIFF(MINUTE,start_time,stop_time) - 60
 											end
-										else 
-											case when dinner = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 60										
-											else 
+										end
+									else 
+										case when dinner_full = 1 then
+											DATEDIFF(MINUTE,start_time,stop_time) - 60										
+										else
+											case when dinner_half = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 30
+											else
 												DATEDIFF(MINUTE,start_time,stop_time)
 											end
 										end
+									end
 								end ) AS total_manpower 
 	                    FROM WorkingHours
                         WHERE WorkingHours.job_id <> 'J999999'
@@ -214,7 +231,7 @@ namespace WebENG.Service
                         Quotation.customer,
                         Jobs.cost,
                         (Jobs.md_rate * Jobs.pd_rate) as factor,
-                        FORMAT((T1.total_manpower / 60.0),'N1') as total_manpower ,
+                        CAST((T1.total_manpower / 60.0) as decimal(18,1)) as total_manpower ,
                         Jobs.status,
                         Jobs.process_id as process,
 						Jobs.system_id as system

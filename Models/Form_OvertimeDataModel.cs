@@ -14,8 +14,10 @@ namespace WebENG.Models
         public string task { get; set; }
         public string start_time { get; set; }
         public string stop_time { get; set; }
-        public string lunch { get; set; }
-        public string dinner { get; set; }
+        public string lunch_full { get; set; }
+        public string lunch_half { get; set; }
+        public string dinner_full { get; set; }
+        public string dinner_half { get; set; }
         public string normal { get; set; }
         public string ot1_5 { get; set; }
         public string ot3_0 { get; set; }

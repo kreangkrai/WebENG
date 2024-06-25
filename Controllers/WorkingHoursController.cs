@@ -114,8 +114,10 @@ namespace WebENG.Controllers
                     day = monthly[i].working_date.DayOfWeek.ToString().ToUpper(),
                     job = monthly[i].job_id,
                     task = monthly[i].task_name,
-                    lunch = monthly[i].lunch == true ? "✓" : "",
-                    dinner = monthly[i].dinner == true ? "✓" : "",
+                    lunch_full = monthly[i].lunch_full == true ? "✓" : "",
+                    lunch_half = monthly[i].lunch_half == true ? "✓" : "",
+                    dinner_full = monthly[i].dinner_full == true ? "✓" : "",
+                    dinner_half = monthly[i].dinner_half == true ? "✓" : "",
                     weekend = (monthly[i].working_date.DayOfWeek == DayOfWeek.Saturday || monthly[i].working_date.DayOfWeek == DayOfWeek.Sunday) ? true : false,
                     holiday = (holidays.Where(w=>w.date == monthly[i].working_date).ToList().Count() > 0) ? true : false,
                 };

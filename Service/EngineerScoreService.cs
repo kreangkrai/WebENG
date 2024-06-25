@@ -16,40 +16,57 @@ namespace WebENG.Service
             try
             {
                 string string_command = string.Format($@"
+                        
                 with t2 as (
 					SELECT 
 		                    WorkingHours.job_id, 
 		                    SUM(
                                 case when task_id = 'T001' then
 									case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
-										case when lunch = 1 then 
-											case when dinner = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 120
+										case when lunch_full = 1 then 
+											case when dinner_full = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 120												
 											else
-												DATEDIFF(MINUTE,start_time,stop_time) - 60
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 90
+												else
+													DATEDIFF(MINUTE,start_time,stop_time) - 60
+												end
 											end
 										else 
-											case when dinner = 1 then
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 60										
-											else 
-												DATEDIFF(MINUTE,start_time,stop_time)
+											else
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 30
+												else
+													DATEDIFF(MINUTE,start_time,stop_time)
+												end
 											end
 										end
 									else
 										0
 									end
 								else
-									case when lunch = 1 then 
-											case when dinner = 1 then
+									case when lunch_full = 1 then 
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 120
 											else
-												DATEDIFF(MINUTE,start_time,stop_time) - 60
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 90
+												else
+													DATEDIFF(MINUTE,start_time,stop_time) - 60
+												end
 											end
 										else 
-											case when dinner = 1 then
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 60										
 											else 
-												DATEDIFF(MINUTE,start_time,stop_time)
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 30
+												else
+													DATEDIFF(MINUTE,start_time,stop_time)
+												end
 											end
 										end
 								end) AS total_manpower 
@@ -63,34 +80,50 @@ namespace WebENG.Service
 		                    SUM(
 									case when task_id = 'T001' then
 									case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
-										case when lunch = 1 then 
-											case when dinner = 1 then
+										case when lunch_full = 1 then 
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 120
 											else
-												DATEDIFF(MINUTE,start_time,stop_time) - 60
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 90
+												else
+													DATEDIFF(MINUTE,start_time,stop_time) - 60
+												end
 											end
 										else 
-											case when dinner = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 60										
+											case when dinner_full = 1 then
+												DATEDIFF(MINUTE,start_time,stop_time) - 60									
 											else 
-												DATEDIFF(MINUTE,start_time,stop_time)
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 30
+												else
+													DATEDIFF(MINUTE,start_time,stop_time)
+												end
 											end
 										end
 									else
 										0
 									end
 								else
-									case when lunch = 1 then 
-											case when dinner = 1 then
+									case when lunch_full = 1 then 
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 120
 											else
-												DATEDIFF(MINUTE,start_time,stop_time) - 60
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 90
+												else
+													DATEDIFF(MINUTE,start_time,stop_time) - 60
+												end
 											end
-										else 
-											case when dinner = 1 then
+									else 
+											case when dinner_full = 1 then
 												DATEDIFF(MINUTE,start_time,stop_time) - 60										
-											else 
-												DATEDIFF(MINUTE,start_time,stop_time)
+											else
+												case when dinner_half = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 30
+												else
+													DATEDIFF(MINUTE,start_time,stop_time)
+												end
 											end
 										end
 								end) AS working_hours 
@@ -108,11 +141,11 @@ namespace WebENG.Service
 	                    md_rate AS md_rate,
 	                    pd_rate AS pd_rate,
 	                    (md_rate * pd_rate) AS factor,						
-	                    FORMAT((t2.total_manpower / 60.0 ),'N1') AS total_manpower,
-	                    FORMAT((cost / (t2.total_manpower / 60.0 )),'N1') AS cost_per_tmp,
-	                    FORMAT((t3.working_hours / 60.0 ),'N1') AS manpower,
-	                    FORMAT((CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT))),'N1') AS manpower_per_tmp,
-	                    FORMAT((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60)) * (CAST((t3.working_hours / 60) AS FLOAT) / (CAST((t2.total_manpower / 60) AS FLOAT)))),'N1') AS score
+	                    CAST((t2.total_manpower / 60.0 ) as decimal(18,1)) AS total_manpower,
+	                    CAST((cost / (t2.total_manpower / 60.0 )) as decimal(18,1)) AS cost_per_tmp,
+	                    CAST((t3.working_hours / 60.0 ) as decimal(18,1)) AS manpower,
+	                    CAST((CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT))) as decimal(18,1)) AS manpower_per_tmp,
+	                    CAST((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60)) * (CAST((t3.working_hours / 60) AS FLOAT) / (CAST((t2.total_manpower / 60) AS FLOAT)))) as decimal(18,1)) AS score
                     FROM WorkingHours  As t1  
 					LEFT JOIN Jobs ON t1.job_id = Jobs.job_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no

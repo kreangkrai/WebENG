@@ -39,8 +39,10 @@ namespace WebENG.Service
                         Tasks.task_name,
                         WorkingHours.start_time,
                         WorkingHours.stop_time,
-                        WorkingHours.lunch,
-                        WorkingHours.dinner,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
@@ -77,8 +79,10 @@ namespace WebENG.Service
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
                             stop_time = dr["stop_time"] != DBNull.Value ? TimeSpan.Parse(dr["stop_time"].ToString()) : default(TimeSpan),
-                            lunch = dr["lunch"] != DBNull.Value ? Convert.ToBoolean(dr["lunch"].ToString()) : default(bool),
-                            dinner = dr["dinner"] != DBNull.Value ? Convert.ToBoolean(dr["dinner"].ToString()) : default(bool),
+                            lunch_full = dr["lunch_full"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_full"].ToString()) : default(bool),
+                            lunch_half = dr["lunch_half"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_half"].ToString()) : default(bool),
+                            dinner_full = dr["dinner_full"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_full"].ToString()) : default(bool),
+                            dinner_half = dr["dinner_half"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_half"].ToString()) : default(bool),
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                         };
                         whs.Add(wh);
@@ -119,8 +123,10 @@ namespace WebENG.Service
                         Tasks.task_name,
                         WorkingHours.start_time,
                         WorkingHours.stop_time,
-                        WorkingHours.lunch,
-                        WorkingHours.dinner,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
@@ -158,8 +164,10 @@ namespace WebENG.Service
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
                             stop_time = dr["stop_time"] != DBNull.Value ? TimeSpan.Parse(dr["stop_time"].ToString()) : default(TimeSpan),
-                            lunch = dr["lunch"] != DBNull.Value ? Convert.ToBoolean(dr["lunch"].ToString()) : default(bool),
-                            dinner = dr["dinner"] != DBNull.Value ? Convert.ToBoolean(dr["dinner"].ToString()) : default(bool),
+                            lunch_full = dr["lunch_full"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_full"].ToString()) : default(bool),
+                            lunch_half = dr["lunch_half"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_half"].ToString()) : default(bool),
+                            dinner_full = dr["dinner_full"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_full"].ToString()) : default(bool),
+                            dinner_half = dr["dinner_half"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_half"].ToString()) : default(bool),
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                         };
                         whs.Add(wh);
@@ -200,8 +208,10 @@ namespace WebENG.Service
                         Tasks.task_name,
                         WorkingHours.start_time,
                         WorkingHours.stop_time,
-                        WorkingHours.lunch,
-                        WorkingHours.dinner,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
@@ -240,8 +250,10 @@ namespace WebENG.Service
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
                             stop_time = dr["stop_time"] != DBNull.Value ? TimeSpan.Parse(dr["stop_time"].ToString()) : default(TimeSpan),
-                            lunch = dr["lunch"] != DBNull.Value ? Convert.ToBoolean(dr["lunch"].ToString()) : default(bool),
-                            dinner = dr["dinner"] != DBNull.Value ? Convert.ToBoolean(dr["dinner"].ToString()) : default(bool),
+                            lunch_full = dr["lunch_full"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_full"].ToString()) : default(bool),
+                            lunch_half = dr["lunch_half"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_half"].ToString()) : default(bool),
+                            dinner_full = dr["dinner_full"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_full"].ToString()) : default(bool),
+                            dinner_half = dr["dinner_half"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_half"].ToString()) : default(bool),
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                         };
                         whs.Add(wh);
@@ -282,8 +294,10 @@ namespace WebENG.Service
                         Tasks.task_name,
                         WorkingHours.start_time,
                         WorkingHours.stop_time,
-                        WorkingHours.lunch,
-                        WorkingHours.dinner,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
@@ -321,8 +335,10 @@ namespace WebENG.Service
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
                             stop_time = dr["stop_time"] != DBNull.Value ? TimeSpan.Parse(dr["stop_time"].ToString()) : default(TimeSpan),
-                            lunch = dr["lunch"] != DBNull.Value ? Convert.ToBoolean(dr["lunch"].ToString()) : default(bool),
-                            dinner = dr["dinner"] != DBNull.Value ? Convert.ToBoolean(dr["dinner"].ToString()) : default(bool),
+                            lunch_full = dr["lunch_full"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_full"].ToString()) : default(bool),
+                            lunch_half = dr["lunch_half"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_half"].ToString()) : default(bool),
+                            dinner_full = dr["dinner_full"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_full"].ToString()) : default(bool),
+                            dinner_half = dr["dinner_half"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_half"].ToString()) : default(bool),
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                         };
                         whs.Add(wh);
@@ -346,9 +362,9 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO WorkingHours(
-                        ind,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch, dinner, note)
+                        ind,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch_full,lunch_half, dinner_full,dinner_half, note)
                     VALUES (
-                        @ind,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch, @dinner, @note)");
+                        @ind,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch_full,@lunch_half, @dinner_full,@dinner_half, @note)");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
@@ -386,8 +402,10 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
-                    cmd.Parameters.AddWithValue("@lunch", wh.lunch);
-                    cmd.Parameters.AddWithValue("@dinner", wh.dinner);
+                    cmd.Parameters.AddWithValue("@lunch_full", wh.lunch_full);
+                    cmd.Parameters.AddWithValue("@lunch_half", wh.lunch_half);
+                    cmd.Parameters.AddWithValue("@dinner_full", wh.dinner_full);
+                    cmd.Parameters.AddWithValue("@dinner_half", wh.dinner_half);
                     cmd.Parameters.AddWithValue("@note", wh.note);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
@@ -427,8 +445,10 @@ namespace WebENG.Service
                         task_id = @task_id,
                         start_time = @start_time,
                         stop_time = @stop_time,
-                        lunch = @lunch,
-                        dinner = @dinner,
+                        lunch_full = @lunch_full,
+                        lunch_half = @lunch_half,
+                        dinner_full = @dinner_full,
+                        dinner_half = @dinner_half,
                         note = @note
                     WHERE ind = @ind");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
@@ -466,8 +486,10 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
-                    cmd.Parameters.AddWithValue("@lunch", wh.lunch);
-                    cmd.Parameters.AddWithValue("@dinner", wh.dinner);
+                    cmd.Parameters.AddWithValue("@lunch_full", wh.lunch_full);
+                    cmd.Parameters.AddWithValue("@lunch_half", wh.lunch_half);
+                    cmd.Parameters.AddWithValue("@dinner_full", wh.dinner_full);
+                    cmd.Parameters.AddWithValue("@dinner_half", wh.dinner_half);
                     cmd.Parameters.AddWithValue("@note", wh.note);
                     cmd.Parameters.AddWithValue("@ind", wh.index);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -498,8 +520,10 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     UPDATE WorkingHours 
-                    SET lunch = @lunch,
-                        dinner = @dinner
+                    SET lunch_full = @lunch_full,
+                        lunch_half = @lunch_half,
+                        dinner_full = @dinner_full,
+                        dinner_half = @dinner_half
                     WHERE user_id = @user_id 
                         AND working_date = @working_date 
                         AND job_id = @job_id
@@ -509,8 +533,10 @@ namespace WebENG.Service
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@lunch", wh.lunch);
-                    cmd.Parameters.AddWithValue("@dinner", wh.dinner);
+                    cmd.Parameters.AddWithValue("@lunch_full", wh.lunch_full);
+                    cmd.Parameters.AddWithValue("@lunch_half", wh.lunch_half);
+                    cmd.Parameters.AddWithValue("@dinner_full", wh.dinner_full);
+                    cmd.Parameters.AddWithValue("@dinner_half", wh.dinner_half);
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
@@ -715,8 +741,10 @@ namespace WebENG.Service
                         Tasks.task_name,
                         WorkingHours.start_time,
                         WorkingHours.stop_time,
-                        WorkingHours.lunch,
-                        WorkingHours.dinner,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
                         LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
@@ -754,8 +782,10 @@ namespace WebENG.Service
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
                             start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
                             stop_time = dr["stop_time"] != DBNull.Value ? TimeSpan.Parse(dr["stop_time"].ToString()) : default(TimeSpan),
-                            lunch = dr["lunch"] != DBNull.Value ? Convert.ToBoolean(dr["lunch"].ToString()) : default(bool),
-                            dinner = dr["dinner"] != DBNull.Value ? Convert.ToBoolean(dr["dinner"].ToString()) : default(bool),
+                            lunch_full = dr["lunch_full"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_full"].ToString()) : default(bool),
+                            lunch_half = dr["lunch_half"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_half"].ToString()) : default(bool),
+                            dinner_full = dr["dinner_full"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_full"].ToString()) : default(bool),
+                            dinner_half = dr["dinner_half"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_half"].ToString()) : default(bool),
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                         };
                         whs.Add(wh);
@@ -839,12 +869,15 @@ namespace WebENG.Service
                 {
                     TimeSpan substraction = new TimeSpan(8, 0, 0);
                     TimeSpan anHour = new TimeSpan(1, 0, 0);
+                    TimeSpan anHalf = new TimeSpan(0, 30, 0);
                     TimeSpan noon = new TimeSpan(12, 0, 0);
-                    TimeSpan after_noon = new TimeSpan(13, 0, 0);
+                    TimeSpan after_noon_full = new TimeSpan(13, 0, 0);
+                    TimeSpan after_noon_half = new TimeSpan(12, 30, 0);
 
                     TimeSpan morning = new TimeSpan(8, 30, 0);
                     TimeSpan evening = new TimeSpan(17, 30, 0);
-                    TimeSpan end_evening = new TimeSpan(18, 30, 0);
+                    TimeSpan end_evening_full = new TimeSpan(18, 30, 0);
+                    TimeSpan end_evening_half = new TimeSpan(18, 0, 0);
                     TimeSpan leave = TimeSpan.Zero;
                     
                    
@@ -863,8 +896,10 @@ namespace WebENG.Service
                         wh.task_name = whd[j].task_name;
                         wh.start_time = whd[j].start_time;
                         wh.stop_time = whd[j].stop_time;
-                        wh.lunch = whd[j].lunch;
-                        wh.dinner = whd[j].dinner;
+                        wh.lunch_full = whd[j].lunch_full;
+                        wh.lunch_half = whd[j].lunch_half;
+                        wh.dinner_full = whd[j].dinner_full;
+                        wh.dinner_half = whd[j].dinner_half;
                         wh.day = day;
 
                         bool isHoliday = holidays.Where(w => w.date == whd[0].working_date).Count() > 0 ? true : false;
@@ -881,14 +916,22 @@ namespace WebENG.Service
                                 ot15 += wh.stop_time - wh.start_time;
                             }
 
-                            if (wh.lunch)
+                            if (wh.lunch_full)
                             {
                                 ot15 -= anHour;
                             }
+                            if (wh.lunch_half)
+                            {
+                                ot15 -= anHalf;
+                            }
 
-                            if (wh.dinner)
+                            if (wh.dinner_full)
                             {
                                 ot15 -= anHour;
+                            }
+                            if (wh.dinner_half)
+                            {
+                                ot15 -= anHalf;
                             }
                         }
                         else
@@ -995,14 +1038,24 @@ namespace WebENG.Service
                                 }
                             }
 
-                            if (wh.lunch && wh.start_time <= noon && wh.stop_time > after_noon && regular.Hours > 1)
+                            if (wh.lunch_full && wh.start_time <= noon && wh.stop_time > after_noon_full && regular.Hours > 1)
                             {
-                                regular -= after_noon - noon;
+                                regular -= after_noon_full - noon;
                             }
 
-                            if (wh.dinner && wh.start_time <= evening && wh.stop_time > end_evening && ot15.Hours > 1)
+                            if (wh.lunch_half && wh.start_time <= noon && wh.stop_time > after_noon_half && regular.Hours > 1)
                             {
-                                ot15 -= end_evening - evening;
+                                regular -= after_noon_half - noon;
+                            }
+
+                            if (wh.dinner_full && wh.start_time <= evening && wh.stop_time > end_evening_full && ot15.Hours > 1)
+                            {
+                                ot15 -= end_evening_full - evening;
+                            }
+
+                            if (wh.dinner_half && wh.start_time <= evening && wh.stop_time > end_evening_half && ot15.Hours > 1)
+                            {
+                                ot15 -= end_evening_half - evening;
                             }
 
                             // Regular time <= 8
@@ -1118,8 +1171,10 @@ namespace WebENG.Service
                         task_name = "",
                         start_time = default(TimeSpan),
                         stop_time = default(TimeSpan),
-                        lunch = false,
-                        dinner = false,
+                        lunch_full = false,
+                        lunch_half = false,
+                        dinner_full = false,
+                        dinner_half = false,
                         normal = default(TimeSpan),
                         ot1_5 = default(TimeSpan),
                         ot3_0 = default(TimeSpan),

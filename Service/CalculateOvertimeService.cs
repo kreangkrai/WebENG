@@ -16,8 +16,10 @@ namespace WebENG.Services
             DateTime date = wh.working_date;
             TimeSpan start_time = wh.start_time;
             TimeSpan stop_time = wh.stop_time;
-            bool lunch = wh.lunch;
-            bool dinner = wh.dinner;
+            bool lunch_full = wh.lunch_full;
+            bool lunch_half = wh.lunch_half;
+            bool dinner_full = wh.dinner_full;
+            bool dinner_half = wh.dinner_half;
 
             TimeSpan normal = new TimeSpan();
             TimeSpan ot1_5 = new TimeSpan();
@@ -36,7 +38,7 @@ namespace WebENG.Services
             }
 
             //12:00 -> 13:00
-            if ((start_time < t2) && !lunch)
+            if ((start_time < t2) && (!lunch_full && !lunch_half))
             {
                 TimeSpan time_start = new TimeSpan();
                 TimeSpan time_end = new TimeSpan();
@@ -56,7 +58,7 @@ namespace WebENG.Services
             }
 
             //17:30 -> 18:00
-            if ((start_time < t4) && !dinner)
+            if ((start_time < t4) && (!dinner_full && !dinner_half))
             {
                 TimeSpan time_start = new TimeSpan();
                 TimeSpan time_end = new TimeSpan();
