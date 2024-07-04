@@ -1402,6 +1402,11 @@
             });
         };
 
+        $("#job_id").on("input", function (e) {
+            $(this).val(function (i, v) {
+                return v.replace(/[^a-z0-9-_.]/gi, "");
+            });
+        });
 
     </script>
 }
