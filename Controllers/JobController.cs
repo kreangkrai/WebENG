@@ -37,6 +37,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+
+                // Update Status With Warranty
+                List<string> jobs = JobService.GetDueWarranty();
+                for (int i = 0; i < jobs.Count; i++)
+                {
+                    JobService.UpdateFinish(jobs[i]);
+                }
                 return View(u);
             }
             else

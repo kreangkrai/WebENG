@@ -23,6 +23,7 @@ namespace WebENG.Interface
         List<EngSystemModel> GetSystems();
         List<EngSystemModel> GetSystemByJob(string job);
         List<EngSystemModel> GetSystemByUser(string user);
-
+        string UpdateFinish(string job);
+        List<string> GetDueWarranty();
     }
 }

@@ -36,6 +36,7 @@ namespace WebENG.Models
         public List<JobSummaryModel> job_summary { get; set; }
         public DateTime due_date { get; set; }
         public DateTime finished_date { get; set; }
+        public int warranty_period { get; set; }
     }
 
     public class InvoiceModel

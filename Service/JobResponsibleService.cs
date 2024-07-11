@@ -30,7 +30,7 @@ namespace WebENG.Service
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
                         LEFT JOIN Authen AS Authen ON JobResponsible.user_id = Authen.user_id
                         LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
-                    WHERE LOWER(Authen.name) = '{user_name}'
+                    WHERE LOWER(Authen.name) = '{user_name}' AND Jobs.status <> 'STA999'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

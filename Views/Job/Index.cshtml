@@ -346,6 +346,10 @@
                             <label for="finished_date">Date Finished</label>
                             <input id="finished_date"type="date"  class="form-control" value="1900-01-01" />
                         </div>
+                        <div class="col-3" id="group_warranty_period">
+                            <label for="warranty_period">Warranty Period</label>
+                            <input id="warranty_period" type="number" class="form-control" value="0" disabled/>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -884,6 +888,7 @@
             $('#invoice').val(0);
             $('#due_date').val(null);
             $('#group_finished_date').hide();
+            $('#group_warranty_period').hide();
             $('#modal_job').modal();
         };
 
@@ -957,12 +962,24 @@
             $('#due_date').val(job.due_date.split('T')[0]);
 
             $('#finished_date').val(finished_date.split('T')[0]);
+            $('#warranty_period').val(job.warranty_period);
 
             let finish_status = statuses.filter(f=>f.status_id == status).map(m=> m.status_name);
-            if (finish_status[0] === "Finished"){
+            if (finish_status[0] === "Warranty") {
                 $('#group_finished_date').show();
-            }else{
-                $('#group_finished_date').hide();
+                $('#group_warranty_period').show();
+                $('#warranty_period').attr('disabled', false);
+            } else {
+                if (finish_status[0] === "Finished") {
+                    $('#warranty_period').val(0);
+                    $('#warranty_period').attr('disabled', true);
+                    $('#group_warranty_period').show();
+                    $('#group_finished_date').show();
+                } else {
+                    $('#group_warranty_period').hide();
+                    $('#group_finished_date').hide();
+                }
+                $('#group_warranty_period').hide();
             }
 
             let datas_percent = [];
@@ -1031,10 +1048,21 @@
         $('#status').on('change',function(){
             let status = $('#status').val();
             let finish_status = statuses.filter(f=>f.status_id === status).map(m=> m.status_name);
-            if (finish_status[0] === "Finished"){
+            if (finish_status[0] === "Warranty") {
                 $('#group_finished_date').show();
+                $('#group_warranty_period').show();
+                $('#warranty_period').attr('disabled', false);
             }else{
-                $('#group_finished_date').hide();
+                if (finish_status[0] === "Finished") {
+                    $('#warranty_period').val(0);
+                    $('#warranty_period').attr('disabled', true);
+                    $('#group_warranty_period').show();
+                    $('#group_finished_date').show();
+                } else {                    
+                    $('#group_warranty_period').hide();
+                    $('#group_finished_date').hide();
+                }
+                $('#group_warranty_period').hide();
             }
         });
 
@@ -1053,6 +1081,7 @@
             let job_in_hand = $('#job_in_hand').val();
             let job_eng_in_hand = $('#job_eng_in_hand').val();
             let due_date = $('#due_date').val();
+            let warranty_period = $('#warranty_period').val();
             if (status === null) {
                 status = 1;
             }
@@ -1135,7 +1164,8 @@
                 "job_eng_in_hand":job_eng_in_hand,
                 "invoices":invoices,
                 "due_date":due_date,
-                "finished_date": finished_date
+                "finished_date": finished_date,
+                "warranty_period":warranty_period
             });
 
             if (debug_job_string) {

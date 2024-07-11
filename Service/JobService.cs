@@ -991,5 +991,79 @@ namespace WebENG.Service
 
             return jobProcessSystems;
         }
+        public string UpdateFinish(string job)
+        {
+            try
+            {
+                string string_command = string.Format($@"
+            UPDATE Jobs 
+            SET
+                status = @status,
+                warranty_period = @warranty_period
+            WHERE job_id = @job_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@job_id", job.Replace("-", String.Empty));
+                    cmd.Parameters.AddWithValue("@status", "STA999");
+                    cmd.Parameters.AddWithValue("@warranty_period", 0);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+
+        public List<string> GetDueWarranty()
+        {
+            List<string> jobs = new List<string>();
+            try
+            {
+                string string_command = string.Format($@"
+             SELECT job_id,finished_date FROM (SELECT job_id,finished_date,warranty_period,DATEADD(day,warranty_period,GETDATE()) as arride_date FROM Jobs 
+                 LEFT JOIN Eng_Status ON Eng_Status.Status_ID = Jobs.status
+                 WHERE Eng_Status.Status_Name = 'Warranty'
+                 ) as temp
+                 WHERE temp.arride_date >= temp.finished_date");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        jobs.Add(dr["job_id"].ToString());
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return jobs;
+        }
     }
 }

@@ -524,17 +524,19 @@
                 }               
             }
             jobs = new_jobs;
-
+           
             for (let i = 0; i < jobs.length; i++) {
+                
                 sum_invoice = 0;
                 for(let j=0;j<jobs[i].invoices.length;j++){
                     sum_invoice += jobs[i].invoices[j].invoice;
                 }
+               
                 let eng_invoice = jobs[i].eng_invoice > 0 ? parseInt(jobs[i].eng_invoice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.map(m=>m.cost)[0] : 0;
                 let _eng_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m=>m.totalEngCost).reduce((acc,b) =>  acc + b) : 0;
                 let percent_eng_cost = Math.ceil((Number(_eng_cost) / Number(cost)) * 100);
-                let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);
+                let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);                
                 let down_payment = jobs[i].term_payment.down_payment > 0 ? jobs[i].term_payment.down_payment : "";
                 let document_submit = jobs[i].term_payment.document_submit > 0 ? jobs[i].term_payment.document_submit : "";
                 let instrument_vendor = jobs[i].term_payment.instrument_vendor > 0 ? jobs[i].term_payment.instrument_vendor : "";
@@ -640,7 +642,7 @@
                     }
                     //Highlight Due Date
                     let diff_day = Math.round(new Date(due_date).getTime() - new Date(Date.now()).getTime()) / (1000 * 3600 * 24);
-                    if (data.status !== "Finished"){
+                    if (data.status !== "Finished" && data.status !== "Warranty") {
                         if (diff_day <= 0 && diff_day > -10000){
                             $(`td:eq(0)`, row).css({ "color": 'red'});
                             $(`td:eq(1)`, row).css({ "color": 'red'});
@@ -660,7 +662,7 @@
                     
                     for(let i=0;i<payments.length;i++){
                         $(`td:eq(${start_column + i})`, row).css({ "background-color": '#EFECE8'});
-                        if (data.status === "Finished"){
+                        if (data.status === "Finished" || data.status === "Warranty"){
                                 $(`td`,row).css({ "text-decoration": 'line-through'});
                                 $(`td`,row).css({ "background-color": '#DEE6E5'});
                                 
