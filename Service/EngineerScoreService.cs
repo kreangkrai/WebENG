@@ -145,7 +145,7 @@ namespace WebENG.Service
 	                    CAST((cost / (t2.total_manpower / 60.0 )) as decimal(18,1)) AS cost_per_tmp,
 	                    CAST((t3.working_hours / 60.0 ) as decimal(18,1)) AS manpower,
 	                    CAST((CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT))) as decimal(18,1)) AS manpower_per_tmp,
-	                    CAST((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60)) * (CAST((t3.working_hours / 60) AS FLOAT) / (CAST((t2.total_manpower / 60) AS FLOAT)))) as decimal(18,1)) AS score
+	                    CAST((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60.0)) * (CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT)))) as decimal(18,1)) AS score
                     FROM WorkingHours  As t1  
 					LEFT JOIN Jobs ON t1.job_id = Jobs.job_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
