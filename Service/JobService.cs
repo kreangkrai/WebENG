@@ -74,6 +74,7 @@ namespace WebENG.Service
                         Jobs.quotation_no,
                         Jobs.job_type,
                         Jobs.finished_date,
+                        Jobs.warranty_period,
                         Quotation.customer,
 	                    Quotation.enduser,
 	                    Quotation.sale_name,
@@ -140,7 +141,8 @@ namespace WebENG.Service
                             enduser = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
                             sale_name = dr["sale_name"] != DBNull.Value ? dr["sale_name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
-                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                            warranty_period = dr["warranty_period"] != DBNull.Value ? Convert.ToInt32(dr["warranty_period"].ToString()) : 0
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -1039,7 +1041,7 @@ namespace WebENG.Service
                  LEFT JOIN Eng_Status ON Eng_Status.Status_ID = Jobs.status
                  WHERE Eng_Status.Status_Name = 'Warranty'
                  ) as temp
-                 WHERE temp.arride_date >= temp.finished_date");
+                 WHERE temp.arride_date < temp.finished_date");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
