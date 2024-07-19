@@ -10,5 +10,6 @@ namespace WebENG.Interface
     {
         List<UserModel> getAllUser();
         List<UserModel> getWorkingUser();
+        List<UserModel> getWorkingUser(DateTime start,DateTime stop);
     }
 }

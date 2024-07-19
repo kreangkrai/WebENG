@@ -6,15 +6,23 @@
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-8">
+                    <div class="col-xl-6">
 
                     </div>
-                    <div class="col-xl-2">
-                        <input id="month" type="month" class="form-control" />
+                     <div class="col-xl-2">
+                        <input id="start_month" type="month" class="form-control" />
                     </div>
                     <div class="col-xl-2">
+                        <input id="stop_month" type="month" class="form-control" />
+                    </div>
+                    <div class="col-xl-1">
                         <button id="btnUpdate" type="button" class="btn btn-primary form-control">
                             Update
+                        </button>
+                    </div>
+                    <div class="col-xl-1">
+                        <button id="btnExport" type="button" class="btn btn-success form-control">
+                            Export
                         </button>
                     </div>
                 </div>
@@ -29,7 +37,7 @@
             <div class="card-header">
                 <span>Table</span>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="overflow-x:auto">
                 <table id="tableIdleHrs" class="table table-bordered table-hover table-sm text-center w-100">
                     <thead>
                         <tr>
@@ -48,19 +56,26 @@
                 </table>
             </div>
         </div>
+        <div class="card card-dark">
+            <div class="card-body">
+                <canvas id="radar_chart" style="height:700px" />
+            </div>
+        </div>
     </div>
 </div>
 @section Scripts
 {
     <script type="text/javascript">
         let chart;
+        let radar_chart;
         let table;
 
         $(document).ready(function () {
             var today = new Date();
             var year = today.getFullYear();
             var month = today.getMonth();
-            $('#month').val(year + "-" + (today.getMonth()+1).toString().padStart(2,0));
+            $('#start_month').val(year + "-" + (today.getMonth()+1).toString().padStart(2,0));
+            $('#stop_month').val(year + "-" + (today.getMonth()+1).toString().padStart(2,0));
             UpdateView();
         });
 
@@ -69,20 +84,21 @@
         });
 
         async function UpdateView() {
-            let month = new Date($('#month').val());
-            //let stopDate = new Date($('#stopDate').val());
-            let idles = await GetIdleTimes(month.toJSON());
+            let start_month = new Date($('#start_month').val());
+            let stop_month = new Date($('#stop_month').val());
+            let idles = await GetIdleTimes(start_month.toJSON(),stop_month.toJSON());
             GenerateChart(idles);
+            GenerateRadarChart(idles);
             GenerateTable(idles);
         }
 
-        async function GetIdleTimes(month) {
+        async function GetIdleTimes(start_month,stop_month) {
             let idles = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetIdleTimes", "IdleTime")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { month },
+                data: { start_month,stop_month },
                 success: function (response) {
                     idles = response;
                 }
@@ -170,7 +186,10 @@
                     plugins: {
                         title: {
                             text: `Working Hours Chart`,
-                            display: true
+                            display: true,
+                            font: {
+                                size: 18
+                            },
                         },
                         legend: {
                             position: 'bottom',
@@ -182,6 +201,92 @@
             });
         }
 
+        function GenerateRadarChart(idles) {
+
+            let colors = ['rgba(202, 233, 255, 0.7)', 'rgba(95, 168, 211, 0.7)', 'rgba(27, 73, 101, 0.7)','rgba(41, 31, 125, 0.7)','rgba(32, 159, 125, 0.7)'];
+
+            let users = [];
+            users = idles.map(m => m.userName).filter(f => f !== "");
+            users = [... new Set(users)];
+
+            let hoursIdle = [];
+            let hoursNormal = [];
+            let hoursOT1_5 = [];
+            let hoursOT3_0 = [];
+            let hoursLeave = [];
+            for (let i = 0; i < users.length; i++) {
+                let datas = idles.filter(f => f.userName === users[i]);
+                hoursIdle.push(datas.map(m => m.idle)[0]);
+                hoursNormal.push(datas.map(m => m.normal)[0]);
+                hoursOT1_5.push(datas.map(m => m.ot1_5)[0]);
+                hoursOT3_0.push(datas.map(m => m.ot3_0)[0]);
+                hoursLeave.push(datas.map(m => m.leave)[0]);
+            }
+
+            if (radar_chart !== undefined) {
+                radar_chart.destroy();
+            }
+
+            const ctx = document.getElementById('radar_chart').getContext('2d');
+            radar_chart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: users,
+                    datasets: [
+                        {
+                            label: 'Idle',
+                            data: hoursIdle,
+                            backgroundColor: colors[0]
+                        },
+                        {
+                            label: 'Normal',
+                            data: hoursNormal,
+                            backgroundColor: colors[1]
+                        },
+                        {
+                            label: 'OT 1.5',
+                            data: hoursOT1_5,
+                            backgroundColor: colors[2]
+                        },
+                        {
+                            label: 'OT 3.0',
+                            data: hoursOT3_0,
+                            backgroundColor: colors[3]
+                        },
+                        {
+                            label: 'Leave',
+                            data: hoursLeave,
+                            backgroundColor: colors[4]
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                      r: {
+                        pointLabels: {
+                          font: {
+                            size: 14
+                          }
+                        }
+                      }
+                    },
+                    plugins: {
+                        title: {
+                            text: `Working Hours Radar Chart`,
+                            display: true,                
+                            font: {
+                                size: 18
+                            },                           
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true,                           
+                        },                       
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }
         function GenerateTable(idles) {
             let datas = idles;
             datas = datas.filter(f => f.userName !== "");
@@ -196,11 +301,17 @@
                         <td>${datas[i].ot3_0}</td>
                         <td>${datas[i].leave}</td>
                         <td>${datas[i].workingHours}</td>                        
-                        <td>${datas[i].normal + datas[i].leave + datas[i].ot1_5 + + datas[i].ot3_0}</td>
+                        <td>${datas[i].normal + datas[i].leave + datas[i].ot1_5 + datas[i].ot3_0}</td>
                     </tr>
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);
             }
         }
+
+        $('#btnExport').on('click',function(){
+            let start_year = $('#start_month').val();
+            let stop_year = $('#stop_month').val();
+            location.href = '@Url.Action("ExportIdleTime", "IdleTime")?start_year='+ start_year + '&stop_year='+stop_year;
+        });
     </script>
 }

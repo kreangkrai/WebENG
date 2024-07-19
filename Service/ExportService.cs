@@ -54,6 +54,35 @@ namespace WebENG.Service
             return stream;
         }
 
+        public Stream ExportIdleTime(FileInfo path, List<EngineerIdleTimeModel> idles)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["Idle"];
+
+                    int startRows = 2;
+                    for (int i = 0; i < idles.Count; i++)
+                    {
+                        worksheet.Cells["A" + (i + startRows)].Value = (i + 1);
+                        worksheet.Cells["B" + (i + startRows)].Value = idles[i].userName;
+                        worksheet.Cells["C" + (i + startRows)].Value = idles[i].idle;
+                        worksheet.Cells["D" + (i + startRows)].Value = idles[i].normal;
+                        worksheet.Cells["E" + (i + startRows)].Value = idles[i].ot1_5;
+                        worksheet.Cells["F" + (i + startRows)].Value = idles[i].ot3_0;
+                        worksheet.Cells["G" + (i + startRows)].Value = idles[i].leave;
+                        worksheet.Cells["H" + (i + startRows)].Value = idles[i].workingHours;
+                        worksheet.Cells["I" + (i + startRows)].Value = idles[i].normal + idles[i].leave + idles[i].ot1_5 + idles[i].ot3_0;
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
         public Stream ExportSummaryJobInHand(FileInfo path, List<SummaryJobInHandModel> all, List<SummaryJobInHandModel> projects, List<SummaryJobInHandModel> services)
         {
             Stream stream = new MemoryStream();
