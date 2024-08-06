@@ -60,17 +60,17 @@
     table.dataTable th:nth-child(4),
     table.dataTable th:nth-child(5),
     table.dataTable th:nth-child(6),
-    table.dataTable th:nth-child(22),
     table.dataTable th:nth-child(23),
-    table.dataTable th:nth-child(24){
+    table.dataTable th:nth-child(24),
+    table.dataTable th:nth-child(25){
         text-align: center;
         vertical-align:middle;
     }
 
     table.dataTable th:nth-child(1),
-    table.dataTable th:nth-child(22),
     table.dataTable th:nth-child(23),
-    table.dataTable th:nth-child(24){
+    table.dataTable th:nth-child(24),
+    table.dataTable th:nth-child(25){
         white-space: nowrap;
     }
 
@@ -83,23 +83,23 @@
         white-space: nowrap;
     }
 
-    table.dataTable td:nth-child(7),th:nth-child(7),
-    table.dataTable td:nth-child(8),th:nth-child(8),
-    table.dataTable td:nth-child(9),th:nth-child(9),
-    table.dataTable td:nth-child(10),th:nth-child(10),
-    table.dataTable td:nth-child(11),th:nth-child(11),
-    table.dataTable td:nth-child(12),th:nth-child(12),
-    table.dataTable td:nth-child(13),th:nth-child(13),
-    table.dataTable td:nth-child(14),th:nth-child(14),
-    table.dataTable td:nth-child(15),th:nth-child(15),
-    table.dataTable td:nth-child(16),th:nth-child(16),
-    table.dataTable td:nth-child(17),th:nth-child(17),
-    table.dataTable td:nth-child(18),th:nth-child(18),
-    table.dataTable td:nth-child(19),th:nth-child(19),
-    table.dataTable td:nth-child(20),th:nth-child(20),
-    table.dataTable td:nth-child(21),th:nth-child(21){
-      width: 30px;
-      max-width: 30px;      
+    table.dataTable td:nth-child(8), th:nth-child(8),
+    table.dataTable td:nth-child(9), th:nth-child(9),
+    table.dataTable td:nth-child(10), th:nth-child(10),
+    table.dataTable td:nth-child(11), th:nth-child(11),
+    table.dataTable td:nth-child(12), th:nth-child(12),
+    table.dataTable td:nth-child(13), th:nth-child(13),
+    table.dataTable td:nth-child(14), th:nth-child(14),
+    table.dataTable td:nth-child(15), th:nth-child(15),
+    table.dataTable td:nth-child(16), th:nth-child(16),
+    table.dataTable td:nth-child(17), th:nth-child(17),
+    table.dataTable td:nth-child(18), th:nth-child(18),
+    table.dataTable td:nth-child(19), th:nth-child(19),
+    table.dataTable td:nth-child(20), th:nth-child(20),
+    table.dataTable td:nth-child(21), th:nth-child(21),
+    table.dataTable td:nth-child(22), th:nth-child(22) {
+        width: 30px;
+        max-width: 30px;
     }
 </style>
 <div class="row p-4" style="row-gap:20px">
@@ -173,6 +173,7 @@
                                     <th>% Eng Cost</th>
                                     <th>% Invoice</th>
                                     <th>Current Status</th>
+                                    <th>Remaining</th>
                                     <th style="font-size:11px">Down Payment/KOM</th>
                                     <th style="font-size:11px">Document Submit</th>
                                     <th style="font-size:11px">Instrument to Vendor</th>
@@ -483,9 +484,9 @@
                 set_payments.add(statuses[i].status_name);
             }
             set_column = new Set();
-            set_column.add({'title':'Job In Hand','index':20});
-            set_column.add({'title':'Invoice','index':21});
-            set_column.add({'title':'Due Date','index':22});
+            set_column.add({'title':'Job In Hand','index':22});
+            set_column.add({'title':'Invoice','index':23});
+            set_column.add({'title':'Due Date','index':24});
 
 
             let user = $('#user_name').val();
@@ -507,7 +508,7 @@
             let new_jobs = [];
             let sum_invoice = 0;
             let columns = [];
-            let _columns = [20,21,22];
+            let _columns = [22,23,24];
             for (let i=0;i<_columns.length;i++){
                 let b = arr_column.map(m=>m.index).find(a=> a == _columns[i]);
                 if (!b){
@@ -534,7 +535,7 @@
                
                 let eng_invoice = jobs[i].eng_invoice > 0 ? parseInt(jobs[i].eng_invoice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.map(m=>m.cost)[0] : 0;
-                let _eng_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m=>m.totalEngCost).reduce((acc,b) =>  acc + b) : 0;
+                let _eng_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m => m.totalEngCost).reduce((acc, b) => acc + b) : 0;                
                 let percent_eng_cost = Math.ceil((Number(_eng_cost) / Number(cost)) * 100);
                 let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);                
                 let down_payment = jobs[i].term_payment.down_payment > 0 ? jobs[i].term_payment.down_payment : "";
@@ -555,6 +556,7 @@
                 let job_in_hand = jobs[i].job_in_hand > 0 ? jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let job_eng_in_hand = jobs[i].job_eng_in_hand > 0 ? jobs[i].job_eng_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let due_date = jobs[i].due_date.split('T')[0];
+                let remaining = (parseFloat(jobs[i].job_eng_in_hand) - parseFloat(jobs[i].eng_invoice)).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
@@ -562,6 +564,7 @@
                     percent_eng_cost,
                     percent_invoice,
                     jobs[i].status,
+                    remaining,
                     down_payment,
                     document_submit,
                     instrument_vendor,
@@ -611,7 +614,7 @@
 
                     let payments = [];
                     let sum_percent = 0;
-                    let start_column = 6;
+                    let start_column = 7;
                     let check_current_status = false;
 
                     let datas_percent = [];
@@ -1317,11 +1320,11 @@
                 set_column.forEach(x => x.title === value ? set_column.delete(x) : x)
             }else{
                 if (value === "Job In Hand"){
-                    set_column.add({'title':'Job In Hand','index':20});
+                    set_column.add({'title':'Job In Hand','index':22});
                 }else if (value === "Invoice"){
-                    set_column.add({'title':'Invoice','index':21});
+                    set_column.add({'title':'Invoice','index':23});
                 }else if (value === "Due Date") {
-                    set_column.add({'title':'Due Date','index':22});
+                    set_column.add({'title':'Due Date','index':24});
                 }              
             }
             GenerateTable(jobs_status);
@@ -1329,12 +1332,12 @@
 
         function GenerateColumnCheckBox(){
             $('#checkcolumnboxes').empty();
-            let str = `<label for="COL20" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL20" value="Job In Hand" onchange="ColumnCheckChange('COL20')" checked/> Job In Hand</label>
-                       <label for="COL21" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL21" value="Invoice" onchange="ColumnCheckChange('COL21')" checked/> Invoice</label>
-                       <label for="COL22" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL22" value="Due Date" onchange="ColumnCheckChange('COL22')" checked/> Due Date</label>
+            let str = `<label for="COL22" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL22" value="Job In Hand" onchange="ColumnCheckChange('COL22')" checked/> Job In Hand</label>
+                       <label for="COL23" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL23" value="Invoice" onchange="ColumnCheckChange('COL23')" checked/> Invoice</label>
+                       <label for="COL24" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL24" value="Due Date" onchange="ColumnCheckChange('COL24')" checked/> Due Date</label>
 `;
             $('#checkcolumnboxes').append(str);
            
