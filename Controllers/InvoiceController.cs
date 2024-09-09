@@ -70,7 +70,7 @@ namespace WebENG.Controllers
             double backlog_volume = datas.Where(w => w.type == "backlog" && w.quarter == 0 && w.job_date.Year < year).Select(s => s.job_eng_in_hand).Sum() - datas.Where(w => w.type == "backlog" && w.quarter == 0).Select(s => s.backlog_invoice_eng).Sum();
             int backlog = datas.Where(w => w.type == "backlog" && w.job_type != "").Select(s => s.job_id).Count();
             double backlog_invoice_volume = datas.Where(w => w.type == "backlog").Select(s => s.invoice_eng).Sum();
-            int backlog_complete = datas.Where(w => w.type == "backlog" && w.finished_date.Year == year && w.status == "Finished").Select(s => s.job_id).Count();
+            int backlog_complete = datas.Where(w => w.type == "backlog" && w.finished_date.Year == year && (w.status == "Finished" || w.status == "Warranty")).Select(s => s.job_id).Count();
             double backlog_pending_volume = backlog_volume - backlog_invoice_volume;
             int backlog_incomplete = backlog - backlog_complete;
 
@@ -88,7 +88,7 @@ namespace WebENG.Controllers
             double q1_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.job_eng_in_hand).Sum();
             int q1 = datas.Where(w => w.type == "now" && w.quarter == 1 && w.job_type != "").Select(s => s.job_id).Count();
             double q1_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.invoice_eng).Sum();
-            int q1_complete = datas.Where(w => w.type == "now" && w.quarter == 1 && w.finished_date.Year == year && w.status == "Finished").Select(s => s.job_id).Count();
+            int q1_complete = datas.Where(w => w.type == "now" && w.quarter == 1 && w.finished_date.Year == year && (w.status == "Finished" || w.status == "Warranty")).Select(s => s.job_id).Count();
             double q1_pending_volume = q1_volume - q1_invoice_volume;
             int q1_incomplete = q1 - q1_complete;
 
@@ -106,7 +106,7 @@ namespace WebENG.Controllers
             double q2_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.job_eng_in_hand).Sum();
             int q2 = datas.Where(w => w.type == "now" && w.quarter == 2 && w.job_type != "").Select(s => s.job_id).Count();
             double q2_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.invoice_eng).Sum();
-            int q2_complete = datas.Where(w => w.type == "now" && w.quarter == 2 && w.finished_date.Year == year && w.status == "Finished").Select(s => s.job_id).Count();
+            int q2_complete = datas.Where(w => w.type == "now" && w.quarter == 2 && w.finished_date.Year == year && (w.status == "Finished" || w.status == "Warranty")).Select(s => s.job_id).Count();
             double q2_pending_volume = q2_volume - q2_invoice_volume;
             int q2_incomplete = q2 - q2_complete;
 
@@ -124,7 +124,7 @@ namespace WebENG.Controllers
             double q3_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.job_eng_in_hand).Sum();
             int q3 = datas.Where(w => w.type == "now" && w.quarter == 3 && w.job_type != "").Select(s => s.job_id).Count();
             double q3_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.invoice_eng).Sum();
-            int q3_complete = datas.Where(w => w.type == "now" && w.quarter == 3 && w.finished_date.Year == year && w.status == "Finished").Select(s => s.job_id).Count();
+            int q3_complete = datas.Where(w => w.type == "now" && w.quarter == 3 && w.finished_date.Year == year && (w.status == "Finished" || w.status == "Warranty")).Select(s => s.job_id).Count();
             double q3_pending_volume = q3_volume - q3_invoice_volume;
             int q3_incomplete = q3 - q3_complete;
 
@@ -142,7 +142,7 @@ namespace WebENG.Controllers
             double q4_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.job_eng_in_hand).Sum();
             int q4 = datas.Where(w => w.type == "now" && w.quarter == 4 && w.job_type != "").Select(s => s.job_id).Count();
             double q4_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.invoice_eng).Sum();
-            int q4_complete = datas.Where(w => w.type == "now" && w.quarter == 4 && w.finished_date.Year == year && w.status == "Finished").Select(s => s.job_id).Count();
+            int q4_complete = datas.Where(w => w.type == "now" && w.quarter == 4 && w.finished_date.Year == year && (w.status == "Finished" || w.status == "Warranty")).Select(s => s.job_id).Count();
             double q4_pending_volume = q4_volume - q4_invoice_volume;
             int q4_incomplete = q4 - q4_complete;
 
