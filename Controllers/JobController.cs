@@ -104,7 +104,29 @@ namespace WebENG.Controllers
 
             }).ToList();
             return Json(sum);
-        } 
+        }
+
+        [HttpGet]
+        public JsonResult GetJobsSummaryByJob(string job)
+        {
+            List<JobSummaryModel> jobsSummary = JobService.GetJobsSummary();
+            List<JobSummaryModel> sum = jobsSummary.GroupBy(g => g.jobId).Select(s => new JobSummaryModel()
+            {
+                jobId = s.Key,
+                jobName = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().jobName,
+                customer = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().customer,
+                cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cost,
+                factor = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().factor,
+                totalManhour = s.Sum(k => k.totalManhour),
+                status = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().status,
+                process = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().process,
+                system = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().system,
+                remainingCost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cost - s.Sum(k => k.totalEngCost)
+
+            }).ToList();
+            JobSummaryModel _sum = sum.Where(w => w.jobId == job).FirstOrDefault();
+            return Json(_sum);
+        }
 
         [HttpPost]
         public JsonResult AddJob(string job_string)

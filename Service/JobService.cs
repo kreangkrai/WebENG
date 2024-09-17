@@ -47,6 +47,10 @@ namespace WebENG.Service
                         Jobs.job_name,
                         Jobs.customer_name as customer,
                         Jobs.job_date,
+                        Jobs.gp,
+                        Jobs.est_cost,
+                        Jobs.total_cost,
+                        Jobs.remaining_cost,
                         Jobs.cost,
                         Jobs.process_id,
                         Jobs.system_id,
@@ -121,7 +125,11 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",                           
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
+                            gp = dr["gp"] != DBNull.Value ? Convert.ToDouble(dr["gp"].ToString()) : 0.0,
+                            est_cost = dr["est_cost"] != DBNull.Value ? Convert.ToInt32(dr["est_cost"]) : 0,
                             cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
+                            total_cost = dr["total_cost"] != DBNull.Value ? Convert.ToInt32(dr["total_cost"]) : 0,
+                            remaining_cost = dr["remaining_cost"] != DBNull.Value ? Convert.ToInt32(dr["remaining_cost"]) : 0,
                             process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
                             system = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
                             md_rate = dr["md_rate"] != DBNull.Value ? Convert.ToDouble(dr["md_rate"]) : 1,
@@ -290,11 +298,11 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO 
-                        Jobs(job_id, job_name,job_date,customer_name,quotation_no,job_type, cost,process_id,
+                        Jobs(job_id, job_name,job_date,customer_name,quotation_no,job_type,gp,est_cost, cost, total_cost,remaining_cost,process_id,
                              system_id, md_rate, pd_rate, status,
                              job_in_hand,job_eng_in_hand,due_date
                         )
-                        VALUES(@job_id, @job_name,@job_date,@customer_name, @quotation_no,@job_type, @cost,@process_id,
+                        VALUES(@job_id, @job_name,@job_date,@customer_name, @quotation_no,@job_type,@gp,@est_cost, @total_cost,@remaining_cost,@cost,@process_id,
                                @system_id, @md_rate, @pd_rate, @status,
                                @job_in_hand,@job_eng_in_hand,@due_date
                         )");
@@ -307,7 +315,11 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@customer_name", job.customer);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
+                    cmd.Parameters.AddWithValue("@gp", job.gp);
+                    cmd.Parameters.AddWithValue("@est_cost", job.est_cost);
                     cmd.Parameters.AddWithValue("@cost", job.cost);
+                    cmd.Parameters.AddWithValue("@total_cost", job.total_cost);
+                    cmd.Parameters.AddWithValue("@remaining_cost", job.remaining_cost);
                     cmd.Parameters.AddWithValue("@process_id", job.process);
                     cmd.Parameters.AddWithValue("@system_id", job.system);
                     cmd.Parameters.AddWithValue("@md_rate", job.md_rate);
@@ -354,7 +366,11 @@ namespace WebENG.Service
                         customer_name = @customer_name,
                         quotation_no = @quotation_no,
                         job_type = @job_type,
+                        gp = @gp,
+                        est_cost = @est_cost,
                         cost = @cost,
+                        total_cost = @total_cost,
+                        remaining_cost = @remaining_cost,
                         process_id = @process_id,
                         system_id = @system_id,
                         md_rate = @md_rate,
@@ -374,7 +390,11 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@customer_name", job.customer);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
+                    cmd.Parameters.AddWithValue("@gp", job.gp);
+                    cmd.Parameters.AddWithValue("@est_cost", job.est_cost);
                     cmd.Parameters.AddWithValue("@cost", job.cost);
+                    cmd.Parameters.AddWithValue("@total_cost", job.total_cost);
+                    cmd.Parameters.AddWithValue("@remaining_cost", job.remaining_cost);
                     cmd.Parameters.AddWithValue("@process_id", job.process);
                     cmd.Parameters.AddWithValue("@system_id", job.system);
                     cmd.Parameters.AddWithValue("@md_rate", job.md_rate);

@@ -49,6 +49,10 @@
                             <th>OT MP</th>
                             <th>Status</th>
                             <th>C SAT.</th>
+                            <th>GP</th>
+                            <th>EST Cost</th>
+                            <th>Total Cost</th>
+                            <th>Remaining Cost</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,6 +77,10 @@
                             <th>OT MP</th>
                             <th>Status</th>
                             <th>C SAT.</th>
+                            <th>GP</th>
+                            <th>EST Cost</th>
+                            <th>Total Cost</th>
+                            <th>Remaining Cost</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -105,7 +113,7 @@
                     <div class="form-row">
                         <div class="col-3">
                             <label for="job_date">Job Date</label>
-                            <input id="job_date" type="date" class="form-control"/>
+                            <input id="job_date" type="date" class="form-control" />
                         </div>
                         <div class="col-2">
                             <label for="quotation_no">Quotation</label>
@@ -114,16 +122,34 @@
                         </div>
                         <div class="col-5">
                             <label for="job_customer">Customer</label>
-                            <input id="job_customer" type="text" class="form-control" placeholder=""/>
+                            <input id="job_customer" type="text" class="form-control" placeholder="" />
                         </div>
                         <div class="col-2">
                             <label for="job_type">Job Type</label>
-                            <input id="job_type" type="text" class="form-control" placeholder=""/>
+                            <input id="job_type" type="text" class="form-control" placeholder="" />
                         </div>
                     </div>
-                    <div class="form-row">                       
+                    <div class="form-row">
                         <div class="col-4">
-                            <label for="cost">Cost</label>
+                            <label for="gp">%GP</label>
+                            <div class="input-group">
+                                <input id="gp" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="est_cost">EST Cost</label>
+                            <div class="input-group">
+                                <input id="est_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="cost">ENG Cost</label>
                             <div class="input-group">
                                 <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
                                 <div class="input-group-append">
@@ -131,6 +157,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="form-row">
                         <div class="col-4">
                             <label for="md_rate">Market Develop</label>
                             <div class="input-group">
@@ -160,7 +188,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row">
-                                         <div class="col-9">
+                                        <div class="col-9">
                                             <label for="select_process">Process</label>
                                             <select id="select_process" class="form-control">
                                             </select>
@@ -181,10 +209,10 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -195,7 +223,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row">
-                                         <div class="col-9">
+                                        <div class="col-9">
                                             <label for="select_system">System</label>
                                             <select id="select_system" class="form-control">
                                             </select>
@@ -216,10 +244,10 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
-                                    </div>  
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -232,7 +260,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row">
-                                         <div class="col-5">
+                                        <div class="col-5">
                                             <label for="select_payment">Term Payment</label>
                                             <select id="select_payment" class="form-control">
                                             </select>
@@ -254,13 +282,13 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>                       
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="col-4">
@@ -283,7 +311,7 @@
                         </div>
                         <div class="col-4">
                             <label for="due_date">Due Date</label>
-                            <input id="due_date"type="date"  class="form-control" value="1900-01-01" />
+                            <input id="due_date" type="date" class="form-control" value="1900-01-01" />
                         </div>
                     </div>
                     <div class="form-row pt-2">
@@ -295,11 +323,11 @@
                                             <span style="font-weight:bold">Invoice</span>
                                         </div>
                                         <div class="col-2 col-md-2 d-flex justify-content-end">
-                                            <button id="add_invoice" type="button" class="btn btn-primary form-control elevation-1"  style="width:50px">
+                                            <button id="add_invoice" type="button" class="btn btn-primary form-control elevation-1" style="width:50px">
                                                 <i class="fas fa-plus"></i>
                                             </button>
                                         </div>
-                                    </div>                                    
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row pt-1">
@@ -313,7 +341,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -334,9 +362,42 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                       
-                    </div>                   
-                    <div class="form-row">                       
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="total_cost">Total Cost</label>
+                            <div class="input-group">
+                                <input id="total_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <label for="remaining_cost">Remaining Cost</label>
+                            <div class="input-group">
+                                <input id="remaining_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">THB</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <label for="btn_cal_gp">Calculate GP</label>                          
+                            <input id="btn_cal_gp" type="button" class="form-control btn btn-primary" value="Cal GP" />
+                        </div>
+                        <div class="col-2">
+                            <label for="gp_improve">%GP Improve</label>
+                            <div class="input-group">
+                                <input id="gp_improve" type="number" class="form-control" placeholder="0" value="0" disabled/>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="col-5">
                             <label for="status">Status</label>
                             <select id="status" class="form-control">
@@ -344,11 +405,11 @@
                         </div>
                         <div class="col-4" id="group_finished_date">
                             <label for="finished_date">Date Finished</label>
-                            <input id="finished_date"type="date"  class="form-control" value="1900-01-01" />
+                            <input id="finished_date" type="date" class="form-control" value="1900-01-01" />
                         </div>
                         <div class="col-3" id="group_warranty_period">
                             <label for="warranty_period">Warranty Period</label>
-                            <input id="warranty_period" type="number" class="form-control" value="0" disabled/>
+                            <input id="warranty_period" type="number" class="form-control" value="0" disabled />
                         </div>
                     </div>
                 </form>
@@ -586,7 +647,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    processes = response;                   
+                    processes = response;
                 }
             });
         }
@@ -597,7 +658,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    systems = response;               
+                    systems = response;
                 }
             });
         }
@@ -641,10 +702,10 @@
                 $('#table_job').DataTable().destroy();
 
             for (let i = 0; i < jobs.length; i++) {
-                
+
                 let countProcess = (jobs[i].process.match(/,/g) || []).length;
                 let countSystem = (jobs[i].system.match(/,/g) || []).length;
-             
+
                 let process = "";
                 let system = "";
 
@@ -681,7 +742,11 @@
                     jobs[i].cost_per_manpower,
                     jobs[i].ot_manpower,
                     jobs[i].status,
-                    "" //Customer Satisfaction
+                    "", //Customer Satisfaction
+                    jobs[i].gp,
+                    jobs[i].est_cost,
+                    jobs[i].total_cost,
+                    jobs[i].remaining_cost
                 ]);
             }
 
@@ -694,7 +759,7 @@
                 },
                 columnDefs: [
                     {
-                        targets: [4, 5, 6, 10, 11, 13, 14, 15],
+                        targets: [4, 5, 6, 10, 11, 13, 14, 15,18,19,20,21],
                         visible: false
                     },
                 ],
@@ -709,7 +774,7 @@
                     }else{
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
-                                       
+
                     $('td:eq(8)', row).html(status_str);
                 }
             });
@@ -721,10 +786,10 @@
                 $('#table_payment').DataTable().destroy();
 
             for (let i = 0; i < payments.length; i++) {
-                
+
                 let payment = payments[i].payment_name;
                 let percent = payments[i].percent;
-             
+
                 datas.push([
                     payment,
                     percent
@@ -740,11 +805,11 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
-                    
+
                 },
                 searching: false,
                 ordering: false,
@@ -759,8 +824,8 @@
                 $('#table_process').DataTable().destroy();
 
             for (let i = 0; i < processes.length; i++) {
-                
-                let process = processes[i].process_name;            
+
+                let process = processes[i].process_name;
                 datas.push([
                     process
                 ]);
@@ -775,11 +840,11 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
-                    
+
                 },
                 searching: false,
                 ordering: false,
@@ -795,8 +860,8 @@
                 $('#table_system').DataTable().destroy();
 
             for (let i = 0; i < systems.length; i++) {
-                
-                let system = systems[i].system_name;            
+
+                let system = systems[i].system_name;
                 datas.push([
                     system
                 ]);
@@ -811,11 +876,11 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
-                    
+
                 },
                 searching: false,
                 ordering: false,
@@ -866,20 +931,24 @@
             GenerateTableInvoice(set_invoice);
 
             await GetQuotations();
-            await GenerateQuotationOptions();  
+            await GenerateQuotationOptions();
             Prepmodal();
         });
 
         function Prepmodal() {
             $('#job_id').attr('disabled', false);
-            update = false;           
+            update = false;
             $('#modal_title').text("Create Job");
             $('#job_id').val(null);
             $('#job_name').val(null);
             $('#job_customer').val(null);
             $('#job_date').val(null);
             $('#quotation_no').val(null);
+            $('#gp').val(0);
+            $('#est_cost').val(0);
             $('#cost').val(0);
+            $('#total_cost').val(0);
+            $('#remaining_cost').val(0);
             $('#md').val(1);
             $('#pd').val(1);
             $('#status').val(1);
@@ -913,7 +982,7 @@
 
             let job_id = data[0];
             let job_name = data[1];
-            
+
             let quotation_no = data[2];
             let list_process = [];
             let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
@@ -939,11 +1008,15 @@
             }
 
             let list_invoice = job.invoices;
-
+            
             let cost = data[9].replaceAll(",","");
             let md = data[10];
             let pd = data[11];
             let status = data[16];
+            let gp = data[18];
+            let est_cost = data[19];
+            let total_cost = data[20];
+            let remaining_cost = data[21];
             let finished_date = jobs.filter(f=>f.job_id == job_id).map(m=>m.finished_date)[0];
 
             $('#job_id').val(job_id);
@@ -953,7 +1026,11 @@
             $('#job_date').val(job_date);
             $('#quotation_no').val(quotation_no);
             $('#job_type').val(job_type);
+            $('#gp').val(gp);
+            $('#est_cost').val(est_cost);
             $('#cost').val(cost);
+            $('#total_cost').val(total_cost);
+            $('#remaining_cost').val(remaining_cost);
             $('#md').val(md);
             $('#pd').val(pd);
             $('#status').val(status);
@@ -1011,24 +1088,24 @@
                 }
             }
             set_payments = new_payments;
-            
+
             //Process
-            for (let i=0;i<list_process.length;i++){      
-                let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];         
-                set_processes.push({'process_id': process_id ,'process_name': list_process[i]});               
+            for (let i=0;i<list_process.length;i++){
+                let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];
+                set_processes.push({'process_id': process_id ,'process_name': list_process[i]});
             }
-            
+
             //System
-            for (let i=0;i<list_system.length;i++){      
+            for (let i=0;i<list_system.length;i++){
                 let system_id = systems.filter(f=>f.system_name == list_system[i] ).map(m=>m.system_id)[0];
-                set_systems.push({'system_id': system_id ,'system_name': list_system[i]});               
+                set_systems.push({'system_id': system_id ,'system_name': list_system[i]});
             }
 
             //Invoice
-            for (let i=0;i<list_invoice.length;i++){      
+            for (let i=0;i<list_invoice.length;i++){
                 let invoice = list_invoice[i].invoice;
                 let date = list_invoice[i].invoice_date;
-                set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});               
+                set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});
             }
 
             GenerateTablePayment(set_payments);
@@ -1058,7 +1135,7 @@
                     $('#warranty_period').attr('disabled', true);
                     $('#group_warranty_period').show();
                     $('#group_finished_date').show();
-                } else {                    
+                } else {
                     $('#group_warranty_period').hide();
                     $('#group_finished_date').hide();
                 }
@@ -1073,7 +1150,11 @@
             let job_date = $('#job_date').val();
             let quotation_no = $('#quotation_no').val();
             let job_type = $('#job_type').val();
+            let gp = $('#gp').val();
+            let est_cost = $('#est_cost').val();
             let cost = $('#cost').val();
+            let total_cost = $('#total_cost').val();
+            let remaining_cost = $('#remaining_cost').val();
             let md_rate = $('#md_rate').val();
             let pd_rate = $('#pd_rate').val();
             let status = $('#status').val();
@@ -1135,7 +1216,7 @@
                     str_process += list_process[k];
                 }else{
                     str_process += list_process[k] + ",";
-                }               
+                }
             }
 
             for(let k=0 ;k<list_system.length;k++){
@@ -1143,7 +1224,7 @@
                     str_system += list_system[k];
                 }else{
                     str_system += list_system[k] + ",";
-                }               
+                }
             }
 
             let job_string = JSON.stringify({
@@ -1152,8 +1233,12 @@
                 "customer":customer,
                 "job_date":job_date,
                 "quotation_no": quotation_no,
-                "job_type":job_type,
+                "job_type": job_type,
+                "gp": gp,
+                "est_cost": est_cost,
                 "cost": cost,
+                "total_cost": total_cost,
+                "remaining_cost": remaining_cost,
                 "process":str_process,
                 "system": str_system,
                 "md_rate": md_rate,
@@ -1178,11 +1263,10 @@
             else {
                 AddJob(job_string);
             }
-
         });
 
         $('#add_payment').on('click',function(){
-            let _payment = $('#select_payment').val();       
+            let _payment = $('#select_payment').val();
             let payment = statuses.filter(f=>f.status_id === _payment ).map(m=>m.status_name)[0];
             let check_payment = set_payments.find(f=>f.payment_name == payment);
             if (check_payment == undefined){
@@ -1192,7 +1276,7 @@
         });
 
         $('#add_process').on('click',function(){
-            let _process = $('#select_process').val();       
+            let _process = $('#select_process').val();
             let process = processes.filter(f=>f.process_id === _process ).map(m=>m.process_name)[0];
             let check_process = set_processes.find(f=>f.process_name == process);
             if (check_process == undefined){
@@ -1202,7 +1286,7 @@
         });
 
         $('#add_system').on('click',function(){
-            let _system = $('#select_system').val();       
+            let _system = $('#select_system').val();
             let system = systems.filter(f=>f.system_id === _system ).map(m=>m.system_name)[0];
             let check_system = set_systems.find(f=>f.system_name == system);
             if (check_system == undefined){
@@ -1342,7 +1426,7 @@
             });
         }
 
-        $('#add_invoice').on('click',function(){     
+        $('#add_invoice').on('click',function(){
             var today = new Date();
             var year = today.getFullYear();
             var month = (today.getMonth() + 1).toString().padStart(2,0);
@@ -1357,7 +1441,7 @@
             }else{
                 set_invoice.push({'id': 1 ,'invoice': 0,'date': date});
             }
-                   
+
             GenerateTableInvoice(set_invoice);
         });
 
@@ -1400,7 +1484,7 @@
 
             for (let i = 0; i < invoices.length; i++) {
                 let no = invoices[i].id;
-                let invoice = invoices[i].invoice; 
+                let invoice = invoices[i].invoice;
                 let date = invoices[i].date;
                 datas.push([
                     no,
@@ -1418,7 +1502,7 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
@@ -1435,6 +1519,26 @@
         $("#job_id").on("input", function (e) {
             $(this).val(function (i, v) {
                 return v.replace(/[^a-z0-9-_.]/gi, "");
+            });
+        });
+
+        $('#btn_cal_gp').on('click', async function () {
+            let job = $('#job_id').val();
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobsSummaryByJob", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job
+                },
+                success: function (response) {
+                    let use_cost = parseInt(response.cost) - parseInt(response.remainingCost);
+                    let remaining_cost = parseInt($('#remaining_cost').val());
+                    let est_cost = parseInt($('#est_cost').val());
+                    let total_cost = parseInt($('#total_cost').val());
+                    let gp = (((remaining_cost - use_cost - (total_cost - est_cost)) / est_cost) * 100.0).toFixed(1);
+                    $('#gp_improve').val(gp);
+                }
             });
         });
 
