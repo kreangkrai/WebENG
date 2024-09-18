@@ -1532,10 +1532,10 @@
                     job
                 },
                 success: function (response) {
-                    let use_cost = parseInt(response.cost) - parseInt(response.remainingCost);
-                    let remaining_cost = parseInt($('#remaining_cost').val());
-                    let est_cost = parseInt($('#est_cost').val());
-                    let total_cost = parseInt($('#total_cost').val());
+                    let use_cost = parseFloat(response.cost) - parseFloat(response.remainingCost);
+                    let remaining_cost = parseFloat($('#remaining_cost').val());
+                    let est_cost = parseFloat($('#est_cost').val());
+                    let total_cost = parseFloat($('#total_cost').val());
                     let gp = (((remaining_cost - use_cost - (total_cost - est_cost)) / est_cost) * 100.0).toFixed(1);
                     $('#gp_improve').val(gp);
                 }

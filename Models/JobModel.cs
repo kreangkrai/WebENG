@@ -13,10 +13,10 @@ namespace WebENG.Models
         public string sale_department { get; set; }
         public string sale { get; set; }
         public double gp { get; set; }
-        public int est_cost { get; set; }
-        public int cost { get; set; }
-        public int total_cost { get; set; }
-        public int remaining_cost { get; set; }
+        public double est_cost { get; set; }
+        public double cost { get; set; }
+        public double total_cost { get; set; }
+        public double remaining_cost { get; set; }
         public double md_rate { get; set; }
         public double pd_rate { get; set; }
         public double factor { get; set; }
