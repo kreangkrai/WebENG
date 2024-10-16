@@ -86,6 +86,37 @@ namespace WebENG.Service
             return stream;
         }
 
+        public Stream ExportServiceReport(FileInfo path, List<DailyActivityModel> reports)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["Sheet1"];
+
+                    int startRows = 2;
+                    for (int i = 0; i < reports.Count; i++)
+                    {
+                        worksheet.Cells["A" + (i + startRows)].Value = reports[i].date;
+                        worksheet.Cells["B" + (i + startRows)].Value = reports[i].start_time;
+                        worksheet.Cells["C" + (i + startRows)].Value = reports[i].stop_time;
+                        worksheet.Cells["D" + (i + startRows)].Value = reports[i].task_name;
+                        worksheet.Cells["E" + (i + startRows)].Value = reports[i].problem;
+                        worksheet.Cells["F" + (i + startRows)].Value = reports[i].solution;
+                        worksheet.Cells["G" + (i + startRows)].Value = reports[i].tomorrow_plan;
+                        worksheet.Cells["H" + (i + startRows)].Value = reports[i].note;
+                        worksheet.Cells["I" + (i + startRows)].Value = reports[i].user_name;
+                        worksheet.Cells["J" + (i + startRows)].Value = reports[i].customer;
+
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
         public Stream ExportSummaryJobInHand(FileInfo path, List<SummaryJobInHandModel> all, List<SummaryJobInHandModel> projects, List<SummaryJobInHandModel> services)
         {
             Stream stream = new MemoryStream();
