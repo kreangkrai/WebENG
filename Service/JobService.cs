@@ -379,7 +379,8 @@ namespace WebENG.Service
                         job_in_hand = @job_in_hand,
                         job_eng_in_hand = @job_eng_in_hand,
                         due_date = @due_date,
-                        finished_date = @finished_date
+                        finished_date = @finished_date,
+                        warranty_period = @warranty_period
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -404,6 +405,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_eng_in_hand", job.job_eng_in_hand);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     cmd.Parameters.AddWithValue("@finished_date", job.finished_date);
+                    cmd.Parameters.AddWithValue("@warranty_period", job.warranty_period);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
