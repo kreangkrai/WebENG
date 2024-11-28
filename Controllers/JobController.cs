@@ -9,6 +9,8 @@ using WebENG.Service;
 using Microsoft.AspNetCore.Http;
 using WebENG.Models;
 using System.Text.RegularExpressions;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 
 namespace WebENG.Controllers
 {
@@ -18,12 +20,16 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly IStatus Status;
         readonly IInvoice Invoice;
-        public JobController()
+        readonly IExport Export;
+        protected readonly IHostingEnvironment _hostingEnvironment;
+        public JobController(IHostingEnvironment hostingEnvironment)
         {
             JobService = new JobService();
             Accessory = new AccessoryService();
             Status = new EngStatusService();
             Invoice = new InvoiceService();
+            Export = new ExportService();
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IActionResult Index()
@@ -170,6 +176,15 @@ namespace WebENG.Controllers
         {
             List<JobQuotationModel> quots = JobService.GetJobQuotations();
             return Json(quots);
+        }
+
+        public IActionResult ExportJob()
+        {
+            List<JobModel> jobs = JobService.GetAllJobs();
+            //Download Excel
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/Template", "jobs.xlsx"));
+            var stream = Export.ExportJob(templateFileInfo, jobs);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "jobs_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx");
         }
     }
 }

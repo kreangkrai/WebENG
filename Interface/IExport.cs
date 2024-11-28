@@ -14,5 +14,6 @@ namespace WebENG.Interface
         Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> acc_invoices,List<SummaryInvoiceModel> invoices);
         Stream ExportIdleTime(FileInfo path, List<EngineerIdleTimeModel> idles);
         Stream ExportServiceReport(FileInfo path, List<DailyActivityModel> reports);
+        Stream ExportJob(FileInfo path, List<JobModel> jobs);
     }
 }

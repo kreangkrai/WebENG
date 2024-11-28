@@ -10,6 +10,13 @@ namespace WebENG.Service
 {
     public class ExportService : IExport
     {
+        readonly IStatus Status;
+        readonly IJob Job;
+        public ExportService()
+        {
+            Status = new EngStatusService();
+            Job = new JobService();
+        }
         public Stream ExportData(FileInfo path, List<JobModel> jobs)
         {
             Stream stream = new MemoryStream();
@@ -78,6 +85,65 @@ namespace WebENG.Service
                         worksheet.Cells["G" + (i + startRows)].Value = idles[i].leave;
                         worksheet.Cells["H" + (i + startRows)].Value = idles[i].workingHours;
                         worksheet.Cells["I" + (i + startRows)].Value = idles[i].normal + idles[i].leave + idles[i].ot1_5 + idles[i].ot3_0;
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
+        public Stream ExportJob(FileInfo path, List<JobModel> jobs)
+        {
+            List<EngStatusModel> statuses = Status.GetStatuses();
+            List<JobSummaryModel> jobSummaries = Job.GetJobsSummary();
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["Sheet1"];
+
+                    int startRows = 2;
+                    for (int i = 0; i < jobs.Count; i++)
+                    {
+                        worksheet.Cells["A" + (i + startRows)].Value = (i + 1);
+                        worksheet.Cells["B" + (i + startRows)].Value = jobs[i].job_id;
+                        worksheet.Cells["C" + (i + startRows)].Value = jobs[i].job_name;
+                        worksheet.Cells["D" + (i + startRows)].Value = jobs[i].job_date.ToString("dd/MM/yyyy");
+                        worksheet.Cells["E" + (i + startRows)].Value = jobs[i].customer;
+                        worksheet.Cells["F" + (i + startRows)].Value = jobs[i].gp;
+                        worksheet.Cells["G" + (i + startRows)].Value = jobs[i].est_cost;
+                        worksheet.Cells["H" + (i + startRows)].Value = jobs[i].cost;
+                        worksheet.Cells["I" + (i + startRows)].Value = jobs[i].total_cost;
+                        worksheet.Cells["J" + (i + startRows)].Value = jobs[i].remaining_cost;
+
+                        double gp = 0;
+                        double use_cost = 0;
+                        if (jobSummaries != null)
+                        {
+                            JobSummaryModel summary = jobSummaries.Where(w => w.jobId == jobs[i].job_id).FirstOrDefault();
+                            use_cost = summary.cost - summary.remainingCost;
+                            double remaining_cost = jobs[i].remaining_cost;
+                            double est_cost = jobs[i].est_cost;
+                            double total_cost = jobs[i].total_cost;
+                            gp = (((remaining_cost - use_cost - (total_cost - est_cost)) / est_cost) * 100.0);
+                        }
+                        worksheet.Cells["K" + (i + startRows)].Value = use_cost;
+                        worksheet.Cells["L" + (i + startRows)].Value = gp;
+                        worksheet.Cells["M" + (i + startRows)].Value = jobs[i].md_rate;
+                        worksheet.Cells["N" + (i + startRows)].Value = jobs[i].pd_rate;
+                        worksheet.Cells["O" + (i + startRows)].Value = jobs[i].factor;
+                        worksheet.Cells["P" + (i + startRows)].Value = jobs[i].quotation_no;
+                        worksheet.Cells["Q" + (i + startRows)].Value = jobs[i].job_type;
+                        worksheet.Cells["R" + (i + startRows)].Value = jobs[i].job_in_hand;
+                        worksheet.Cells["S" + (i + startRows)].Value = jobs[i].job_eng_in_hand;
+                        worksheet.Cells["T" + (i + startRows)].Value = jobs[i].invoices.Sum(s=>s.invoice);
+                        worksheet.Cells["U" + (i + startRows)].Value = jobs[i].eng_invoice;
+                        worksheet.Cells["V" + (i + startRows)].Value = jobs[i].due_date.ToString("dd/MM/yyyy");
+                        worksheet.Cells["W" + (i + startRows)].Value = jobs[i].finished_date.ToString("dd/MM/yyyy");
+                        worksheet.Cells["X" + (i + startRows)].Value = jobs[i].warranty_period;
+                        worksheet.Cells["Y" + (i + startRows)].Value = statuses.Where(w=>w.status_id == jobs[i].status).Select(s=>s.status_name).FirstOrDefault();
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;
