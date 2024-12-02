@@ -354,7 +354,7 @@ namespace WebENG.Service
         {
             try
             {
-                if (job.finished_date.Day == new DateTime(1, 1, 1).Day)
+                if (job.finished_date.Date == new DateTime(1, 1, 1).Date)
                 {
                     job.finished_date = new DateTime(1900, 1, 1);
                 }
