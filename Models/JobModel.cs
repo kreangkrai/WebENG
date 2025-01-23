@@ -41,13 +41,23 @@ namespace WebENG.Models
         public DateTime due_date { get; set; }
         public DateTime finished_date { get; set; }
         public int warranty_period { get; set; }
+        public int bank_guarantee { get; set; }
+        public DateTime bg_start { get; set; }
+        public DateTime bg_finish { get; set; }
+        public int retention { get; set; }
     }
 
     public class InvoiceModel
     {
         public string job_id { get; set; }
         public double invoice { get; set; }
-        public DateTime invoice_date { get; set; }
+        public DateTime plan_date { get; set; }
+        public DateTime actual_date { get; set; }
+        public string status { get; set; }
+        public string remark { get; set; }
+        public DateTime new_plan_date { get; set; }
+        public string milestone { get; set; }
+        public int milestone_order { get; set; }
     }
     public class Term_PaymentModel
     {

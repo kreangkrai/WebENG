@@ -22,7 +22,16 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
-                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date FROM Invoice");
+                string command_invoice = string.Format($@"SELECT job_id,
+                                                                milestone,
+                                                                milestone_order,
+                                                                invoice,
+                                                                plan_date,
+                                                                actual_date,
+                                                                status,
+                                                                remark,
+                                                                new_plan_date
+                                                        FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
                 cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -38,8 +47,14 @@ namespace WebENG.Service
                         InvoiceModel invoice = new InvoiceModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            milestone = dr["milestone"] != DBNull.Value ? dr["milestone"].ToString() : "",
+                            milestone_order = dr["milestone_order"] != DBNull.Value ? Convert.ToInt32(dr["milestone_order"].ToString()) : 0,
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
-                            invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
+                            plan_date = dr["plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["plan_date"].ToString()) : DateTime.MinValue,
+                            actual_date = dr["actual_date"] != DBNull.Value ? Convert.ToDateTime(dr["actual_date"].ToString()) : DateTime.MinValue,
+                            new_plan_date = dr["new_plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["new_plan_date"].ToString()) : DateTime.MinValue,
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
+                            remark = dr["remark"] != DBNull.Value ? dr["remark"].ToString() : ""
                         };
                         invoices.Add(invoice);
                     }
@@ -59,6 +74,9 @@ namespace WebENG.Service
                         Jobs.system_id,
                         Jobs.md_rate,
                         Jobs.pd_rate,
+						Jobs.enduser,
+						Jobs.sale,
+						Jobs.sale_department,
                         Eng_Status.Status_Name as status,
 						Term_Payment.down_payment,
 						Term_Payment.document_submit,
@@ -79,7 +97,11 @@ namespace WebENG.Service
                         Jobs.job_eng_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
-                        Jobs.finished_date
+                        Jobs.finished_date,
+						Jobs.bank_guarantee,
+						Jobs.bg_start,
+						Jobs.bg_finish,
+						Jobs.retention
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
@@ -130,6 +152,9 @@ namespace WebENG.Service
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             customer = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
+                            enduser = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
+                            sale = dr["sale"] != DBNull.Value ? dr["sale"].ToString() : "",
+                            sale_department = dr["sale_department"] != DBNull.Value ? dr["sale_department"].ToString() : "",
                             cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
                             process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
                             system = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
@@ -147,7 +172,11 @@ namespace WebENG.Service
                             job_summary = jobSummary,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
-                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                            bank_guarantee = dr["bank_guarantee"] != DBNull.Value ? Convert.ToInt32(dr["bank_guarantee"]) : 0,
+                            bg_start = dr["bg_start"] != DBNull.Value ? Convert.ToDateTime(dr["bg_start"].ToString()) : DateTime.MinValue,
+                            bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
+                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -177,7 +206,16 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
-                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date FROM Invoice");
+                string command_invoice = string.Format($@"SELECT job_id,
+                                                                milestone,
+                                                                milestone_order,
+                                                                invoice,
+                                                                plan_date,
+                                                                actual_date,
+                                                                status,
+                                                                remark,
+                                                                new_plan_date
+                                                        FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
                 cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -193,8 +231,14 @@ namespace WebENG.Service
                         InvoiceModel invoice = new InvoiceModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            milestone = dr["milestone"] != DBNull.Value ? dr["milestone"].ToString() : "",
+                            milestone_order = dr["milestone_order"] != DBNull.Value ? Convert.ToInt32(dr["milestone_order"].ToString()) : 0,
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
-                            invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
+                            plan_date = dr["plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["plan_date"].ToString()) : DateTime.MinValue,
+                            actual_date = dr["actual_date"] != DBNull.Value ? Convert.ToDateTime(dr["actual_date"].ToString()) : DateTime.MinValue,
+                            new_plan_date = dr["new_plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["new_plan_date"].ToString()) : DateTime.MinValue,
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
+                            remark = dr["remark"] != DBNull.Value ? dr["remark"].ToString() : ""
                         };
                         invoices.Add(invoice);
                     }
@@ -214,6 +258,9 @@ namespace WebENG.Service
                         Jobs.system_id,
                         Jobs.md_rate,
                         Jobs.pd_rate,
+                        Jobs.enduser,
+						Jobs.sale,
+						Jobs.sale_department,
                         Eng_Status.Status_Name as status,
 						Term_Payment.down_payment,
 						Term_Payment.document_submit,
@@ -234,7 +281,11 @@ namespace WebENG.Service
                         Jobs.job_eng_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
-                        Jobs.finished_date
+                        Jobs.finished_date,
+                        Jobs.bank_guarantee,
+						Jobs.bg_start,
+						Jobs.bg_finish,
+						Jobs.retention
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
@@ -288,6 +339,9 @@ namespace WebENG.Service
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             customer = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
+                            enduser = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
+                            sale = dr["sale"] != DBNull.Value ? dr["sale"].ToString() : "",
+                            sale_department = dr["sale_department"] != DBNull.Value ? dr["sale_department"].ToString() : "",
                             process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
                             system = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
                             md_rate = dr["md_rate"] != DBNull.Value ? Convert.ToDouble(dr["md_rate"]) : 1,
@@ -304,7 +358,11 @@ namespace WebENG.Service
                             job_summary = jobSummary,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
-                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                            bank_guarantee = dr["bank_guarantee"] != DBNull.Value ? Convert.ToInt32(dr["bank_guarantee"]) : 0,
+                            bg_start = dr["bg_start"] != DBNull.Value ? Convert.ToDateTime(dr["bg_start"].ToString()) : DateTime.MinValue,
+                            bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
+                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;

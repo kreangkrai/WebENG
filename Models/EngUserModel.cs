@@ -12,5 +12,7 @@ namespace WebENG.Models
         public string department { get; set; }
         public string role { get; set; }
         public bool allow_edit { get; set; }
+        public string group { get; set; }
+        public bool active { get; set; }
     }
 }

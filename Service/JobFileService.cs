@@ -1,0 +1,103 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
+using WebENG.Interface;
+using WebENG.Models;
+
+namespace WebENG.Service
+{
+    public class JobFileService : IJobFile
+    {
+        public JobFileModel GetJobFile(string job_id)
+        {
+            JobFileModel job = new JobFileModel();
+            SqlCommand cmd = new SqlCommand();
+            SqlDataReader dr = null;
+            try
+            {
+                string command = string.Format($@"SELECT job_id,quotation,po,hand_over FROM JobFile WHERE job_id = '{job_id}'");
+                cmd = new SqlCommand(command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        job = new JobFileModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            quotation = dr["quotation"] != DBNull.Value ? dr["quotation"].ToString() : "",
+                            po = dr["po"] != DBNull.Value ? dr["po"].ToString() : "",
+                            hand_over = dr["hand_over"] != DBNull.Value ? dr["hand_over"].ToString() : "",
+                        };
+                    }
+                }
+                else
+                {
+                    job = new JobFileModel()
+                    {
+                        job_id = job_id,
+                        quotation = "",
+                        po = "",
+                        hand_over = "",
+                    };
+                }
+                dr.Close();
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return job;
+        }
+
+        public string UpdateJobFileByItem(string job_id, string item, string link)
+        {
+            try
+            {
+                //===item===
+                // quatation
+                // po
+                // hand_over
+                string string_command = string.Format($@"
+                    UPDATE JobFile
+                    SET
+                        {item} = @item
+                    WHERE job_id = @job_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@job_id", job_id);
+                    cmd.Parameters.AddWithValue("@item", link);
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+    }
+}

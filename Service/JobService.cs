@@ -18,7 +18,16 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
-                string command_invoice = string.Format($@"SELECT job_id,invoice,invoice_date FROM Invoice");
+                string command_invoice = string.Format($@"SELECT job_id,
+                                                                milestone,
+                                                                milestone_order,
+                                                                invoice,
+                                                                plan_date,
+                                                                actual_date,
+                                                                status,
+                                                                remark,
+                                                                new_plan_date
+                                                        FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
                 cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -34,8 +43,14 @@ namespace WebENG.Service
                         InvoiceModel invoice = new InvoiceModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            milestone = dr["milestone"] != DBNull.Value ? dr["milestone"].ToString() : "",
+                            milestone_order = dr["milestone_order"] != DBNull.Value ? Convert.ToInt32(dr["milestone_order"].ToString()) : 0,
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
-                            invoice_date = dr["invoice_date"] != DBNull.Value ? Convert.ToDateTime(dr["invoice_date"].ToString()) : DateTime.MinValue,
+                            plan_date = dr["plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["plan_date"].ToString()) : DateTime.MinValue,
+                            actual_date = dr["actual_date"] != DBNull.Value ? Convert.ToDateTime(dr["actual_date"].ToString()) : DateTime.MinValue,
+                            new_plan_date = dr["new_plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["new_plan_date"].ToString()) : DateTime.MinValue,
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
+                            remark = dr["remark"] != DBNull.Value ? dr["remark"].ToString() : ""
                         };
                         invoices.Add(invoice);
                     }
@@ -57,6 +72,9 @@ namespace WebENG.Service
                         Jobs.md_rate,
                         Jobs.pd_rate,
                         Jobs.status,
+						Jobs.enduser,
+						Jobs.sale,
+						Jobs.sale_department,
 						Term_Payment.down_payment,
 						Term_Payment.document_submit,
 						Term_Payment.instrument_vendor,
@@ -79,12 +97,11 @@ namespace WebENG.Service
                         Jobs.job_type,
                         Jobs.finished_date,
                         Jobs.warranty_period,
-                        Quotation.customer,
-	                    Quotation.enduser,
-	                    Quotation.sale_name,
-	                    Quotation.department
+						Jobs.bank_guarantee,
+						Jobs.bg_start,
+						Jobs.bg_finish,
+						Jobs.retention
                     FROM Jobs
-                    LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
                     ORDER BY Jobs.job_id");
                 cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
@@ -147,10 +164,14 @@ namespace WebENG.Service
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
                             enduser = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
-                            sale_name = dr["sale_name"] != DBNull.Value ? dr["sale_name"].ToString() : "",
-                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
+                            sale = dr["sale"] != DBNull.Value ? dr["sale"].ToString() : "",
+                            sale_department = dr["sale_department"] != DBNull.Value ? dr["sale_department"].ToString() : "",
                             finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
-                            warranty_period = dr["warranty_period"] != DBNull.Value ? Convert.ToInt32(dr["warranty_period"].ToString()) : 0
+                            warranty_period = dr["warranty_period"] != DBNull.Value ? Convert.ToInt32(dr["warranty_period"].ToString()) : 0,
+                            bank_guarantee = dr["bank_guarantee"] != DBNull.Value ? Convert.ToInt32(dr["bank_guarantee"].ToString()) : 0,
+                            bg_start = dr["bg_start"] != DBNull.Value ? Convert.ToDateTime(dr["bg_start"].ToString()) : DateTime.MinValue,
+                            bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
+                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"].ToString()) : 0
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -174,8 +195,7 @@ namespace WebENG.Service
             List<JobSummaryModel> jobsSummaries = new List<JobSummaryModel>();
             try
             {
-                string stringCommand = string.Format($@"
-                
+                string stringCommand = string.Format($@"               
                     WITH T1 AS (
                         SELECT
 							WorkingHours.user_id,
@@ -238,15 +258,14 @@ namespace WebENG.Service
 						case when Authen.levels is null then 1 else Authen.levels end levels,
                         Jobs.job_id,
                         Jobs.job_name,
-                        Quotation.customer,
+                        Jobs.customer_name as customer,
                         Jobs.cost,
                         (Jobs.md_rate * Jobs.pd_rate) as factor,
                         CAST((T1.total_manpower / 60.0) as decimal(18,1)) as total_manpower ,
                         Jobs.status,
                         Jobs.process_id as process,
 						Jobs.system_id as system
-                    FROM Jobs
-                    LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
+                    FROM Jobs                  
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
 					LEFT JOIN Authen ON Authen.user_id = T1.user_id
                     ORDER BY Jobs.job_id");
@@ -298,13 +317,59 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"
                     INSERT INTO 
-                        Jobs(job_id, job_name,job_date,customer_name,quotation_no,job_type,gp,est_cost, cost, total_cost,remaining_cost,process_id,
-                             system_id, md_rate, pd_rate, status,
-                             job_in_hand,job_eng_in_hand,due_date
+                        Jobs(job_id,
+                            job_name,
+                            job_date,
+                            customer_name,
+                            sale_department,
+                            sale,
+                            quotation_no,
+                            job_type,
+                            gp,
+                            est_cost,
+                            cost,
+                            total_cost,
+                            remaining_cost,
+                            process_id,
+                            system_id,
+                            md_rate,
+                            pd_rate,
+                            status,
+                            job_in_hand,
+                            job_eng_in_hand,
+                            due_date,
+                            enduser,
+                            bank_guarantee,
+                            bg_start,
+                            bg_finish,
+                            retention
                         )
-                        VALUES(@job_id, @job_name,@job_date,@customer_name, @quotation_no,@job_type,@gp,@est_cost, @total_cost,@remaining_cost,@cost,@process_id,
-                               @system_id, @md_rate, @pd_rate, @status,
-                               @job_in_hand,@job_eng_in_hand,@due_date
+                        VALUES(@job_id,
+                            @job_name,
+                            @job_date,
+                            @customer_name,
+                            @sale_department,
+                            @sale,
+                            @quotation_no,
+                            @job_type,
+                            @gp,
+                            @est_cost,
+                            @total_cost,
+                            @remaining_cost,
+                            @cost,
+                            @process_id,
+                            @system_id,
+                            @md_rate,
+                            @pd_rate,
+                            @status,
+                            @job_in_hand,
+                            @job_eng_in_hand,
+                            @due_date,
+                            @enduser,
+                            @bank_guarantee,
+                            @bg_start,
+                            @bg_finish,
+                            @retention
                         )");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -313,6 +378,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_name", job.job_name);
                     cmd.Parameters.AddWithValue("@job_date", job.job_date);
                     cmd.Parameters.AddWithValue("@customer_name", job.customer);
+                    cmd.Parameters.AddWithValue("@sale_department", job.sale_department);
+                    cmd.Parameters.AddWithValue("@sale", job.sale);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
                     cmd.Parameters.AddWithValue("@gp", job.gp);
@@ -328,6 +395,11 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
                     cmd.Parameters.AddWithValue("@job_eng_in_hand", job.job_eng_in_hand);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
+                    cmd.Parameters.AddWithValue("@enduser", job.enduser);
+                    cmd.Parameters.AddWithValue("@bank_guarantee", job.bank_guarantee);
+                    cmd.Parameters.AddWithValue("@bg_start", job.bg_start);
+                    cmd.Parameters.AddWithValue("@bg_finish", job.bg_finish);
+                    cmd.Parameters.AddWithValue("@retention", job.retention);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -364,6 +436,8 @@ namespace WebENG.Service
                         job_name = @job_name,
                         job_date = @job_date,
                         customer_name = @customer_name,
+                        sale_department = @sale_department,
+                        sale = @sale,
                         quotation_no = @quotation_no,
                         job_type = @job_type,
                         gp = @gp,
@@ -380,7 +454,12 @@ namespace WebENG.Service
                         job_eng_in_hand = @job_eng_in_hand,
                         due_date = @due_date,
                         finished_date = @finished_date,
-                        warranty_period = @warranty_period
+                        warranty_period = @warranty_period,
+                        enduser = @enduser,
+                        bank_guarantee = @bank_guarantee,
+                        bg_start = @bg_start,
+                        bg_finish = @bg_finish,
+                        retention = @retention
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -389,6 +468,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_name", job.job_name);
                     cmd.Parameters.AddWithValue("@job_date", job.job_date);
                     cmd.Parameters.AddWithValue("@customer_name", job.customer);
+                    cmd.Parameters.AddWithValue("@sale_department", job.sale_department);
+                    cmd.Parameters.AddWithValue("@sale", job.sale);
                     cmd.Parameters.AddWithValue("@quotation_no", job.quotation_no);
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
                     cmd.Parameters.AddWithValue("@gp", job.gp);
@@ -406,6 +487,11 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     cmd.Parameters.AddWithValue("@finished_date", job.finished_date);
                     cmd.Parameters.AddWithValue("@warranty_period", job.warranty_period);
+                    cmd.Parameters.AddWithValue("@enduser", job.enduser);
+                    cmd.Parameters.AddWithValue("@bank_guarantee", job.bank_guarantee);
+                    cmd.Parameters.AddWithValue("@bg_start", job.bg_start);                   
+                    cmd.Parameters.AddWithValue("@bg_finish", job.bg_finish);
+                    cmd.Parameters.AddWithValue("@retention", job.retention);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();

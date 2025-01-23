@@ -66,6 +66,8 @@ namespace WebENG.Service
                             user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString().ToLower() : "",
                             department = dr["Department2"] != DBNull.Value ? dr["Department2"].ToString() : "",
                             allow_edit = false,
+                            group = dr["Group"] != DBNull.Value ? dr["Group"].ToString().ToLower() : "",
+                            active = dr["active"] != DBNull.Value ? Convert.ToBoolean(dr["active"].ToString()) : false,
                         };
                         users.Add(user);
                     }

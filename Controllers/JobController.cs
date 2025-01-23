@@ -21,6 +21,7 @@ namespace WebENG.Controllers
         readonly IStatus Status;
         readonly IInvoice Invoice;
         readonly IExport Export;
+        readonly IEngUser EngUserService;
         protected readonly IHostingEnvironment _hostingEnvironment;
         public JobController(IHostingEnvironment hostingEnvironment)
         {
@@ -29,6 +30,7 @@ namespace WebENG.Controllers
             Status = new EngStatusService();
             Invoice = new InvoiceService();
             Export = new ExportService();
+            EngUserService = new EngUserService();
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -78,6 +80,13 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
+        public JsonResult GetAllUsers()
+        {
+            List<EngUserModel> users = EngUserService.GetUsers().Where(w=>w.group != "" && w.active == true).OrderBy(o => o.user_id).ToList();
+            return Json(users);
+        }
+
+        [HttpGet]
         public JsonResult GetJobs()
         {
             List<JobModel> jobs = JobService.GetAllJobs();
@@ -90,6 +99,7 @@ namespace WebENG.Controllers
             List<EngStatusModel> statuses = Status.GetStatuses();
             return Json(statuses);
         }
+
 
         [HttpGet]
         public JsonResult GetJobsSummary()

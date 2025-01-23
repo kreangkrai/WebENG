@@ -125,13 +125,28 @@
                             <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
                             <datalist id="quotations"></datalist>
                         </div>
+                        <div class="col-2">
+                            <label for="job_type">Job Type</label>
+                            <input id="job_type" type="text" class="form-control" placeholder="" />
+                        </div>
                         <div class="col-5">
                             <label for="job_customer">Customer</label>
                             <input id="job_customer" type="text" class="form-control" placeholder="" />
                         </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-5">
+                            <label for="select_sale">Sale</label>
+                            <select id="select_sale" class="form-control">
+                            </select>
+                        </div>
                         <div class="col-2">
-                            <label for="job_type">Job Type</label>
-                            <input id="job_type" type="text" class="form-control" placeholder="" />
+                            <label for="sale_department">Sale Department</label>
+                            <input id="sale_department" type="text" class="form-control" placeholder="" />
+                        </div>
+                        <div class="col-5">
+                            <label for="end_user">End User</label>
+                            <input id="end_user" type="text" class="form-control" placeholder="" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -180,6 +195,33 @@
                                     <input id="pd_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">X</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color:#42D5D8">
+                                    <span style="font-weight:bold">Job File</span>
+                                </div>
+                                <div class="card-body">                                   
+                                    <div class="form-row pt-1">
+                                        <div class="col-12">
+                                            <table id="table_job_file" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                <thead style="background-color:#42B4D8">
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>หัวข้อ</th>
+                                                        <th>ไฟล์แนบ</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -370,6 +412,36 @@
                         </div>
                     </div>
                     <div class="form-row">
+                        <div class="col-3">
+                            <label for="bank_guarantee">Bank Guarantee</label>
+                            <div class="input-group">
+                                <input id="bank_guarantee" type="number" class="form-control" placeholder="#" value="0" step="1" min="0" max="100" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label for="bg_start">BG Start</label>
+                            <input id="bg_start" type="date" class="form-control" />
+                        </div>
+                        <div class="col-3">
+                            <label for="bg_finish">BG Finish</label>
+                            <input id="bg_finish" type="date" class="form-control" />
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group ">
+                                <label for="retention">Retention</label>
+                                <div class="input-group">
+                                    <input id="retention" type="number" class="form-control" placeholder="#" value="0" step="1" min="0" max="100" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <div class="col-4">
                             <label for="total_cost">Total Cost</label>
                             <div class="input-group">
@@ -389,13 +461,13 @@
                             </div>
                         </div>
                         <div class="col-2">
-                            <label for="btn_cal_gp">Calculate GP</label>                          
+                            <label for="btn_cal_gp">Calculate GP</label>
                             <input id="btn_cal_gp" type="button" class="form-control btn btn-primary" value="Cal GP" />
                         </div>
                         <div class="col-2">
                             <label for="gp_improve">%GP Improve</label>
                             <div class="input-group">
-                                <input id="gp_improve" type="number" class="form-control" placeholder="0" value="0" disabled/>
+                                <input id="gp_improve" type="number" class="form-control" placeholder="0" value="0" disabled />
                                 <div class="input-group-append">
                                     <span class="input-group-text">%</span>
                                 </div>
@@ -574,7 +646,7 @@
         let statuses = [];
         let processes = [];
         let systems = [];
-
+        let all_users = [];
         let set_payments = [];
         let set_processes = [];
         let set_systems = [];
@@ -588,12 +660,14 @@
 
         $(document).ready(async function () {
             await GetStatus();
+            await GetAllUsers();
             await GenerateStatusOption();
             await GeneratePaymentOption();
             await GetProcess();
             await GetSystem();
             await GenerateProcessOption();
             await GenerateSystemOption();
+            await GenerateAllUser();
             GetJobs();
         });
 
@@ -686,6 +760,29 @@
             for (let i = 0; i < systems.length; i++) {
                 if (systems[i].system_name === system || system === "" || system === null) {
                     $('#select_system').append(`<option value="${systems[i].system_id}">${systems[i].system_id}: ${systems[i].system_name}</option>`);
+                }
+            }
+        }
+
+        async function GetAllUsers() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAllUsers", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    all_users = response;
+                }
+            });
+        };
+
+        function GenerateAllUser() {
+            let user = $('#select_sale').val();
+            $('#select_sale').empty();
+            $('#select_sale').append(`<option value="" selected disabled>Please Select Sale</option>`);
+            for (let i = 0; i < all_users.length; i++) {
+                if (all_users[i].user_name === user || user === "" || user === null) {
+                    $('#select_sale').append(`<option value="${all_users[i].user_name}">${all_users[i].user_name}</option>`);
                 }
             }
         }
@@ -858,7 +955,6 @@
             });
         };
 
-
         function GenerateTableSystem(systems) {
             let datas = [];
             if (table_system !== null)
@@ -922,6 +1018,11 @@
             $('#quotations').empty();
             $('#quotations').append(quots_str);
         }
+        $('#select_sale').on('change', function () {
+            let user_name = $('#select_sale').val();
+            let department = all_users.filter(f => f.user_name === user_name).map(m => m.department)[0];
+            $('#sale_department').val(department);
+        });
 
         $('#btn_create').on('click', async function () {
             set_payments = [];
