@@ -17,15 +17,19 @@ namespace WebENG.Controllers
     public class JobController : Controller
     {
         readonly IJob JobService;
+        readonly IJobFile JobFile;
         readonly IAccessory Accessory;
         readonly IStatus Status;
         readonly IInvoice Invoice;
         readonly IExport Export;
         readonly IEngUser EngUserService;
         protected readonly IHostingEnvironment _hostingEnvironment;
+        static string _job_id;
+        static string _item;
         public JobController(IHostingEnvironment hostingEnvironment)
         {
             JobService = new JobService();
+            JobFile = new JobFileService();
             Accessory = new AccessoryService();
             Status = new EngStatusService();
             Invoice = new InvoiceService();
@@ -155,6 +159,10 @@ namespace WebENG.Controllers
                 if (result == "Success")
                 {
                     result = Invoice.Insert(job.invoices);
+                    if (result == "Success")
+                    {
+                        result = JobFile.CreateJobFile(job.job_id);
+                    }
                 }
             }
             return Json(result);
@@ -188,6 +196,83 @@ namespace WebENG.Controllers
             return Json(quots);
         }
 
+        [HttpGet]
+        public JsonResult GetJobFileByJob(string job_id)
+        {
+            JobFileModel job = JobFile.GetJobFile(job_id);
+            return Json(job);
+        }
+
+        [HttpPost]
+        public string InsertFile(string job_id,string item)
+        {
+            _job_id = job_id;
+            _item = item;
+            return "Success";
+        }
+
+        [HttpPost]
+        public IActionResult ImportJobFile()
+        {
+            IFormFile file = Request.Form.Files[0];
+            string folderName = "";
+            string item = "";
+            if (_item == "Quotation")
+            {
+                folderName = $"backup/{_job_id}/Quotation/";
+                item = "quotation";
+            }
+            if (_item == "PO")
+            {
+                folderName = $"backup/{_job_id}/PO/";
+                item = "po";
+            }
+            if (_item == "Hand Over")
+            {
+                folderName = $"backup/{_job_id}/Hand Over/";
+                item = "hand_over";
+            }
+            
+            string webRootPath = _hostingEnvironment.WebRootPath;
+            string newPath = Path.Combine(webRootPath, folderName);
+            if (!Directory.Exists(newPath))
+            {
+                Directory.CreateDirectory(newPath);
+            }
+            else
+            {
+                DirectoryInfo di = new DirectoryInfo(newPath);
+                foreach (FileInfo f in di.GetFiles())
+                {
+                    f.Delete();
+                }
+                foreach (DirectoryInfo dir in di.GetDirectories())
+                {
+
+                    dir.Delete(true);
+                }
+                Directory.CreateDirectory(newPath);
+
+            }
+
+            if (file.Length > 0)
+            {
+                string fullPath = Path.Combine(newPath, file.FileName);
+                FileStream stream = new FileStream(fullPath, FileMode.Create);
+                file.CopyTo(stream);
+
+                stream.Position = 0;
+                stream.Close();
+
+                string scheme = Request.Scheme;
+                string host = Request.Host.Host;
+                string path = folderName + file.FileName;
+                //string _path = scheme + "://" + host + "/eng/Job/" + path;
+                string _path = scheme + "://" + host +"/" + path;
+                string msg = JobFile.UpdateJobFileByItem(_job_id, item, _path);
+            }
+            return Json("Success");
+        }
         public IActionResult ExportJob()
         {
             List<JobModel> jobs = JobService.GetAllJobs();

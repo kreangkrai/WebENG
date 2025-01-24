@@ -35,7 +35,7 @@ namespace WebENG.Service
 				        Jobs.finished_date
 				from Jobs
 				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -137,7 +137,7 @@ namespace WebENG.Service
 	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,3))) as remaining_percent_invoice,
 	                    CAST((job_eng_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                 from Jobs
-                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
@@ -206,7 +206,7 @@ namespace WebENG.Service
 	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,3))) as remaining_percent_invoice,
 	                    CAST((job_eng_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                     from Jobs 
-                    LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                    LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     where FORMAT(job_date,'yyyy') = '{year}'");
                 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
@@ -402,8 +402,8 @@ namespace WebENG.Service
 				        Jobs.finished_date
 				from Jobs
 
-				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
-                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(invoice_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
+				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());

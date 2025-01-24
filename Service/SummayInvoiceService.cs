@@ -28,10 +28,10 @@ namespace WebENG.Service
 		                       Jobs.job_eng_in_hand,
 		                       Invoice.invoice,
 		                       CAST(((Invoice.invoice / Jobs.job_in_hand) * Jobs.job_eng_in_hand / 1000000) as DECIMAL(18,3)) as invoice_eng,
-		                       FORMAT(invoice_date,'MMM') as month
+		                       FORMAT(actual_date,'MMM') as month
 	                    FROM Invoice
 	                    LEFT JOIN Jobs ON Jobs.job_id = Invoice.job_id
-	                    WHERE FORMAT(invoice_date,'yyyy') = '{year}'
+	                    WHERE FORMAT(actual_date,'yyyy') = '{year}'
 	                ) as mian
 	                GROUP BY month");
 

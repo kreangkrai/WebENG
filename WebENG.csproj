@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <Folder Include="Views\Analysis\" />
+    <Folder Include="wwwroot\backup\" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,11 @@
 @{
     ViewData["Title"] = "Jobs";
 }
+<style>
+    #table_job_file {
+        cursor: pointer;
+    }
+</style>
 <div class="row p-3">
     @if (Model.role == "Admin")
     {
@@ -212,10 +217,9 @@
                                             <table id="table_job_file" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
                                                 <thead style="background-color:#42B4D8">
                                                     <tr>
-                                                        <th></th>
                                                         <th>หัวข้อ</th>
-                                                        <th>ไฟล์แนบ</th>
-                                                        <th></th>
+                                                        <th style="text-align:center">ไฟล์แนบ</th>
+                                                        <th style="width:10%"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -628,6 +632,41 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="ImportJobFileModal" tabindex="-1" role="dialog" style="overflow-y:auto" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"><b>อัพเดทไฟล์</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <form>
+                        <div class="row pt-1" style="row-gap:1px">
+                            <div class="col-xl-12">
+                                <div class="card elevation-1">
+                                    <div class="card-header">
+                                        <span class="card-title">
+                                            <i class="fas fa-file-excel"></i> <b> Import File</b>
+                                        </span>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label id="importJobFileName">File Name</label>
+                                            <input id="importJobFile" type="file" class="form-control-file" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
@@ -638,6 +677,7 @@
         let table_process;
         let table_system;
         let table_invoice;
+        let table_job_file;
 
         let update = false;
         let jobs = [];
@@ -651,6 +691,7 @@
         let set_processes = [];
         let set_systems = [];
         let set_invoice = [];
+        let job_files = [];
 
         //Change these parameters to true to show result
         let debug_jobs = false;
@@ -1036,8 +1077,8 @@
             GenerateTableInvoice(set_invoice);
             GenerateTableInvoice(set_invoice);
 
-            await GetQuotations();
-            await GenerateQuotationOptions();
+            //await GetQuotations();
+            //await GenerateQuotationOptions();
             Prepmodal();
         });
 
@@ -1048,6 +1089,8 @@
             $('#job_id').val(null);
             $('#job_name').val(null);
             $('#job_customer').val(null);
+            $('#end_user').val(null);
+            $('#sale_department').val(null);
             $('#job_date').val(null);
             $('#quotation_no').val(null);
             $('#gp').val(0);
@@ -1062,6 +1105,10 @@
             $('#job_eng_in_hand').val(0);
             $('#invoice').val(0);
             $('#due_date').val(null);
+            $('#bank_guarantee').val(0);
+            $('#bg_start').val(null);
+            $('#bg_finish').val(null);
+            $('#retention').val(0);
             $('#group_finished_date').hide();
             $('#group_warranty_period').hide();
             $('#modal_job').modal();
@@ -1070,11 +1117,25 @@
         $('#table_job tbody').on('click', 'tr', async function () {
             let admin = '@Model.role' == "Admin" ? true : false;
             if (admin) {
-                await GetQuotations();
-                await GenerateQuotationOptions();
+                //await GetQuotations();
+                //await GenerateQuotationOptions();
+                let job_id = table.row(this).data()[0];
+                await GetJobFile(job_id);
                 await EditJob(table.row(this).data());
             }
         });
+
+        async function GetJobFile(job_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetJobFileByJob", "Job")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { job_id },
+                success: function (response) {
+                    job_files = response;
+                }
+            });
+        }
 
         function EditJob(data) {
             set_payments = [];
@@ -1093,10 +1154,16 @@
             let list_process = [];
             let job = jobs.filter(f=>f.job_id == job_id).map(m=>m)[0];
             let customer = job.customer;
+            let sale_name = job.sale;
+            let sale_department = job.sale_department;
+            let end_user = job.enduser;
             let job_date = job.job_date.split('T')[0];
             let job_type = job.job_type;
             let countProcess = (job.process.match(/,/g) || []).length;
-
+            let bank_guarantee = job.bank_guarantee;
+            let bg_start = job.bg_start.split('T')[0];
+            let bg_finish = job.bg_finish.split('T')[0];
+            let retention = job.retention;
             for (let k=0;k<=countProcess;k++){
                 let _process = processes.filter(f=>f.process_id == job.process.split(',')[k]).map(m=>m.process_name)[0];
                 if (_process !== undefined){
@@ -1123,12 +1190,15 @@
             let est_cost = data[19];
             let total_cost = data[20];
             let remaining_cost = data[21];
-            let finished_date = jobs.filter(f=>f.job_id == job_id).map(m=>m.finished_date)[0];
+            let finished_date = jobs.filter(f => f.job_id == job_id).map(m => m.finished_date)[0];           
 
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
             $('#job_name').val(job_name);
             $('#job_customer').val(customer);
+            $('#select_sale').val(sale_name);
+            $('#sale_department').val(sale_department);
+            $('#end_user').val(end_user);
             $('#job_date').val(job_date);
             $('#quotation_no').val(quotation_no);
             $('#job_type').val(job_type);
@@ -1146,6 +1216,11 @@
 
             $('#finished_date').val(finished_date.split('T')[0]);
             $('#warranty_period').val(job.warranty_period);
+            $('#bank_guarantee').val(bank_guarantee);
+            $('#bg_start').val(bg_start);
+            $('#bg_finish').val(bg_finish);
+            $('#retention').val(retention);
+
 
             let finish_status = statuses.filter(f=>f.status_id == status).map(m=> m.status_name);
             if (finish_status[0] === "Warranty") {
@@ -1218,6 +1293,7 @@
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
             GenerateTableInvoice(set_invoice);
+            GenerateTableJobFile(job_files);
         }
         $('#quotation_no').on('change',function(){
             let quo = $('#quotation_no').val();
@@ -1253,6 +1329,9 @@
             let job_id = $('#job_id').val();
             let job_name = $('#job_name').val();
             let customer = $('#job_customer').val();
+            let sale = $('#select_sale').val();
+            let sale_department = $('#sale_department').val();
+            let enduser = $('#end_user').val();
             let job_date = $('#job_date').val();
             let quotation_no = $('#quotation_no').val();
             let job_type = $('#job_type').val();
@@ -1269,6 +1348,10 @@
             let job_eng_in_hand = $('#job_eng_in_hand').val();
             let due_date = $('#due_date').val();
             let warranty_period = $('#warranty_period').val();
+            let bank_guarantee = $('#bank_guarantee').val();
+            let bg_start = $('#bg_start').val();
+            let bg_finish = $('#bg_finish').val();
+            let retention = $('#retention').val();
             if (status === null) {
                 status = 1;
             }
@@ -1336,7 +1419,10 @@
             let job_string = JSON.stringify({
                 "job_id": job_id,
                 "job_name": job_name,
-                "customer":customer,
+                "customer": customer,
+                "sale": sale,
+                "sale_department": sale_department,
+                "enduser": enduser,
                 "job_date":job_date,
                 "quotation_no": quotation_no,
                 "job_type": job_type,
@@ -1356,7 +1442,11 @@
                 "invoices":invoices,
                 "due_date":due_date,
                 "finished_date": finished_date,
-                "warranty_period":warranty_period
+                "warranty_period": warranty_period,
+                "bank_guarantee": bank_guarantee,
+                "bg_start": bg_start,
+                "bg_finish": bg_finish,
+                "retention": retention
             });
 
             if (debug_job_string) {
@@ -1621,6 +1711,101 @@
                 info : false
             });
         };
+
+        function GenerateTableJobFile(job_files) {
+            let _datas = [];
+            _datas.push([
+                "Quotation", job_files.quotation, ""
+            ]);
+            _datas.push([
+                "PO", job_files.po, ""
+            ]);
+            _datas.push([
+                "Hand Over", job_files.hand_over, ""
+            ]);
+
+
+            if (table_job_file !== undefined) {
+                table_job_file.destroy();
+            }
+            table_job_file = $('#table_job_file').DataTable({
+                data: _datas,
+                columnDefs: [
+                    {
+                        targets: 1,
+                        className: "dt-left"
+                    },
+                ],
+                rowCallback: function (row, data) {
+                    let job_id = $("#job_id").val();
+                    let item = data[0];
+                    $('td:eq(2)', row).html(`
+                        <input type="button" class="btn btn-success" style="width:80px;font-size:12px" onclick="AddJobFile('${job_id}','${item}')" value="อัพเดทไฟล์" />
+                    `);
+                },
+                searching: false,
+                paging: false,
+                info: false,
+                order: false,
+            });
+        }
+        $('#table_job_file tbody').on('click', 'td','tr', async function () {
+            let col = table_job_file.cell(this)[0][0].column;
+            let path = table_job_file.row(this).data()[1];
+            if (col === 1) {
+                window.open(path);
+            }
+        });
+
+        async function AddJobFile(job_id, item) {
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("InsertFile", "Job")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { job_id, item },
+                success: async function (response) {
+                    if (response === "Success") {
+                        $('#ImportJobFileModal').modal();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        }
+
+        $('#importJobFile').on('change', async function (e) {
+            if (e.target.files[0]) {
+                let fdata = new FormData();
+                let fileUpload = $('#importJobFile').get(0);
+                let files = fileUpload.files;
+                fdata.append(files[0].name, files[0]);
+                $('#importJobFileName').text(files[0].name);
+
+                await $.ajax({
+                    type: "POST",
+                    url: "Job/ImportJobfile",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader("XSRF-TOKEN",
+                            $('input:hidden[name="__RequestVerificationToken"]').val());
+                    },
+                    data: fdata,
+                    contentType: false,
+                    processData: false,
+                    success: async function (response) {
+                        if (response.length == 0)
+                            alert('Some error occured while uploading');
+                        else {
+                            alert(response);
+                            let job_id = $('#job_id').val();
+                            await GetJobFile(job_id);
+                            GenerateTableJobFile(job_files);
+                            $('#ImportJobFileModal').modal('hide');
+                        }
+                    },
+                });
+            }
+        });
+
 
         $("#job_id").on("input", function (e) {
             $(this).val(function (i, v) {

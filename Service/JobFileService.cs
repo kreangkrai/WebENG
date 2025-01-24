@@ -10,6 +10,46 @@ namespace WebENG.Service
 {
     public class JobFileService : IJobFile
     {
+        public string CreateJobFile(string job_id)
+        {
+            try
+            {
+                //===item===
+                // quatation
+                // po
+                // hand_over
+                string string_command = string.Format($@"
+                    INSERT INTO JobFile (job_id,quotation,po,hand_over)
+                               VALUES (@job_id,@quotation,@po,@hand_over)");
+                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                {
+                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@job_id", job_id.Replace("-", String.Empty));
+                    cmd.Parameters.AddWithValue("@quotation", "");
+                    cmd.Parameters.AddWithValue("@po", "");
+                    cmd.Parameters.AddWithValue("@hand_over", "");
+                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                    {
+                        ConnectSQL.CloseConnect();
+                        ConnectSQL.OpenConnect();
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return "Success";
+        }
+
         public JobFileModel GetJobFile(string job_id)
         {
             JobFileModel job = new JobFileModel();
