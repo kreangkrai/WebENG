@@ -44,7 +44,6 @@ namespace WebENG.Service
             {
                 string string_command = string.Format($@"SELECT job_id,
                                                                 milestone,
-                                                                milestone_order,
                                                                 invoice,
                                                                 plan_date,
                                                                 actual_date,
@@ -67,7 +66,6 @@ namespace WebENG.Service
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             milestone = dr["milestone"] != DBNull.Value ? dr["milestone"].ToString() : "",
-                            milestone_order = dr["milestone_order"] != DBNull.Value ? Convert.ToInt32(dr["milestone_order"].ToString()) : 0,
                             invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0.0,
                             plan_date = dr["plan_date"] != DBNull.Value ? Convert.ToDateTime(dr["plan_date"].ToString()) : DateTime.MinValue,
                             actual_date = dr["actual_date"] != DBNull.Value ? Convert.ToDateTime(dr["actual_date"].ToString()) : DateTime.MinValue,
@@ -99,7 +97,6 @@ namespace WebENG.Service
                     string string_command = string.Format($@"
                     INSERT INTO Invoice(job_id,
                                         milestone,
-                                        milestone_order,
                                         invoice,
                                         plan_date,
                                         actual_date,
@@ -108,7 +105,6 @@ namespace WebENG.Service
                                         new_plan_date)
                     VALUES(@job_id,
                             @milestone,
-                            @milestone_order,
                             @invoice,
                             @plan_date,
                             @actual_date,
@@ -120,7 +116,6 @@ namespace WebENG.Service
                         cmd.CommandType = System.Data.CommandType.Text;
                         cmd.Parameters.AddWithValue("@job_id", invoices[i].job_id.Replace("-",String.Empty));
                         cmd.Parameters.AddWithValue("@milestone", invoices[i].milestone);
-                        cmd.Parameters.AddWithValue("@milestone_order", invoices[i].milestone_order);
                         cmd.Parameters.AddWithValue("@invoice", invoices[i].invoice);
                         cmd.Parameters.AddWithValue("@plan_date", invoices[i].plan_date);
                         cmd.Parameters.AddWithValue("@actual_date", invoices[i].actual_date);

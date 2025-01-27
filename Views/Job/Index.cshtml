@@ -207,7 +207,7 @@
                     </div>
                     <div class="form-row">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card" style="overflow-x:auto">
                                 <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold">Job File</span>
                                 </div>
@@ -382,13 +382,19 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row pt-1">
-                                        <div class="col-12">
+                                        <div class="col-12" style="overflow-x:auto">
                                             <table id="table_invoice" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
                                                 <thead style="background-color:#42B4D8">
                                                     <tr>
                                                         <th>No</th>
+                                                        <th>ID</th>
+                                                        <th>Milestone</th>
                                                         <th>Invoice</th>
-                                                        <th>Date</th>
+                                                        <th>Plan Date</th>
+                                                        <th>Actual Date</th>
+                                                        <th>New Plan Date</th>
+                                                        <th>Status</th>
+                                                        <th>Remark</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -538,7 +544,7 @@
 </div>
 
 <div class="modal fade" id="modal_edit_invoice" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 id="modal_title" class="modal-title"><b>Edit Invoice</b></h5>
@@ -551,17 +557,45 @@
                     <div class="form-row">
                         <div class="col-2">
                             <label for="edit_invoice_no">No</label>
-                            <input id="edit_invoice_no" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="edit_invoice_no" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                        <div class="col-5">
+                        <div class="col-2">
+                            <label for="edit_invoice_id">ID</label>
+                            <input id="edit_invoice_id" type="number" class="form-control" placeholder="" disabled />
+                        </div>
+                        <div class="col-8">
+                            <label for="edit_invoice_milestone">Milestone</label>
+                            <select id="edit_invoice_milestone" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
                             <label for="edit_invoice">Invoice</label>
-                            <input id="edit_invoice" type="number" class="form-control" placeholder=""/>
+                            <input id="edit_invoice" type="number" class="form-control" placeholder="" />
                         </div>
-                        <div class="col-5">
-                            <label for="edit_invoice_date">Date</label>
-                            <input id="edit_invoice_date" type="date" class="form-control" placeholder="" />
+                        <div class="col-4">
+                            <label for="edit_invoice_plan_date">Plan Date</label>
+                            <input id="edit_invoice_plan_date" type="date" class="form-control" placeholder="" />
                         </div>
-                    </div>                                       
+                        <div class="col-4">
+                            <label for="edit_invoice_actual_date">Actual Date</label>
+                            <input id="edit_invoice_actual_date" type="date" class="form-control" placeholder="" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="edit_invoice_status">Status</label>
+                            <select id="edit_invoice_status" class="form-control"></select>
+                        </div>
+                        <div class="col-4">
+                            <label for="edit_invoice_remark">Remark</label>
+                            <textarea id="edit_invoice_remark" cols="50" rows="3" class="form-control"></textarea>
+                        </div>
+                        <div class="col-4">
+                            <label for="edit_invoice_new_plan_date">New Plan Date</label>
+                            <input id="edit_invoice_new_plan_date" type="date" class="form-control" placeholder="" />
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -692,7 +726,7 @@
         let set_systems = [];
         let set_invoice = [];
         let job_files = [];
-
+        let status_invoices = ['', 'วางบิลแล้ว', 'คาดว่าจะวางบิลได้ภายในเดือน', 'อยู่ระหว่างรอลูกค้าตรวจรับงาน', 'ยังไม่เริ่มงาน', 'เลื่อน', 'งานยกเลิก'];
         //Change these parameters to true to show result
         let debug_jobs = false;
         let debug_user = false;
@@ -1046,9 +1080,24 @@
             $('#select_payment').empty();
             $('#select_payment').append(`<option value="" selected disabled>Please Select Term Payment</option>`);
             for (let i = 0; i < statuses.length; i++) {
-                if (statuses[i].status_name === status || status === "" || status === null) {
+                if (statuses[i].status_name === payment || payment === "" || payment === null) {
                     $('#select_payment').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
                 }
+            }
+        }
+        function GenerateMilestoneOption() {
+            $('#edit_invoice_milestone').empty();
+            $('#edit_invoice_milestone').append(`<option value="" selected disabled>Please Select Milestone</option>`);
+            $('#edit_invoice_milestone').append(`<option value="STA000"></option>`);
+            for (let i = 0; i < statuses.length; i++) {
+                $('#edit_invoice_milestone').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
+            }
+        }
+        function GenerateStatucInvoiceOption() {
+            $('#edit_invoice_status').empty();
+            $('#edit_invoice_status').append(`<option value="" selected disabled>Please Select Status</option>`);           
+            for (let i = 0; i < status_invoices.length; i++) {
+                $('#edit_invoice_status').append(`<option value="${i}">${status_invoices[i]}</option>`);
             }
         }
         function GenerateQuotationOptions() {
@@ -1285,10 +1334,33 @@
             //Invoice
             for (let i=0;i<list_invoice.length;i++){
                 let invoice = list_invoice[i].invoice;
-                let date = list_invoice[i].invoice_date;
-                set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});
+                let actual_date = list_invoice[i].actual_date;
+                let plan_date = list_invoice[i].plan_date;
+                let new_plan_date = list_invoice[i].new_plan_date;
+                let status = list_invoice[i].status;
+                let remark = list_invoice[i].remark;
+                let milestone = list_invoice[i].milestone;
+                let id = 0;
+                if (milestone !== "") {
+                    id = statuses.filter(f => f.status_name === milestone).map(m => m.no)[0];
+                }
+                set_invoice.push({
+                    'no': (i + 1),
+                    'id': id,
+                    'milestone': milestone,
+                    'invoice': invoice,
+                    'plan_date': plan_date,
+                    'actual_date': actual_date,
+                    'new_plan_date': new_plan_date,
+                    'status': status,
+                    'remark': remark
+                });
             }
 
+            set_invoice.sort((a, b) => a.id - b.id || a.no - b.no);
+
+            GenerateStatucInvoiceOption();
+            GenerateMilestoneOption();
             GenerateTablePayment(set_payments);
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
@@ -1355,7 +1427,7 @@
             if (status === null) {
                 status = 1;
             }
-
+            
             let term_payment = {};
             let down_payment = set_payments.filter(f=>f.payment_id == "STA001").map(m=>m.percent)[0];
             let document_submit = set_payments.filter(f=>f.payment_id == "STA002").map(m=>m.percent)[0];
@@ -1391,8 +1463,17 @@
             term_payment.finished = finished;
 
             let invoices = [];
-            for(let i=0;i<set_invoice.length;i++){
-                invoices.push({'job_id':job_id,'invoice':set_invoice[i].invoice,'invoice_date': set_invoice[i].date});
+            for (let i = 0; i < set_invoice.length; i++){                
+                invoices.push({
+                    'job_id': job_id,
+                    'invoice': set_invoice[i].invoice,
+                    'milestone': set_invoice[i].milestone,
+                    'plan_date': set_invoice[i].plan_date,
+                    'actual_date': set_invoice[i].actual_date,
+                    'new_plan_date': set_invoice[i].new_plan_date,
+                    'status': set_invoice[i].status,
+                    'remark': set_invoice[i].remark
+                });               
             }
 
             let str_process = "";
@@ -1628,14 +1709,34 @@
             var month = (today.getMonth() + 1).toString().padStart(2,0);
             var day = today.getDate().toString().padStart(2,0);
             let date = year + "-" + month + "-" + day;
-
+            let actual_date = new Date(1900,1,1).toISOString().split('T')[0];
             set_invoice.sort();
             let last_id = 0;
             if (set_invoice.length > 0){
-                last_id = set_invoice[set_invoice.length-1].id;
-                set_invoice.push({'id': Number(last_id + 1) ,'invoice': 0,'date': date});
+                last_id = set_invoice[set_invoice.length-1].no;
+                set_invoice.push({
+                    'no': Number(last_id + 1),
+                    'id': 0,
+                    'milestone': "",
+                    'invoice': 0,
+                    'plan_date': date,
+                    'actual_date': actual_date,
+                    'new_plan_date': date,
+                    'status': "",
+                    'remark': ""
+                });
             }else{
-                set_invoice.push({'id': 1 ,'invoice': 0,'date': date});
+                set_invoice.push({
+                    'no': 1,
+                    'id': 0,
+                    'milestone': "",
+                    'invoice': 0,
+                    'plan_date': date,
+                    'actual_date': actual_date,
+                    'new_plan_date': date,
+                    'status': "",
+                    'remark': ""
+                });
             }
 
             GenerateTableInvoice(set_invoice);
@@ -1644,21 +1745,58 @@
         $('#table_invoice tbody').on('click', 'tr', async function () {
             let data = table_invoice.row(this).data();
             let no = data[0];
-            let invoice = data[1].replaceAll(',','');
-            let date = data[2];
+            let id = data[1];
+            let milestone = data[2];
+            let invoice = data[3].replaceAll(',','');
+            let plan_date = data[4];
+            let actual_date = data[5];
+            let new_plan_date = data[6];
+            let status = data[7];
+            let remark = data[8];
+            let milestone_id = statuses.filter(f => f.status_name === milestone).map(m => m.status_id);
             $('#edit_invoice_no').val(no);
+            $('#edit_invoice_id').val(id);
+            $('#edit_invoice_milestone').val(milestone_id);
             $('#edit_invoice').val(invoice);
-            $('#edit_invoice_date').val(date);
+            $('#edit_invoice_plan_date').val(plan_date);
+            $('#edit_invoice_actual_date').val(actual_date);
+            $('#edit_invoice_new_plan_date').val(new_plan_date);
+            $('#edit_invoice_status').val(status_invoices.findIndex(f=>f === status));
+            $('#edit_invoice_remark').val(remark);
             $('#modal_edit_invoice').modal();
+        });
+
+        $('#edit_invoice_milestone').on('change', function () {
+            let milestone = $('#edit_invoice_milestone').val();
+            let data = statuses.filter(f => f.status_id === milestone).map(m => m)[0];
+            let id = 0;
+            if (typeof(data) !== "undefined") {
+                id = data.no;
+            }
+            $('#edit_invoice_id').val(id);
         });
 
         $('#btn_invoice_save').on('click',function(){
             let no = $('#edit_invoice_no').val();
+            let id = $('#edit_invoice_id').val();
             let invoice = $('#edit_invoice').val();
-            let date = $('#edit_invoice_date').val();
-            let index = set_invoice.findIndex(f=>f.id == no);
+            let milestone = statuses.filter(f => f.status_id === $('#edit_invoice_milestone').val()).map(m => m.status_name)[0];
+            let plan_date = $('#edit_invoice_plan_date').val();
+            let actual_date = $('#edit_invoice_actual_date').val();
+            let new_plan_date = $('#edit_invoice_new_plan_date').val();
+            let status = status_invoices[$('#edit_invoice_status').val()];
+            let remark = $('#edit_invoice_remark').val();
+            let index = set_invoice.findIndex(f => f.no == no);
+            set_invoice[index].id = id;
             set_invoice[index].invoice = invoice;
-            set_invoice[index].date = date;
+            set_invoice[index].milestone = milestone;
+            set_invoice[index].plan_date = plan_date;
+            set_invoice[index].actual_date = actual_date;
+            set_invoice[index].new_plan_date = new_plan_date;
+            set_invoice[index].status = status;
+            set_invoice[index].remark = remark;
+
+            set_invoice.sort((a, b) => a.id - b.id || a.no - b.no);
             GenerateTableInvoice(set_invoice);
             $('#modal_edit_invoice').modal('hide');
         });
@@ -1679,13 +1817,27 @@
                 $('#table_invoice').DataTable().destroy();
 
             for (let i = 0; i < invoices.length; i++) {
-                let no = invoices[i].id;
+                let no = (i+1);
+                let id = invoices[i].id;
+                let milestone = invoices[i].milestone;
                 let invoice = invoices[i].invoice;
-                let date = invoices[i].date;
+                let plan_date = invoices[i].plan_date;
+                let actual_date = invoices[i].actual_date;
+                let new_plan_date = invoices[i].new_plan_date;
+                let status = invoices[i].status;
+                let remark = invoices[i].remark;
+
+                set_invoice[i].no = (i + 1);
                 datas.push([
                     no,
+                    id,
+                    milestone,
                     invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                    date.toString().split('T')[0]
+                    plan_date.split('T')[0],
+                    actual_date.toString().split('T')[0],
+                    new_plan_date.split('T')[0],
+                    status,
+                    remark
                 ]);
             }
 

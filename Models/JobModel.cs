@@ -57,7 +57,6 @@ namespace WebENG.Models
         public string remark { get; set; }
         public DateTime new_plan_date { get; set; }
         public string milestone { get; set; }
-        public int milestone_order { get; set; }
     }
     public class Term_PaymentModel
     {

@@ -268,7 +268,7 @@ namespace WebENG.Controllers
                 string host = Request.Host.Host;
                 string path = folderName + file.FileName;
                 //string _path = scheme + "://" + host + "/eng/Job/" + path;
-                string _path = scheme + "://" + host +"/" + path;
+                string _path = scheme + "://" + host +"/eng/" + path;
                 string msg = JobFile.UpdateJobFileByItem(_job_id, item, _path);
             }
             return Json("Success");
