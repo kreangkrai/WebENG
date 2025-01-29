@@ -1093,7 +1093,7 @@
                 $('#edit_invoice_milestone').append(`<option value="${statuses[i].status_id}">${statuses[i].status_name}</option>`);
             }
         }
-        function GenerateStatucInvoiceOption() {
+        function GenerateStatusInvoiceOption() {
             $('#edit_invoice_status').empty();
             $('#edit_invoice_status').append(`<option value="" selected disabled>Please Select Status</option>`);           
             for (let i = 0; i < status_invoices.length; i++) {
@@ -1120,6 +1120,8 @@
             set_systems = [];
             set_invoice = [];
 
+            GenerateStatusInvoiceOption();
+            GenerateMilestoneOption();
             GenerateTablePayment(set_payments);
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
@@ -1359,7 +1361,7 @@
 
             set_invoice.sort((a, b) => a.id - b.id || a.no - b.no);
 
-            GenerateStatucInvoiceOption();
+            GenerateStatusInvoiceOption();
             GenerateMilestoneOption();
             GenerateTablePayment(set_payments);
             GenerateTableProcess(set_processes);
