@@ -15,5 +15,6 @@ namespace WebENG.Interface
         Stream ExportIdleTime(FileInfo path, List<EngineerIdleTimeModel> idles);
         Stream ExportServiceReport(FileInfo path, List<DailyActivityModel> reports);
         Stream ExportJob(FileInfo path, List<JobModel> jobs);
+        Stream ExportQuotationSummary(FileInfo path, List<QuotationSummaryModel> quotations);
     }
 }

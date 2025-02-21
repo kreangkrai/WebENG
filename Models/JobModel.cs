@@ -45,6 +45,7 @@ namespace WebENG.Models
         public DateTime bg_start { get; set; }
         public DateTime bg_finish { get; set; }
         public int retention { get; set; }
+        public string responsible { get; set; }
     }
 
     public class InvoiceModel

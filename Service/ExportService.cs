@@ -151,6 +151,60 @@ namespace WebENG.Service
                         worksheet.Cells["AD" + (i + startRows)].Value = jobs[i].bg_finish.ToString("dd/MM/yyyy");
                         worksheet.Cells["AE" + (i + startRows)].Value = jobs[i].retention;
                         worksheet.Cells["AF" + (i + startRows)].Value = statuses.Where(w=>w.status_id == jobs[i].status).Select(s=>s.status_name).FirstOrDefault();
+                        worksheet.Cells["AG" + (i + startRows)].Value = jobs[i].responsible;
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
+        public Stream ExportQuotationSummary(FileInfo path, List<QuotationSummaryModel> quotations)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["Sheet1"];
+
+                    int startRows = 2;
+                    int k = 0;
+                    for (int i = 0; i < quotations.Count; i++)
+                    {
+                        int engineers = quotations[i].engineers.Count;
+                        if (engineers == 0)
+                        {
+                            worksheet.Cells["A" + (k + startRows)].Value = quotations[i].quotation;
+                            worksheet.Cells["B" + (k + startRows)].Value = quotations[i].quotation_name;
+                            worksheet.Cells["C" + (k + startRows)].Value = quotations[i].date.ToString("dd/MM/yyyy");
+                            worksheet.Cells["D" + (k + startRows)].Value = quotations[i].quotation_type;
+                            worksheet.Cells["E" + (k + startRows)].Value = quotations[i].customer;
+                            worksheet.Cells["F" + (k + startRows)].Value = quotations[i].end_user;
+                            worksheet.Cells["G" + (k + startRows)].Value = quotations[i].sale_name;
+                            worksheet.Cells["H" + (k + startRows)].Value = quotations[i].sale_department;
+                            worksheet.Cells["I" + (k + startRows)].Value = "";
+                            worksheet.Cells["J" + (k + startRows)].Value = "";
+                            k++;
+                        }
+                        else
+                        {
+                            for(int j = 0; j < quotations[i].engineers.Count; j++)
+                            {
+                                worksheet.Cells["A" + (k + startRows)].Value = quotations[i].quotation;
+                                worksheet.Cells["B" + (k + startRows)].Value = quotations[i].quotation_name;
+                                worksheet.Cells["C" + (k + startRows)].Value = quotations[i].date.ToString("dd/MM/yyyy");
+                                worksheet.Cells["D" + (k + startRows)].Value = quotations[i].quotation_type;
+                                worksheet.Cells["E" + (k + startRows)].Value = quotations[i].customer;
+                                worksheet.Cells["F" + (k + startRows)].Value = quotations[i].end_user;
+                                worksheet.Cells["G" + (k + startRows)].Value = quotations[i].sale_name;
+                                worksheet.Cells["H" + (k + startRows)].Value = quotations[i].sale_department;
+                                worksheet.Cells["I" + (k+ startRows)].Value = quotations[i].engineers[j].name;
+                                worksheet.Cells["J" + (k + startRows)].Value = quotations[i].engineers[j].total_manhour;
+                                k++;
+                            }
+                        }
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;

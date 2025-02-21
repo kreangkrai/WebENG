@@ -49,13 +49,20 @@
                 </li>
                 @if (Model.role == "Admin" || Model.role != "User")
                 {
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Job" asp-action="JobsSummary">
-                            <i class="nav-icon fas fa-search"></i>
-                            <p class="text-bold">JOBS SUMMARY</p>
-                        </a>
-                    </li>
-                }
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="Job" asp-action="JobsSummary">
+                    <i class="nav-icon fas fa-search"></i>
+                    <p class="text-bold">JOBS SUMMARY</p>
+                </a>
+            </li>}
+                @if (Model.role == "Admin" || Model.role != "User")
+                {
+            <li class="nav-item">
+                <a class="nav-link" asp-controller="QuotationSummary" asp-action="Index">
+                    <i class="nav-icon fas fa-search"></i>
+                    <p class="text-bold">QUOTATION SUMMARY</p>
+                </a>
+            </li>}
 
                 @if (Model.role == "Admin")
                 {
@@ -84,7 +91,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>}
+            </li>
+}
                 @if (Model.role == "Admin")
                 {
             <li class="nav-item">
@@ -106,7 +114,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>}
+            </li>
+}
 
                 @if (Model.role == "Admin")
                 {
@@ -180,7 +189,8 @@
                                 </a>
                             </li>*@
                                 </ul>
-                            </li>}
+                            </li>
+}
 
                 @if (Model.role == "Admin")
                 {
@@ -203,7 +213,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>}
+            </li>
+}
 
                 @if (Model.role == "Admin")
                 {
@@ -220,7 +231,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>}
+            </li>
+}
 
                 @if (Model.role == "Admin")
                 {
@@ -273,7 +285,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>}
+            </li>
+}
 
                 @if (Model.role == "Admin")
                 {
@@ -350,7 +363,8 @@
                         </a>
                     </li>
                 </ul>
-            </li>}
+            </li>
+}
 
                 <li class="nav-item pt-2">
                     <a class="nav-link" href="http://cup.contrologic.co.th">

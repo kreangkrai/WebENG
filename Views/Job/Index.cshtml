@@ -184,7 +184,7 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="col-4">
+                        <div class="col-3">
                             <label for="md_rate">Market Develop</label>
                             <div class="input-group">
                                 <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
@@ -193,7 +193,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <div class="form-group ">
                                 <label for="pd_rate">Product Develop</label>
                                 <div class="input-group">
@@ -203,6 +203,11 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="col-6">
+                            <label for="select_responsible">Responsible</label>
+                            <select id="select_responsible" class="form-control">
+                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -743,6 +748,7 @@
             await GenerateProcessOption();
             await GenerateSystemOption();
             await GenerateAllUser();
+            await GenerateResponsible();
             GetJobs();
         });
 
@@ -858,6 +864,17 @@
             for (let i = 0; i < all_users.length; i++) {
                 if (all_users[i].user_name === user || user === "" || user === null) {
                     $('#select_sale').append(`<option value="${all_users[i].user_name}">${all_users[i].user_name}</option>`);
+                }
+            }
+        }
+
+        function GenerateResponsible() {
+            let user = $('#select_responsible').val();
+            $('#select_responsible').empty();
+            $('#select_responsible').append(`<option value="" selected disabled>Please Select Responsible</option>`);
+            for (let i = 0; i < all_users.length; i++) {
+                if (all_users[i].user_name === user || user === "" || user === null) {
+                    $('#select_responsible').append(`<option value="${all_users[i].user_name}">${all_users[i].user_name}</option>`);
                 }
             }
         }
@@ -1242,6 +1259,7 @@
             let total_cost = data[20];
             let remaining_cost = data[21];
             let finished_date = jobs.filter(f => f.job_id == job_id).map(m => m.finished_date)[0];           
+            let responsible = job.responsible;
 
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
@@ -1271,7 +1289,7 @@
             $('#bg_start').val(bg_start);
             $('#bg_finish').val(bg_finish);
             $('#retention').val(retention);
-
+            $('#select_responsible').val(responsible);
 
             let finish_status = statuses.filter(f=>f.status_id == status).map(m=> m.status_name);
             if (finish_status[0] === "Warranty") {
@@ -1426,6 +1444,7 @@
             let bg_start = $('#bg_start').val();
             let bg_finish = $('#bg_finish').val();
             let retention = $('#retention').val();
+            let responsible = $('#select_responsible').val();
             if (status === null) {
                 status = 1;
             }
@@ -1529,7 +1548,8 @@
                 "bank_guarantee": bank_guarantee,
                 "bg_start": bg_start,
                 "bg_finish": bg_finish,
-                "retention": retention
+                "retention": retention,
+                "responsible":responsible
             });
 
             if (debug_job_string) {

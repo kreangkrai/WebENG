@@ -1,0 +1,197 @@
+﻿@{ 
+    ViewData["title"] = "Quotation Summary";
+    List<string> years = ViewBag.ListYear;
+    List<string> engineers = ViewBag.ListEngineer;
+    List<string> departments = ViewBag.ListDepartment;
+}
+
+<div class="row p-4" style="row-gap:5px">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-body">
+                <div class="row" style="row-gap:10px">
+                    <div class="col-xl-6">
+
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="select_mode" class="form-control">
+                            <option value="Year">Year</option>
+                            <option value="Engineer">Engineer</option>
+                            <option value="Department">Department</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2" id="div_year">
+                        <select id="select_year" class="form-control">
+                            @for (int i = 0; i < years.Count; i++)
+                            {
+                                <option value="@years[i]">@years[i]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-xl-2" id="div_engineer" hidden>
+                        <select id="select_engineer" class="form-control">
+                            @for (int i = 0; i < engineers.Count; i++)
+                            {
+                                <option value="@engineers[i]">@engineers[i]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-xl-2" id="div_department" hidden>
+                        <select id="select_department" class="form-control">
+                            @for (int i = 0; i < departments.Count; i++)
+                            {
+                                <option value="@departments[i]">@departments[i]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-xl-1">
+                        <button id="btnUpdate" type="button" class="btn btn-primary form-control">
+                            Update
+                        </button>
+                    </div>
+                    <div class="col-xl-1">
+                        <button id="btnExport" type="button" class="btn btn-success form-control">
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-dark">
+            <div class="card-header">
+                <span>Quotation Summary</span>
+            </div>
+            <div class="card-body" style="overflow-x:auto">
+                <table id="tableQuotation" class="table table-bordered table-hover table-sm text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Quotation</th>
+                            <th>Quotation Name</th>
+                            <th>Create Date</th>
+                            <th>Type</th>
+                            <th>Customer</th>
+                            <th>End User</th>
+                            <th>Sale</th>
+                            <th>Sale Department</th>
+                            <th>Engineer</th>
+                            <th>Total ManHour</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script type="text/javascript">
+        let table;
+        let mode = "Year";
+        $(document).ready(function () {
+            UpdateView();
+        });
+
+        $('#btnUpdate').on('click', function () {
+            UpdateView();
+        });
+
+        $('#select_mode').on('change', function () {
+            let _mode = $('#select_mode').val();
+            if (_mode === "Year") {
+                $('#div_year').attr('hidden', false);
+                $('#div_engineer').attr('hidden', true);
+                $('#div_department').attr('hidden', true);
+                mode = "Year";
+            }
+            if (_mode === "Engineer") {
+                $('#div_year').attr('hidden', true);
+                $('#div_engineer').attr('hidden', false);
+                $('#div_department').attr('hidden', true);
+                mode = "Engineer";
+            }
+            if (_mode === "Department") {
+                $('#div_year').attr('hidden', true);
+                $('#div_engineer').attr('hidden', true);
+                $('#div_department').attr('hidden', false);
+                mode = "Department";
+            }
+        });
+
+        async function UpdateView() {
+            let value = "";
+            if (mode === "Year") {
+                value = $('#select_year').val();
+            }
+            if (mode === "Engineer") {
+                value = $('#select_engineer').val();
+            }
+            if (mode === "Department") {
+                value = $('#select_department').val();
+            }
+            await GetQuotation(value);
+        }
+
+        async function GetQuotation(value) {
+            let quotations = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetQuotationSummary", "QuotationSummary")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { mode,value },
+                success: function (response) {
+                    quotations = response;
+                    GenerateTable(quotations);
+                }
+            });
+        };
+
+        function GenerateTable(quotations) {
+            let datas = quotations;
+
+            $('#tableQuotation tbody').empty();
+            for (let i = 0; i < datas.length; i++) {
+                let rowStr = '';
+                let engineers = datas[i].engineers.length;
+                if (engineers === 0) {
+                    rowStr = `
+                        <tr>
+                            <td>${datas[i].quotation}</td>
+                            <td style="text-align:left">${datas[i].quotation_name}</td>
+                            <td>${datas[i].date.split('T')[0]}</td>
+                            <td>${datas[i].quotation_type}</td>
+                            <td style="text-align:left">${datas[i].customer}</td>
+                            <td style="text-align:left">${datas[i].end_user}</td>
+                            <td style="text-align:left">${datas[i].sale_name}</td>
+                            <td>${datas[i].sale_department}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>`;
+                } else {
+                    for (let j = 0; j < datas[i].engineers.length; j++) {
+                        rowStr = `
+                        <tr>
+                            <td>${datas[i].quotation}</td>
+                            <td style="text-align:left">${datas[i].quotation_name}</td>
+                            <td>${datas[i].date.split('T')[0]}</td>
+                            <td>${datas[i].quotation_type}</td>
+                            <td style="text-align:left">${datas[i].customer}</td>
+                            <td style="text-align:left">${datas[i].end_user}</td>
+                            <td style="text-align:left">${datas[i].sale_name}</td>
+                            <td>${datas[i].sale_department}</td>
+                            <td style="text-align:left">${datas[i].engineers[j].name}</td>
+                            <td>${datas[i].engineers[j].total_manhour}</td>
+                        </tr>`;
+                    }
+                }
+
+                $('#tableQuotation tbody').append(rowStr);
+            }
+        }
+
+        $('#btnExport').on('click',function(){
+            location.href = '@Url.Action("ExportQuotationSummary", "QuotationSummary")';
+        });
+    </script>
+}

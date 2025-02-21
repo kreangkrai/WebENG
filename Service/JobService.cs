@@ -98,7 +98,8 @@ namespace WebENG.Service
 						Jobs.bank_guarantee,
 						Jobs.bg_start,
 						Jobs.bg_finish,
-						Jobs.retention
+						Jobs.retention,
+                        Jobs.responsible
                     FROM Jobs
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
                     ORDER BY Jobs.job_id");
@@ -169,7 +170,8 @@ namespace WebENG.Service
                             bank_guarantee = dr["bank_guarantee"] != DBNull.Value ? Convert.ToInt32(dr["bank_guarantee"].ToString()) : 0,
                             bg_start = dr["bg_start"] != DBNull.Value ? Convert.ToDateTime(dr["bg_start"].ToString()) : DateTime.MinValue,
                             bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
-                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"].ToString()) : 0
+                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"].ToString()) : 0,
+                            responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -340,7 +342,8 @@ namespace WebENG.Service
                             bank_guarantee,
                             bg_start,
                             bg_finish,
-                            retention
+                            retention,
+                            responsible
                         )
                         VALUES(@job_id,
                             @job_name,
@@ -367,7 +370,8 @@ namespace WebENG.Service
                             @bank_guarantee,
                             @bg_start,
                             @bg_finish,
-                            @retention
+                            @retention,
+                            @responsible
                         )");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -398,6 +402,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@bg_start", job.bg_start);
                     cmd.Parameters.AddWithValue("@bg_finish", job.bg_finish);
                     cmd.Parameters.AddWithValue("@retention", job.retention);
+                    cmd.Parameters.AddWithValue("@responsible", job.responsible);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -457,7 +462,8 @@ namespace WebENG.Service
                         bank_guarantee = @bank_guarantee,
                         bg_start = @bg_start,
                         bg_finish = @bg_finish,
-                        retention = @retention
+                        retention = @retention,
+                        responsible = @responsible
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -490,6 +496,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@bg_start", job.bg_start);                   
                     cmd.Parameters.AddWithValue("@bg_finish", job.bg_finish);
                     cmd.Parameters.AddWithValue("@retention", job.retention);
+                    cmd.Parameters.AddWithValue("@responsible", job.responsible);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
