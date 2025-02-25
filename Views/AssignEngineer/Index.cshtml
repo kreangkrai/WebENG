@@ -54,6 +54,7 @@
                                 <tr>
                                     <th>Staff ID</th>
                                     <th>Staff Name</th>
+                                    <th>Level</th>
                                     <th>Role</th>
                                     <th>Assign By</th>
                                     <th>Assign Date</th>
@@ -108,6 +109,10 @@
                     <div class="form-group">
                         <label for="user_id">Engineer</label>
                         <select id="user_id" class="form-control"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_level">Level</label>
+                        <input type="text" id="user_level" class="form-control" disabled/>
                     </div>
                 </form>
             </div>
@@ -223,6 +228,7 @@
                 datas.push([
                     assign_engs[i].user_id,
                     assign_engs[i].user_name,
+                    assign_engs[i].level,
                     assign_engs[i].role,
                     assign_engs[i].assign_by,
                     assign_engs[i].assign_date.split("T")[0]
@@ -293,7 +299,7 @@
             var engineer_str = '<option value="" selected disabled>Please Select Engineer</option>';
             for (var i = 0; i < engineers.length; i++) {
                 if (department === "" || (engineers[i].department === department))
-                    engineer_str += '<option value="' + engineers[i].user_id + '">' + engineers[i].user_name + '</option>';
+                    engineer_str += '<option value="' + engineers[i].user_id + '">' + engineers[i].name + '</option>';
             }
             $('#user_id').empty();
             $('#user_id').append(engineer_str);
@@ -337,11 +343,14 @@
         })
 
         $('#user_id').on('change', function () {
-            var user_id = $('#user_id').val();
+            var user_id = $('#user_id').val();          
             if (user_id === "") {
                 $('#btn_accept').attr('disabled', true);
             }
             else {
+                let name = $('#user_id option:selected').text();
+                let level = engineers.filter(f => f.name == name).map(m => m.levels)[0];
+                $('#user_level').val(level);
                 $('#btn_accept').attr('disabled', false);
             }
         });
@@ -349,11 +358,13 @@
         $('#btn_accept').on('click', async function () {
             var user_id = $('#user_id').val();
             var job_id = $('#job_id').val();
+            var level = $('#user_level').val();
             var assign_by = '@Model.name';
             var assign_date = new Date();
             var jr_string = JSON.stringify({
                 "user_id": user_id,
                 "job_id": job_id,
+                "level":level,
                 "role": "Engineer",
                 "assign_by": assign_by,
                 "assign_date": assign_date

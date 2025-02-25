@@ -20,5 +20,6 @@ namespace WebENG.Models
         public double manpower { get; set; }
         public double manpower_per_tmp { get; set; }
         public double score { get; set; }
+        public double remaining_cost { get; set; }
     }
 }

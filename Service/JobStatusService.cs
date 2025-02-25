@@ -99,7 +99,8 @@ namespace WebENG.Service
 						Jobs.bank_guarantee,
 						Jobs.bg_start,
 						Jobs.bg_finish,
-						Jobs.retention
+						Jobs.retention,
+                        Jobs.responsible
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
@@ -174,7 +175,8 @@ namespace WebENG.Service
                             bank_guarantee = dr["bank_guarantee"] != DBNull.Value ? Convert.ToInt32(dr["bank_guarantee"]) : 0,
                             bg_start = dr["bg_start"] != DBNull.Value ? Convert.ToDateTime(dr["bg_start"].ToString()) : DateTime.MinValue,
                             bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
-                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0
+                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0,
+                            responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -281,7 +283,8 @@ namespace WebENG.Service
                         Jobs.bank_guarantee,
 						Jobs.bg_start,
 						Jobs.bg_finish,
-						Jobs.retention
+						Jobs.retention,
+                        Jobs.responsible
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
@@ -358,7 +361,8 @@ namespace WebENG.Service
                             bank_guarantee = dr["bank_guarantee"] != DBNull.Value ? Convert.ToInt32(dr["bank_guarantee"]) : 0,
                             bg_start = dr["bg_start"] != DBNull.Value ? Convert.ToDateTime(dr["bg_start"].ToString()) : DateTime.MinValue,
                             bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
-                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0
+                            retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0,
+                            responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;

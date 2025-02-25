@@ -62,15 +62,17 @@
     table.dataTable th:nth-child(6),
     table.dataTable th:nth-child(23),
     table.dataTable th:nth-child(24),
-    table.dataTable th:nth-child(25){
+    table.dataTable th:nth-child(25),
+    table.dataTable th:nth-child(26) {
         text-align: center;
-        vertical-align:middle;
+        vertical-align: middle;
     }
 
     table.dataTable th:nth-child(1),
     table.dataTable th:nth-child(23),
     table.dataTable th:nth-child(24),
-    table.dataTable th:nth-child(25){
+    table.dataTable th:nth-child(25),
+    table.dataTable th:nth-child(26) {
         white-space: nowrap;
     }
 
@@ -170,6 +172,7 @@
                                     <th>Job No.</th>
                                     <th>Project Name</th>
                                     <th>Customer</th>
+                                    <th>Responsible</th>
                                     <th>% Eng Cost</th>
                                     <th>% Invoice</th>
                                     <th>Current Status</th>
@@ -272,7 +275,11 @@
                             <input id="due_date"type="date"  class="form-control" value="1900-01-01" disabled/>
                         </div>
                     </div>
-                    <div class="form-row" id="form_status">                       
+                    <div class="form-row" id="form_status">
+                        <div class="col-5">
+                            <label for="responsible">Project Status Update by</label>
+                            <input id="responsible" class="form-control" disabled />
+                        </div>
                         <div class="col-5">
                             <label for="status">Status</label>
                             <select id="status" class="form-control">
@@ -484,9 +491,9 @@
                 set_payments.add(statuses[i].status_name);
             }
             set_column = new Set();
-            set_column.add({'title':'Job In Hand','index':22});
-            set_column.add({'title':'Invoice','index':23});
-            set_column.add({'title':'Due Date','index':24});
+            set_column.add({'title':'Job In Hand','index':23});
+            set_column.add({'title':'Invoice','index':24});
+            set_column.add({'title':'Due Date','index':25});
 
 
             let user = $('#user_name').val();
@@ -508,7 +515,7 @@
             let new_jobs = [];
             let sum_invoice = 0;
             let columns = [];
-            let _columns = [22,23,24];
+            let _columns = [23,24,25];
             for (let i=0;i<_columns.length;i++){
                 let b = arr_column.map(m=>m.index).find(a=> a == _columns[i]);
                 if (!b){
@@ -561,6 +568,7 @@
                     jobs[i].job_id,
                     jobs[i].job_name,
                     jobs[i].customer,
+                    jobs[i].responsible,
                     percent_eng_cost,
                     percent_invoice,
                     jobs[i].status,
@@ -614,7 +622,7 @@
 
                     let payments = [];
                     let sum_percent = 0;
-                    let start_column = 7;
+                    let start_column = 8;
                     let check_current_status = false;
 
                     let datas_percent = [];
@@ -771,7 +779,8 @@
                 let status = statuses.filter(f=>f.status_name == data_job.status).map(m=>m.status_id)[0];
                 let job_name = data_job.job_name;
                 let job_in_hand = data_job.job_in_hand;
-
+                let responsible = data_job.responsible;
+                console.log(data_job);
                 let invoice = 0;
                 if (data_job.invoices.length > 0){
                     invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
@@ -830,6 +839,7 @@
                 $('#job_in_hand').val(job_in_hand);
                 $('#invoice').val(invoice);
                 $('#due_date').val(due_date.split('T')[0]);
+                $('#responsible').val(responsible);
                 $('#status').val(status);
 
                 if (status === undefined){
@@ -1320,11 +1330,11 @@
                 set_column.forEach(x => x.title === value ? set_column.delete(x) : x)
             }else{
                 if (value === "Job In Hand"){
-                    set_column.add({'title':'Job In Hand','index':22});
+                    set_column.add({'title':'Job In Hand','index':23});
                 }else if (value === "Invoice"){
-                    set_column.add({'title':'Invoice','index':23});
+                    set_column.add({'title':'Invoice','index':24});
                 }else if (value === "Due Date") {
-                    set_column.add({'title':'Due Date','index':24});
+                    set_column.add({'title':'Due Date','index':25});
                 }              
             }
             GenerateTable(jobs_status);
@@ -1332,12 +1342,12 @@
 
         function GenerateColumnCheckBox(){
             $('#checkcolumnboxes').empty();
-            let str = `<label for="COL22" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL22" value="Job In Hand" onchange="ColumnCheckChange('COL22')" checked/> Job In Hand</label>
-                       <label for="COL23" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL23" value="Invoice" onchange="ColumnCheckChange('COL23')" checked/> Invoice</label>
+            let str = `<label for="COL23" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL23" value="Job In Hand" onchange="ColumnCheckChange('COL23')" checked/> Job In Hand</label>
                        <label for="COL24" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL24" value="Due Date" onchange="ColumnCheckChange('COL24')" checked/> Due Date</label>
+                           <input type="checkbox" id="COL24" value="Invoice" onchange="ColumnCheckChange('COL24')" checked/> Invoice</label>
+                       <label for="COL25" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL25" value="Due Date" onchange="ColumnCheckChange('COL25')" checked/> Due Date</label>
 `;
             $('#checkcolumnboxes').append(str);
            

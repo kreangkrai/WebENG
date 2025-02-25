@@ -12,6 +12,7 @@ namespace WebENG.Models
         public string jobId { get; set; }
         public string jobName { get; set; }
         public string customer { get; set; }
+        public string responsible { get; set; }
         public int cost { get; set; }
         public double factor { get; set; }
         public double totalManhour { get; set; }

@@ -23,6 +23,7 @@ namespace WebENG.Service
 	                    JobResponsible.user_id,
 	                    Authen.name AS user_name,
 	                    Authen.department AS department,
+                        JobResponsible.levels as level,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
 	                    JobResponsible.assign_date
@@ -50,6 +51,7 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
+                            level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 1,
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             role = dr["role"] != DBNull.Value ? dr["role"].ToString() : "",
                             assign_by = dr["assign_by"] != DBNull.Value ? dr["assign_by"].ToString() : "",
@@ -180,6 +182,7 @@ namespace WebENG.Service
 	                    JobResponsible.user_id,
 	                    Authen.name AS user_name,
 	                    Authen.department AS department,
+                        JobResponsible.levels as level,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
                         JobResponsible.assign_date
@@ -207,6 +210,7 @@ namespace WebENG.Service
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
+                            level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 1,
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             role = dr["role"] != DBNull.Value ? dr["role"].ToString() : "",
                             assign_by = dr["assign_by"] != DBNull.Value ? dr["assign_by"].ToString() : "",
@@ -237,8 +241,8 @@ namespace WebENG.Service
                             SELECT job_id, user_id FROM JobResponsible WHERE user_id = @user_id AND job_id = @job_id
                         )
                         BEGIN
-                            INSERT INTO JobResponsible(job_id, user_id, role, assign_by, assign_date)
-                            VALUES(@job_id, @user_id, @role, @assign_by, @assign_date)
+                            INSERT INTO JobResponsible(job_id, user_id, role, levels, assign_by, assign_date)
+                            VALUES(@job_id, @user_id, @role, @levels, @assign_by, @assign_date)
                         END
                     END
                 ");
@@ -248,6 +252,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_id", jr.job_id.Replace("-", String.Empty));
                     cmd.Parameters.AddWithValue("@user_id", jr.user_id);
                     cmd.Parameters.AddWithValue("@role", jr.role);
+                    cmd.Parameters.AddWithValue("@levels", jr.level);
                     cmd.Parameters.AddWithValue("@assign_by", jr.assign_by);
                     cmd.Parameters.AddWithValue("@assign_date", jr.assign_date);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

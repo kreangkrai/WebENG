@@ -18,7 +18,7 @@ namespace WebForecastReport.Controllers
         readonly IEngUser EngineerService;
         readonly IJob JobService;
         readonly IJobResponsible JobResponsibleService;
-
+        readonly IAuthen Authen;
         public AssignEngineerController()
         {
             WorkingHoursService = new WorkingHoursService();
@@ -26,6 +26,7 @@ namespace WebForecastReport.Controllers
             EngineerService = new EngUserService();
             JobService = new JobService();
             JobResponsibleService = new JobResponsibleService();
+            Authen = new AuthenService();
         }
 
         public IActionResult Index()
@@ -57,14 +58,15 @@ namespace WebForecastReport.Controllers
         [HttpGet]
         public List<string> GetDepartments()
         {
-            List<string> departments = EngineerService.GetUsers().Select(s => s.department).Distinct().ToList();
+            List<string> departments = Authen.GetAuthens().Select(s => s.department).Distinct().ToList();
             return departments;
         }
 
         [HttpGet]
-        public List<EngUserModel> GetUsers()
+        public List<AuthenModel> GetUsers()
         {
-            List<EngUserModel> users = EngineerService.GetUsers().OrderBy(o => o.user_name).ToList();
+            //List<EngUserModel> users = EngineerService.GetUsers().OrderBy(o => o.user_name).ToList();
+            List<AuthenModel> users = Authen.GetAuthens().OrderBy(o => o.name).ToList();
             return users;
         }
 

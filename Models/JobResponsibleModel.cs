@@ -15,6 +15,7 @@ namespace WebENG.Models
         public string department { get; set; }
         public string role { get; set; }
         public string assign_by { get; set; }
+        public int level { get; set; }
         public DateTime assign_date { get; set; }
     }
 }

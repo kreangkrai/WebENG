@@ -15,64 +15,78 @@ namespace WebENG.Service
             List<EngineerScoreModel> scores = new List<EngineerScoreModel>();
             try
             {
-                string string_command = string.Format($@"
+				string string_command = string.Format($@" 
+                
                         
                 with t2 as (
-					SELECT 
-		                    WorkingHours.job_id, 
-		                    SUM(
-                                case when task_id = 'T001' then
-									case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
-										case when lunch_full = 1 then 
-											case when dinner_full = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 120												
-											else
-												case when dinner_half = 1 then
-													DATEDIFF(MINUTE,start_time,stop_time) - 90
+					SELECT t.job_id,CAST(SUM(t.total_manpower * t. level) AS decimal(18,1)) as total_manpower ,
+						 CAST(SUM(t.total_manpower / 60.0 / 8.0 * t.level * 3200) AS decimal(18,1)) as total_used_cost FROM ( 
+							SELECT main.user_id,
+							main.job_id,
+							main.total_manpower,
+							CASE WHEN JobResponsible.levels IS NULL THEN 1 ELSE JobResponsible.levels END as level
+							 FROM (
+							SELECT 
+								WorkingHours.job_id,
+								WorkingHours.user_id,
+								SUM(
+									case when task_id = 'T001' then
+										case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
+											case when lunch_full = 1 then 
+												case when dinner_full = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 120												
 												else
-													DATEDIFF(MINUTE,start_time,stop_time) - 60
+													case when dinner_half = 1 then
+														DATEDIFF(MINUTE,start_time,stop_time) - 90
+													else
+														DATEDIFF(MINUTE,start_time,stop_time) - 60
+													end
+												end
+											else 
+												case when dinner_full = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 60										
+												else
+													case when dinner_half = 1 then
+														DATEDIFF(MINUTE,start_time,stop_time) - 30
+													else
+														DATEDIFF(MINUTE,start_time,stop_time)
+													end
 												end
 											end
-										else 
-											case when dinner_full = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 60										
-											else
-												case when dinner_half = 1 then
-													DATEDIFF(MINUTE,start_time,stop_time) - 30
-												else
-													DATEDIFF(MINUTE,start_time,stop_time)
-												end
-											end
+										else
+											0
 										end
 									else
-										0
-									end
-								else
-									case when lunch_full = 1 then 
-											case when dinner_full = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 120
-											else
-												case when dinner_half = 1 then
-													DATEDIFF(MINUTE,start_time,stop_time) - 90
+										case when lunch_full = 1 then 
+												case when dinner_full = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 120
 												else
-													DATEDIFF(MINUTE,start_time,stop_time) - 60
+													case when dinner_half = 1 then
+														DATEDIFF(MINUTE,start_time,stop_time) - 90
+													else
+														DATEDIFF(MINUTE,start_time,stop_time) - 60
+													end
 												end
-											end
-										else 
-											case when dinner_full = 1 then
-												DATEDIFF(MINUTE,start_time,stop_time) - 60										
 											else 
-												case when dinner_half = 1 then
-													DATEDIFF(MINUTE,start_time,stop_time) - 30
-												else
-													DATEDIFF(MINUTE,start_time,stop_time)
+												case when dinner_full = 1 then
+													DATEDIFF(MINUTE,start_time,stop_time) - 60										
+												else 
+													case when dinner_half = 1 then
+														DATEDIFF(MINUTE,start_time,stop_time) - 30
+													else
+														DATEDIFF(MINUTE,start_time,stop_time)
+													end
 												end
 											end
-										end
-								end) AS total_manpower 
-	                    FROM WorkingHours
-                        WHERE WorkingHours.job_id <> 'J999999'
-	                    GROUP BY job_id
+							end) AS total_manpower
+								
+							FROM WorkingHours						
+							WHERE WorkingHours.job_id <> 'J999999'
+							GROUP BY WorkingHours.job_id,WorkingHours.user_id
+							) as main
+							LEFT JOIN JobResponsible ON main.user_id = JobResponsible.user_id AND main.job_id = JobResponsible.job_id
+							) as t
+							GROUP BY t.job_id
 					),
 					t3 as (
 					SELECT 
@@ -145,7 +159,8 @@ namespace WebENG.Service
 	                    CAST((cost / (t2.total_manpower / 60.0 )) as decimal(18,1)) AS cost_per_tmp,
 	                    CAST((t3.working_hours / 60.0 ) as decimal(18,1)) AS manpower,
 	                    CAST((CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT))) as decimal(18,1)) AS manpower_per_tmp,
-	                    CAST((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60.0)) * (CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT)))) as decimal(18,1)) AS score
+	                    CAST((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60.0)) * (CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT)))) as decimal(18,1)) AS score,
+						CAST((cost - t2.total_used_cost) AS decimal(18,1)) as remaining_cost
                     FROM WorkingHours  As t1  
 					LEFT JOIN Jobs ON t1.job_id = Jobs.job_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
@@ -180,7 +195,8 @@ namespace WebENG.Service
                             manpower = dr["manpower"] != DBNull.Value ? Convert.ToDouble(dr["manpower"]) : 0,
                             manpower_per_tmp = dr["manpower_per_tmp"] != DBNull.Value ? Convert.ToDouble(dr["manpower_per_tmp"]) : 0,
                             score = dr["score"] != DBNull.Value ? Convert.ToDouble(dr["score"]) : 0,
-                        };
+							remaining_cost = dr["remaining_cost"] != DBNull.Value ? Convert.ToDouble(dr["remaining_cost"]) : 0,
+						};
                         scores.Add(score);
                     }
                     dr.Close();

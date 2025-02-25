@@ -255,10 +255,11 @@ namespace WebENG.Service
 					)
                     SELECT
 						T1.user_id,
-						case when Authen.levels is null then 1 else Authen.levels end levels,
+						case when JobResponsible.levels is null then 1 else JobResponsible.levels end levels,
                         Jobs.job_id,
                         Jobs.job_name,
                         Jobs.customer_name as customer,
+                        Jobs.responsible,
                         Jobs.cost,
                         (Jobs.md_rate * Jobs.pd_rate) as factor,
                         CAST((T1.total_manpower / 60.0) as decimal(18,1)) as total_manpower ,
@@ -267,7 +268,7 @@ namespace WebENG.Service
 						Jobs.system_id as system
                     FROM Jobs                  
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
-					LEFT JOIN Authen ON Authen.user_id = T1.user_id
+					LEFT JOIN JobResponsible ON JobResponsible.user_id = T1.user_id AND JobResponsible.job_id = T1.job_id
                     ORDER BY Jobs.job_id");
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -292,7 +293,9 @@ namespace WebENG.Service
                             totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"]) : 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1",
                             process = dr["process"] != DBNull.Value ? dr["process"].ToString() : "",
-                            system = dr["system"] != DBNull.Value ? dr["system"].ToString() : ""
+                            system = dr["system"] != DBNull.Value ? dr["system"].ToString() : "",
+                            responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
+
                         };
                         jobSummary.totalEngCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
                         jobSummary.remainingCost = jobSummary.cost - jobSummary.totalEngCost;

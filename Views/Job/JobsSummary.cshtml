@@ -20,6 +20,7 @@
                             <th>Job ID</th>
                             <th>Job Name</th>
                             <th>Customer</th>
+                            <th>Responsible</th>
                             <th>Cost</th>
                             <th>Factor</th>
                             <th>Total Manhours</th>
@@ -34,6 +35,7 @@
                             <th>Job ID</th>
                             <th>Job Name</th>
                             <th>Customer</th>
+                            <th>Responsible</th>
                             <th>Cost</th>
                             <th>Factor</th>
                             <th>Total Manhours</th>
@@ -191,17 +193,21 @@
                         </div>
                     </div>                                       
                     <div class="form-row">
-                        <div class="col-3">
+                        <div class="col-2">
                             <label for="job_total_man_hours">Total Man Hours</label>
-                            <input id="job_total_man_hours" class="form-control" disabled/>
+                            <input id="job_total_man_hours" class="form-control" disabled />
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                             <label for="job_remain_cost">Remain Cost</label>
-                            <input id="job_remain_cost" class="form-control" disabled/>
+                            <input id="job_remain_cost" class="form-control" disabled />
                         </div>
                         <div class="col-5">
+                            <label for="job_responsible">Project Status Update by</label>
+                            <input id="job_responsible" class="form-control" disabled />
+                        </div>
+                        <div class="col-3">
                             <label for="job_status">Status</label>
-                            <input id="job_status" class="form-control" disabled/>
+                            <input id="job_status" class="form-control" disabled />
                         </div>
                     </div>
                 </form>
@@ -396,9 +402,10 @@
                     jobsSummary[i].jobId,
                     jobsSummary[i].jobName,
                     jobsSummary[i].customer,
+                    jobsSummary[i].responsible,
                     jobsSummary[i].cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     jobsSummary[i].factor,
-                    jobsSummary[i].totalManhour,
+                    jobsSummary[i].totalManhour.toFixed(2),
                     jobsSummary[i].remainingCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     jobsSummary[i].process,
                     jobsSummary[i].system,
@@ -420,7 +427,7 @@
                 ],
                 paging: false,
                 rowCallback: function (row, data) {
-                    let code_status = data[9];
+                    let code_status = data[10];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
                     if(code_status === "STA999"){
@@ -429,7 +436,7 @@
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
 
-                    $('td:eq(9)', row).html(status_str);
+                    $('td:eq(10)', row).html(status_str);
                 }
             });
         }
@@ -440,7 +447,7 @@
             let admin = '@Model.role' == "Admin" ? true : false;
 
             //Column Total Manhours
-            if (columnID === 5 && admin) {
+            if (columnID === 6 && admin) {
                 ShowJobManpowerInfo(jobId);
             }else{
                 EditJob(table.row(this).data());
@@ -457,9 +464,10 @@
             let job_name = job.jobName;
             let quotation_no = job.quotation_no;
             let customer = job.customer;
+            let responsible = job.responsible;
             let cost = job.cost.toString().replaceAll(",","");
             let status = statuses.filter(f=>f.status_id == job.status).map(m=>m.status_name)[0];
-            let total_man_hours = job.totalManhour;
+            let total_man_hours = job.totalManhour.toFixed(2);
             let remain_cost = job.remainingCost;
             let list_process = [];
             
@@ -486,6 +494,7 @@
             $('#job_quotation_no').val(quotation_no);
             $('#job_cost').val(cost);
             $('#job_customer').val(customer);
+            $('#job_responsible').val(responsible);
             $('#job_status').val(status);
             $('#job_total_man_hours').val(total_man_hours);
             $('#job_remain_cost').val(remain_cost);
