@@ -331,7 +331,9 @@
         }
 
         $('#btn_print').on('click', function () {
-            var url = '@Url.Action("FormDailyReport", "DailyReport")';
+            var user_name = $('#user_name option:selected').text().toLowerCase();
+            var month = $('#month').val();
+            var url = '@Url.Action("FormDailyReport", "DailyReport")?user_name='+user_name+'&month='+month;
             window.open(url);
         });
 

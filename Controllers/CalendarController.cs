@@ -123,7 +123,10 @@ namespace WebENG.Controllers
         {
             try
             {
+                int id = WorkingHoursService.GetLastWorkingHoursID() + 1;
+                string wh_id = "WH" + id.ToString().PadLeft(6, '0');
                 WorkingHoursModel wh = JsonConvert.DeserializeObject<WorkingHoursModel>(wh_string);
+                wh.index = wh_id;
                 var result = WorkingHoursService.AddWorkingHours(wh);
                 return Json(result);
             }

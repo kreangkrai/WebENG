@@ -17,14 +17,6 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly IWorkingHours WorkingHoursService;
         readonly IHoliday HolidayService;
-
-        static List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
-        static string form_employee_name;
-        static string form_department;
-        static string form_phone_number;
-        static string form_start_time;
-        static string form_month;
-        static Form_OvertimeModel form_data;
         static List<UserModel> users;
         public WorkingHoursController()
         {
@@ -75,18 +67,14 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetWorkingHours(string user_name, string month)
         {
-            form_employee_name = user_name;
-            form_month = month;
-            form_department = users.Where(w => w.name.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
-            form_phone_number = "";
-            form_start_time = "08:30";
-            monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
             return Json(monthly);
         }
 
         [HttpGet]
-        public JsonResult GetMonthlySummary()
+        public JsonResult GetMonthlySummary(string user_name, string month)
         {
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
             List<WorkingHoursSummaryModel> whs = WorkingHoursService.CalculateMonthlySummary(monthly);
             return Json(whs);
         }
@@ -99,8 +87,11 @@ namespace WebENG.Controllers
             return Json(result);
         }
 
-        public IActionResult FormOvertime()
+        public IActionResult FormOvertime(string user_name,string month)
         {
+            string department = users.Where(w => w.name.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
+
             List<Form_OvertimeDataModel> datas = new List<Form_OvertimeDataModel>();
             List<HolidayModel> holidays = HolidayService.GetHolidays(monthly[0].working_date.Year.ToString());
             TimeSpan sum_normal = default(TimeSpan);
@@ -179,13 +170,13 @@ namespace WebENG.Controllers
 
             TimeSpan twhs = sum_normal + sum_ot1_5 + sum_ot3_0;
 
-            form_data = new Form_OvertimeModel()
+            Form_OvertimeModel form_data = new Form_OvertimeModel()
             {
-                employee_name = form_employee_name,
-                department = form_department,
-                phone_number = form_phone_number,
-                normal_start_time = form_start_time,
-                month = form_month,
+                employee_name = user_name,
+                department = department,
+                phone_number = "",
+                normal_start_time = "08:30",
+                month = month,
                 datas = datas,
                 summary = summaries,
                 total_working_hours = ((int)(twhs.TotalHours)).ToString().PadLeft(2,'0') + ":" + twhs.Minutes.ToString().PadLeft(2,'0'),

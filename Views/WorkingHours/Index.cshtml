@@ -241,12 +241,15 @@
 
         $(document).ready(async function () {
             var today = new Date();
+
             await GetUsers();
             await GenerateUsersOption();
+            $('#user_id').val("@Model.user_id");
+            $('#whs_month').val(today.getFullYear() + "-" + (today.getMonth() + 1).toString().padStart(2, 0));
+
             await GetWorkingHours("@Model.name.ToLower()", today.toISOString().substring(0, 7));
             await GetWorkingHoursSummary();
-            $('#user_id').val("@Model.user_id");
-            $('#whs_month').val(today.getFullYear() + "-" + (today.getMonth()+1).toString().padStart(2,0));           
+
         });
 
         async function GetUsers() {
@@ -327,7 +330,7 @@
             $('#report_title').text(report_name);
             var datas = [];
             for (var i = 0; i < whs.length; i++) {
-                
+
                     datas.push([
                         whs[i].working_date.split("T")[0],
                         whs[i].job_id,
@@ -344,9 +347,9 @@
                         whs[i].ot3_0.substring(0, 5),
                         whs[i].day
                     ]);
-                
+
             }
-           
+
             if (table !== undefined)
                 table.destroy();
 
@@ -402,11 +405,13 @@
         }
 
         async function GetWorkingHoursSummary() {
+            var user_name = $('#user_id option:selected').text().toLowerCase();
+            var month = $('#whs_month').val();
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetMonthlySummary", "WorkingHours")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { },
+                data: { user_name, month},
                 success: function (response) {
                     if(debug_summary)
                         console.log(response);
@@ -597,7 +602,9 @@
         }
 
         $('#btn_print').on('click', function () {
-            var url = '@Url.Action("FormOvertime","WorkingHours")';
+            var user_name = $('#user_id option:selected').text().toLowerCase();
+            var month = $('#whs_month').val();
+            var url = '@Url.Action("FormOvertime","WorkingHours")?user_name='+user_name+'&month='+month;
             window.open(url);
         });
 

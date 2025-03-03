@@ -19,9 +19,6 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly IDailyReport DailyReport;
-
-        static Form_DailyReportModel form_model;
-
         public DailyReportController()
         {
             Accessory = new AccessoryService();
@@ -64,7 +61,7 @@ namespace WebENG.Controllers
         public List<DailyActivityModel> GetDailyActivities(string user_name, string month)
         {
             List<DailyActivityModel> drs = DailyReport.GetDailyActivities(user_name, month);
-            form_model = new Form_DailyReportModel()
+            Form_DailyReportModel form_model = new Form_DailyReportModel()
             {
                 name = user_name,
                 month = month,
@@ -82,8 +79,16 @@ namespace WebENG.Controllers
             return Json(result);
         }
 
-        public IActionResult FormDailyReport(string user_name, DateTime start_date, DateTime stop_date)
+        public IActionResult FormDailyReport(string user_name, string month)
         {
+            List<DailyActivityModel> drs = DailyReport.GetDailyActivities(user_name, month);
+            Form_DailyReportModel form_model = new Form_DailyReportModel()
+            {
+                name = user_name,
+                month = month,
+                datas = drs
+            };
+
             //string footer = "" +
             //    "--print-media-type " + 
             //    "--footer-left \"Job No : J99-9999\" " +
