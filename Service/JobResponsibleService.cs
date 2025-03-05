@@ -231,11 +231,13 @@ namespace WebENG.Service
             return jrs;
         }
 
-        public string AddJobResponsible(JobResponsibleModel jr)
+        public string AddJobResponsible(List<JobResponsibleModel> jrs)
         {
             try
             {
-                string string_command = string.Format($@"
+                for (int i = 0; i < jrs.Count; i++)
+                {
+                    string string_command = string.Format($@"
                     BEGIN
                         IF NOT EXISTS (
                             SELECT job_id, user_id FROM JobResponsible WHERE user_id = @user_id AND job_id = @job_id
@@ -246,24 +248,27 @@ namespace WebENG.Service
                         END
                     END
                 ");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
-                {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.AddWithValue("@job_id", jr.job_id.Replace("-", String.Empty));
-                    cmd.Parameters.AddWithValue("@user_id", jr.user_id);
-                    cmd.Parameters.AddWithValue("@role", jr.role);
-                    cmd.Parameters.AddWithValue("@levels", jr.level);
-                    cmd.Parameters.AddWithValue("@assign_by", jr.assign_by);
-                    cmd.Parameters.AddWithValue("@assign_date", jr.assign_date);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+
+
+                    using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                     {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.Parameters.AddWithValue("@job_id", jrs[i].job_id.Replace("-", String.Empty));
+                        cmd.Parameters.AddWithValue("@user_id", jrs[i].user_id);
+                        cmd.Parameters.AddWithValue("@role", jrs[i].role);
+                        cmd.Parameters.AddWithValue("@levels", jrs[i].level);
+                        cmd.Parameters.AddWithValue("@assign_by", jrs[i].assign_by);
+                        cmd.Parameters.AddWithValue("@assign_date", jrs[i].assign_date);
+                        if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                        {
+                            ConnectSQL.CloseConnect();
+                            ConnectSQL.OpenConnect();
+                        }
+                        cmd.ExecuteNonQuery();
                     }
-                    cmd.ExecuteNonQuery();
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 return exception.Message;
             }

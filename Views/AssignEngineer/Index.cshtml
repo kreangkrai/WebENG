@@ -297,6 +297,7 @@
         async function GenerateEngineerOption() {
             var department = $('#department').val();
             var engineer_str = '<option value="" selected disabled>Please Select Engineer</option>';
+            engineer_str += '<option value="ALL">ALL</option>';
             for (var i = 0; i < engineers.length; i++) {
                 if (department === "" || (engineers[i].department === department))
                     engineer_str += '<option value="' + engineers[i].user_id + '">' + engineers[i].name + '</option>';
@@ -350,7 +351,11 @@
             else {
                 let name = $('#user_id option:selected').text();
                 let level = engineers.filter(f => f.name == name).map(m => m.levels)[0];
-                $('#user_level').val(level);
+                if (typeof (level) === "undefined") {
+                    $('#user_level').val(0);
+                } else {
+                    $('#user_level').val(level);
+                }
                 $('#btn_accept').attr('disabled', false);
             }
         });
@@ -361,13 +366,15 @@
             var level = $('#user_level').val();
             var assign_by = '@Model.name';
             var assign_date = new Date();
+            var department = $('#department').val();
             var jr_string = JSON.stringify({
                 "user_id": user_id,
                 "job_id": job_id,
                 "level":level,
                 "role": "Engineer",
                 "assign_by": assign_by,
-                "assign_date": assign_date
+                "assign_date": assign_date,
+                "department": department
             });
             await AddJobResponsible(jr_string);
         });

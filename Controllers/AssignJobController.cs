@@ -18,6 +18,7 @@ namespace WebENG.Controllers
         readonly IEngUser EngineerService;
         readonly IJob JobService;
         readonly IJobResponsible JobResponsibleService;
+        readonly IAuthen Authen;
 
         public AssignJobController()
         {
@@ -26,6 +27,7 @@ namespace WebENG.Controllers
             EngineerService = new EngUserService();
             JobService = new JobService();
             JobResponsibleService = new JobResponsibleService();
+            Authen = new AuthenService();
         }
 
         public IActionResult Index()
@@ -80,8 +82,32 @@ namespace WebENG.Controllers
         {
             try
             {
+                List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
                 JobResponsibleModel jr = JsonConvert.DeserializeObject<JobResponsibleModel>(jr_string);
-                var result = JobResponsibleService.AddJobResponsible(jr);
+                if (jr.user_id == "ALL")
+                {
+                    List<AuthenModel> users = Authen.GetAuthens().OrderBy(o => o.name).ToList();
+                    users = users.Where(w => w.department == jr.department).ToList();
+                    JobResponsibleModel _jr = new JobResponsibleModel();
+                    for(int i = 0; i < users.Count; i++)
+                    {
+                        _jr = new JobResponsibleModel()
+                        {
+                            user_id = users[i].user_id,
+                            job_id = jr.job_id,
+                            level = users[i].levels,
+                            role = users[i].role,
+                            assign_by = jr.assign_by,
+                            assign_date = jr.assign_date
+                        };
+                        jrs.Add(_jr);
+                    }
+                }
+                else
+                {
+                    jrs.Add(jr);
+                }
+                var result = JobResponsibleService.AddJobResponsible(jrs);
                 return Json(result);
             }
             catch(Exception exception)

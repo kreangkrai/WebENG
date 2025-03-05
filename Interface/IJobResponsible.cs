@@ -12,6 +12,6 @@ namespace WebENG.Interface
         List<JobResponsibleModel> GetJobLists();
         List<QuotationResponsibleModel> GetQuotationResponsible(string user_name);
         List<JobResponsibleModel> GetAssignEngineers(string job_id);
-        string AddJobResponsible(JobResponsibleModel jr);
+        string AddJobResponsible(List<JobResponsibleModel> jr);
     }
 }
