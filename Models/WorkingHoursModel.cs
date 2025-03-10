@@ -35,4 +35,10 @@ namespace WebENG.Models
         public TimeSpan ot3_0 { get; set; }
         public TimeSpan leave { get; set; }
     }
+
+    public class WorkingDayModel
+    {
+        public DateTime date { get; set; }
+        public List<WorkingHoursModel> workings { get; set; }
+    }
 }

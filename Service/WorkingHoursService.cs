@@ -185,8 +185,9 @@ namespace WebENG.Service
             return whs;
         }
 
-        public List<WorkingHoursModel> GetWorkingHours(string year, string month, string user_name)
+        public List<WorkingDayModel> GetWorkingHours(string year, string month, string user_name)
         {
+            List<WorkingDayModel> wd = new List<WorkingDayModel>();
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
@@ -259,6 +260,12 @@ namespace WebENG.Service
                         whs.Add(wh);
                     }
                     dr.Close();
+
+                    wd = whs.GroupBy(g => g.working_date).Select(s => new WorkingDayModel()
+                    {
+                        date = s.Key,
+                        workings = whs.Where(w=>w.working_date.Date == s.Key.Date).ToList()
+                    }).ToList();
                 }
             }
             finally
@@ -268,7 +275,7 @@ namespace WebENG.Service
                     ConnectSQL.CloseConnect();
                 }
             }
-            return whs;
+            return wd;
         }
 
         public List<WorkingHoursModel> GetWorkingHours(string user_name, DateTime working_date)
@@ -835,6 +842,356 @@ namespace WebENG.Service
             return id;
         }
 
+        //public List<WorkingHoursModel> CalculateWorkingHours_OLD(string user_name, string month)
+        //{
+        //    List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
+
+        //    string day = "";
+        //    int yy = Convert.ToInt32(month.Split("-")[0]);
+        //    int mm = Convert.ToInt32(month.Split("-")[1]);
+
+        //    List<WorkingHoursModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
+        //    List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
+ 
+        //    whs = whs.OrderBy(o => o.working_date).ToList();
+        //    int days = DateTime.DaysInMonth(yy, mm);
+        //    for (int i = 0; i < days; i++)
+        //    {
+        //        DateTime date = new DateTime(yy, mm, i + 1);
+        //        List<WorkingHoursModel> whd = whs.Where(w => w.working_date == date).ToList();
+
+        //        bool _isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
+               
+        //        // Check Holiday and Get day
+        //        if (_isHoliday)
+        //        {
+        //            day = "Holiday";
+        //        }
+        //        else
+        //        {
+        //            day = date.DayOfWeek.ToString();
+        //        }
+
+        //        if (whd.Count > 0)
+        //        {
+        //            TimeSpan substraction = new TimeSpan(8, 0, 0);
+        //            TimeSpan anHour = new TimeSpan(1, 0, 0);
+        //            TimeSpan anHalf = new TimeSpan(0, 30, 0);
+        //            TimeSpan noon = new TimeSpan(12, 0, 0);
+        //            TimeSpan after_noon_full = new TimeSpan(13, 0, 0);
+        //            TimeSpan after_noon_half = new TimeSpan(12, 30, 0);
+
+        //            TimeSpan morning = new TimeSpan(8, 30, 0);
+        //            TimeSpan evening = new TimeSpan(17, 30, 0);
+        //            TimeSpan end_evening_full = new TimeSpan(18, 30, 0);
+        //            TimeSpan end_evening_half = new TimeSpan(18, 0, 0);
+        //            TimeSpan leave = TimeSpan.Zero;
+                    
+                   
+        //            whd.OrderBy(o => o.start_time);
+                                     
+        //            for (int j = 0; j < whd.Count; j++)
+        //            {
+        //                TimeSpan regular = new TimeSpan();
+        //                TimeSpan ot15 = new TimeSpan();
+        //                TimeSpan ot3 = new TimeSpan();
+        //                WorkingHoursModel wh = new WorkingHoursModel();
+        //                wh.working_date = whd[j].working_date;
+        //                wh.job_id = whd[j].job_id;
+        //                wh.job_name = whd[j].job_name;
+        //                wh.task_id = whd[j].task_id;
+        //                wh.task_name = whd[j].task_name;
+        //                wh.start_time = whd[j].start_time;
+        //                wh.stop_time = whd[j].stop_time;
+        //                wh.lunch_full = whd[j].lunch_full;
+        //                wh.lunch_half = whd[j].lunch_half;
+        //                wh.dinner_full = whd[j].dinner_full;
+        //                wh.dinner_half = whd[j].dinner_half;
+        //                wh.day = day;
+
+        //                bool isHoliday = holidays.Where(w => w.date == whd[0].working_date).Count() > 0 ? true : false;
+        //                bool isWeekend = (whd[0].working_date.DayOfWeek == DayOfWeek.Saturday || whd[0].working_date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
+
+        //                if (isHoliday || isWeekend)
+        //                {
+        //                    if (wh.stop_time == new TimeSpan(23, 59, 0))
+        //                    {
+        //                        ot15 += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
+        //                    }
+        //                    else
+        //                    {
+        //                        ot15 += wh.stop_time - wh.start_time;
+        //                    }
+
+        //                    if (wh.lunch_full)
+        //                    {
+        //                        ot15 -= anHour;
+        //                    }
+        //                    if (wh.lunch_half)
+        //                    {
+        //                        ot15 -= anHalf;
+        //                    }
+
+        //                    if (wh.dinner_full)
+        //                    {
+        //                        ot15 -= anHour;
+        //                    }
+        //                    if (wh.dinner_half)
+        //                    {
+        //                        ot15 -= anHalf;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (wh.start_time < morning && wh.stop_time <= morning)
+        //                    {
+        //                        //Start before 08.30 and stop before 08.30
+        //                        if (wh.task_name == "Traveling")
+        //                        {
+        //                            regular += new TimeSpan(0, 0, 0);
+        //                        }
+        //                        else
+        //                        {
+        //                            regular += wh.stop_time - wh.start_time;
+        //                        }
+        //                    }
+        //                    else if (wh.start_time < morning && wh.stop_time > morning && wh.stop_time <= evening)
+        //                    {
+        //                        //Start before 08.30 and stop after 08.30
+        //                        if (wh.task_name == "Traveling")
+        //                        {
+        //                            regular += wh.stop_time - morning;
+        //                        }
+        //                    }
+        //                    //Check Start and Stop Time to calculate hours
+        //                    else if (wh.start_time < evening && wh.stop_time > evening)
+        //                    {
+        //                        //Start before 17.30 and stop after 17.30
+        //                        regular += evening - wh.start_time;
+
+        //                        //Check if task is not equal to travel
+        //                        if (wh.task_id[0] != 'T')
+        //                        {
+        //                            //Add hours to overtime 1.5 if task is not travel
+        //                            if (wh.stop_time == new TimeSpan(23, 59, 0))
+        //                            {
+        //                                ot15 += (wh.stop_time - evening).Add(new TimeSpan(0, 1, 0));
+        //                            }
+        //                            else
+        //                            {
+        //                                ot15 += wh.stop_time - evening;
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            if (wh.task_name == "Traveling")
+        //                            {
+        //                                //Add hours to regular if task is travel
+        //                                regular = evening - wh.start_time;
+        //                            }
+        //                        }
+
+        //                    }
+        //                    else if (wh.start_time < evening && wh.stop_time <= evening)
+        //                    {
+        //                        //Start before 17.30 and stop before 17.30
+        //                        // Leave
+        //                        if (wh.task_name == "Leave")
+        //                        {
+        //                            var leave_hours = wh.stop_time - wh.start_time;
+        //                            if (leave_hours.TotalHours >= 8)
+        //                            {
+        //                                leave = leave.Add(new TimeSpan(8, 0, 0));
+        //                            }
+        //                            else
+        //                            {
+        //                                leave = leave.Add(wh.stop_time - wh.start_time);
+        //                            }
+        //                        }
+        //                        regular += wh.stop_time - wh.start_time;
+
+        //                    }
+        //                    else
+        //                    {
+        //                        //Start and stop after 17.30
+        //                        //Check if task is not equal to travel
+        //                        if (wh.task_id[0] != 'T')
+        //                        {
+        //                            //Add hours to overtime 1.5 if task is not travel        
+
+        //                            if (wh.stop_time == new TimeSpan(23, 59, 0))
+        //                            {
+        //                                ot15 += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
+        //                            }
+        //                            else
+        //                            {
+        //                                ot15 += wh.stop_time - wh.start_time;
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            //Add hours to regular if task is travel
+        //                            if (wh.task_name != "Traveling")
+        //                            {
+        //                                if (wh.stop_time == new TimeSpan(23, 59, 0))
+        //                                {
+        //                                    regular += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
+        //                                }
+        //                                else
+        //                                {
+        //                                    regular += wh.stop_time - wh.start_time;
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+
+        //                    if (wh.lunch_full && wh.start_time <= noon && wh.stop_time > after_noon_full && regular.Hours > 1)
+        //                    {
+        //                        regular -= after_noon_full - noon;
+        //                    }
+
+        //                    if (wh.lunch_half && wh.start_time <= noon && wh.stop_time > after_noon_half && regular.Hours > 1)
+        //                    {
+        //                        regular -= after_noon_half - noon;
+        //                    }
+
+        //                    if (wh.dinner_full && wh.start_time <= evening && wh.stop_time > end_evening_full && ot15.Hours > 1)
+        //                    {
+        //                        ot15 -= end_evening_full - evening;
+        //                    }
+
+        //                    if (wh.dinner_half && wh.start_time <= evening && wh.stop_time > end_evening_half && ot15.Hours > 1)
+        //                    {
+        //                        ot15 -= end_evening_half - evening;
+        //                    }
+
+        //                    // Regular time <= 8
+        //                    if (regular.TotalHours > 8)
+        //                    {
+        //                        regular = new TimeSpan(8, 0, 0);
+        //                    }
+        //                }
+
+        //                if ((ot15 > substraction) && (isHoliday || isWeekend))
+        //                {
+        //                    ot3 += ot15 - substraction;
+        //                    ot15 -= ot15 - substraction;
+        //                }
+
+        //                List<WorkingHoursModel> lastDays = monthly.Where(w => w.working_date.Date == date.Date).ToList();
+        //                TimeSpan lastOT15 = TimeSpan.Zero;
+        //                TimeSpan lastNormal = TimeSpan.Zero;
+        //                for (int k = 0; k < lastDays.Count; k++)
+        //                {
+        //                    lastOT15 += lastDays[k].ot1_5;
+        //                    lastNormal += lastDays[k].normal;
+        //                }
+
+        //                bool isTaskT = wh.task_id[0] == 'T';
+        //                if (!isTaskT)
+        //                {
+        //                    wh.normal = TimeSpan.Zero;
+        //                    TimeSpan remain_ot15 = TimeSpan.Zero;
+        //                    remain_ot15 = substraction - lastOT15;
+
+        //                    if (isWeekend || isHoliday)
+        //                    {
+        //                        if ((lastOT15 + ot15).TotalHours >= 8)
+        //                        {
+        //                            if (ot3.TotalHours > 0)
+        //                            {
+        //                                wh.ot1_5 = ot15 - (ot15 - remain_ot15);
+        //                                wh.ot3_0 = ot3;
+        //                            }
+        //                            else
+        //                            {
+        //                                wh.ot1_5 = ot15 - (ot15 - remain_ot15);
+        //                                wh.ot3_0 = ot15 - remain_ot15;
+        //                            }
+                                    
+        //                        }
+        //                        else
+        //                        {
+        //                            wh.ot1_5 = ot15;
+        //                            wh.ot3_0 = ot3;
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        if (lastNormal.TotalHours >= 8)
+        //                        {
+        //                            if (regular.TotalHours > 0)
+        //                            {
+        //                                wh.ot1_5 = regular;
+        //                                wh.ot3_0 = new TimeSpan(0, 0, 0);
+        //                            }
+        //                            else
+        //                            {
+        //                                wh.ot1_5 = ot15;
+        //                                wh.ot3_0 = new TimeSpan(0, 0, 0);
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            wh.normal = regular;
+        //                            wh.ot1_5 = ot15;
+        //                            wh.ot3_0 = new TimeSpan(0, 0, 0);
+        //                        }
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    if (wh.task_name == "Leave")
+        //                    {
+        //                        wh.normal = TimeSpan.Zero;
+        //                        wh.ot1_5 = TimeSpan.Zero;
+        //                        wh.ot3_0 = TimeSpan.Zero;
+        //                        wh.leave = leave;
+        //                    }
+        //                    if (wh.task_name == "Traveling")
+        //                    {
+        //                        if (regular.TotalHours >= 8)
+        //                        {
+        //                            wh.normal = new TimeSpan(8, 0, 0);
+        //                        }
+        //                        else
+        //                        {
+        //                            wh.normal = regular;
+        //                        }
+
+        //                        wh.ot1_5 = TimeSpan.Zero;
+        //                        wh.ot3_0 = TimeSpan.Zero;
+        //                    }
+        //                }
+        //                monthly.Add(wh);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            WorkingHoursModel wh = new WorkingHoursModel()
+        //            {
+        //                working_date = date,
+        //                day = day,
+        //                job_id = "",
+        //                job_name = "",
+        //                task_id = "",
+        //                task_name = "",
+        //                start_time = default(TimeSpan),
+        //                stop_time = default(TimeSpan),
+        //                lunch_full = false,
+        //                lunch_half = false,
+        //                dinner_full = false,
+        //                dinner_half = false,
+        //                normal = default(TimeSpan),
+        //                ot1_5 = default(TimeSpan),
+        //                ot3_0 = default(TimeSpan),
+        //                leave = default(TimeSpan)
+        //            };
+        //            monthly.Add(wh);
+        //        }
+        //    }
+        //    return monthly;
+        //}
         public List<WorkingHoursModel> CalculateWorkingHours(string user_name, string month)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
@@ -843,325 +1200,366 @@ namespace WebENG.Service
             int yy = Convert.ToInt32(month.Split("-")[0]);
             int mm = Convert.ToInt32(month.Split("-")[1]);
 
-            List<WorkingHoursModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
+            List<WorkingDayModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
             List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
- 
-            whs = whs.OrderBy(o => o.working_date).ToList();
-            int days = DateTime.DaysInMonth(yy, mm);
-            for (int i = 0; i < days; i++)
+            WorkingHoursModel wh = new WorkingHoursModel();
+            TimeSpan working_date = new TimeSpan(0, 0, 0);
+            for (DateTime date = new DateTime(yy, mm, 1); date <= new DateTime(yy, mm, DateTime.DaysInMonth(yy, mm)); date = date.AddDays(1))
             {
-                DateTime date = new DateTime(yy, mm, i + 1);
-                List<WorkingHoursModel> whd = whs.Where(w => w.working_date == date).ToList();
-
-                bool _isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
-               
-                // Check Holiday and Get day
-                if (_isHoliday)
+                day = date.DayOfWeek.ToString();
+                List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date).ToList();
+                bool isHoliday = holidays.Where(w => w.date.Date == date.Date).Count() > 0 ? true : false;
+                bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
+                if (isHoliday)
                 {
                     day = "Holiday";
                 }
-                else
+                if (_wd.Count > 0)
                 {
-                    day = date.DayOfWeek.ToString();
-                }
-
-                if (whd.Count > 0)
-                {
-                    TimeSpan substraction = new TimeSpan(8, 0, 0);
-                    TimeSpan anHour = new TimeSpan(1, 0, 0);
-                    TimeSpan anHalf = new TimeSpan(0, 30, 0);
-                    TimeSpan noon = new TimeSpan(12, 0, 0);
-                    TimeSpan after_noon_full = new TimeSpan(13, 0, 0);
-                    TimeSpan after_noon_half = new TimeSpan(12, 30, 0);
-
-                    TimeSpan morning = new TimeSpan(8, 30, 0);
-                    TimeSpan evening = new TimeSpan(17, 30, 0);
-                    TimeSpan end_evening_full = new TimeSpan(18, 30, 0);
-                    TimeSpan end_evening_half = new TimeSpan(18, 0, 0);
-                    TimeSpan leave = TimeSpan.Zero;
-                    
-                   
-                    whd.OrderBy(o => o.start_time);
-                                     
-                    for (int j = 0; j < whd.Count; j++)
+                    for (int i = 0; i < _wd.Count; i++)
                     {
-                        TimeSpan regular = new TimeSpan();
-                        TimeSpan ot15 = new TimeSpan();
-                        TimeSpan ot3 = new TimeSpan();
-                        WorkingHoursModel wh = new WorkingHoursModel();
-                        wh.working_date = whd[j].working_date;
-                        wh.job_id = whd[j].job_id;
-                        wh.job_name = whd[j].job_name;
-                        wh.task_id = whd[j].task_id;
-                        wh.task_name = whd[j].task_name;
-                        wh.start_time = whd[j].start_time;
-                        wh.stop_time = whd[j].stop_time;
-                        wh.lunch_full = whd[j].lunch_full;
-                        wh.lunch_half = whd[j].lunch_half;
-                        wh.dinner_full = whd[j].dinner_full;
-                        wh.dinner_half = whd[j].dinner_half;
-                        wh.day = day;
+                        working_date = new TimeSpan(0, 0, 0);
 
-                        bool isHoliday = holidays.Where(w => w.date == whd[0].working_date).Count() > 0 ? true : false;
-                        bool isWeekend = (whd[0].working_date.DayOfWeek == DayOfWeek.Saturday || whd[0].working_date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
-
-                        if (isHoliday || isWeekend)
+                        TimeSpan regular = new TimeSpan(0, 0, 0);
+                        TimeSpan ot15 = new TimeSpan(0, 0, 0);
+                        TimeSpan ot3 = new TimeSpan(0, 0, 0);
+                        TimeSpan leave = new TimeSpan(0, 0, 0);
+                        for (int j = 0; j < _wd[i].workings.Count; j++)
                         {
-                            if (wh.stop_time == new TimeSpan(23, 59, 0))
+                            regular = new TimeSpan(0, 0, 0);
+                            //_wd[i].workings = _wd[i].workings.OrderByDescending(o => o.start_time).ToList();
+                            // Check Holiday and Get day
+                            if (isHoliday || isWeekend)
                             {
-                                ot15 += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
-                            }
-                            else
-                            {
-                                ot15 += wh.stop_time - wh.start_time;
-                            }
+                                if (_wd[i].workings[j].task_name == "Traveling")
+                                {
+                                    ot15 = default(TimeSpan);
+                                    ot3 = default(TimeSpan);
 
-                            if (wh.lunch_full)
-                            {
-                                ot15 -= anHour;
-                            }
-                            if (wh.lunch_half)
-                            {
-                                ot15 -= anHalf;
-                            }
-
-                            if (wh.dinner_full)
-                            {
-                                ot15 -= anHour;
-                            }
-                            if (wh.dinner_half)
-                            {
-                                ot15 -= anHalf;
-                            }
-                        }
-                        else
-                        {
-                            if (wh.start_time < morning && wh.stop_time <= morning)
-                            {
-                                //Start before 08.30 and stop before 08.30
-                                if (wh.task_name == "Traveling")
-                                {
-                                    regular += new TimeSpan(0, 0, 0);
-                                }
-                                else
-                                {
-                                    regular += wh.stop_time - wh.start_time;
-                                }
-                            }
-                            else if (wh.start_time < morning && wh.stop_time > morning && wh.stop_time <= evening)
-                            {
-                                //Start before 08.30 and stop after 08.30
-                                if (wh.task_name == "Traveling")
-                                {
-                                    regular += wh.stop_time - morning;
-                                }
-                            }
-                            //Check Start and Stop Time to calculate hours
-                            else if (wh.start_time < evening && wh.stop_time > evening)
-                            {
-                                //Start before 17.30 and stop after 17.30
-                                regular += evening - wh.start_time;
-
-                                //Check if task is not equal to travel
-                                if (wh.task_id[0] != 'T')
-                                {
-                                    //Add hours to overtime 1.5 if task is not travel
-                                    if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                    if (_wd[i].workings[j].lunch_full)
                                     {
-                                        ot15 += (wh.stop_time - evening).Add(new TimeSpan(0, 1, 0));
-                                    }
-                                    else
-                                    {
-                                        ot15 += wh.stop_time - evening;
-                                    }
-                                }
-                                else
-                                {
-                                    if (wh.task_name == "Traveling")
-                                    {
-                                        //Add hours to regular if task is travel
-                                        regular = evening - wh.start_time;
-                                    }
-                                }
-
-                            }
-                            else if (wh.start_time < evening && wh.stop_time <= evening)
-                            {
-                                //Start before 17.30 and stop before 17.30
-                                // Leave
-                                if (wh.task_name == "Leave")
-                                {
-                                    var leave_hours = wh.stop_time - wh.start_time;
-                                    if (leave_hours.TotalHours >= 8)
-                                    {
-                                        leave = leave.Add(new TimeSpan(8, 0, 0));
-                                    }
-                                    else
-                                    {
-                                        leave = leave.Add(wh.stop_time - wh.start_time);
-                                    }
-                                }
-                                regular += wh.stop_time - wh.start_time;
-
-                            }
-                            else
-                            {
-                                //Start and stop after 17.30
-                                //Check if task is not equal to travel
-                                if (wh.task_id[0] != 'T')
-                                {
-                                    //Add hours to overtime 1.5 if task is not travel        
-
-                                    if (wh.stop_time == new TimeSpan(23, 59, 0))
-                                    {
-                                        ot15 += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
-                                    }
-                                    else
-                                    {
-                                        ot15 += wh.stop_time - wh.start_time;
-                                    }
-                                }
-                                else
-                                {
-                                    //Add hours to regular if task is travel
-                                    if (wh.task_name != "Traveling")
-                                    {
-                                        if (wh.stop_time == new TimeSpan(23, 59, 0))
+                                        if (ot15 != default(TimeSpan))
                                         {
-                                            regular += (wh.stop_time - wh.start_time).Add(new TimeSpan(0, 1, 0));
-                                        }
-                                        else
-                                        {
-                                            regular += wh.stop_time - wh.start_time;
+                                            ot15 -= new TimeSpan(1, 0, 0);
                                         }
                                     }
-                                }
-                            }
-
-                            if (wh.lunch_full && wh.start_time <= noon && wh.stop_time > after_noon_full && regular.Hours > 1)
-                            {
-                                regular -= after_noon_full - noon;
-                            }
-
-                            if (wh.lunch_half && wh.start_time <= noon && wh.stop_time > after_noon_half && regular.Hours > 1)
-                            {
-                                regular -= after_noon_half - noon;
-                            }
-
-                            if (wh.dinner_full && wh.start_time <= evening && wh.stop_time > end_evening_full && ot15.Hours > 1)
-                            {
-                                ot15 -= end_evening_full - evening;
-                            }
-
-                            if (wh.dinner_half && wh.start_time <= evening && wh.stop_time > end_evening_half && ot15.Hours > 1)
-                            {
-                                ot15 -= end_evening_half - evening;
-                            }
-
-                            // Regular time <= 8
-                            if (regular.TotalHours > 8)
-                            {
-                                regular = new TimeSpan(8, 0, 0);
-                            }
-                        }
-
-                        if ((ot15 > substraction) && (isHoliday || isWeekend))
-                        {
-                            ot3 += ot15 - substraction;
-                            ot15 -= ot15 - substraction;
-                        }
-
-                        List<WorkingHoursModel> lastDays = monthly.Where(w => w.working_date.Date == date.Date).ToList();
-                        TimeSpan lastOT15 = TimeSpan.Zero;
-                        TimeSpan lastNormal = TimeSpan.Zero;
-                        for (int k = 0; k < lastDays.Count; k++)
-                        {
-                            lastOT15 += lastDays[k].ot1_5;
-                            lastNormal += lastDays[k].normal;
-                        }
-
-                        bool isTaskT = wh.task_id[0] == 'T';
-                        if (!isTaskT)
-                        {
-                            wh.normal = TimeSpan.Zero;
-                            TimeSpan remain_ot15 = TimeSpan.Zero;
-                            remain_ot15 = substraction - lastOT15;
-
-                            if (isWeekend || isHoliday)
-                            {
-                                if ((lastOT15 + ot15).TotalHours >= 8)
-                                {
-                                    if (ot3.TotalHours > 0)
+                                    if (_wd[i].workings[j].lunch_half)
                                     {
-                                        wh.ot1_5 = ot15 - (ot15 - remain_ot15);
-                                        wh.ot3_0 = ot3;
+                                        if (ot15 != default(TimeSpan))
+                                        {
+                                            ot15 -= new TimeSpan(0, 30, 0);
+                                        }
                                     }
-                                    else
+
+                                    if (_wd[i].workings[j].dinner_full)
                                     {
-                                        wh.ot1_5 = ot15 - (ot15 - remain_ot15);
-                                        wh.ot3_0 = ot15 - remain_ot15;
+                                        if (ot15 != default(TimeSpan))
+                                        {
+                                            ot15 -= new TimeSpan(1, 0, 0);
+                                        }
                                     }
-                                    
+                                    if (_wd[i].workings[j].dinner_half)
+                                    {
+                                        if (ot15 != default(TimeSpan))
+                                        {
+                                            ot15 -= new TimeSpan(0, 30, 0);
+                                        }
+                                    }
+
+                                    wh = new WorkingHoursModel()
+                                    {
+                                        working_date = _wd[i].date,
+                                        job_id = _wd[i].workings[j].job_id,
+                                        job_name = _wd[i].workings[j].job_name,
+                                        task_id = _wd[i].workings[j].task_id,
+                                        task_name = _wd[i].workings[j].task_name,
+                                        start_time = _wd[i].workings[j].start_time,
+                                        stop_time = _wd[i].workings[j].stop_time,
+                                        lunch_full = _wd[i].workings[j].lunch_full,
+                                        lunch_half = _wd[i].workings[j].lunch_half,
+                                        dinner_full = _wd[i].workings[j].dinner_full,
+                                        dinner_half = _wd[i].workings[j].dinner_half,
+                                        day = day,
+                                        normal = regular,
+                                        ot1_5 = ot15,
+                                        ot3_0 = ot3,
+                                        leave = leave
+                                    };
+                                    monthly.Add(wh);
+                                    regular = new TimeSpan(0, 0, 0);
+                                    continue;
                                 }
                                 else
                                 {
-                                    wh.ot1_5 = ot15;
-                                    wh.ot3_0 = ot3;
+                                    if (_wd[i].workings[j].stop_time == new TimeSpan(23, 59, 0))
+                                    {
+                                        ot15 += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time).Add(new TimeSpan(0, 1, 0));
+                                    }
+                                    else
+                                    {
+                                        ot15 += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                    }
+
                                 }
+                                if (_wd[i].workings[j].lunch_full)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(1, 0, 0);
+                                    }
+                                }
+                                if (_wd[i].workings[j].lunch_half)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(0, 30, 0);
+                                    }
+                                }
+
+                                if (_wd[i].workings[j].dinner_full)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(1, 0, 0);
+                                    }
+                                }
+                                if (_wd[i].workings[j].dinner_half)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(0, 30, 0);
+                                    }
+                                }
+
+
+                                if (ot15 >= new TimeSpan(8, 0, 0))
+                                {
+                                    ot3 = ot15 - new TimeSpan(8, 0, 0);
+                                }
+
+                                if (ot3 > new TimeSpan(0, 0, 0))
+                                {
+                                    if (j == 0)
+                                    {
+                                        ot15 = new TimeSpan(8, 0, 0);
+                                    }
+                                    else
+                                    {
+                                        ot15 = default(TimeSpan);
+                                    }
+                                }
+
+
+                                wh = new WorkingHoursModel()
+                                {
+                                    working_date = _wd[i].date,
+                                    job_id = _wd[i].workings[j].job_id,
+                                    job_name = _wd[i].workings[j].job_name,
+                                    task_id = _wd[i].workings[j].task_id,
+                                    task_name = _wd[i].workings[j].task_name,
+                                    start_time = _wd[i].workings[j].start_time,
+                                    stop_time = _wd[i].workings[j].stop_time,
+                                    lunch_full = _wd[i].workings[j].lunch_full,
+                                    lunch_half = _wd[i].workings[j].lunch_half,
+                                    dinner_full = _wd[i].workings[j].dinner_full,
+                                    dinner_half = _wd[i].workings[j].dinner_half,
+                                    day = day,
+                                    normal = default(TimeSpan),
+                                    ot1_5 = ot15,
+                                    ot3_0 = ot3,
+                                    leave = default(TimeSpan)
+                                };
+                                monthly.Add(wh);
                             }
                             else
                             {
-                                if (lastNormal.TotalHours >= 8)
+                                day = _wd[i].workings[j].working_date.DayOfWeek.ToString();
+                                if (_wd[i].workings[j].task_name == "Traveling")
                                 {
-                                    if (regular.TotalHours > 0)
+                                    regular = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                    ot15 = default(TimeSpan);
+                                    ot3 = default(TimeSpan);
+
+                                    if (_wd[i].workings[j].lunch_full)
                                     {
-                                        wh.ot1_5 = regular;
-                                        wh.ot3_0 = new TimeSpan(0, 0, 0);
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(1, 0, 0);
+                                        }
+                                    }
+                                    if (_wd[i].workings[j].lunch_half)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(0, 30, 0);
+                                        }
+                                    }
+                                    if (_wd[i].workings[j].dinner_full)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(1, 0, 0);
+                                        }
+                                    }
+                                    if (_wd[i].workings[j].dinner_half)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(0, 30, 0);
+                                        }
+                                    }
+
+                                    wh = new WorkingHoursModel()
+                                    {
+                                        working_date = _wd[i].date,
+                                        job_id = _wd[i].workings[j].job_id,
+                                        job_name = _wd[i].workings[j].job_name,
+                                        task_id = _wd[i].workings[j].task_id,
+                                        task_name = _wd[i].workings[j].task_name,
+                                        start_time = _wd[i].workings[j].start_time,
+                                        stop_time = _wd[i].workings[j].stop_time,
+                                        lunch_full = _wd[i].workings[j].lunch_full,
+                                        lunch_half = _wd[i].workings[j].lunch_half,
+                                        dinner_full = _wd[i].workings[j].dinner_full,
+                                        dinner_half = _wd[i].workings[j].dinner_half,
+                                        day = day,
+                                        normal = regular,
+                                        ot1_5 = ot15,
+                                        ot3_0 = ot3,
+                                        leave = leave
+                                    };
+                                    monthly.Add(wh);
+                                    regular = new TimeSpan(0, 0, 0);
+                                    continue;
+                                }
+                                else if (_wd[i].workings[j].task_name == "Leave")
+                                {
+                                    regular = default(TimeSpan);
+                                    ot15 = default(TimeSpan);
+                                    ot3 = default(TimeSpan);
+                                    leave = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                    if (leave > new TimeSpan(8, 0, 0))
+                                    {
+                                        leave = new TimeSpan(8, 0, 0);
+                                    }
+
+                                    wh = new WorkingHoursModel()
+                                    {
+                                        working_date = _wd[i].date,
+                                        job_id = _wd[i].workings[j].job_id,
+                                        job_name = _wd[i].workings[j].job_name,
+                                        task_id = _wd[i].workings[j].task_id,
+                                        task_name = _wd[i].workings[j].task_name,
+                                        start_time = _wd[i].workings[j].start_time,
+                                        stop_time = _wd[i].workings[j].stop_time,
+                                        lunch_full = _wd[i].workings[j].lunch_full,
+                                        lunch_half = _wd[i].workings[j].lunch_half,
+                                        dinner_full = _wd[i].workings[j].dinner_full,
+                                        dinner_half = _wd[i].workings[j].dinner_half,
+                                        day = day,
+                                        normal = regular,
+                                        ot1_5 = ot15,
+                                        ot3_0 = ot3,
+                                        leave = leave
+                                    };
+                                    monthly.Add(wh);
+                                    regular = new TimeSpan(0, 0, 0);
+                                    continue;
+                                }
+                                else
+                                {
+                                    if (_wd[i].workings[j].stop_time == new TimeSpan(23, 59, 0))
+                                    {
+                                        regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time).Add(new TimeSpan(0, 1, 0));
                                     }
                                     else
                                     {
-                                        wh.ot1_5 = ot15;
-                                        wh.ot3_0 = new TimeSpan(0, 0, 0);
+                                        regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
                                     }
                                 }
-                                else
+                                if (_wd[i].workings[j].lunch_full)
                                 {
-                                    wh.normal = regular;
-                                    wh.ot1_5 = ot15;
-                                    wh.ot3_0 = new TimeSpan(0, 0, 0);
+                                    if (regular != default(TimeSpan))
+                                    {
+                                        regular -= new TimeSpan(1, 0, 0);
+                                    }
                                 }
-                            }
-                        }
-                        else
-                        {
-                            if (wh.task_name == "Leave")
-                            {
-                                wh.normal = TimeSpan.Zero;
-                                wh.ot1_5 = TimeSpan.Zero;
-                                wh.ot3_0 = TimeSpan.Zero;
-                                wh.leave = leave;
-                            }
-                            if (wh.task_name == "Traveling")
-                            {
-                                if (regular.TotalHours >= 8)
+                                if (_wd[i].workings[j].lunch_half)
                                 {
-                                    wh.normal = new TimeSpan(8, 0, 0);
+                                    if (regular != default(TimeSpan))
+                                    {
+                                        regular -= new TimeSpan(0, 30, 0);
+                                    }
                                 }
-                                else
+                                if (_wd[i].workings[j].dinner_full)
                                 {
-                                    wh.normal = regular;
+                                    if (regular != default(TimeSpan))
+                                    {
+                                        regular -= new TimeSpan(1, 0, 0);
+                                    }
+                                }
+                                if (_wd[i].workings[j].dinner_half)
+                                {
+                                    if (regular != default(TimeSpan))
+                                    {
+                                        regular -= new TimeSpan(0, 30, 0);
+                                    }
                                 }
 
-                                wh.ot1_5 = TimeSpan.Zero;
-                                wh.ot3_0 = TimeSpan.Zero;
+                                //Check Sum Regular
+                                TimeSpan sum_regular = monthly.Where(w => w.working_date.Date == date.Date).ToList().Aggregate(
+                                    TimeSpan.Zero, (sum_reg, next_reg) => sum_reg + next_reg.normal) + regular;
+                                if (sum_regular > new TimeSpan(8, 0, 0))
+                                {
+                                    regular = new TimeSpan(8, 0, 0) - (sum_regular - regular);
+                                    ot15 = sum_regular - new TimeSpan(8, 0, 0);
+                                }
+
+                                if (regular >= new TimeSpan(8, 0, 0))
+                                {
+                                    ot15 = regular - new TimeSpan(8, 0, 0);
+                                }
+
+                                if (ot15 > new TimeSpan(0, 0, 0))
+                                {
+                                    if (j == 0)
+                                    {
+                                        regular = new TimeSpan(8, 0, 0);
+                                    }
+                                    else
+                                    {
+                                        //regular = default(TimeSpan);
+                                    }
+                                }
+
+                                
+                                wh = new WorkingHoursModel()
+                                {
+                                    working_date = _wd[i].date,
+                                    job_id = _wd[i].workings[j].job_id,
+                                    job_name = _wd[i].workings[j].job_name,
+                                    task_id = _wd[i].workings[j].task_id,
+                                    task_name = _wd[i].workings[j].task_name,
+                                    start_time = _wd[i].workings[j].start_time,
+                                    stop_time = _wd[i].workings[j].stop_time,
+                                    lunch_full = _wd[i].workings[j].lunch_full,
+                                    lunch_half = _wd[i].workings[j].lunch_half,
+                                    dinner_full = _wd[i].workings[j].dinner_full,
+                                    dinner_half = _wd[i].workings[j].dinner_half,
+                                    day = day,
+                                    normal = regular,
+                                    ot1_5 = ot15,
+                                    ot3_0 = ot3,
+                                    leave = leave
+                                };
+                                monthly.Add(wh);
                             }
                         }
-                        monthly.Add(wh);
                     }
                 }
                 else
                 {
-                    WorkingHoursModel wh = new WorkingHoursModel()
+                    wh = new WorkingHoursModel()
                     {
                         working_date = date,
                         day = day,
@@ -1182,10 +1580,9 @@ namespace WebENG.Service
                     };
                     monthly.Add(wh);
                 }
-            }
+            }           
             return monthly;
         }
-
         public List<WorkingHoursSummaryModel> CalculateMonthlySummary(List<WorkingHoursModel> workings)
         {
             List<WorkingHoursSummaryModel> whs = new List<WorkingHoursSummaryModel>();
