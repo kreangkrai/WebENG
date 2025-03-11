@@ -840,19 +840,20 @@
             let stop = $('#stop_time').val();
             let minute_start = 0;
             let minute_stop = 0;
-            if (start !== "" ){
+            if (start !== "") {
                 let hours = parseInt(start.split(':')[0]);
                 let minute = parseInt(start.split(':')[1]);
-                minute_start = ( hours * 60 ) + minute;
+                minute_start = (hours * 60) + minute;
             }
 
             let hours = parseInt(stop.split(':')[0]);
             let minute = parseInt(stop.split(':')[1]);
-            minute_stop = ( hours * 60 ) + minute;
-            if (minute_start > minute_stop){
-                alert('เวลาไม่ถูกต้อง');
+            minute_stop = (hours * 60) + minute;
+            if (minute_start > minute_stop) {
+                //alert('เวลาไม่ถูกต้อง');
                 $('#stop_time').val(null);
             }
+
         });
 
         $('#btn_accept').on('click', async function () {

@@ -852,7 +852,7 @@ namespace WebENG.Service
 
         //    List<WorkingHoursModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
         //    List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
- 
+
         //    whs = whs.OrderBy(o => o.working_date).ToList();
         //    int days = DateTime.DaysInMonth(yy, mm);
         //    for (int i = 0; i < days; i++)
@@ -861,7 +861,7 @@ namespace WebENG.Service
         //        List<WorkingHoursModel> whd = whs.Where(w => w.working_date == date).ToList();
 
         //        bool _isHoliday = holidays.Where(w => w.date == date).Count() > 0 ? true : false;
-               
+
         //        // Check Holiday and Get day
         //        if (_isHoliday)
         //        {
@@ -886,10 +886,10 @@ namespace WebENG.Service
         //            TimeSpan end_evening_full = new TimeSpan(18, 30, 0);
         //            TimeSpan end_evening_half = new TimeSpan(18, 0, 0);
         //            TimeSpan leave = TimeSpan.Zero;
-                    
-                   
+
+
         //            whd.OrderBy(o => o.start_time);
-                                     
+
         //            for (int j = 0; j < whd.Count; j++)
         //            {
         //                TimeSpan regular = new TimeSpan();
@@ -1108,7 +1108,7 @@ namespace WebENG.Service
         //                                wh.ot1_5 = ot15 - (ot15 - remain_ot15);
         //                                wh.ot3_0 = ot15 - remain_ot15;
         //                            }
-                                    
+
         //                        }
         //                        else
         //                        {
@@ -1227,6 +1227,9 @@ namespace WebENG.Service
                         for (int j = 0; j < _wd[i].workings.Count; j++)
                         {
                             regular = new TimeSpan(0, 0, 0);
+                            ot15 = new TimeSpan(0, 0, 0);
+                            ot3 = new TimeSpan(0, 0, 0);
+                            leave = new TimeSpan(0, 0, 0);
                             //_wd[i].workings = _wd[i].workings.OrderByDescending(o => o.start_time).ToList();
                             // Check Holiday and Get day
                             if (isHoliday || isWeekend)
@@ -1349,6 +1352,14 @@ namespace WebENG.Service
                                     }
                                 }
 
+                                //Check Sum OT 1.5
+                                TimeSpan sum_ot15 = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Traveling").ToList().Aggregate(
+                                    TimeSpan.Zero, (sum_ot, next_ot) => sum_ot + next_ot.ot1_5) + ot15;
+                                if (sum_ot15 > new TimeSpan(8, 0, 0))
+                                {
+                                    ot15 = new TimeSpan(8, 0, 0) - (sum_ot15 - ot15);
+                                    ot3 = sum_ot15 - new TimeSpan(8, 0, 0);
+                                }
 
                                 wh = new WorkingHoursModel()
                                 {
@@ -1507,7 +1518,7 @@ namespace WebENG.Service
                                 }
 
                                 //Check Sum Regular
-                                TimeSpan sum_regular = monthly.Where(w => w.working_date.Date == date.Date).ToList().Aggregate(
+                                TimeSpan sum_regular = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Traveling" && w.task_name != "Leave").ToList().Aggregate(
                                     TimeSpan.Zero, (sum_reg, next_reg) => sum_reg + next_reg.normal) + regular;
                                 if (sum_regular > new TimeSpan(8, 0, 0))
                                 {
@@ -1515,24 +1526,6 @@ namespace WebENG.Service
                                     ot15 = sum_regular - new TimeSpan(8, 0, 0);
                                 }
 
-                                if (regular >= new TimeSpan(8, 0, 0))
-                                {
-                                    ot15 = regular - new TimeSpan(8, 0, 0);
-                                }
-
-                                if (ot15 > new TimeSpan(0, 0, 0))
-                                {
-                                    if (j == 0)
-                                    {
-                                        regular = new TimeSpan(8, 0, 0);
-                                    }
-                                    else
-                                    {
-                                        //regular = default(TimeSpan);
-                                    }
-                                }
-
-                                
                                 wh = new WorkingHoursModel()
                                 {
                                     working_date = _wd[i].date,
@@ -1580,7 +1573,7 @@ namespace WebENG.Service
                     };
                     monthly.Add(wh);
                 }
-            }           
+            }
             return monthly;
         }
         public List<WorkingHoursSummaryModel> CalculateMonthlySummary(List<WorkingHoursModel> workings)
