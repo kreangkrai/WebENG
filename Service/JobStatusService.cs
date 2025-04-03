@@ -67,7 +67,9 @@ namespace WebENG.Service
                         Jobs.job_date,
                         Jobs.job_type,
                         Jobs.customer_name,
-                        Jobs.cost,
+                        Jobs.eng_cost,
+                        Jobs.cis_cost,
+                        Jobs.ais_cost,
                         Jobs.process_id,
                         Jobs.system_id,
                         Jobs.md_rate,
@@ -93,6 +95,8 @@ namespace WebENG.Service
 						Term_Payment.finished,
 						Jobs.job_in_hand,
                         Jobs.job_eng_in_hand,
+                        Jobs.job_cis_in_hand,
+                        Jobs.job_ais_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.finished_date,
@@ -120,6 +124,8 @@ namespace WebENG.Service
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
                         double job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0;
                         double job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0;
+                        double job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"]) : 0.0;
+                        double job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"]) : 0.0;
                         double eng_invoice = (_invoices.Sum(s => s.invoice) / job_in_hand ) * job_eng_in_hand;
 
                         List<JobSummaryModel> jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).ToList();
@@ -154,7 +160,9 @@ namespace WebENG.Service
                             enduser = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
                             sale = dr["sale"] != DBNull.Value ? dr["sale"].ToString() : "",
                             sale_department = dr["sale_department"] != DBNull.Value ? dr["sale_department"].ToString() : "",
-                            cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
+                            eng_cost = dr["eng_cost"] != DBNull.Value ? Convert.ToInt32(dr["eng_cost"]) : 0,
+                            cis_cost = dr["cis_cost"] != DBNull.Value ? Convert.ToInt32(dr["cis_cost"]) : 0,
+                            ais_cost = dr["ais_cost"] != DBNull.Value ? Convert.ToInt32(dr["ais_cost"]) : 0,
                             process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
                             system = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
                             md_rate = dr["md_rate"] != DBNull.Value ? Convert.ToDouble(dr["md_rate"]) : 1,
@@ -166,6 +174,8 @@ namespace WebENG.Service
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
                             job_in_hand = job_in_hand,
                             job_eng_in_hand = job_eng_in_hand,
+                            job_cis_in_hand = job_cis_in_hand,
+                            job_ais_in_hand = job_ais_in_hand,
                             invoices = _invoices,
                             eng_invoice = eng_invoice,
                             job_summary = jobSummary,
@@ -251,7 +261,9 @@ namespace WebENG.Service
                         Jobs.job_date,
                         Jobs.job_type,
                         Jobs.customer_name,
-                        Jobs.cost,
+                        Jobs.eng_cost,
+                        Jobs.cis_cost,
+                        Jobs.ais_cost,
                         Jobs.process_id,
                         Jobs.system_id,
                         Jobs.md_rate,
@@ -277,6 +289,8 @@ namespace WebENG.Service
 						Term_Payment.finished,
 						Jobs.job_in_hand,
                         Jobs.job_eng_in_hand,
+                        Jobs.job_cis_in_hand,
+                        Jobs.job_ais_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.finished_date,
@@ -306,6 +320,8 @@ namespace WebENG.Service
 
                         double job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0;
                         double job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0;
+                        double job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"]) : 0.0;
+                        double job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"]) : 0.0;
                         double eng_invoice = (_invoices.Sum(s => s.invoice) / job_in_hand) * job_eng_in_hand;
 
                         List<JobSummaryModel> jobSummary = jobSummaries.Where(w => w.jobId == dr["job_id"].ToString()).ToList();
@@ -334,7 +350,9 @@ namespace WebENG.Service
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
-                            cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
+                            eng_cost = dr["eng_cost"] != DBNull.Value ? Convert.ToInt32(dr["eng_cost"]) : 0,
+                            cis_cost = dr["cis_cost"] != DBNull.Value ? Convert.ToInt32(dr["cis_cost"]) : 0,
+                            ais_cost = dr["ais_cost"] != DBNull.Value ? Convert.ToInt32(dr["ais_cost"]) : 0,
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             customer = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",

@@ -29,7 +29,7 @@ namespace WebENG.Service
                     int startRows = 3;
                     for (int i = 0; i < jobs.Count; i++)
                     {
-                        double cost = jobs[i].job_summary.Count > 0 ? jobs[i].job_summary[0].cost : 0;
+                        double cost = jobs[i].job_summary.Count > 0 ? jobs[i].job_summary[0].eng_cost : 0;
                         double _eng_cost = jobs[i].job_summary.Count > 0 ? jobs[i].job_summary.Sum(s => s.totalEngCost) : 0;
                         worksheet.Cells["A" + (i + startRows)].Value = (i+1);
                         worksheet.Cells["B" + (i + startRows)].Value = jobs[i].job_id;
@@ -118,7 +118,7 @@ namespace WebENG.Service
                         worksheet.Cells["H" + (i + startRows)].Value = jobs[i].sale_department;
                         worksheet.Cells["I" + (i + startRows)].Value = jobs[i].gp;
                         worksheet.Cells["J" + (i + startRows)].Value = jobs[i].est_cost;
-                        worksheet.Cells["K" + (i + startRows)].Value = jobs[i].cost;
+                        worksheet.Cells["K" + (i + startRows)].Value = jobs[i].eng_cost;
                         worksheet.Cells["L" + (i + startRows)].Value = jobs[i].total_cost;
                         worksheet.Cells["M" + (i + startRows)].Value = jobs[i].remaining_cost;
 
@@ -127,7 +127,7 @@ namespace WebENG.Service
                         if (jobSummaries != null)
                         {
                             JobSummaryModel summary = jobSummaries.Where(w => w.jobId == jobs[i].job_id).FirstOrDefault();
-                            use_cost = summary.cost - summary.remainingCost;
+                            use_cost = (summary.eng_cost + summary.cis_cost + summary.ais_cost) - summary.remainingCost;
                             double remaining_cost = jobs[i].remaining_cost;
                             double est_cost = jobs[i].est_cost;
                             double total_cost = jobs[i].total_cost;

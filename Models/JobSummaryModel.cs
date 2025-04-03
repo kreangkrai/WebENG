@@ -13,13 +13,15 @@ namespace WebENG.Models
         public string jobName { get; set; }
         public string customer { get; set; }
         public string responsible { get; set; }
-        public int cost { get; set; }
+        public double eng_cost { get; set; }
+        public double cis_cost { get; set; }
+        public double ais_cost { get; set; }
         public double factor { get; set; }
         public double totalManhour { get; set; }
-        public int totalEngCost { get; set; }
+        public double totalEngCost { get; set; }
         public string status { get; set; }
         public string process { get; set; }
         public string system { get; set; }
-        public int remainingCost { get; set; }
+        public double remainingCost { get; set; }
     }
 }

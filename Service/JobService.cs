@@ -64,7 +64,9 @@ namespace WebENG.Service
                         Jobs.est_cost,
                         Jobs.total_cost,
                         Jobs.remaining_cost,
-                        Jobs.cost,
+                        Jobs.eng_cost,
+                        Jobs.cis_cost,
+                        Jobs.ais_cost,
                         Jobs.process_id,
                         Jobs.system_id,
                         Jobs.md_rate,
@@ -90,6 +92,8 @@ namespace WebENG.Service
 						Term_Payment.finished,
 						Jobs.job_in_hand,
                         Jobs.job_eng_in_hand,
+                        Jobs.job_cis_in_hand,
+                        Jobs.job_ais_in_hand,
 						Jobs.due_date,
                         Jobs.quotation_no,
                         Jobs.job_type,
@@ -143,7 +147,9 @@ namespace WebENG.Service
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             gp = dr["gp"] != DBNull.Value ? Convert.ToDouble(dr["gp"].ToString()) : 0.0,
                             est_cost = dr["est_cost"] != DBNull.Value ? Convert.ToDouble(dr["est_cost"]) : 0.0,
-                            cost = dr["cost"] != DBNull.Value ? Convert.ToDouble(dr["cost"]) : 0.0,
+                            eng_cost = dr["eng_cost"] != DBNull.Value ? Convert.ToDouble(dr["eng_cost"]) : 0.0,
+                            cis_cost = dr["cis_cost"] != DBNull.Value ? Convert.ToDouble(dr["cis_cost"]) : 0.0,
+                            ais_cost = dr["ais_cost"] != DBNull.Value ? Convert.ToDouble(dr["ais_cost"]) : 0.0,
                             total_cost = dr["total_cost"] != DBNull.Value ? Convert.ToDouble(dr["total_cost"]) : 0.0,
                             remaining_cost = dr["remaining_cost"] != DBNull.Value ? Convert.ToDouble(dr["remaining_cost"]) : 0.0,
                             process = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
@@ -157,6 +163,8 @@ namespace WebENG.Service
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0,
+                            job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"]) : 0.0,
+                            job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"]) : 0.0,
                             invoices = _invoices,
                             due_date = dr["due_date"] != DBNull.Value ? Convert.ToDateTime(dr["due_date"].ToString()) : DateTime.MinValue,
                             quotation_no = dr["quotation_no"] != DBNull.Value ? dr["quotation_no"].ToString() : "",
@@ -260,7 +268,9 @@ namespace WebENG.Service
                         Jobs.job_name,
                         Jobs.customer_name as customer,
                         Jobs.responsible,
-                        Jobs.cost,
+                        Jobs.eng_cost,
+                        Jobs.cis_cost,
+                        Jobs.ais_cost,
                         (Jobs.md_rate * Jobs.pd_rate) as factor,
                         CAST((T1.total_manpower / 60.0) as decimal(18,1)) as total_manpower ,
                         Jobs.status,
@@ -288,7 +298,9 @@ namespace WebENG.Service
                             jobId = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             jobName = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
-                            cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
+                            eng_cost = dr["eng_cost"] != DBNull.Value ? Convert.ToInt32(dr["eng_cost"]) : 0,
+                            cis_cost = dr["cis_cost"] != DBNull.Value ? Convert.ToInt32(dr["cis_cost"]) : 0,
+                            ais_cost = dr["ais_cost"] != DBNull.Value ? Convert.ToInt32(dr["ais_cost"]) : 0,
                             factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 1,
                             totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"]) : 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1",
@@ -298,7 +310,7 @@ namespace WebENG.Service
 
                         };
                         jobSummary.totalEngCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
-                        jobSummary.remainingCost = jobSummary.cost - jobSummary.totalEngCost;
+                        jobSummary.remainingCost = (jobSummary.eng_cost + jobSummary.cis_cost + jobSummary.ais_cost) - jobSummary.totalEngCost;
                         jobsSummaries.Add(jobSummary);
                     }
                     dr.Close();
@@ -330,7 +342,9 @@ namespace WebENG.Service
                             job_type,
                             gp,
                             est_cost,
-                            cost,
+                            eng_cost,
+                            cis_cost,
+                            ais_cost,
                             total_cost,
                             remaining_cost,
                             process_id,
@@ -340,6 +354,8 @@ namespace WebENG.Service
                             status,
                             job_in_hand,
                             job_eng_in_hand,
+                            job_cis_in_hand,
+                            job_ais_in_hand,
                             due_date,
                             enduser,
                             bank_guarantee,
@@ -358,7 +374,9 @@ namespace WebENG.Service
                             @job_type,
                             @gp,
                             @est_cost,
-                            @cost,
+                            @eng_cost,
+                            @cis_cost,
+                            @ais_cost,
                             @total_cost,
                             @remaining_cost,                           
                             @process_id,
@@ -368,6 +386,8 @@ namespace WebENG.Service
                             @status,
                             @job_in_hand,
                             @job_eng_in_hand,
+                            @job_cis_in_hand,
+                            @job_ais_in_hand,
                             @due_date,
                             @enduser,
                             @bank_guarantee,
@@ -389,7 +409,9 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
                     cmd.Parameters.AddWithValue("@gp", job.gp);
                     cmd.Parameters.AddWithValue("@est_cost", job.est_cost);
-                    cmd.Parameters.AddWithValue("@cost", job.cost);
+                    cmd.Parameters.AddWithValue("@eng_cost", job.eng_cost);
+                    cmd.Parameters.AddWithValue("@cis_cost", job.cis_cost);
+                    cmd.Parameters.AddWithValue("@ais_cost", job.ais_cost);
                     cmd.Parameters.AddWithValue("@total_cost", job.total_cost);
                     cmd.Parameters.AddWithValue("@remaining_cost", job.remaining_cost);
                     cmd.Parameters.AddWithValue("@process_id", job.process);
@@ -399,6 +421,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@status", job.status);
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
                     cmd.Parameters.AddWithValue("@job_eng_in_hand", job.job_eng_in_hand);
+                    cmd.Parameters.AddWithValue("@job_cis_in_hand", job.job_cis_in_hand);
+                    cmd.Parameters.AddWithValue("@job_ais_in_hand", job.job_ais_in_hand);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     cmd.Parameters.AddWithValue("@enduser", job.enduser);
                     cmd.Parameters.AddWithValue("@bank_guarantee", job.bank_guarantee);
@@ -448,7 +472,9 @@ namespace WebENG.Service
                         job_type = @job_type,
                         gp = @gp,
                         est_cost = @est_cost,
-                        cost = @cost,
+                        eng_cost = @eng_cost,
+                        cis_cost = @cis_cost,
+                        ais_cost = @ais_cost,
                         total_cost = @total_cost,
                         remaining_cost = @remaining_cost,
                         process_id = @process_id,
@@ -458,6 +484,8 @@ namespace WebENG.Service
                         status = @status,
                         job_in_hand = @job_in_hand,
                         job_eng_in_hand = @job_eng_in_hand,
+                        job_cis_in_hand = @job_cis_in_hand,
+                        job_ais_in_hand = @job_ais_in_hand,
                         due_date = @due_date,
                         finished_date = @finished_date,
                         warranty_period = @warranty_period,
@@ -481,7 +509,9 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@job_type", job.job_type);
                     cmd.Parameters.AddWithValue("@gp", job.gp);
                     cmd.Parameters.AddWithValue("@est_cost", job.est_cost);
-                    cmd.Parameters.AddWithValue("@cost", job.cost);
+                    cmd.Parameters.AddWithValue("@eng_cost", job.eng_cost);
+                    cmd.Parameters.AddWithValue("@cis_cost", job.cis_cost);
+                    cmd.Parameters.AddWithValue("@ais_cost", job.ais_cost);
                     cmd.Parameters.AddWithValue("@total_cost", job.total_cost);
                     cmd.Parameters.AddWithValue("@remaining_cost", job.remaining_cost);
                     cmd.Parameters.AddWithValue("@process_id", job.process);
@@ -491,6 +521,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@status", job.status);
                     cmd.Parameters.AddWithValue("@job_in_hand", job.job_in_hand);
                     cmd.Parameters.AddWithValue("@job_eng_in_hand", job.job_eng_in_hand);
+                    cmd.Parameters.AddWithValue("@job_cis_in_hand", job.job_cis_in_hand);
+                    cmd.Parameters.AddWithValue("@job_ais_in_hand", job.job_ais_in_hand);
                     cmd.Parameters.AddWithValue("@due_date", job.due_date);
                     cmd.Parameters.AddWithValue("@finished_date", job.finished_date);
                     cmd.Parameters.AddWithValue("@warranty_period", job.warranty_period);

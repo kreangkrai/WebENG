@@ -154,8 +154,8 @@ namespace WebENG.Service
                     {
                         string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
                         JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
-                        double cost = _job.job_summary.FirstOrDefault().cost;
-                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / cost * 100);
+                        double eng_cost = _job.job_summary.FirstOrDefault().eng_cost;
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / eng_cost * 100);
                         double invoice_eng = _job.eng_invoice;
                         double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
                         double remaining_amount = _job.job_eng_in_hand - invoice_eng;
@@ -223,8 +223,8 @@ namespace WebENG.Service
                     {
                         string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
                         JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
-                        double cost = _job.job_summary.FirstOrDefault().cost;
-                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / cost * 100);
+                        double eng_cost = _job.job_summary.FirstOrDefault().eng_cost;
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / eng_cost * 100);
                         double invoice_eng = _job.eng_invoice;
                         double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
                         double remaining_amount = _job.job_eng_in_hand - invoice_eng;
@@ -394,7 +394,7 @@ namespace WebENG.Service
 						ELSE
 							0						
 						END as quarter,
-						case when FORMAT(job_date,'yyyy') < {year} OR job_date is null then 'backlog' else 'now' end as type,
+						case when FORMAT(job_date,'yyyy') < {year} OR Jobs.job_date IS NULL then 'backlog' else 'now' end as type,
 						CAST((Jobs.job_eng_in_hand / 1000000) as decimal(18,3)) as job_eng_in_hand,
 						CAST((((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) / 1000000) as decimal(18,3)) as invoice_eng,
                         CAST((((case when backlog_invoice.invoice is null then 0 else backlog_invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) / 1000000) as decimal(18,3)) as backlog_invoice_eng,
@@ -404,7 +404,8 @@ namespace WebENG.Service
 
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
-				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status");
+				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
+                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

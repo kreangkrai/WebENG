@@ -14,7 +14,9 @@ namespace WebENG.Models
         public string sale { get; set; }
         public double gp { get; set; }
         public double est_cost { get; set; }
-        public double cost { get; set; }
+        public double eng_cost { get; set; }
+        public double cis_cost { get; set; }
+        public double ais_cost { get; set; }
         public double total_cost { get; set; }
         public double remaining_cost { get; set; }
         public double md_rate { get; set; }
@@ -35,6 +37,8 @@ namespace WebENG.Models
         public Term_PaymentModel term_payment { get; set; }
         public double job_in_hand { get; set; }
         public double job_eng_in_hand { get; set; }
+        public double job_cis_in_hand { get; set; }
+        public double job_ais_in_hand { get; set; }
         public List<InvoiceModel> invoices { get; set; } = new List<InvoiceModel>();
         public double eng_invoice { get; set; }
         public List<JobSummaryModel> job_summary { get; set; }
