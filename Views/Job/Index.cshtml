@@ -19,13 +19,13 @@
     }
     <div class="col-xl-1 pb-3">
         @*<button id="btn_import" type="button" class="btn btn-primary form-control elevation-1" hidden>
-            <i class="fas fa-upload"></i> Import
-        </button>*@
+                <i class="fas fa-upload"></i> Import
+            </button>*@
     </div>
     <div class="col-xl-1 pb-3">
         @*<button id="btn_export" type="button" class="btn btn-warning form-control elevation-1" hidden>
-            <i class="fas fa-download"></i> Export
-        </button>*@
+                <i class="fas fa-download"></i> Export
+            </button>*@
     </div>
     <div class="col-xl-12">
         <div class="card card-dark">
@@ -37,65 +37,67 @@
                     </button>
                 </div>
             </div>
-                <div class="card-body">
-                    <table id="table_job" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Quotation</th>
-                                <th>Customer</th>
-                                <th>End User</th>
-                                <th>Sale Name</th>
-                                <th>Department</th>
-                                <th>Process</th>
-                                <th>System</th>
-                                <th>Cost</th>
-                                <th>MD</th>
-                                <th>PD</th>
-                                <th>FT</th>
-                                <th>MP</th>
-                                <th>Cost/MP</th>
-                                <th>OT MP</th>
-                                <th>Status</th>
-                                <th>C SAT.</th>
-                                <th>GP</th>
-                                <th>EST Cost</th>
-                                <th>Total Cost</th>
-                                <th>Remaining Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                        <tfoot class="text-center">
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Quotation</th>
-                                <th>Customer</th>
-                                <th>End User</th>
-                                <th>Sale Name</th>
-                                <th>Department</th>
-                                <th>Process</th>
-                                <th>System</th>
-                                <th>Cost</th>
-                                <th>MD</th>
-                                <th>PD</th>
-                                <th>FT</th>
-                                <th>MP</th>
-                                <th>Cost/MP</th>
-                                <th>OT MP</th>
-                                <th>Status</th>
-                                <th>C SAT.</th>
-                                <th>GP</th>
-                                <th>EST Cost</th>
-                                <th>Total Cost</th>
-                                <th>Remaining Cost</th>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
+            <div class="card-body" style="overflow-x:auto">
+                <table id="table_job" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quotation</th>
+                            <th>Customer</th>
+                            <th>End User</th>
+                            <th>Sale Name</th>
+                            <th>Department</th>
+                            <th>Process</th>
+                            <th>System</th>
+                            <th>ENG Cost</th>
+                            <th>CIS Cost</th>
+                            <th>AIS Cost</th>
+                            <th>MD</th>
+                            <th>PD</th>
+                            <th>FT</th>
+                            <th>MP</th>
+                            <th>Cost/MP</th>
+                            <th>OT MP</th>
+                            <th>Status</th>
+                            <th>C SAT.</th>
+                            <th>GP</th>
+                            <th>EST Cost</th>
+                            <th>Total Cost</th>
+                            <th>Remaining Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                    <tfoot class="text-center">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Quotation</th>
+                            <th>Customer</th>
+                            <th>End User</th>
+                            <th>Sale Name</th>
+                            <th>Department</th>
+                            <th>Process</th>
+                            <th>System</th>
+                            <th>Cost</th>
+                            <th>MD</th>
+                            <th>PD</th>
+                            <th>FT</th>
+                            <th>MP</th>
+                            <th>Cost/MP</th>
+                            <th>OT MP</th>
+                            <th>Status</th>
+                            <th>C SAT.</th>
+                            <th>GP</th>
+                            <th>EST Cost</th>
+                            <th>Total Cost</th>
+                            <th>Remaining Cost</th>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
+        </div>
     </div>
 </div>
 
@@ -110,104 +112,146 @@
             </div>
             <div class="modal-body">
                 <form>
-                    <div class="form-row">
-                        <div class="col-4">
-                            <label for="job_id">Job Number</label>
-                            <input id="job_id" type="text" class="form-control" placeholder="JYYXXXX" />
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Job</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-8">
-                            <label for="job_name">Job Name</label>
-                            <input id="job_name" type="text" class="form-control" placeholder="Job Name" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-3">
-                            <label for="job_date">Job Date</label>
-                            <input id="job_date" type="date" class="form-control" />
-                        </div>
-                        <div class="col-2">
-                            <label for="quotation_no">Quotation</label>
-                            <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
-                            <datalist id="quotations"></datalist>
-                        </div>
-                        <div class="col-2">
-                            <label for="job_type">Job Type</label>
-                            <input id="job_type" type="text" class="form-control" placeholder="" />
-                        </div>
-                        <div class="col-5">
-                            <label for="job_customer">Customer</label>
-                            <input id="job_customer" type="text" class="form-control" placeholder="" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-5">
-                            <label for="select_sale">Sale</label>
-                            <select id="select_sale" class="form-control">
-                            </select>
-                        </div>
-                        <div class="col-2">
-                            <label for="sale_department">Sale Department</label>
-                            <input id="sale_department" type="text" class="form-control" placeholder="" />
-                        </div>
-                        <div class="col-5">
-                            <label for="end_user">End User</label>
-                            <input id="end_user" type="text" class="form-control" placeholder="" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="col-4">
-                            <label for="gp">%GP</label>
-                            <div class="input-group">
-                                <input id="gp" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-4 col-xl-4 ">
+                                    <label for="job_id">Job Number</label>
+                                    <input id="job_id" type="text" class="form-control" placeholder="JYYXXXX" />
+                                </div>
+                                <div class="col-sm-6 col-md-8 col-xl-8">
+                                    <label for="job_name">Job Name</label>
+                                    <input id="job_name" type="text" class="form-control" placeholder="Job Name" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <label for="job_date">Job Date</label>
+                                    <input id="job_date" type="date" class="form-control" />
+                                </div>
+                                <div class="col-sm-6 col-md-2 col-xl-2">
+                                    <label for="quotation_no">Quotation</label>
+                                    <input id="quotation_no" type="text" class="form-control" placeholder="Quotation Number" list="quotations" />
+                                    <datalist id="quotations"></datalist>
+                                </div>
+                                <div class="col-sm-6 col-md-2 col-xl-2">
+                                    <label for="job_type">Job Type</label>
+                                    <input id="job_type" type="text" class="form-control" placeholder="" />
+                                </div>
+                                <div class="col-sm-6 col-md-5 col-xl-5">
+                                    <label for="job_customer">Customer</label>
+                                    <input id="job_customer" type="text" class="form-control" placeholder="" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-5 col-xl-5">
+                                    <label for="select_sale">Sale</label>
+                                    <select id="select_sale" class="form-control">
+                                    </select>
+                                </div>
+                                <div class="col-sm-6 col-md-2 col-xl-2">
+                                    <label for="sale_department">Sale Dep.</label>
+                                    <input id="sale_department" type="text" class="form-control" placeholder="" />
+                                </div>
+                                <div class="col-sm-6  col-md-5 col-xl-5">
+                                    <label for="end_user">End User</label>
+                                    <input id="end_user" type="text" class="form-control" placeholder="" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <label for="md_rate">Market Develop</label>
+                                    <div class="input-group">
+                                        <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">X</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <div class="form-group ">
+                                        <label for="pd_rate">Product Develop</label>
+                                        <div class="input-group">
+                                            <input id="pd_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">X</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <label for="select_responsible">Project Status Update by</label>
+                                    <select id="select_responsible" class="form-control">
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <label for="est_cost">EST Cost</label>
-                            <div class="input-group">
-                                <input id="est_cost" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <label for="cost">ENG Cost</label>
-                            <div class="input-group">
-                                <input id="cost" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-3">
-                            <label for="md_rate">Market Develop</label>
-                            <div class="input-group">
-                                <input id="md_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">X</span>
-                                </div>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Cost</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <div class="form-group ">
-                                <label for="pd_rate">Product Develop</label>
-                                <div class="input-group">
-                                    <input id="pd_rate" type="number" class="form-control" placeholder="#.#" value="1.0" step="0.1" min="0" max="10" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">X</span>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <label for="gp">%GP</label>
+                                    <div class="input-group">
+                                        <input id="gp" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <label for="est_cost">EST Cost</label>
+                                    <div class="input-group">
+                                        <input id="est_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="cost">ENG Cost</label>
+                                    <div class="input-group">
+                                        <input id="eng_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="cost">CIS Cost</label>
+                                    <div class="input-group">
+                                        <input id="cis_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="cost">AIS Cost</label>
+                                    <div class="input-group">
+                                        <input id="ais_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-6">
-                            <label for="select_responsible">Project Status Update by</label>
-                            <select id="select_responsible" class="form-control">
-                            </select>
                         </div>
                     </div>
                     <div class="form-row">
@@ -215,8 +259,13 @@
                             <div class="card" style="overflow-x:auto">
                                 <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold">Job File</span>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus" style="color:black"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="card-body">                                   
+                                <div class="card-body">
                                     <div class="form-row pt-1">
                                         <div class="col-12">
                                             <table id="table_job_file" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
@@ -236,72 +285,84 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-6">
-                            <div class="card">
-                                <div class="card-header" style="background-color:#42D5D8">
-                                    <span style="font-weight:bold;">Process</span>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-row">
-                                        <div class="col-9">
-                                            <label for="select_process">Process</label>
-                                            <select id="select_process" class="form-control">
-                                            </select>
-                                        </div>
-                                        <div class="col-3">
-                                            <label for="add_process">Add</label>
-                                            <button id="add_process" type="button" class="btn btn-primary form-control elevation-1" disabled>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="form-row pt-1">
-                                        <div class="col-12">
-                                            <table id="table_process" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
-                                                <thead style="background-color:#42B4D8">
-                                                    <tr>
-                                                        <th>Process</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Process & System</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="card">
-                                <div class="card-header" style="background-color:#42D5D8">
-                                    <span style="font-weight:bold">System</span>
-                                </div>
-                                <div class="card-body">
-                                    <div class="form-row">
-                                        <div class="col-9">
-                                            <label for="select_system">System</label>
-                                            <select id="select_system" class="form-control">
-                                            </select>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <div class="card">
+                                        <div class="card-header" style="background-color: #42B4D8">
+                                            <span style="font-weight:bold;">Process</span>
                                         </div>
-                                        <div class="col-3">
-                                            <label for="add_system">Add</label>
-                                            <button id="add_system" type="button" class="btn btn-primary form-control elevation-1" disabled>
-                                                <i class="fas fa-plus"></i>
-                                            </button>
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <div class="col-sm-6 col-md-9 col-xl-9">
+                                                    <label for="select_process">Process</label>
+                                                    <select id="select_process" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                                    <label for="add_process">Add</label>
+                                                    <button id="add_process" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="form-row pt-1">
+                                                <div class="col-12" style="overflow-x:auto">
+                                                    <table id="table_process" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                        <thead style="background-color:#42B4D8">
+                                                            <tr>
+                                                                <th>Process</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="form-row pt-1">
-                                        <div class="col-12">
-                                            <table id="table_system" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
-                                                <thead style="background-color:#42B4D8">
-                                                    <tr>
-                                                        <th>System</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
+                                </div>
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <div class="card">
+                                        <div class="card-header" style="background-color: #42B4D8">
+                                            <span style="font-weight:bold">System</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <div class="col-sm-6 col-md-9 col-xl-9">
+                                                    <label for="select_system">System</label>
+                                                    <select id="select_system" class="form-control">
+                                                    </select>
+                                                </div>
+                                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                                    <label for="add_system">Add</label>
+                                                    <button id="add_system" type="button" class="btn btn-primary form-control elevation-1" disabled>
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="form-row pt-1">
+                                                <div class="col-12" style="overflow-x:auto">
+                                                    <table id="table_system" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                                        <thead style="background-color:#42B4D8">
+                                                            <tr>
+                                                                <th>System</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -313,15 +374,20 @@
                             <div class="card">
                                 <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold">Term Payment</span>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus" style="color:black"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row">
-                                        <div class="col-5">
+                                        <div class="col-sm-6 col-md-5 col-xl-5">
                                             <label for="select_payment">Term Payment</label>
                                             <select id="select_payment" class="form-control">
                                             </select>
                                         </div>
-                                        <div class="col-2 col-md-2">
+                                        <div class="col-sm-6 col-md-2 col-xl-2">
                                             <label for="add_payment">Add</label>
                                             <button id="add_payment" type="button" class="btn btn-primary form-control elevation-1" disabled>
                                                 <i class="fas fa-plus"></i>
@@ -346,37 +412,75 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-4">
-                            <label for="cost">Total Job In Hand</label>
-                            <div class="input-group">
-                                <input id="job_in_hand" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
-                                </div>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Job In Hand</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <label for="cost">ENG Job In Hand</label>
-                            <div class="input-group">
-                                <input id="job_eng_in_hand" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <label for="cost">Total Job In Hand</label>
+                                    <div class="input-group">
+                                        <input id="job_in_hand" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-6 col-xl-6">
+                                    <label for="due_date">Due Date</label>
+                                    <input id="due_date" type="date" class="form-control" value="1900-01-01" />
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="cost">ENG Job In Hand</label>
+                                    <div class="input-group">
+                                        <input id="job_eng_in_hand" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="cost">CIS Job In Hand</label>
+                                    <div class="input-group">
+                                        <input id="job_cis_in_hand" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="cost">AIS Job In Hand</label>
+                                    <div class="input-group">
+                                        <input id="job_ais_in_hand" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-4">
-                            <label for="due_date">Due Date</label>
-                            <input id="due_date" type="date" class="form-control" value="1900-01-01" />
                         </div>
                     </div>
                     <div class="form-row pt-2">
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header" style="background-color:#42D5D8">
+                                    <span style="font-weight:bold">Invoice</span>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus" style="color:black"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
                                     <div class="row">
                                         <div class="col-10 d-flex justify-content-start pt-2">
-                                            <span style="font-weight:bold">Invoice</span>
+
                                         </div>
                                         <div class="col-2 col-md-2 d-flex justify-content-end">
                                             <button id="add_invoice" type="button" class="btn btn-primary form-control elevation-1" style="width:50px">
@@ -384,8 +488,6 @@
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="card-body">
                                     <div class="form-row pt-1">
                                         <div class="col-12" style="overflow-x:auto">
                                             <table id="table_invoice" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
@@ -407,12 +509,12 @@
                                             </table>
                                         </div>
                                     </div>
-                                    <div class="col-6 pt-1">
+                                    <div class="col-sm-6 col-md-6 col-xl-6 pt-1">
                                         <div class="row">
-                                            <div class="col-2 pt-1">
+                                            <div class="col-sm-6 col-md-2 col-xl-2 pt-1">
                                                 <label for="cost">รวม</label>
                                             </div>
-                                            <div class="col-10">
+                                            <div class="col-sm-6 col-md-10 col-xl-10">
                                                 <div class="input-group">
                                                     <input id="invoice" type="text" class="form-control" placeholder="0" value="0" />
                                                     <div class="input-group-append">
@@ -426,82 +528,118 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-3">
-                            <label for="bank_guarantee">Bank Guarantee</label>
-                            <div class="input-group">
-                                <input id="bank_guarantee" type="number" class="form-control" placeholder="#" value="0" step="1" min="0" max="100" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
-                                </div>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Bank</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-3">
-                            <label for="bg_start">BG Start</label>
-                            <input id="bg_start" type="date" class="form-control" />
-                        </div>
-                        <div class="col-3">
-                            <label for="bg_finish">BG Finish</label>
-                            <input id="bg_finish" type="date" class="form-control" />
-                        </div>
-                        <div class="col-3">
-                            <div class="form-group ">
-                                <label for="retention">Retention</label>
-                                <div class="input-group">
-                                    <input id="retention" type="number" class="form-control" placeholder="#" value="0" step="1" min="0" max="100" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <label for="bank_guarantee">Bank Guarantee</label>
+                                    <div class="input-group">
+                                        <input id="bank_guarantee" type="number" class="form-control" placeholder="#" value="0" step="1" min="0" max="100" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <label for="bg_start">BG Start</label>
+                                    <input id="bg_start" type="date" class="form-control" />
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <label for="bg_finish">BG Finish</label>
+                                    <input id="bg_finish" type="date" class="form-control" />
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-xl-3">
+                                    <div class="form-group ">
+                                        <label for="retention">Retention</label>
+                                        <div class="input-group">
+                                            <input id="retention" type="number" class="form-control" placeholder="#" value="0" step="1" min="0" max="100" />
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-4">
-                            <label for="total_cost">Total Cost</label>
-                            <div class="input-group">
-                                <input id="total_cost" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
-                                </div>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Total Cost</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <label for="remaining_cost">Remaining Cost</label>
-                            <div class="input-group">
-                                <input id="remaining_cost" type="number" class="form-control" placeholder="0" value="0" />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">THB</span>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="total_cost">Total Cost</label>
+                                    <div class="input-group">
+                                        <input id="total_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <label for="btn_cal_gp">Calculate GP</label>
-                            <input id="btn_cal_gp" type="button" class="form-control btn btn-primary" value="Cal GP" />
-                        </div>
-                        <div class="col-2">
-                            <label for="gp_improve">%GP Improve</label>
-                            <div class="input-group">
-                                <input id="gp_improve" type="number" class="form-control" placeholder="0" value="0" disabled />
-                                <div class="input-group-append">
-                                    <span class="input-group-text">%</span>
+                                <div class="col-sm-6 col-md-4 col-xl-4">
+                                    <label for="remaining_cost">Remaining Cost</label>
+                                    <div class="input-group">
+                                        <input id="remaining_cost" type="number" class="form-control" placeholder="0" value="0" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">THB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-2 col-xl-2">
+                                    <label for="btn_cal_gp">Calculate GP</label>
+                                    <input id="btn_cal_gp" type="button" class="form-control btn btn-primary" value="Cal GP" />
+                                </div>
+                                <div class="col-sm-6 col-md-2 col-xl-2">
+                                    <label for="gp_improve">%GP Improve</label>
+                                    <div class="input-group">
+                                        <input id="gp_improve" type="number" class="form-control" placeholder="0" value="0" disabled />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="col-5">
-                            <label for="status">Status</label>
-                            <select id="status" class="form-control">
-                            </select>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Status</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="col-4" id="group_finished_date">
-                            <label for="finished_date">Date Finished</label>
-                            <input id="finished_date" type="date" class="form-control" value="1900-01-01" />
-                        </div>
-                        <div class="col-3" id="group_warranty_period">
-                            <label for="warranty_period">Warranty Period</label>
-                            <input id="warranty_period" type="number" class="form-control" value="0" disabled />
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-6 col-md-5 col-xl-5">
+                                    <label for="status">Status</label>
+                                    <select id="status" class="form-control">
+                                    </select>
+                                </div>
+                                <div class="col-sm-6 col-md-4 col-xl-4" id="group_finished_date">
+                                    <label for="finished_date">Date Finished</label>
+                                    <input id="finished_date" type="date" class="form-control" value="1900-01-01" />
+                                </div>
+                                <div class="col-sm-6 col-md-3 col-xl-3" id="group_warranty_period">
+                                    <label for="warranty_period">Warranty Period</label>
+                                    <input id="warranty_period" type="number" class="form-control" value="0" disabled />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -526,15 +664,15 @@
             <div class="modal-body">
                 <form>
                     <div class="form-row">
-                        <div class="col-8">
+                        <div class="col-sm-6 col-md-8 col-xl-8">
                             <label for="edit_payment_name">Term Payment</label>
-                            <input id="edit_payment_name" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="edit_payment_name" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_percent">Percent</label>
                             <input id="edit_percent" type="number" class="form-control" placeholder="" />
                         </div>
-                    </div>                                       
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -560,43 +698,43 @@
             <div class="modal-body">
                 <form>
                     <div class="form-row">
-                        <div class="col-2">
+                        <div class="col-sm-6 col-md-2 col-xl-2">
                             <label for="edit_invoice_no">No</label>
                             <input id="edit_invoice_no" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                        <div class="col-2">
+                        <div class="col-sm-6 col-md-2 col-xl-2">
                             <label for="edit_invoice_id">ID</label>
                             <input id="edit_invoice_id" type="number" class="form-control" placeholder="" disabled />
                         </div>
-                        <div class="col-8">
+                        <div class="col-sm-6 col-md-8 col-xl-8">
                             <label for="edit_invoice_milestone">Milestone</label>
                             <select id="edit_invoice_milestone" class="form-control"></select>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_invoice">Invoice</label>
                             <input id="edit_invoice" type="number" class="form-control" placeholder="" />
                         </div>
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_invoice_plan_date">Plan Date</label>
                             <input id="edit_invoice_plan_date" type="date" class="form-control" placeholder="" />
                         </div>
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_invoice_actual_date">Actual Date</label>
                             <input id="edit_invoice_actual_date" type="date" class="form-control" placeholder="" />
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_invoice_status">Status</label>
                             <select id="edit_invoice_status" class="form-control"></select>
                         </div>
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_invoice_remark">Remark</label>
                             <textarea id="edit_invoice_remark" cols="50" rows="3" class="form-control"></textarea>
                         </div>
-                        <div class="col-4">
+                        <div class="col-sm-6 col-md-4 col-xl-4">
                             <label for="edit_invoice_new_plan_date">New Plan Date</label>
                             <input id="edit_invoice_new_plan_date" type="date" class="form-control" placeholder="" />
                         </div>
@@ -626,11 +764,11 @@
             <div class="modal-body">
                 <form>
                     <div class="form-row">
-                        <div class="col-12">
+                        <div class="col-sm-12 col-md-12 col-xl-12">
                             <label for="edit_process_name">Process</label>
-                            <input id="edit_process_name" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="edit_process_name" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                    </div>                                       
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -655,11 +793,11 @@
             <div class="modal-body">
                 <form>
                     <div class="form-row">
-                        <div class="col-12">
+                        <div class="col-sm-12 col-md-12 col-xl-12">
                             <label for="edit_system_name">System</label>
-                            <input id="edit_system_name" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="edit_system_name" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                    </div>                                       
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -684,7 +822,7 @@
                 <div class="modal-body">
                     <form>
                         <div class="row pt-1" style="row-gap:1px">
-                            <div class="col-xl-12">
+                            <div class="col-sm-12 col-md-12 col-xl-12">
                                 <div class="card elevation-1">
                                     <div class="card-header">
                                         <span class="card-title">
@@ -929,6 +1067,8 @@
                     process,
                     system,
                     jobs[i].eng_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobs[i].cis_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobs[i].ais_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     jobs[i].md_rate,
                     jobs[i].pd_rate,
                     jobs[i].md_rate * jobs[i].pd_rate, //Factor
@@ -953,14 +1093,14 @@
                 },
                 columnDefs: [
                     {
-                        targets: [4, 5, 6, 10, 11, 13, 14, 15,18,19,20,21],
+                        targets: [4, 5, 6, 12, 13, 15, 16, 17,20,21,22,23],
                         visible: false
                     },
                 ],
                 rowCallback: function (row, data) {
                     $('td:eq(1)', row).addClass("text-left");
                     $('td:eq(3)', row).addClass("text-left");
-                    let code_status = data[16];
+                    let code_status = data[18];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
                     if (code_status === "STA999"){
@@ -969,7 +1109,7 @@
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
 
-                    $('td:eq(8)', row).html(status_str);
+                    $('td:eq(10)', row).html(status_str);
                 }
             });
         };
@@ -1112,7 +1252,7 @@
         }
         function GenerateStatusInvoiceOption() {
             $('#edit_invoice_status').empty();
-            $('#edit_invoice_status').append(`<option value="" selected disabled>Please Select Status</option>`);           
+            $('#edit_invoice_status').append(`<option value="" selected disabled>Please Select Status</option>`);
             for (let i = 0; i < status_invoices.length; i++) {
                 $('#edit_invoice_status').append(`<option value="${i}">${status_invoices[i]}</option>`);
             }
@@ -1163,7 +1303,9 @@
             $('#quotation_no').val(null);
             $('#gp').val(0);
             $('#est_cost').val(0);
-            $('#cost').val(0);
+            $('#eng_cost').val(0);
+            $('#cis_cost').val(0);
+            $('#ais_cost').val(0);
             $('#total_cost').val(0);
             $('#remaining_cost').val(0);
             $('#md').val(1);
@@ -1171,6 +1313,8 @@
             $('#status').val(1);
             $('#job_in_hand').val(0);
             $('#job_eng_in_hand').val(0);
+            $('#job_cis_in_hand').val(0);
+            $('#job_ais_in_hand').val(0);
             $('#invoice').val(0);
             $('#due_date').val(null);
             $('#bank_guarantee').val(0);
@@ -1250,15 +1394,17 @@
 
             let list_invoice = job.invoices;
 
-            let cost = data[9].replaceAll(",","");
-            let md = data[10];
-            let pd = data[11];
-            let status = data[16];
-            let gp = data[18];
-            let est_cost = data[19];
-            let total_cost = data[20];
-            let remaining_cost = data[21];
-            let finished_date = jobs.filter(f => f.job_id == job_id).map(m => m.finished_date)[0];           
+            let eng_cost = data[9].replaceAll(",", "");
+            let cis_cost = data[10].replaceAll(",", "");
+            let ais_cost = data[11].replaceAll(",", "");
+            let md = data[12];
+            let pd = data[13];
+            let status = data[18];
+            let gp = data[20];
+            let est_cost = data[21];
+            let total_cost = data[22];
+            let remaining_cost = data[23];
+            let finished_date = jobs.filter(f => f.job_id == job_id).map(m => m.finished_date)[0];
             let responsible = job.responsible;
 
             $('#job_id').val(job_id);
@@ -1273,7 +1419,9 @@
             $('#job_type').val(job_type);
             $('#gp').val(gp);
             $('#est_cost').val(est_cost);
-            $('#cost').val(cost);
+            $('#eng_cost').val(eng_cost);
+            $('#cis_cost').val(cis_cost);
+            $('#ais_cost').val(ais_cost);
             $('#total_cost').val(total_cost);
             $('#remaining_cost').val(remaining_cost);
             $('#md').val(md);
@@ -1281,6 +1429,8 @@
             $('#status').val(status);
             $('#job_in_hand').val(job.job_in_hand);
             $('#job_eng_in_hand').val(job.job_eng_in_hand);
+            $('#job_cis_in_hand').val(job.job_cis_in_hand);
+            $('#job_ais_in_hand').val(job.job_ais_in_hand);
             $('#due_date').val(job.due_date.split('T')[0]);
 
             $('#finished_date').val(finished_date.split('T')[0]);
@@ -1429,7 +1579,9 @@
             let job_type = $('#job_type').val();
             let gp = $('#gp').val();
             let est_cost = $('#est_cost').val();
-            let cost = $('#cost').val();
+            let eng_cost = $('#eng_cost').val();
+            let cis_cost = $('#cis_cost').val();
+            let ais_cost = $('#ais_cost').val();
             let total_cost = $('#total_cost').val();
             let remaining_cost = $('#remaining_cost').val();
             let md_rate = $('#md_rate').val();
@@ -1438,6 +1590,8 @@
             let finished_date = $('#finished_date').val();
             let job_in_hand = $('#job_in_hand').val();
             let job_eng_in_hand = $('#job_eng_in_hand').val();
+            let job_cis_in_hand = $('#job_cis_in_hand').val();
+            let job_ais_in_hand = $('#job_ais_in_hand').val();
             let due_date = $('#due_date').val();
             let warranty_period = $('#warranty_period').val();
             let bank_guarantee = $('#bank_guarantee').val();
@@ -1448,7 +1602,7 @@
             if (status === null) {
                 status = 1;
             }
-            
+
             let term_payment = {};
             let down_payment = set_payments.filter(f=>f.payment_id == "STA001").map(m=>m.percent)[0];
             let document_submit = set_payments.filter(f=>f.payment_id == "STA002").map(m=>m.percent)[0];
@@ -1484,7 +1638,7 @@
             term_payment.finished = finished;
 
             let invoices = [];
-            for (let i = 0; i < set_invoice.length; i++){                
+            for (let i = 0; i < set_invoice.length; i++){
                 invoices.push({
                     'job_id': job_id,
                     'invoice': set_invoice[i].invoice,
@@ -1494,7 +1648,7 @@
                     'new_plan_date': set_invoice[i].new_plan_date,
                     'status': set_invoice[i].status,
                     'remark': set_invoice[i].remark
-                });               
+                });
             }
 
             let str_process = "";
@@ -1530,7 +1684,9 @@
                 "job_type": job_type,
                 "gp": gp,
                 "est_cost": est_cost,
-                "cost": cost,
+                "eng_cost": eng_cost,
+                "cis_cost": cis_cost,
+                "ais_cost": ais_cost,
                 "total_cost": total_cost,
                 "remaining_cost": remaining_cost,
                 "process":str_process,
@@ -1540,7 +1696,9 @@
                 "status": status,
                 "term_payment":term_payment,
                 "job_in_hand":job_in_hand,
-                "job_eng_in_hand":job_eng_in_hand,
+                "job_eng_in_hand": job_eng_in_hand,
+                "job_cis_in_hand": job_cis_in_hand,
+                "job_ais_in_hand": job_ais_in_hand,
                 "invoices":invoices,
                 "due_date":due_date,
                 "finished_date": finished_date,
@@ -1996,8 +2154,8 @@
                 data: {
                     job
                 },
-                success: function (response) {
-                    let use_cost = parseFloat(response.cost) - parseFloat(response.remainingCost);
+                success: function (response) {                   
+                    let use_cost = (parseFloat(response.eng_cost) + parseFloat(response.cis_cost) + parseFloat(response.ais_cost)) - parseFloat(response.remainingCost);
                     let remaining_cost = parseFloat($('#remaining_cost').val());
                     let est_cost = parseFloat($('#est_cost').val());
                     let total_cost = parseFloat($('#total_cost').val());

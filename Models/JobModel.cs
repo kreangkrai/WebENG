@@ -41,6 +41,8 @@ namespace WebENG.Models
         public double job_ais_in_hand { get; set; }
         public List<InvoiceModel> invoices { get; set; } = new List<InvoiceModel>();
         public double eng_invoice { get; set; }
+        public double cis_invoice { get; set; }
+        public double ais_invoice { get; set; }
         public List<JobSummaryModel> job_summary { get; set; }
         public DateTime due_date { get; set; }
         public DateTime finished_date { get; set; }

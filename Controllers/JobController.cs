@@ -115,13 +115,17 @@ namespace WebENG.Controllers
                 jobName = jobsSummary.Where(w=>w.jobId == s.Key).FirstOrDefault().jobName,
                 customer = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().customer,
                 responsible = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().responsible,
-                cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cost,
+                eng_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost,
+                cis_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost,
+                ais_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost,
                 factor = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().factor,
                 totalManhour = s.Sum(k=>k.totalManhour),
                 status = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().status,
                 process = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().process,
                 system = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().system,
-                remainingCost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cost - s.Sum(k=>k.totalEngCost)
+                remainingCost = (jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
+                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
+                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k=>k.totalEngCost)
 
             }).ToList();
             return Json(sum);
@@ -137,13 +141,17 @@ namespace WebENG.Controllers
                 jobName = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().jobName,
                 customer = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().customer,
                 responsible = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().responsible,
-                cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cost,
+                eng_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost,
+                cis_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost,
+                ais_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost,
                 factor = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().factor,
                 totalManhour = s.Sum(k => k.totalManhour),
                 status = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().status,
                 process = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().process,
                 system = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().system,
-                remainingCost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cost - s.Sum(k => k.totalEngCost)
+                remainingCost = (jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
+                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
+                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k => k.totalEngCost)
 
             }).ToList();
             JobSummaryModel _sum = sum.Where(w => w.jobId == job).FirstOrDefault();
