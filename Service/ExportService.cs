@@ -30,7 +30,7 @@ namespace WebENG.Service
                     for (int i = 0; i < jobs.Count; i++)
                     {
                         double cost = jobs[i].job_summary.Count > 0 ? jobs[i].job_summary[0].eng_cost : 0;
-                        double _eng_cost = jobs[i].job_summary.Count > 0 ? jobs[i].job_summary.Sum(s => s.totalEngCost) : 0;
+                        double _eng_cost = jobs[i].job_summary.Count > 0 ? jobs[i].job_summary.Sum(s => s.totalCost) : 0;
                         worksheet.Cells["A" + (i + startRows)].Value = (i+1);
                         worksheet.Cells["B" + (i + startRows)].Value = jobs[i].job_id;
                         worksheet.Cells["C" + (i + startRows)].Value = jobs[i].job_name;

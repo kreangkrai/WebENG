@@ -111,10 +111,13 @@
                 <span class="card-title">Job Status</span>
             </div>
             <div class="card-body">
-                <form>
+                <form>                   
                     <div class="form-group row" style="row-gap:20px">
                         @if (Model.role == "Admin")
                         {
+                            <div class="col-xl-1">
+                                <select id="departments" class="form-control"></select>
+                            </div>
                             <div class="col-xl-3">
                                 <select id="user_name" class="form-control">
                                     <option value="all" selected>ALL</option>
@@ -134,31 +137,31 @@
                                 <i class="fas fa-sync"></i> Load
                             </button>
                         </div>
-                        <div id="form_select_term_payment"class="col-xl-3" hidden>
-                              <div class="multiselect">
+                        <div id="form_select_term_payment" class="col-xl-3" hidden>
+                            <div class="multiselect">
                                 <div class="selectBox" onclick="showCheckboxes()">
-                                  <select class="form-control">
-                                    <option>Select Term Payment</option>
-                                  </select>
-                                  <div class="overSelect"></div>
+                                    <select class="form-control">
+                                        <option>Select Term Payment</option>
+                                    </select>
+                                    <div class="overSelect"></div>
                                 </div>
-                                <div id="checkboxes">                                 
+                                <div id="checkboxes">
                                 </div>
-                              </div>
+                            </div>
                         </div>
-                        <div id="form_select_column"class="col-xl-3" hidden>
-                              <div class="multiselect">
+                        <div id="form_select_column" class="col-xl-3" hidden>
+                            <div class="multiselect">
                                 <div class="selectBox" onclick="showColumnCheckboxes()">
-                                  <select class="form-control">
-                                    <option>Select Column</option>
-                                  </select>
-                                  <div class="overSelect"></div>
+                                    <select class="form-control">
+                                        <option>Select Column</option>
+                                    </select>
+                                    <div class="overSelect"></div>
                                 </div>
-                                <div id="checkcolumnboxes">                                 
+                                <div id="checkcolumnboxes">
                                 </div>
-                              </div>
+                            </div>
                         </div>
-                        <div id="form_export" class="col-xl-2 col-lg-2 col-md-2 pb-2" hidden>
+                        <div id="form_export" class="col-xl-1 col-lg-1 col-md-1 pb-2" hidden>
                             <button id="btn_export" type="button" class="btn btn-success form-control elevation-1">
                                 <i class="fas fa-file-excel"></i> Export
                             </button>
@@ -173,7 +176,9 @@
                                     <th>Project Name</th>
                                     <th>Customer</th>
                                     <th>Responsible</th>
-                                    <th>% Eng Cost</th>
+                                    <th>% ENG Cost</th>
+                                    <th>% CIS Cost</th>
+                                    <th>% AIS Cost</th>
                                     <th>% Invoice</th>
                                     <th>Current Status</th>
                                     <th>Remaining</th>
@@ -192,11 +197,14 @@
                                     <th style="font-size:11px">As-Built</th>
                                     <th style="font-size:11px">Warranty</th>
                                     <th style="font-size:11px">Finished</th>
-                                    <th>Job In Hand</th>
+                                    <th>Job ENG In Hand</th>
+                                    <th>Job CIS In Hand</th>
+                                    <th>Job AIS In Hand</th>
+                                    <th>Job Total In Hand</th>
                                     <th>Total Invoice</th>
                                     <th>Due Date</th>
                                 </tr>
-                            </thead>                           
+                            </thead>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -420,15 +428,15 @@
 
          let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff','#912AB4','#D32D67','#3973DF','#298ED9','#73E5AE','#EFC67A','#CAEF7A','#485E1A','#93A6DA','#0B717A'];
 
-         $(document).ready(async function (){     
-             await GetUsers();
-             await GenerateUsers();             
-             await GetStatus();
-             await GenerateStatusOption();
-            
-             let user = '@Model.user_id.ToLower()';
-             $('#user_name').val(user);
-         });
+        $(document).ready(async function () {
+            await GetUsers();
+            await GenerateUsers();
+            await GetStatus();
+            await GenerateStatusOption();
+            await GenerateDepartmentOptions();
+            let user = '@Model.user_id.ToLower()';
+            $('#user_name').val(user);
+        });
 
          async function GetStatus() {
             await $.ajax({
@@ -461,13 +469,20 @@
                 }
             });
         }
+
         function GenerateUsers() {
             var user_string = '';
+            let department = $('#departments :selected').text();
             $('#user_name').empty();
-            $('#user_name').append(`<option value="all">ALL</option>`);
-            for (var i = 0; i < users.length; i++) {
-                user_string += `<option value="${users[i].user_id.toLowerCase()}">${users[i].name}</option>`;
-            }          
+            $('#user_name').append('<option value="ALL">ALL</option>');
+            let employees = users;
+            if (department !== "ALL") {
+                employees = users.filter(f => f.department === department);
+            }
+           
+            for (var i = 0; i < employees.length; i++) {
+                user_string += `<option value="${employees[i].user_id.toLowerCase()}">${employees[i].name}</option>`;
+            }
             $('#user_name').append(user_string);
         }
 
@@ -485,25 +500,28 @@
         }
 
         $('#btn_load').on('click',async function(){
-            
+
             set_payments = new Set();
             for (let i =0;i<statuses.length;i++){
                 set_payments.add(statuses[i].status_name);
             }
             set_column = new Set();
-            set_column.add({'title':'Job In Hand','index':23});
-            set_column.add({'title':'Invoice','index':24});
-            set_column.add({'title':'Due Date','index':25});
+            set_column.add({ 'title': 'Job ENG In Hand', 'index': 25 });
+            set_column.add({ 'title': 'Job CIS In Hand', 'index': 26 });
+            set_column.add({ 'title': 'Job AIS In Hand', 'index': 27 });
+            set_column.add({ 'title': 'Job Total In Hand', 'index': 28 });
+            set_column.add({ 'title': 'Invoice', 'index': 29 });
+            set_column.add({ 'title': 'Due Date', 'index': 30 });
 
 
             let user = $('#user_name').val();
             await GetJobStatusByUser(user);
-            
+
             GenerateCheckBox();
             GenerateColumnCheckBox();
             $('#form_select_term_payment').attr('hidden',false);
             $('#form_select_column').attr('hidden',false);
-            $('#form_export').attr('hidden',false);         
+            $('#form_export').attr('hidden',false);
         });
 
         function GenerateTable(jobs) {
@@ -515,12 +533,12 @@
             let new_jobs = [];
             let sum_invoice = 0;
             let columns = [];
-            let _columns = [23,24,25];
+            let _columns = [25,26,27,28,29,30];
             for (let i=0;i<_columns.length;i++){
                 let b = arr_column.map(m=>m.index).find(a=> a == _columns[i]);
                 if (!b){
                     columns.push(_columns[i]);
-                }               
+                }
             }
             columns.sort();
             for(let i=0;i<jobs.length;i++){
@@ -529,22 +547,25 @@
                         new_jobs.push(jobs[i]);
                         break;
                     }
-                }               
+                }
             }
             jobs = new_jobs;
-           
+
             for (let i = 0; i < jobs.length; i++) {
-                
+
                 sum_invoice = 0;
                 for(let j=0;j<jobs[i].invoices.length;j++){
                     sum_invoice += jobs[i].invoices[j].invoice;
                 }
-               
-                let eng_invoice = jobs[i].eng_invoice > 0 ? parseInt(jobs[i].eng_invoice).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
-                let cost = jobs[i].job_summary.cost !== null ? jobs[i].job_summary.map(m=>m.cost)[0] : 0;
-                let _eng_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m => m.totalEngCost).reduce((acc, b) => acc + b) : 0;                
-                let percent_eng_cost = Math.ceil((Number(_eng_cost) / Number(cost)) * 100);
-                let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);                
+
+                let eng_cost = jobs[i].job_summary.eng_cost !== null ? jobs[i].job_summary.map(m => m.eng_cost)[0] : 0;
+                let cis_cost = jobs[i].job_summary.cis_cost !== null ? jobs[i].job_summary.map(m => m.cis_cost)[0] : 0;
+                let ais_cost = jobs[i].job_summary.ais_cost !== null ? jobs[i].job_summary.map(m => m.ais_cost)[0] : 0;
+                let total_cost = jobs[i].job_summary.length > 0 ? jobs[i].job_summary.map(m => m.totalCost).reduce((acc, b) => acc + b) : 0;
+                let percent_eng_cost = Math.ceil((Number(eng_cost) / Number(total_cost)) * 100);
+                let percent_cis_cost = Math.ceil((Number(cis_cost) / Number(total_cost)) * 100);
+                let percent_ais_cost = Math.ceil((Number(ais_cost) / Number(total_cost)) * 100);
+                let percent_invoice = Math.ceil((Number(sum_invoice) / Number(jobs[i].job_in_hand)) * 100);
                 let down_payment = jobs[i].term_payment.down_payment > 0 ? jobs[i].term_payment.down_payment : "";
                 let document_submit = jobs[i].term_payment.document_submit > 0 ? jobs[i].term_payment.document_submit : "";
                 let instrument_vendor = jobs[i].term_payment.instrument_vendor > 0 ? jobs[i].term_payment.instrument_vendor : "";
@@ -562,14 +583,21 @@
                 let finished = jobs[i].term_payment.finished > 0 ? jobs[i].term_payment.finished : "";
                 let job_in_hand = jobs[i].job_in_hand > 0 ? jobs[i].job_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let job_eng_in_hand = jobs[i].job_eng_in_hand > 0 ? jobs[i].job_eng_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+                let job_cis_in_hand = jobs[i].job_cis_in_hand > 0 ? jobs[i].job_cis_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
+                let job_ais_in_hand = jobs[i].job_ais_in_hand > 0 ? jobs[i].job_ais_in_hand.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
                 let due_date = jobs[i].due_date.split('T')[0];
-                let remaining = (parseFloat(jobs[i].job_eng_in_hand) - parseFloat(jobs[i].eng_invoice)).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                let total_invoice = jobs[i].invoices.map(m => m.invoice).reduce((acc, b) => acc + b, 0);
+                let remaining = (parseFloat(jobs[i].job_in_hand) - parseFloat(total_invoice)).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                
+                console.log(jobs[i]);
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
                     jobs[i].customer,
                     jobs[i].responsible,
                     percent_eng_cost,
+                    percent_cis_cost,
+                    percent_ais_cost,
                     percent_invoice,
                     jobs[i].status,
                     remaining,
@@ -589,7 +617,10 @@
                     warranty,
                     finished,
                     job_eng_in_hand,
-                    eng_invoice,
+                    job_cis_in_hand,
+                    job_ais_in_hand,
+                    job_in_hand,
+                    total_invoice,
                     due_date
                 ]);
             }
@@ -622,7 +653,7 @@
 
                     let payments = [];
                     let sum_percent = 0;
-                    let start_column = 8;
+                    let start_column = 10;
                     let check_current_status = false;
 
                     let datas_percent = [];
@@ -670,17 +701,17 @@
                             }
                         }
                     }
-                    
+
                     for(let i=0;i<payments.length;i++){
                         $(`td:eq(${start_column + i})`, row).css({ "background-color": '#EFECE8'});
                         if (data.status === "Finished" || data.status === "Warranty"){
                                 $(`td`,row).css({ "text-decoration": 'line-through'});
                                 $(`td`,row).css({ "background-color": '#DEE6E5'});
-                                
+
                         }else{
-                            if (payments[i].percent > 0){                          
+                            if (payments[i].percent > 0){
                                 sum_percent += Number(payments[i].percent);
-                                if (current_status === payments[i].payment_id){                          
+                                if (current_status === payments[i].payment_id){
                                     if (percent >= sum_percent){
                                         $(`td:eq(${start_column + i})`, row).css({ "background-color": '#42CAD8'});
                                     }else{
@@ -723,7 +754,7 @@
 
             for (let i = 0; i < invoices.length; i++) {
                 let no = invoices[i].id;
-                let invoice = invoices[i].invoice; 
+                let invoice = invoices[i].invoice;
                 let date = invoices[i].date;
                 datas.push([
                     no,
@@ -741,7 +772,7 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
@@ -759,14 +790,14 @@
             let job_id = table.row(this).data()[0];
             let columnID = table.cell(this)[0][0].column;
             let column_name = $("tr").find(`th:eq(${columnID})`).html();
-            if (column_name === "% Invoice"){                             
+            if (column_name === "% Invoice"){
                 let job = jobs_status.filter(f=>f.job_id == job_id).map(m=>m)[0];
                 let list_invoice = job.invoices;
                 set_invoice = [];
-                for (let i=0;i<list_invoice.length;i++){ 
+                for (let i=0;i<list_invoice.length;i++){
                     let invoice = list_invoice[i].invoice;
                     let date = list_invoice[i].invoice_date;
-                    set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});               
+                    set_invoice.push({'id': (i+1) ,'invoice': invoice,'date': date});
                 }
                 GenerateTableInvoice(set_invoice);
                 $('#modal_invoice').modal();
@@ -826,7 +857,7 @@
                 for (let i =0;i<statuses.length;i++){
                     payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
                 }
-          
+
                 for (let i=0;i<payments.length;i++){
                     if (payments[i].percent > 0){
                         new_payments.push(payments[i]);
@@ -853,13 +884,13 @@
             }
         });
 
-       async function ShowJobManpowerInfo(jobId) {  
+       async function ShowJobManpowerInfo(jobId) {
             $('#modalJobInfo').modal();
             await GetTaskRatio(jobId);
             await GetTaskDistribution(jobId);
             await GetManpowerRatio(jobId);
             await GetManpowerDistribution(jobId);
-            
+
             $('#job_title').html(`Job Manpower Information : ${jobId}`);
         }
 
@@ -922,6 +953,21 @@
                 }
             });
         }
+
+        function GenerateDepartmentOptions() {
+            let departments = users.map(m => m.department);
+            departments = [...new Set(departments)].sort();
+            $('#departments').empty();
+            $('#departments').append('<option value="" selected disabled>Dep.</option>');
+            $('#departments').append('<option value="ALL">ALL</option>');
+            for (let i = 0; i < departments.length; i++) {
+                $('#departments').append(`<option value="${departments[i]}">${departments[i]}</option>`);
+            }
+        }
+
+        $('#departments').on('change', function () {
+            GenerateUsers();
+        });
 
         @*function GenerateChartTaskRatio() {
 
@@ -1226,10 +1272,10 @@
                 $('#table_payment').DataTable().destroy();
 
             for (let i = 0; i < payments.length; i++) {
-                
+
                 let payment = payments[i].payment_name;
                 let percent = payments[i].percent;
-             
+
                 datas.push([
                     payment,
                     percent
@@ -1244,11 +1290,11 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
-                    
+
                 },
                 searching: false,
                 ordering: false,
@@ -1289,7 +1335,7 @@
 
         var expanded = false;
         function showCheckboxes() {
-          var checkboxes = document.getElementById("checkboxes");            
+          var checkboxes = document.getElementById("checkboxes");
           if (!expanded) {
             checkboxes.style.display = "block";
             expanded = true;
@@ -1301,7 +1347,7 @@
 
         var expanded = false;
         function showColumnCheckboxes() {
-          var checkboxes = document.getElementById("checkcolumnboxes");            
+          var checkboxes = document.getElementById("checkcolumnboxes");
           if (!expanded) {
             checkboxes.style.display = "block";
             expanded = true;
@@ -1326,31 +1372,47 @@
         function ColumnCheckChange(column){
             let chk = $(`#${column}`).prop('checked');
             let value = $(`#${column}`).val();
+            console.log(value);
             if (!chk){
                 set_column.forEach(x => x.title === value ? set_column.delete(x) : x)
-            }else{
-                if (value === "Job In Hand"){
-                    set_column.add({'title':'Job In Hand','index':23});
+            } else {
+                if (value === "Job ENG In Hand") {
+                    set_column.add({ 'title': 'Job ENG In Hand', 'index': 25 });
+                }
+                else if (value === "Job CIS In Hand") {
+                    set_column.add({ 'title': 'Job CIS In Hand', 'index': 26 });
+                }
+                else if (value === "Job AIS In Hand") {
+                    set_column.add({ 'title': 'Job AIS In Hand', 'index': 27 });
+                }
+                else if (value === "Job Total In Hand"){
+                    set_column.add({'title':'Job Total In Hand','index':28});
                 }else if (value === "Invoice"){
-                    set_column.add({'title':'Invoice','index':24});
+                    set_column.add({'title':'Invoice','index':29});
                 }else if (value === "Due Date") {
-                    set_column.add({'title':'Due Date','index':25});
-                }              
+                    set_column.add({'title':'Due Date','index':30});
+                }
             }
             GenerateTable(jobs_status);
         }
 
         function GenerateColumnCheckBox(){
             $('#checkcolumnboxes').empty();
-            let str = `<label for="COL23" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL23" value="Job In Hand" onchange="ColumnCheckChange('COL23')" checked/> Job In Hand</label>
-                       <label for="COL24" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL24" value="Invoice" onchange="ColumnCheckChange('COL24')" checked/> Invoice</label>
-                       <label for="COL25" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL25" value="Due Date" onchange="ColumnCheckChange('COL25')" checked/> Due Date</label>
+            let str = `<label for="COL25" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL25" value="Job ENG In Hand" onchange="ColumnCheckChange('COL25')" checked/> Job ENG In Hand</label>
+                       <label for="COL26" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL26" value="Job CIS In Hand" onchange="ColumnCheckChange('COL26')" checked/> Job CIS In Hand</label>
+                       <label for="COL27" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL27" value="Job AIS In Hand" onchange="ColumnCheckChange('COL27')" checked/> Job AIS In Hand</label>
+                       <label for="COL28" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL28" value="Job Total In Hand" onchange="ColumnCheckChange('COL28')" checked/> Job Total In Hand</label>
+                       <label for="COL29" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL29" value="Invoice" onchange="ColumnCheckChange('COL29')" checked/> Invoice</label>
+                       <label for="COL30" class="form-check-label pl-2">
+                           <input type="checkbox" id="COL30" value="Due Date" onchange="ColumnCheckChange('COL30')" checked/> Due Date</label>
 `;
             $('#checkcolumnboxes').append(str);
-           
+
         }
 
         function GenerateCheckBox(){
@@ -1359,8 +1421,8 @@
             for (let i=0;i<statuses.length;i++){
                 str += `<label for="${statuses[i].status_id}" class="form-check-label pl-2">
                                     <input type="checkbox" id="${statuses[i].status_id}" value="${statuses[i].status_name}" onchange="CheckChange('${statuses[i].status_id}')" checked/> ${statuses[i].status_name}</label>`;
-            }            
-            $('#checkboxes').append(str);          
+            }
+            $('#checkboxes').append(str);
         }
 
         $('#btn_export').on('click',function(){

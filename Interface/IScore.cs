@@ -8,6 +8,6 @@ namespace WebENG.Interface
 {
     interface IScore
     {
-        List<EngineerScoreModel> GetScores(string user_id, string year);
+        List<EngineerScoreModel> GetScores(string user_id, string department);
     }
 }

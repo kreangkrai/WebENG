@@ -309,8 +309,8 @@ namespace WebENG.Service
                             responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
 
                         };
-                        jobSummary.totalEngCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
-                        jobSummary.remainingCost = (jobSummary.eng_cost + jobSummary.cis_cost + jobSummary.ais_cost) - jobSummary.totalEngCost;
+                        jobSummary.totalCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
+                        jobSummary.remainingCost = (jobSummary.eng_cost + jobSummary.cis_cost + jobSummary.ais_cost) - jobSummary.totalCost;
                         jobsSummaries.Add(jobSummary);
                     }
                     dr.Close();

@@ -41,9 +41,9 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetScores(string user_id, string year)
+        public JsonResult GetScores(string user_id, string department)
         {
-            List<EngineerScoreModel> scores = ScoreService.GetScores(user_id,year);
+            List<EngineerScoreModel> scores = ScoreService.GetScores(user_id, department);
             return Json(scores);
         }
 

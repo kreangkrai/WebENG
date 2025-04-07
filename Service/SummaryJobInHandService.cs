@@ -155,7 +155,7 @@ namespace WebENG.Service
                         string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
                         JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
                         double eng_cost = _job.job_summary.FirstOrDefault().eng_cost;
-                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / eng_cost * 100);
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalCost) / eng_cost * 100);
                         double invoice_eng = _job.eng_invoice;
                         double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
                         double remaining_amount = _job.job_eng_in_hand - invoice_eng;
@@ -224,7 +224,7 @@ namespace WebENG.Service
                         string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
                         JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
                         double eng_cost = _job.job_summary.FirstOrDefault().eng_cost;
-                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalEngCost) / eng_cost * 100);
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalCost) / eng_cost * 100);
                         double invoice_eng = _job.eng_invoice;
                         double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
                         double remaining_amount = _job.job_eng_in_hand - invoice_eng;

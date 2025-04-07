@@ -245,8 +245,8 @@
         $('#year').val(date.getFullYear());
         
         let user_id = $('#user_id').val();
-        let year = $('#year').val();
-        await GetScores(user_id,year);
+        let department = $('#departments :selected').text();
+        await GetScores(user_id, department);
         GenerateTable();
         $('#name1').html(user_id + " Manpower");
         $('#name2').html(user_id + " Manpower");
@@ -311,12 +311,12 @@
         });
     }
 
-    async function GetScores(user_id, year) {
+    async function GetScores(user_id,department) {
         await $.ajax({
             type: "GET",
             url: '@Url.Action("GetScores", "EngineerScore")',
             contentType: 'application/x-www-form-urlencoded',
-            data: { user_id, year },
+            data: { user_id, department},
             success: function (response) {
                 scores = response;
                 if (debug_score) {
@@ -331,7 +331,6 @@
         let departments = users.map(m => m.department);
         departments = [...new Set(departments)].sort();
         $('#departments').empty();
-        $('#departments').append(`<option value="ALL" selected>ALL</option>`);
         for (let i = 0; i < departments.length; i++) {
             $('#departments').append(`<option value="${departments[i]}">${departments[i]}</option>`);
         }
@@ -486,8 +485,9 @@
 
     $('#btn_filter').on('click', async function () {
         let user_id = $('#user_id').val();
-        let year = $('#year').val();
-        await GetScores(user_id, year);
+        let department = $('#departments :selected').text();
+        
+        await GetScores(user_id, department);
         await GenerateTable();
         $('#name1').html(user_id + " Manpower");
         $('#name2').html(user_id + " Manpower");

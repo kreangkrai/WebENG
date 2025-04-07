@@ -10,14 +10,30 @@ namespace WebENG.Service
 {
     public class EngineerScoreService : IScore
     {
-        public List<EngineerScoreModel> GetScores(string user_id, string year)
+        public List<EngineerScoreModel> GetScores(string user_id, string department)
         {
-            List<EngineerScoreModel> scores = new List<EngineerScoreModel>();
-            try
+			string cost = "";
+			if (department == "ENG")
             {
-				string string_command = string.Format($@" 
-                
-                        
+				cost = "eng_cost";
+            }
+			if (department == "CIS")
+			{
+				cost = "cis_cost";
+			}
+
+			if (department == "AIS")
+			{
+				cost = "ais_cost";
+			}
+
+			List<EngineerScoreModel> scores = new List<EngineerScoreModel>();
+
+			if (cost != "")
+			{				
+				try
+				{
+					string string_command = string.Format($@"                                       
                 with t2 as (
 					SELECT t.job_id,CAST(SUM(t.total_manpower * t. level) AS decimal(18,1)) as total_manpower ,
 						 CAST(SUM(t.total_manpower / 60.0 / 8.0 * t.level * 3200) AS decimal(18,1)) as total_used_cost FROM ( 
@@ -151,16 +167,24 @@ namespace WebENG.Service
 	                    Jobs.job_name AS job_name,
                         Quotation.customer as customer,
                         Jobs.status,
-                        cost,
+                        {cost},
 	                    md_rate AS md_rate,
 	                    pd_rate AS pd_rate,
 	                    (md_rate * pd_rate) AS factor,						
 	                    CAST((t2.total_manpower / 60.0 ) as decimal(18,1)) AS total_manpower,
-	                    CAST((cost / (t2.total_manpower / 60.0 )) as decimal(18,1)) AS cost_per_tmp,
+	                    CAST(((CASE WHEN eng_cost IS NULL THEN 0 ELSE eng_cost END +
+						 CASE WHEN cis_cost IS NULL THEN 0 ELSE cis_cost END + 
+						 CASE WHEN ais_cost IS NULL THEN 0 ELSE ais_cost END) / (t2.total_manpower / 60.0 )) as decimal(18,1)) AS cost_per_tmp,
 	                    CAST((t3.working_hours / 60.0 ) as decimal(18,1)) AS manpower,
 	                    CAST((CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT))) as decimal(18,1)) AS manpower_per_tmp,
-	                    CAST((cost * (md_rate + pd_rate) * (cost / (t2.total_manpower / 60.0)) * (CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT)))) as decimal(18,1)) AS score,
-						CAST((cost - t2.total_used_cost) AS decimal(18,1)) as remaining_cost
+	                    CAST(((CASE WHEN eng_cost IS NULL THEN 0 ELSE eng_cost END +
+						 CASE WHEN cis_cost IS NULL THEN 0 ELSE cis_cost END + 
+						 CASE WHEN ais_cost IS NULL THEN 0 ELSE ais_cost END) * (md_rate + pd_rate) * ((CASE WHEN eng_cost IS NULL THEN 0 ELSE eng_cost END +
+						 CASE WHEN cis_cost IS NULL THEN 0 ELSE cis_cost END + 
+						 CASE WHEN ais_cost IS NULL THEN 0 ELSE ais_cost END) / (t2.total_manpower / 60.0)) * (CAST((t3.working_hours / 60.0) AS FLOAT) / (CAST((t2.total_manpower / 60.0) AS FLOAT)))) as decimal(18,1)) AS score,
+						CAST(((CASE WHEN eng_cost IS NULL THEN 0 ELSE eng_cost END +
+						 CASE WHEN cis_cost IS NULL THEN 0 ELSE cis_cost END + 
+						 CASE WHEN ais_cost IS NULL THEN 0 ELSE ais_cost END) - t2.total_used_cost) AS decimal(18,1)) as remaining_cost
                     FROM WorkingHours  As t1  
 					LEFT JOIN Jobs ON t1.job_id = Jobs.job_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
@@ -169,46 +193,47 @@ namespace WebENG.Service
                     INNER JOIN t3					
                     ON t1.job_id = t3.job_id
                  WHERE t1.user_id = '{user_id}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        EngineerScoreModel score = new EngineerScoreModel()
-                        {
-                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
-                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
-                            job_status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
-                            customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
-                            cost = dr["cost"] != DBNull.Value ? Convert.ToInt32(dr["cost"]) : 0,
-                            md_rate = dr["md_rate"] != DBNull.Value ? Convert.ToDouble(dr["md_rate"]) : 0,
-                            pd_rate = dr["pd_rate"] != DBNull.Value ? Convert.ToDouble(dr["pd_rate"]) : 0,
-                            factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 0,
-                            total_manpower = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"]) : 0,
-                            cost_per_tmp = dr["cost_per_tmp"] != DBNull.Value ? Convert.ToDouble(dr["cost_per_tmp"]) : 0,
-                            manpower = dr["manpower"] != DBNull.Value ? Convert.ToDouble(dr["manpower"]) : 0,
-                            manpower_per_tmp = dr["manpower_per_tmp"] != DBNull.Value ? Convert.ToDouble(dr["manpower_per_tmp"]) : 0,
-                            score = dr["score"] != DBNull.Value ? Convert.ToDouble(dr["score"]) : 0,
-							remaining_cost = dr["remaining_cost"] != DBNull.Value ? Convert.ToDouble(dr["remaining_cost"]) : 0,
-						};
-                        scores.Add(score);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                }
-            }
+					SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+					if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+					{
+						ConnectSQL.CloseConnect();
+						ConnectSQL.OpenConnect();
+					}
+					SqlDataReader dr = cmd.ExecuteReader();
+					if (dr.HasRows)
+					{
+						while (dr.Read())
+						{
+							EngineerScoreModel score = new EngineerScoreModel()
+							{
+								job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+								job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+								job_status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
+								customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
+								cost = dr[cost] != DBNull.Value ? Convert.ToInt32(dr[cost]) : 0,
+								md_rate = dr["md_rate"] != DBNull.Value ? Convert.ToDouble(dr["md_rate"]) : 0,
+								pd_rate = dr["pd_rate"] != DBNull.Value ? Convert.ToDouble(dr["pd_rate"]) : 0,
+								factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 0,
+								total_manpower = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"]) : 0,
+								cost_per_tmp = dr["cost_per_tmp"] != DBNull.Value ? Convert.ToDouble(dr["cost_per_tmp"]) : 0,
+								manpower = dr["manpower"] != DBNull.Value ? Convert.ToDouble(dr["manpower"]) : 0,
+								manpower_per_tmp = dr["manpower_per_tmp"] != DBNull.Value ? Convert.ToDouble(dr["manpower_per_tmp"]) : 0,
+								score = dr["score"] != DBNull.Value ? Convert.ToDouble(dr["score"]) : 0,
+								remaining_cost = dr["remaining_cost"] != DBNull.Value ? Convert.ToDouble(dr["remaining_cost"]) : 0,
+							};
+							scores.Add(score);
+						}
+						dr.Close();
+					}
+				}
+				finally
+				{
+					if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+					{
+						ConnectSQL.CloseConnect();
+					}
+				}
+			}
             return scores;
         }
     }

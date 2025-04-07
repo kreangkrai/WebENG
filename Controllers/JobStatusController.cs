@@ -59,7 +59,7 @@ namespace WebENG.Controllers
         public JsonResult GetJobStatusByUser(string user)
         {
             List<JobModel> jobs = new List<JobModel>();
-            if (user == "all")
+            if (user == "ALL")
             {
                 jobs = JobStatus.GetJobStatusALL();
             }

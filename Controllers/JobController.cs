@@ -125,7 +125,7 @@ namespace WebENG.Controllers
                 system = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().system,
                 remainingCost = (jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
                 + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
-                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k=>k.totalEngCost)
+                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k=>k.totalCost)
 
             }).ToList();
             return Json(sum);
@@ -151,7 +151,7 @@ namespace WebENG.Controllers
                 system = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().system,
                 remainingCost = (jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
                 + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
-                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k => k.totalEngCost)
+                + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k => k.totalCost)
 
             }).ToList();
             JobSummaryModel _sum = sum.Where(w => w.jobId == job).FirstOrDefault();
