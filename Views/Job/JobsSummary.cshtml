@@ -2,8 +2,8 @@
     ViewData["title"] = "Jobs Summary";
 }
 <style>
-    #tableJobs tr td:nth-of-type(6){
-        cursor: pointer;
+    #tableJobs {
+        cursor:pointer;
     }
 </style>
 
@@ -21,7 +21,10 @@
                             <th>Job Name</th>
                             <th>Customer</th>
                             <th>Responsible</th>
-                            <th>Cost</th>
+                            <th>ENG Cost</th>
+                            <th>CIS Cost</th>
+                            <th>AIS Cost</th>
+                            <th>Total Cost</th>
                             <th>Factor</th>
                             <th>Total Manhours</th>
                             <th>Remaining Cost</th>
@@ -36,7 +39,10 @@
                             <th>Job Name</th>
                             <th>Customer</th>
                             <th>Responsible</th>
-                            <th>Cost</th>
+                            <th>ENG Cost</th>
+                            <th>CIS Cost</th>
+                            <th>AIS Cost</th>
+                            <th>Total Cost</th>
                             <th>Factor</th>
                             <th>Total Manhours</th>
                             <th>Remaining Cost</th>
@@ -103,21 +109,35 @@
                     <div class="form-row">
                         <div class="col-4">
                             <label for="job_id">Job Number</label>
-                            <input id="job_id" type="text" class="form-control" placeholder="JYYXXXX" disabled/>
+                            <input id="job_id" type="text" class="form-control" placeholder="JYYXXXX" disabled />
                         </div>
                         <div class="col-8">
                             <label for="job_name">Job Name</label>
                             <input id="job_name" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                    </div>                   
+                    </div>
                     <div class="form-row">
                         <div class="col-8">
                             <label for="job_customer">Customer</label>
-                            <input id="job_customer" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="job_customer" type="text" class="form-control" placeholder="" disabled />
                         </div>
                         <div class="col-4">
-                            <label for="job_cost">Cost</label>
-                            <input id="job_cost" type="text" class="form-control" placeholder="" disabled/>
+                            <label for="job_total_cost">Total Cost</label>
+                            <input id="job_total_cost" type="text" class="form-control" placeholder="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4">
+                            <label for="job_eng_cost">ENG Cost</label>
+                            <input id="job_eng_cost" type="text" class="form-control" placeholder="" disabled />
+                        </div>
+                        <div class="col-4">
+                            <label for="job_cis_cost">CIS Cost</label>
+                            <input id="job_cis_cost" type="text" class="form-control" placeholder="" disabled />
+                        </div>
+                        <div class="col-4">
+                            <label for="job_ais_cost">AIS Cost</label>
+                            <input id="job_ais_cost" type="text" class="form-control" placeholder="" disabled />
                         </div>
                     </div>
                     <div class="form-row pt-2">
@@ -128,7 +148,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row">
-                                         <div class="col-9">
+                                        <div class="col-9">
                                             <label for="select_process">Process</label>
                                             <select id="select_process" class="form-control">
                                             </select>
@@ -149,10 +169,10 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -163,7 +183,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-row">
-                                         <div class="col-9">
+                                        <div class="col-9">
                                             <label for="select_system">System</label>
                                             <select id="select_system" class="form-control">
                                             </select>
@@ -184,14 +204,14 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
-                                    </div>  
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>                                       
+                    </div>
                     <div class="form-row">
                         <div class="col-2">
                             <label for="job_total_man_hours">Total Man Hours</label>
@@ -398,12 +418,16 @@
             let datas = [];
 
             for (let i = 0; i < jobsSummary.length; i++) {
+                let total_cost = jobsSummary[i].eng_cost + jobsSummary[i].cis_cost + jobsSummary[i].ais_cost;
                 datas.push([
                     jobsSummary[i].jobId,
                     jobsSummary[i].jobName,
                     jobsSummary[i].customer,
                     jobsSummary[i].responsible,
-                    jobsSummary[i].cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobsSummary[i].eng_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobsSummary[i].cis_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobsSummary[i].ais_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    total_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     jobsSummary[i].factor,
                     jobsSummary[i].totalManhour.toFixed(2),
                     jobsSummary[i].remainingCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -427,7 +451,7 @@
                 ],
                 paging: false,
                 rowCallback: function (row, data) {
-                    let code_status = data[10];
+                    let code_status = data[13];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
                     if(code_status === "STA999"){
@@ -436,7 +460,7 @@
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
 
-                    $('td:eq(10)', row).html(status_str);
+                    $('td:eq(13)', row).html(status_str);
                 }
             });
         }
@@ -447,7 +471,7 @@
             let admin = '@Model.role' == "Admin" ? true : false;
 
             //Column Total Manhours
-            if (columnID === 6 && admin) {
+            if (columnID === 9 && admin) {
                 ShowJobManpowerInfo(jobId);
             }else{
                 EditJob(table.row(this).data());
@@ -465,7 +489,10 @@
             let quotation_no = job.quotation_no;
             let customer = job.customer;
             let responsible = job.responsible;
-            let cost = job.cost.toString().replaceAll(",","");
+            let eng_cost = job.eng_cost.toString().replaceAll(",", "");
+            let cis_cost = job.cis_cost.toString().replaceAll(",", "");
+            let ais_cost = job.ais_cost.toString().replaceAll(",", "");
+            let total_cost = (job.eng_cost + job.cis_cost + job.ais_cost).toString().replaceAll(",", "");
             let status = statuses.filter(f=>f.status_id == job.status).map(m=>m.status_name)[0];
             let total_man_hours = job.totalManhour.toFixed(2);
             let remain_cost = job.remainingCost;
@@ -492,7 +519,10 @@
             $('#job_id').val(job_id);
             $('#job_name').val(job_name);
             $('#job_quotation_no').val(quotation_no);
-            $('#job_cost').val(cost);
+            $('#job_eng_cost').val(eng_cost);
+            $('#job_cis_cost').val(cis_cost);
+            $('#job_ais_cost').val(ais_cost);
+            $('#job_total_cost').val(total_cost);
             $('#job_customer').val(customer);
             $('#job_responsible').val(responsible);
             $('#job_status').val(status);

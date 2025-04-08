@@ -9,8 +9,16 @@
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-8">
+                    <div class="col-xl-6">
 
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="departments" class="form-control">
+                            <option value="" selected disabled>Please Select Department</option>
+                            <option value="ENG">ENG</option>
+                            <option value="CIS">CIS</option>
+                            <option value="AIS">AIS</option>
+                        </select>
                     </div>
                     <div class="col-xl-2">
                         <select id="year" class="form-control">
@@ -151,24 +159,24 @@
             $('#backlog_service').val(sum_service);
             $('#backlog_total').val(sum);
         }
-        async function GetJobBackLogProject(year) {            
+        async function GetJobBackLogProject(department,year) {            
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobBackLogProject", "JobBackLog")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year },
+                data: { department,year },
                 success: function (response) {
                     projects_backlog = response;
                 }
             });
         };
 
-        async function GetJobBackLogService(year) {            
+        async function GetJobBackLogService(department,year) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobBackLogService", "JobBackLog")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year },
+                data: { department,year },
                 success: function (response) {
                     services_backlog = response;
                 }
@@ -177,9 +185,9 @@
                
         $('#btnUpdate').on('click',async function(){
             let year = $('#year').val();
-
-            await GetJobBackLogProject(year);
-            await GetJobBackLogService(year);
+            let department = $('#departments :selected').text();
+            await GetJobBackLogProject(department,year);
+            await GetJobBackLogService(department,year);
             GenerateTableProject(projects_backlog);
             GenerateTableService(services_backlog);
 

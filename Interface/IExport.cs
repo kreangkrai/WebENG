@@ -10,7 +10,9 @@ namespace WebENG.Interface
     interface IExport
     {
         Stream ExportData(FileInfo path, List<JobModel> jobs);
-        Stream ExportSummaryJobInHand(FileInfo path, List<SummaryJobInHandModel> all, List<SummaryJobInHandModel> projects, List<SummaryJobInHandModel> services);
+        Stream ExportSummaryENGJobInHand(FileInfo path, List<SummaryENGJobInHandModel> all, List<SummaryENGJobInHandModel> projects, List<SummaryENGJobInHandModel> services);
+        Stream ExportSummaryCISJobInHand(FileInfo path, List<SummaryCISJobInHandModel> all, List<SummaryCISJobInHandModel> projects, List<SummaryCISJobInHandModel> services);
+        Stream ExportSummaryAISJobInHand(FileInfo path, List<SummaryAISJobInHandModel> all, List<SummaryAISJobInHandModel> projects, List<SummaryAISJobInHandModel> services);
         Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> acc_invoices,List<SummaryInvoiceModel> invoices);
         Stream ExportIdleTime(FileInfo path, List<EngineerIdleTimeModel> idles);
         Stream ExportServiceReport(FileInfo path, List<DailyActivityModel> reports);

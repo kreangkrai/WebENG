@@ -45,51 +45,149 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAccJobInHand(int year,string type)
+        public JsonResult GetAccJobInHand(string department, int year,string type)
         {
-            List<SummaryJobInHandModel> jobs = SummaryJobInHand.GetsAccJobInHand(year, type);
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsAccENGJobInHand(year, type);
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsAccCISJobInHand(year, type);
+            }
+            if (department == "AIS")
+            {
+                List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsAccAISJobInHand(year, type);
+            }
+            return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetJobInHandProject(int year, string type)
+        public JsonResult GetJobInHandProject(string department, int year, string type)
         {
-            List<SummaryJobInHandModel> jobs = SummaryJobInHand.GetsProjectJobInHand(year, type);
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsProjectENGJobInHand(year, type);
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsProjectCISJobInHand(year, type);
+                return Json(jobs);
+            }
+            if (department == "AIS")
+            {
+                List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsProjectAISJobInHand(year, type);
+                return Json(jobs);
+            }
+            return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetJobInHandService(int year, string type)
+        public JsonResult GetJobInHandService(string department,int year, string type)
         {
-            List<SummaryJobInHandModel> jobs = SummaryJobInHand.GetsServiceJobInHand(year, type);
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsServiceENGJobInHand(year, type);
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsServiceCISJobInHand(year, type);
+                return Json(jobs);
+            }
+            if (department == "AIS")
+            {
+                List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsServiceAISJobInHand(year, type);
+                return Json(jobs);
+            }
+            return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetProjectInHand(int year)
+        public JsonResult GetProjectInHand(string department,int year)
         {
-            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobInhand(year);
-            jobs = jobs.Where(w => w.job_type == "Project").ToList();
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
+                jobs = jobs.Where(w => w.job_type == "Project").ToList();
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
+                jobs = jobs.Where(w => w.job_type == "Project").ToList();
+                return Json(jobs);
+            }
+            if (department == "AIS")
+            {
+                List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
+                jobs = jobs.Where(w => w.job_type == "Project").ToList();
+                return Json(jobs);
+            }
+            return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetServiceInHand(int year)
+        public JsonResult GetServiceInHand(string department,int year)
         {
-            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobInhand(year);
-            jobs = jobs.Where(w => w.job_type == "Service").ToList();
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
+                jobs = jobs.Where(w => w.job_type == "Service").ToList();
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
+                jobs = jobs.Where(w => w.job_type == "Service").ToList();
+                return Json(jobs);
+            }
+            if (department == "AIS")
+            {
+                List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
+                jobs = jobs.Where(w => w.job_type == "Service").ToList();
+                return Json(jobs);
+            }
+            return Json(null);
         }
-        public IActionResult ExportSummaryJobInHand(int year)
+        public IActionResult ExportSummaryJobInHand(string department,int year)
         {
-            List<SummaryJobInHandModel> all = SummaryJobInHand.GetsAccJobInHand(year, "ALL");
-            List<SummaryJobInHandModel> projects = SummaryJobInHand.GetsProjectJobInHand(year,"Project");
-            List<SummaryJobInHandModel> services = SummaryJobInHand.GetsServiceJobInHand(year, "Service");
+            if (department == "ENG")
+            {
+                List<SummaryENGJobInHandModel> all = SummaryJobInHand.GetsAccENGJobInHand(year, "ALL");
+                List<SummaryENGJobInHandModel> projects = SummaryJobInHand.GetsProjectENGJobInHand(year, "Project");
+                List<SummaryENGJobInHandModel> services = SummaryJobInHand.GetsServiceENGJobInHand(year, "Service");
 
-            //Download Excel
-            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
-            var stream = Export.ExportSummaryJobInHand(templateFileInfo, all, projects, services);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+                //Download Excel
+                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
+                var stream = Export.ExportSummaryENGJobInHand(templateFileInfo, all, projects, services);
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+            }
+            if (department == "CIS")
+            {
+                List<SummaryCISJobInHandModel> all = SummaryJobInHand.GetsAccCISJobInHand(year, "ALL");
+                List<SummaryCISJobInHandModel> projects = SummaryJobInHand.GetsProjectCISJobInHand(year, "Project");
+                List<SummaryCISJobInHandModel> services = SummaryJobInHand.GetsServiceCISJobInHand(year, "Service");
+
+                //Download Excel
+                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
+                var stream = Export.ExportSummaryCISJobInHand(templateFileInfo, all, projects, services);
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+            }
+            if (department == "AIS")
+            {
+                List<SummaryAISJobInHandModel> all = SummaryJobInHand.GetsAccAISJobInHand(year, "ALL");
+                List<SummaryAISJobInHandModel> projects = SummaryJobInHand.GetsProjectAISJobInHand(year, "Project");
+                List<SummaryAISJobInHandModel> services = SummaryJobInHand.GetsServiceAISJobInHand(year, "Service");
+
+                //Download Excel
+                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
+                var stream = Export.ExportSummaryAISJobInHand(templateFileInfo, all, projects, services);
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+            }
+            return null;
         }
     }
 }

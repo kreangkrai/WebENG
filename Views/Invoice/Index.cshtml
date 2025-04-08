@@ -9,7 +9,15 @@
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-6">
+                    <div class="col-xl-4">
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="departments" class="form-control">
+                            <option value="" selected disabled>Please Select Department</option>
+                            <option value="ENG">ENG</option>
+                            <option value="CIS">CIS</option>
+                            <option value="AIS">AIS</option>
+                        </select>
                     </div>
                     <div class="col-xl-2">
                         <select id="year" class="form-control">
@@ -97,47 +105,47 @@
         $('#year').append(year_string);
     };
 
-    async function GetENGInvoice(year) {
+    async function GetInvoice(department,year) {
         await $.ajax({
             type: "GET",
-            url: '@Url.Action("GetENGInvoice", "Invoice")',
+            url: '@Url.Action("GetInvoice", "Invoice")',
             contentType: 'application/x-www-form-urlencoded',
-            data: { year },
+            data: { department,year },
             success: function (response) {
                 invoices = response;
             }
         });
     };
 
-    async function GetAccENGInvoice(year) {
+    async function GetAccInvoice(department,year) {
         await $.ajax({
             type: "GET",
-            url: '@Url.Action("GetAccENGInvoice", "Invoice")',
+            url: '@Url.Action("GetAccInvoice", "Invoice")',
             contentType: 'application/x-www-form-urlencoded',
-            data: { year },
+            data: { department,year },
             success: function (response) {
                 acc_invoices = response;
             }
         });
     };
-    async function GetSummaryQuarter(year){
+    async function GetSummaryQuarter(department,year){
         await $.ajax({
             type: "GET",
             url: '@Url.Action("GetSummaryQuarter", "Invoice")',
             contentType: 'application/x-www-form-urlencoded',
-            data: { year },
+            data: { department,year },
             success: function (response) {
                 summary_quarters = response;
             }
         });
     };
 
-    async function GetOrderInTake(year){
+    async function GetOrderInTake(department,year){
         await $.ajax({
             type: "GET",
             url: '@Url.Action("GetOrderInTake", "Invoice")',
             contentType: 'application/x-www-form-urlencoded',
-            data: { year },
+            data: { department,year },
             success: function (response) {
                 orders_in_take = response;
             }
@@ -146,19 +154,19 @@
 
     $('#btnUpdate').on('click',async function(){
         let year = $('#year').val();
-
+        let department = $('#departments :selected').text();
         $('#label_job').html(`JOB IN HAND & SALES TURNOVER ENG FOR ${year}`);
-        await GetENGInvoice(year);
-        await GetAccENGInvoice(year);
-        await GetSummaryQuarter(year);
-        await GetOrderInTake(year);
-        GenerateChartENGInvoice(year,invoices);
-        GenerateChartAccENGInvoice(year,acc_invoices);
+        await GetInvoice(department,year);
+        await GetAccInvoice(department,year);
+        await GetSummaryQuarter(department,year);
+        await GetOrderInTake(department,year);
+        GenerateChartInvoice(year,invoices);
+        GenerateChartAccInvoice(year,acc_invoices);
         GenerateTable(summary_quarters);
         GenerateOrderInTake(year,orders_in_take);
     });
 
-    function GenerateChartENGInvoice(year,invoices) {
+    function GenerateChartInvoice(year,invoices) {
 
         let colors = ['#04CA13', '#F0390C'];
 
@@ -222,7 +230,7 @@
         });
     }
 
-    function GenerateChartAccENGInvoice(year,invoices) {
+    function GenerateChartAccInvoice(year,invoices) {
         let colors = ['#04CA13', '#F0390C'];
 
         let months = invoices.map(m => m.month);

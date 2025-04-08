@@ -9,8 +9,16 @@
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-6">
+                    <div class="col-xl-4">
 
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="departments" class="form-control">
+                            <option value="" selected disabled>Please Select Department</option>
+                            <option value="ENG">ENG</option>
+                            <option value="CIS">CIS</option>
+                            <option value="AIS">AIS</option>
+                        </select>
                     </div>
                     <div class="col-xl-2">
                         <select id="year" class="form-control">
@@ -99,7 +107,7 @@
                                     <th>Job No.</th>
                                     <th>Customer Name</th>
                                     <th>Project Name</th>
-                                    <th>% Eng Cost</th>
+                                    <th>% Cost</th>
                                     <th>% Invoice</th>
                                     <th>Remaining Amount</th>
                                 </tr>
@@ -124,7 +132,7 @@
                                     <th>Job No.</th>
                                     <th>Customer Name</th>
                                     <th>Project Name</th>
-                                    <th>% Eng Cost</th>
+                                    <th>% Cost</th>
                                     <th>% Invoice</th>
                                     <th>Remaining Amount</th>
                                 </tr>
@@ -178,59 +186,59 @@
             $('#jobinhand_total').val(sum);
         }
 
-        async function GetACCJobInHand(year,type) {            
+        async function GetACCJobInHand(department,year,type) {            
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetAccJobInHand", "JobInHand")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year,type },
+                data: { department,year,type },
                 success: function (response) {
                     acc_jobs_eng_in_hand = response;
                 }
             });
         };
 
-        async function GetJobInHandProject(year,type) {            
+        async function GetJobInHandProject(department,year,type) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobInHandProject", "JobInHand")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year,type },
+                data: { department,year,type },
                 success: function (response) {
                     jobs_eng_in_hand_project = response;
                 }
             });
         };
 
-        async function GetJobInHandService(year,type) {            
+        async function GetJobInHandService(department,year,type) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobInHandService", "JobInHand")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year,type },
+                data: { department,year,type },
                 success: function (response) {
                     jobs_eng_in_hand_service = response;
                 }
             });
         };
 
-        async function GetProjectInHand(year) {            
+        async function GetProjectInHand(department,year) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetProjectInHand", "JobInHand")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year },
+                data: { department,year },
                 success: function (response) {
                     projects_in_hand = response;
                 }
             });
         };
-        async function GetServiceInHand(year) {            
+        async function GetServiceInHand(department,year) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetServiceInHand", "JobInHand")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year },
+                data: { department,year },
                 success: function (response) {
                     services_in_hand = response;
                 }
@@ -238,12 +246,12 @@
         };
         $('#btnUpdate').on('click',async function(){
             let year = $('#year').val();
-
-            await GetACCJobInHand(year,"ALL");
-            await GetJobInHandProject(year,"Project");
-            await GetJobInHandService(year,"Service");
-            await GetProjectInHand(year);
-            await GetServiceInHand(year);
+            let department = $('#departments :selected').text();
+            await GetACCJobInHand(department,year,"ALL");
+            await GetJobInHandProject(department,year,"Project");
+            await GetJobInHandService(department,year,"Service");
+            await GetProjectInHand(department,year);
+            await GetServiceInHand(department,year);
             GenerateChartAcc(year,acc_jobs_eng_in_hand);
             GenerateChartProject(year,jobs_eng_in_hand_project);
             GenerateChartService(year,jobs_eng_in_hand_service);
@@ -253,7 +261,7 @@
         });
 
         function GenerateChartAcc(year,jobs) {
-
+            console.log(jobs);
             let colors = ['#04CA13', '#F0390C'];
 
             let months = jobs.map(m => m.month);

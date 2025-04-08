@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace WebENG.Models
 {
-    public class QuarterModel
+    public class QuarterENGModel
     {
         public string job_id { get; set; }
         public DateTime job_date { get; set; }
@@ -18,7 +18,55 @@ namespace WebENG.Models
         public string status { get; set; }
         public DateTime finished_date { get; set; }
     }
-    public class SummaryQuarterModel
+    public class SummaryENGQuarterModel
+    {
+        public string quarter { get; set; }
+        public double job_in_hand_volume { get; set; }
+        public int job_in_hand { get; set; }
+        public double invoice_volume { get; set; }
+        public int invoice { get; set; }
+        public double pending_volume { get; set; }
+        public int pending { get; set; }
+    }
+
+    public class QuarterCISModel
+    {
+        public string job_id { get; set; }
+        public DateTime job_date { get; set; }
+        public int quarter { get; set; }
+        public string job_type { get; set; }
+        public string type { get; set; }
+        public double job_cis_in_hand { get; set; }
+        public double invoice_cis { get; set; }
+        public double backlog_invoice_cis { get; set; }
+        public string status { get; set; }
+        public DateTime finished_date { get; set; }
+    }
+    public class SummaryCISQuarterModel
+    {
+        public string quarter { get; set; }
+        public double job_in_hand_volume { get; set; }
+        public int job_in_hand { get; set; }
+        public double invoice_volume { get; set; }
+        public int invoice { get; set; }
+        public double pending_volume { get; set; }
+        public int pending { get; set; }
+    }
+
+    public class QuarterAISModel
+    {
+        public string job_id { get; set; }
+        public DateTime job_date { get; set; }
+        public int quarter { get; set; }
+        public string job_type { get; set; }
+        public string type { get; set; }
+        public double job_ais_in_hand { get; set; }
+        public double invoice_ais { get; set; }
+        public double backlog_invoice_ais { get; set; }
+        public string status { get; set; }
+        public DateTime finished_date { get; set; }
+    }
+    public class SummaryAISQuarterModel
     {
         public string quarter { get; set; }
         public double job_in_hand_volume { get; set; }

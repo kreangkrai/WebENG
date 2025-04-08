@@ -95,7 +95,7 @@ namespace WebENG.Controllers
         public IActionResult ExportData(string user)
         {
             List<JobModel> jobs = new List<JobModel>();
-            if (user == "all")
+            if (user == "ALL")
             {
                 jobs = JobStatus.GetJobStatusALL();
             }

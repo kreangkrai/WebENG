@@ -39,19 +39,51 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetJobBackLogProject(int year)
+        public JsonResult GetJobBackLogProject(string department,int year)
         {
-            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
-            jobs = jobs.Where(w => w.job_type == "Project").ToList();
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobBackLog(year);
+                jobs = jobs.Where(w => w.job_type == "Project").ToList();
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobBackLog(year);
+                jobs = jobs.Where(w => w.job_type == "Project").ToList();
+                return Json(jobs);
+            }
+            if (department == "AIS")
+            {
+                List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobBackLog(year);
+                jobs = jobs.Where(w => w.job_type == "Project").ToList();
+                return Json(jobs);
+            }
+            return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetJobBackLogService(int year)
+        public JsonResult GetJobBackLogService(string department,int year)
         {
-            List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
-            jobs = jobs.Where(w => w.job_type == "Service").ToList();
-            return Json(jobs);
+            if (department == "ENG")
+            {
+                List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobBackLog(year);
+                jobs = jobs.Where(w => w.job_type == "Service").ToList();
+                return Json(jobs);
+            }
+            if (department == "CIS")
+            {
+                List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobBackLog(year);
+                jobs = jobs.Where(w => w.job_type == "Service").ToList();
+                return Json(jobs);
+            }
+            if (department == "AIS")
+            {
+                List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobBackLog(year);
+                jobs = jobs.Where(w => w.job_type == "Service").ToList();
+                return Json(jobs);
+            }
+            return Json(null);
         }
     }
 }
