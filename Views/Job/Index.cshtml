@@ -197,6 +197,44 @@
                     </div>
                     <div class="card" style="overflow-x:auto">
                         <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Job Owner</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-12 col-md-4 col-xl-4">
+                                    <div class="input-group">
+                                        <input id="chk_eng" type="checkbox" style="transform:scale(1.5)" />
+                                        <div class="input-group-append">
+                                            <span class="pl-3">ENG</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-xl-4">
+                                    <div class="input-group">
+                                        <input id="chk_cis" type="checkbox" style="transform:scale(1.5)" />
+                                        <div class="input-group-append">
+                                            <span class="pl-3">CIS</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-xl-4">
+                                    <div class="input-group">
+                                        <input id="chk_ais" type="checkbox" style="transform:scale(1.5)" />
+                                        <div class="input-group-append">
+                                            <span class="pl-3">AIS</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
                             <span style="font-weight:bold">Cost</span>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -2154,7 +2192,7 @@
                 data: {
                     job
                 },
-                success: function (response) {                   
+                success: function (response) {
                     let use_cost = (parseFloat(response.eng_cost) + parseFloat(response.cis_cost) + parseFloat(response.ais_cost)) - parseFloat(response.remainingCost);
                     let remaining_cost = parseFloat($('#remaining_cost').val());
                     let est_cost = parseFloat($('#est_cost').val());
@@ -2167,6 +2205,97 @@
 
         $('#btn_export').on('click', function () {
             location.href = '@Url.Action("ExportJob", "Job")';
+        });
+
+        $('#chk_eng').on('change', async function () {
+            let chk = document.getElementById("chk_eng").checked;
+            let job_id = $('#job_id').val();
+            let job_department = "ENG";
+            if (chk === true) {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertJobOwner", "Job")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: {
+                        job_id, job_department
+                    },
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            } else {
+                await $.ajax({
+                    type: "DELETE",
+                    url: '@Url.Action("DeleteJobOwner", "Job")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: {
+                        job_id, job_department
+                    },
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            }
+        });
+        $('#chk_cis').on('change', async function () {
+            let chk = document.getElementById("chk_cis").checked;
+            let job_id = $('#job_id').val();
+            let job_department = "CIS";
+            if (chk === true) {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertJobOwner", "Job")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: {
+                        job_id, job_department
+                    },
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            } else {
+                await $.ajax({
+                    type: "DELETE",
+                    url: '@Url.Action("DeleteJobOwner", "Job")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: {
+                        job_id, job_department
+                    },
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            }
+        });
+        $('#chk_ais').on('change', async function () {
+            let chk = document.getElementById("chk_ais").checked;
+            let job_id = $('#job_id').val();
+            let job_department = "AIS";
+            if (chk === true) {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("InsertJobOwner", "Job")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: {
+                        job_id, job_department
+                    },
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            } else {
+                await $.ajax({
+                    type: "DELETE",
+                    url: '@Url.Action("DeleteJobOwner", "Job")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: {
+                        job_id, job_department
+                    },
+                    success: function (response) {
+                        alert(response);
+                    }
+                });
+            }
         });
     </script>
 }

@@ -59,7 +59,7 @@ namespace WebENG.Controllers
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
                 return Json(invoices);
             }
-            if (department == "ENG")
+            if (department == "AIS")
             {
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
                 return Json(invoices);

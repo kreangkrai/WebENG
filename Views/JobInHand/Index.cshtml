@@ -40,17 +40,17 @@
         </div>
         <div class="card card-dark">
             <div class="card-body">
-                <canvas id="chart_acc_job_eng_in_hand" style="height:400px" />
+                <canvas id="chart_acc_job_in_hand" style="height:400px" />
             </div>
         </div>
         <div class="card card-dark">
             <div class="card-body">
-                <canvas id="chart_project_job_eng_in_hand" style="height:400px" />
+                <canvas id="chart_project_job_in_hand" style="height:400px" />
             </div>
         </div> 
         <div class="card card-dark">
             <div class="card-body">
-                <canvas id="chart_service_job_eng_in_hand" style="height:400px" />
+                <canvas id="chart_service_job_in_hand" style="height:400px" />
             </div>
         </div>
         <div class="row">
@@ -154,9 +154,9 @@
         let chart_acc;
         let chart_project;
         let chart_service;
-        let acc_jobs_eng_in_hand = [];
-        let jobs_eng_in_hand_project = [];
-        let jobs_eng_in_hand_service = [];
+        let acc_jobs_in_hand = [];
+        let jobs_in_hand_project = [];
+        let jobs_in_hand_service = [];
         let projects_in_hand = [];
         let services_in_hand = [];
         $(document).ready(async function () {
@@ -173,14 +173,25 @@
             $('#year').append(year_string);
         };
 
-        function JobInHand(){
+        function JobInHand(department){
             let sum = 0;
             let sum_project = 0;
             let sum_service = 0;
-            sum_project = (projects_in_hand.map(m=>m.job_eng_in_hand).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
-            sum_service = (services_in_hand.map(m=>m.job_eng_in_hand).reduce((acc,x)=> Number(acc) + Number(x),0) / 1000000).toFixed(2);
-            sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
-
+            if (department === "ENG") {
+                sum_project = (projects_in_hand.map(m => m.job_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum_service = (services_in_hand.map(m => m.job_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
+            }
+            if (department === "CIS") {
+                sum_project = (projects_in_hand.map(m => m.job_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum_service = (services_in_hand.map(m => m.job_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
+            }
+            if (department === "AIS") {
+                sum_project = (projects_in_hand.map(m => m.job_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum_service = (services_in_hand.map(m => m.job_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
+            }
             $('#jobinhand_project').val(sum_project);
             $('#jobinhand_service').val(sum_service);
             $('#jobinhand_total').val(sum);
@@ -193,7 +204,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { department,year,type },
                 success: function (response) {
-                    acc_jobs_eng_in_hand = response;
+                    acc_jobs_in_hand = response;
                 }
             });
         };
@@ -205,7 +216,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { department,year,type },
                 success: function (response) {
-                    jobs_eng_in_hand_project = response;
+                    jobs_in_hand_project = response;
                 }
             });
         };
@@ -217,7 +228,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { department,year,type },
                 success: function (response) {
-                    jobs_eng_in_hand_service = response;
+                    jobs_in_hand_service = response;
                 }
             });
         };
@@ -251,17 +262,33 @@
             await GetJobInHandProject(department,year,"Project");
             await GetJobInHandService(department,year,"Service");
             await GetProjectInHand(department,year);
-            await GetServiceInHand(department,year);
-            GenerateChartAcc(year,acc_jobs_eng_in_hand);
-            GenerateChartProject(year,jobs_eng_in_hand_project);
-            GenerateChartService(year,jobs_eng_in_hand_service);
-            GenerateTableProject(projects_in_hand);
-            GenerateTableService(services_in_hand);
-            JobInHand();
+            await GetServiceInHand(department, year);
+
+            if (department === "ENG") {
+                GenerateENGChartAcc(year, acc_jobs_in_hand);
+                GenerateENGChartProject(year, jobs_in_hand_project);
+                GenerateENGChartService(year, jobs_in_hand_service);
+                GenerateENGTableProject(projects_in_hand);
+                GenerateENGTableService(services_in_hand);                
+            }
+            if (department === "CIS") {
+                GenerateCISChartAcc(year, acc_jobs_in_hand);
+                GenerateCISChartProject(year, jobs_in_hand_project);
+                GenerateCISChartService(year, jobs_in_hand_service);
+                GenerateCISTableProject(projects_in_hand);
+                GenerateCISTableService(services_in_hand);
+            }
+            if (department === "AIS") {
+                GenerateAISChartAcc(year, acc_jobs_in_hand);
+                GenerateAISChartProject(year, jobs_in_hand_project);
+                GenerateAISChartService(year, jobs_in_hand_service);
+                GenerateAISTableProject(projects_in_hand);
+                GenerateAISTableService(services_in_hand);
+            }
+            JobInHand(department);
         });
 
-        function GenerateChartAcc(year,jobs) {
-            console.log(jobs);
+        function GenerateENGChartAcc(year,jobs) {
             let colors = ['#04CA13', '#F0390C'];
 
             let months = jobs.map(m => m.month);
@@ -272,7 +299,7 @@
                 chart_acc.destroy();
             }
 
-            const ctx = document.getElementById('chart_acc_job_eng_in_hand').getContext('2d');
+            const ctx = document.getElementById('chart_acc_job_in_hand').getContext('2d');
             chart_acc = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -320,8 +347,126 @@
                 }
             });
         }
+        function GenerateCISChartAcc(year, jobs) {
+            let colors = ['#04CA13', '#F0390C'];
 
-        function GenerateChartProject(year,jobs) {
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_cis_in_hand);
+
+            if (chart_acc !== undefined) {
+                chart_acc.destroy();
+            }
+
+            const ctx = document.getElementById('chart_acc_job_in_hand').getContext('2d');
+            chart_acc = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND CIS ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+        function GenerateAISChartAcc(year, jobs) {
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_ais_in_hand);
+
+            if (chart_acc !== undefined) {
+                chart_acc.destroy();
+            }
+
+            const ctx = document.getElementById('chart_acc_job_in_hand').getContext('2d');
+            chart_acc = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND AIS ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+
+        function GenerateENGChartProject(year, jobs) {
 
             let colors = ['#04CA13', '#F0390C'];
 
@@ -333,7 +478,7 @@
                 chart_project.destroy();
             }
 
-            const ctx = document.getElementById('chart_project_job_eng_in_hand').getContext('2d');
+            const ctx = document.getElementById('chart_project_job_in_hand').getContext('2d');
             chart_project = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -370,7 +515,127 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND PROJECT FOR ${year}`,
+                            text: `SUMMARY OF JOB IN HAND ENG PROJECT FOR ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+        function GenerateCISChartProject(year, jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_cis_in_hand);
+
+            if (chart_project !== undefined) {
+                chart_project.destroy();
+            }
+
+            const ctx = document.getElementById('chart_project_job_in_hand').getContext('2d');
+            chart_project = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND CIS PROJECT FOR ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+        function GenerateAISChartProject(year, jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_ais_in_hand);
+
+            if (chart_project !== undefined) {
+                chart_project.destroy();
+            }
+
+            const ctx = document.getElementById('chart_project_job_in_hand').getContext('2d');
+            chart_project = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND AIS PROJECT FOR ${year}`,
                             display: true
                         },
                         legend: {
@@ -382,7 +647,7 @@
             });
         }
 
-        function GenerateChartService(year,jobs) {
+        function GenerateENGChartService(year,jobs) {
 
             let colors = ['#04CA13', '#F0390C'];
 
@@ -394,7 +659,7 @@
                 chart_service.destroy();
             }
 
-            const ctx = document.getElementById('chart_service_job_eng_in_hand').getContext('2d');
+            const ctx = document.getElementById('chart_service_job_in_hand').getContext('2d');
             chart_service = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -431,7 +696,127 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND SERVICE FOR ${year}`,
+                            text: `SUMMARY OF JOB IN HAND ENG SERVICE FOR ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+        function GenerateCISChartService(year, jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_cis_in_hand);
+
+            if (chart_service !== undefined) {
+                chart_service.destroy();
+            }
+
+            const ctx = document.getElementById('chart_service_job_in_hand').getContext('2d');
+            chart_service = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND CIS SERVICE FOR ${year}`,
+                            display: true
+                        },
+                        legend: {
+                            position: 'bottom',
+                            display: true
+                        }
+                    },
+                }
+            });
+        }
+        function GenerateAISChartService(year, jobs) {
+
+            let colors = ['#04CA13', '#F0390C'];
+
+            let months = jobs.map(m => m.month);
+            let targets = jobs.map(m => m.target_month);
+            let actuals = jobs.map(m => m.job_ais_in_hand);
+
+            if (chart_service !== undefined) {
+                chart_service.destroy();
+            }
+
+            const ctx = document.getElementById('chart_service_job_in_hand').getContext('2d');
+            chart_service = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Target',
+                            data: targets,
+                            borderWidth: 3,
+                            backgroundColor: colors[0],
+                            borderColor: colors[0]
+                        },
+                        {
+                            label: 'Actual',
+                            data: actuals,
+                            borderWidth: 3,
+                            backgroundColor: colors[1],
+                            borderColor: colors[1]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: {
+                                text: "MB",
+                                display: true
+                            },
+                            stacked: false,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            text: `SUMMARY OF JOB IN HAND AIS SERVICE FOR ${year}`,
                             display: true
                         },
                         legend: {
@@ -443,7 +828,7 @@
             });
         }
 
-        function GenerateTableProject(projects) {
+        function GenerateENGTableProject(projects) {
             let datas = [];
             if (table_project !== null)
                 $('#table_project').DataTable().destroy();
@@ -488,8 +873,98 @@
                 info: false
             });
         };
+        function GenerateCISTableProject(projects) {
+            let datas = [];
+            if (table_project !== null)
+                $('#table_project').DataTable().destroy();
 
-        function GenerateTableService(services) {
+            for (let i = 0; i < projects.length; i++) {
+                datas.push([
+                    (i + 1),
+                    projects[i].job_id,
+                    projects[i].customer_name,
+                    projects[i].job_name,
+                    projects[i].percent_cis_cost,
+                    projects[i].percent_invoice,
+                    parseInt(projects[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_project = $('#table_project').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all",
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = projects.filter(f => f.job_id == job_id).map(m => m)[0];
+                    let remaining_amount = data.remaining_amount;
+                    if (remaining_amount == 0) {
+                        $(`td`, row).css({ "text-decoration": 'line-through' });
+                        $(`td`, row).css({ "color": 'blue' });
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                        $(`td:eq(6)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+        function GenerateAISTableProject(projects) {
+            let datas = [];
+            if (table_project !== null)
+                $('#table_project').DataTable().destroy();
+
+            for (let i = 0; i < projects.length; i++) {
+                datas.push([
+                    (i + 1),
+                    projects[i].job_id,
+                    projects[i].customer_name,
+                    projects[i].job_name,
+                    projects[i].percent_ais_cost,
+                    projects[i].percent_invoice,
+                    parseInt(projects[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_project = $('#table_project').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all",
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = projects.filter(f => f.job_id == job_id).map(m => m)[0];
+                    let remaining_amount = data.remaining_amount;
+                    if (remaining_amount == 0) {
+                        $(`td`, row).css({ "text-decoration": 'line-through' });
+                        $(`td`, row).css({ "color": 'blue' });
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                        $(`td:eq(6)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+
+        function GenerateENGTableService(services) {
             let datas = [];
             if (table_service !== null)
                 $('#table_service').DataTable().destroy();
@@ -534,10 +1009,101 @@
                 info: false
             });
         };
+        function GenerateCISTableService(services) {
+            let datas = [];
+            if (table_service !== null)
+                $('#table_service').DataTable().destroy();
 
-        $('#btnExport').on('click',function(){
-            let year = $('#year').val();
-            location.href = '@Url.Action("ExportSummaryJobInHand", "JobInHand")?year='+ year;
+            for (let i = 0; i < services.length; i++) {
+                datas.push([
+                    (i + 1),
+                    services[i].job_id,
+                    services[i].customer_name,
+                    services[i].job_name,
+                    services[i].percent_cis_cost,
+                    services[i].percent_invoice,
+                    parseInt(services[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_service = $('#table_service').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all",
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = services.filter(f => f.job_id == job_id).map(m => m)[0];
+                    let remaining_amount = data.remaining_amount;
+                    if (remaining_amount == 0) {
+                        $(`td`, row).css({ "text-decoration": 'line-through' });
+                        $(`td`, row).css({ "color": 'blue' });
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                        $(`td:eq(6)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+        function GenerateAISTableService(services) {
+            let datas = [];
+            if (table_service !== null)
+                $('#table_service').DataTable().destroy();
+
+            for (let i = 0; i < services.length; i++) {
+                datas.push([
+                    (i + 1),
+                    services[i].job_id,
+                    services[i].customer_name,
+                    services[i].job_name,
+                    services[i].percent_ais_cost,
+                    services[i].percent_invoice,
+                    parseInt(services[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                ]);
+            }
+
+            table_service = $('#table_service').DataTable({
+                data: datas,
+                fixedHeader: true,
+                fixedColumns: {
+                },
+                columnDefs: [
+                    {
+                        "targets": "_all",
+                        "className": "text-center",
+                    }
+                ],
+                rowCallback: function (row, _data) {
+                    let job_id = _data[1];
+                    let data = services.filter(f => f.job_id == job_id).map(m => m)[0];
+                    let remaining_amount = data.remaining_amount;
+                    if (remaining_amount == 0) {
+                        $(`td`, row).css({ "text-decoration": 'line-through' });
+                        $(`td`, row).css({ "color": 'blue' });
+                        $(`td:eq(4)`, row).text("finished");
+                        $(`td:eq(5)`, row).text("finished");
+                        $(`td:eq(6)`, row).text("finished");
+                    }
+                },
+                searching: false,
+                paging: false,
+                info: false
+            });
+        };
+
+        $('#btnExport').on('click', function () {
+            let year = $('#year :selected').text();
+            let department = $('#departments :selected').text();
+            location.href = '@Url.Action("ExportSummaryJobInHand", "JobInHand")?department=' + department + '&year=' + year;
         });
     </script>
 }

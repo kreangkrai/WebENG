@@ -1218,6 +1218,7 @@ namespace WebENG.Service
                 {
                     for (int i = 0; i < _wd.Count; i++)
                     {
+                        bool chk_after_office = false;
                         working_date = new TimeSpan(0, 0, 0);
 
                         TimeSpan regular = new TimeSpan(0, 0, 0);
@@ -1479,15 +1480,29 @@ namespace WebENG.Service
                                 }
                                 else
                                 {
-                                    if (_wd[i].workings[j].stop_time == new TimeSpan(23, 59, 0))
+                                    if (_wd[i].workings[j].task_id.Contains("O")) //Office
                                     {
-                                        regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time).Add(new TimeSpan(0, 1, 0));
+                                        if (_wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
+                                        {
+                                            ot15 += _wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0);
+                                            regular = new TimeSpan(17, 30, 0) - _wd[i].workings[j].start_time;
+                                            chk_after_office = true;
+                                        }
                                     }
-                                    else
+
+                                    if (!chk_after_office)
                                     {
-                                        regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                        if (_wd[i].workings[j].stop_time == new TimeSpan(23, 59, 0))
+                                        {
+                                            regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time).Add(new TimeSpan(0, 1, 0));
+                                        }
+                                        else
+                                        {
+                                            regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                        }
                                     }
                                 }
+                            
                                 if (_wd[i].workings[j].lunch_full)
                                 {
                                     if (regular != default(TimeSpan))

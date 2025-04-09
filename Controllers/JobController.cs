@@ -17,6 +17,7 @@ namespace WebENG.Controllers
     public class JobController : Controller
     {
         readonly IJob JobService;
+        readonly IJobOwner JobOwner;
         readonly IJobFile JobFile;
         readonly IAccessory Accessory;
         readonly IStatus Status;
@@ -35,6 +36,7 @@ namespace WebENG.Controllers
             Invoice = new InvoiceService();
             Export = new ExportService();
             EngUserService = new EngUserService();
+            JobOwner = new JobOwnerService();
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -282,6 +284,19 @@ namespace WebENG.Controllers
                 string msg = JobFile.UpdateJobFileByItem(_job_id, item, _path);
             }
             return Json("Success");
+        }
+
+        [HttpPost]
+        public IActionResult InsertJobOwner(string job_id, string job_department)
+        {
+            string message = JobOwner.Insert(job_id, job_department);
+            return Json(message);
+        }
+        [HttpDelete]
+        public IActionResult DeleteJobOwner(string job_id, string job_department)
+        {
+            string message = JobOwner.DeleteByJobDepartment(job_id, job_department);
+            return Json(message);
         }
         public IActionResult ExportJob()
         {

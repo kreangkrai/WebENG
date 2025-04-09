@@ -55,10 +55,12 @@ namespace WebENG.Controllers
             if (department == "CIS")
             {
                 List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsAccCISJobInHand(year, type);
+                return Json(jobs);
             }
             if (department == "AIS")
             {
                 List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsAccAISJobInHand(year, type);
+                return Json(jobs);
             }
             return Json(null);
         }
@@ -163,7 +165,7 @@ namespace WebENG.Controllers
                 //Download Excel
                 var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
                 var stream = Export.ExportSummaryENGJobInHand(templateFileInfo, all, projects, services);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_ENG_" + year + ".xlsx");
             }
             if (department == "CIS")
             {
@@ -174,7 +176,7 @@ namespace WebENG.Controllers
                 //Download Excel
                 var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
                 var stream = Export.ExportSummaryCISJobInHand(templateFileInfo, all, projects, services);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_CIS_" + year + ".xlsx");
             }
             if (department == "AIS")
             {
@@ -185,7 +187,7 @@ namespace WebENG.Controllers
                 //Download Excel
                 var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
                 var stream = Export.ExportSummaryAISJobInHand(templateFileInfo, all, projects, services);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_" + year + ".xlsx");
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_AIS_" + year + ".xlsx");
             }
             return null;
         }

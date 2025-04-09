@@ -152,21 +152,36 @@
         });
     };
 
-    $('#btnUpdate').on('click',async function(){
+    $('#btnUpdate').on('click', async function () {
         let year = $('#year').val();
         let department = $('#departments :selected').text();
         $('#label_job').html(`JOB IN HAND & SALES TURNOVER ENG FOR ${year}`);
-        await GetInvoice(department,year);
-        await GetAccInvoice(department,year);
-        await GetSummaryQuarter(department,year);
-        await GetOrderInTake(department,year);
-        GenerateChartInvoice(year,invoices);
-        GenerateChartAccInvoice(year,acc_invoices);
-        GenerateTable(summary_quarters);
-        GenerateOrderInTake(year,orders_in_take);
+        await GetInvoice(department, year);
+        await GetAccInvoice(department, year);
+        await GetSummaryQuarter(department, year);
+        await GetOrderInTake(department, year);
+        if (department === "ENG") {
+            GenerateENGChartInvoice(year, invoices);
+            GenerateENGChartAccInvoice(year, acc_invoices);
+            GenerateENGTable(summary_quarters);
+            GenerateENGOrderInTake(year, orders_in_take);
+        }
+        if (department === "CIS") {
+            GenerateCISChartInvoice(year, invoices);
+            GenerateCISChartAccInvoice(year, acc_invoices);
+            GenerateCISTable(summary_quarters);
+            GenerateCISOrderInTake(year, orders_in_take);
+        }
+        if (department === "AIS") {
+            GenerateAISChartInvoice(year, invoices);
+            GenerateAISChartAccInvoice(year, acc_invoices);
+            GenerateAISTable(summary_quarters);
+            GenerateAISOrderInTake(year, orders_in_take);
+        }
+
     });
 
-    function GenerateChartInvoice(year,invoices) {
+    function GenerateENGChartInvoice(year,invoices) {
 
         let colors = ['#04CA13', '#F0390C'];
 
@@ -229,8 +244,134 @@
             }
         });
     }
+    function GenerateCISChartInvoice(year, invoices) {
 
-    function GenerateChartAccInvoice(year,invoices) {
+        let colors = ['#04CA13', '#F0390C'];
+
+        let months = invoices.map(m => m.month);
+        let targets = invoices.map(m => m.target_month);
+        let actuals = invoices.map(m => m.invoice);
+
+        if (chart_invoice !== undefined) {
+            chart_invoice.destroy();
+        }
+
+        const ctx = document.getElementById('chart_invoice').getContext('2d');
+        chart_invoice = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: targets,
+                        borderWidth: 3,
+                        backgroundColor: colors[0],
+                        borderColor: colors[0]
+                    },
+                    {
+                        label: 'Actual',
+                        data: actuals,
+                        borderWidth: 3,
+                        backgroundColor: colors[1],
+                        borderColor: colors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            text: "MB",
+                            display: true
+                        },
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        text: `SUMMARY SALE TURNOVER OF JOB CIS OF ${year}`,
+                        font: {
+                            size: 16
+                        },
+                        display: true
+                    },
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    }
+                },
+            }
+        });
+    }
+    function GenerateAISChartInvoice(year, invoices) {
+
+        let colors = ['#04CA13', '#F0390C'];
+
+        let months = invoices.map(m => m.month);
+        let targets = invoices.map(m => m.target_month);
+        let actuals = invoices.map(m => m.invoice);
+
+        if (chart_invoice !== undefined) {
+            chart_invoice.destroy();
+        }
+
+        const ctx = document.getElementById('chart_invoice').getContext('2d');
+        chart_invoice = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: targets,
+                        borderWidth: 3,
+                        backgroundColor: colors[0],
+                        borderColor: colors[0]
+                    },
+                    {
+                        label: 'Actual',
+                        data: actuals,
+                        borderWidth: 3,
+                        backgroundColor: colors[1],
+                        borderColor: colors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            text: "MB",
+                            display: true
+                        },
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        text: `SUMMARY SALE TURNOVER OF JOB AIS OF ${year}`,
+                        font: {
+                            size: 16
+                        },
+                        display: true
+                    },
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    }
+                },
+            }
+        });
+    }
+
+    function GenerateENGChartAccInvoice(year, invoices) {
         let colors = ['#04CA13', '#F0390C'];
 
         let months = invoices.map(m => m.month);
@@ -292,8 +433,132 @@
             }
         });
     }
+    function GenerateCISChartAccInvoice(year, invoices) {
+        let colors = ['#04CA13', '#F0390C'];
 
-    function GenerateTable(items) {
+        let months = invoices.map(m => m.month);
+        let targets = invoices.map(m => m.target_month);
+        let actuals = invoices.map(m => m.invoice);
+
+        if (chart_acc_invoice !== undefined) {
+            chart_acc_invoice.destroy();
+        }
+
+        const ctx = document.getElementById('chart_acc_invoice').getContext('2d');
+        chart_acc_invoice = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: targets,
+                        borderWidth: 3,
+                        backgroundColor: colors[0],
+                        borderColor: colors[0]
+                    },
+                    {
+                        label: 'Actual',
+                        data: actuals,
+                        borderWidth: 3,
+                        backgroundColor: colors[1],
+                        borderColor: colors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            text: "MB",
+                            display: true
+                        },
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        text: `ACCUMULATE SALE TURNOVER OF JOB CIS OF ${year}`,
+                        font: {
+                            size: 16
+                        },
+                        display: true
+                    },
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    }
+                },
+            }
+        });
+    }
+    function GenerateAISChartAccInvoice(year, invoices) {
+        let colors = ['#04CA13', '#F0390C'];
+
+        let months = invoices.map(m => m.month);
+        let targets = invoices.map(m => m.target_month);
+        let actuals = invoices.map(m => m.invoice);
+
+        if (chart_acc_invoice !== undefined) {
+            chart_acc_invoice.destroy();
+        }
+
+        const ctx = document.getElementById('chart_acc_invoice').getContext('2d');
+        chart_acc_invoice = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: 'Target',
+                        data: targets,
+                        borderWidth: 3,
+                        backgroundColor: colors[0],
+                        borderColor: colors[0]
+                    },
+                    {
+                        label: 'Actual',
+                        data: actuals,
+                        borderWidth: 3,
+                        backgroundColor: colors[1],
+                        borderColor: colors[1]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        title: {
+                            text: "MB",
+                            display: true
+                        },
+                        stacked: false,
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    title: {
+                        text: `ACCUMULATE SALE TURNOVER OF JOB AIS OF ${year}`,
+                        font: {
+                            size: 16
+                        },
+                        display: true
+                    },
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    }
+                },
+            }
+        });
+    }
+
+    function GenerateENGTable(items) {
             if (table !== null)
                 $('#table').DataTable().destroy();
 
@@ -332,8 +597,86 @@
                 info : false
             });
     };
+    function GenerateCISTable(items) {
+        if (table !== null)
+            $('#table').DataTable().destroy();
 
-    function GenerateOrderInTake(year,datas){
+        let datas = [];
+        for (let i = 0; i < items.length; i++) {
+            var data = [
+                items[i].quarter,
+                Number(items[i].job_in_hand_volume).toFixed(3),
+                items[i].job_in_hand,
+                Number(items[i].invoice_volume).toFixed(3),
+                items[i].invoice,
+                Number(items[i].pending_volume).toFixed(3),
+                items[i].pending
+            ];
+            datas.push(data);
+        };
+
+        table = $('#table').DataTable({
+            data: datas,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            columnDefs: [
+                {
+
+                },
+            ],
+            rowCallback: function (row, data) {
+                let type = data[0];
+                if (type === "Summary") {
+                    $('td', row).css("background-color", "#0C9DF0");
+                    $('td', row).css("font-weight", "600");
+                }
+            },
+            searching: false,
+            ordering: false,
+            paging: false,
+            info: false
+        });
+    };
+    function GenerateAISTable(items) {
+        if (table !== null)
+            $('#table').DataTable().destroy();
+
+        let datas = [];
+        for (let i = 0; i < items.length; i++) {
+            var data = [
+                items[i].quarter,
+                Number(items[i].job_in_hand_volume).toFixed(3),
+                items[i].job_in_hand,
+                Number(items[i].invoice_volume).toFixed(3),
+                items[i].invoice,
+                Number(items[i].pending_volume).toFixed(3),
+                items[i].pending
+            ];
+            datas.push(data);
+        };
+
+        table = $('#table').DataTable({
+            data: datas,
+            lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+            columnDefs: [
+                {
+
+                },
+            ],
+            rowCallback: function (row, data) {
+                let type = data[0];
+                if (type === "Summary") {
+                    $('td', row).css("background-color", "#0C9DF0");
+                    $('td', row).css("font-weight", "600");
+                }
+            },
+            searching: false,
+            ordering: false,
+            paging: false,
+            info: false
+        });
+    };
+
+    function GenerateENGOrderInTake(year,datas){
             if (chart_order_in_take != null){
                 chart_order_in_take.destroy();
             }
@@ -406,10 +749,159 @@
 
                         };
                         chart_order_in_take = new Chart(ctx, { type: 'bar', data: data, options: options });             
+    };
+    function GenerateCISOrderInTake(year, datas) {
+        if (chart_order_in_take != null) {
+            chart_order_in_take.destroy();
+        }
+        var chartName = "chart_order_in_take";
+        var ctx = document.getElementById(chartName).getContext('2d');
+
+        var years = [];
+        var backlogs = [];
+        var jobs_cis_in_hand = [];
+        var targets = [];
+
+        //get datas
+        for (var i = 0; i < datas.length; i++) {
+            years.push(datas[i].year);
+            backlogs.push(datas[i].backlog);
+            jobs_cis_in_hand.push(datas[i].job_cis_in_hand);
+            targets.push(datas[i].target);
+        }
+        var labels = years;
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'CIS Job In Hand',
+                    data: jobs_cis_in_hand,
+                    backgroundColor: '#203864',
+                    stack: 'Stack 0',
+                },
+                {
+                    label: 'Backlog',
+                    data: backlogs,
+                    backgroundColor: '#1E83C6',
+                    stack: 'Stack 0',
+                },
+                {
+                    label: 'Target',
+                    data: targets,
+                    backgroundColor: '#1FDCEC',
+                    stack: 'Stack 1',
+                },
+            ],
         };
+
+        const options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    title: {
+                        text: "MB",
+                        display: true
+                    },
+                    stacked: true,
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    text: `TREND ORDER IN TAKE CIS JOB OF Y2019 - Y${year}`,
+                    font: {
+                        size: 16
+                    },
+                    display: true
+                },
+                legend: {
+                    position: 'bottom',
+                    display: true
+                }
+            },
+
+        };
+        chart_order_in_take = new Chart(ctx, { type: 'bar', data: data, options: options });
+    };
+    function GenerateAISOrderInTake(year, datas) {
+        if (chart_order_in_take != null) {
+            chart_order_in_take.destroy();
+        }
+        var chartName = "chart_order_in_take";
+        var ctx = document.getElementById(chartName).getContext('2d');
+
+        var years = [];
+        var backlogs = [];
+        var jobs_ais_in_hand = [];
+        var targets = [];
+
+        //get datas
+        for (var i = 0; i < datas.length; i++) {
+            years.push(datas[i].year);
+            backlogs.push(datas[i].backlog);
+            jobs_ais_in_hand.push(datas[i].job_ais_in_hand);
+            targets.push(datas[i].target);
+        }
+        var labels = years;
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'AIS Job In Hand',
+                    data: jobs_ais_in_hand,
+                    backgroundColor: '#203864',
+                    stack: 'Stack 0',
+                },
+                {
+                    label: 'Backlog',
+                    data: backlogs,
+                    backgroundColor: '#1E83C6',
+                    stack: 'Stack 0',
+                },
+                {
+                    label: 'Target',
+                    data: targets,
+                    backgroundColor: '#1FDCEC',
+                    stack: 'Stack 1',
+                },
+            ],
+        };
+
+        const options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    title: {
+                        text: "MB",
+                        display: true
+                    },
+                    stacked: true,
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                title: {
+                    text: `TREND ORDER IN TAKE AIS JOB OF Y2019 - Y${year}`,
+                    font: {
+                        size: 16
+                    },
+                    display: true
+                },
+                legend: {
+                    position: 'bottom',
+                    display: true
+                }
+            },
+
+        };
+        chart_order_in_take = new Chart(ctx, { type: 'bar', data: data, options: options });
+    };
     $('#btnExport').on('click',function(){
         let year = $('#year').val();
-        location.href = '@Url.Action("ExportSummarySaleTurnOver", "Invoice")?year='+ year;
+        let department = $('#departments :selected').text();
+        location.href = '@Url.Action("ExportSummarySaleTurnOver", "Invoice")?department=' + department + '&year=' + year;
     });
 </script>
 }
