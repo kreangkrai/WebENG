@@ -1370,7 +1370,6 @@
         function ColumnCheckChange(column){
             let chk = $(`#${column}`).prop('checked');
             let value = $(`#${column}`).val();
-            console.log(value);
             if (!chk){
                 set_column.forEach(x => x.title === value ? set_column.delete(x) : x)
             } else {
@@ -1407,10 +1406,8 @@
                        <label for="COL29" class="form-check-label pl-2">
                            <input type="checkbox" id="COL29" value="Invoice" onchange="ColumnCheckChange('COL29')" checked/> Invoice</label>
                        <label for="COL30" class="form-check-label pl-2">
-                           <input type="checkbox" id="COL30" value="Due Date" onchange="ColumnCheckChange('COL30')" checked/> Due Date</label>
-`;
+                           <input type="checkbox" id="COL30" value="Due Date" onchange="ColumnCheckChange('COL30')" checked/> Due Date</label>`;
             $('#checkcolumnboxes').append(str);
-
         }
 
         function GenerateCheckBox(){

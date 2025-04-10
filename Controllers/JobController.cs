@@ -92,11 +92,44 @@ namespace WebENG.Controllers
             return Json(users);
         }
 
-        [HttpGet]
-        public JsonResult GetJobs()
+        [HttpPost]
+        public JsonResult GetJobs(string[] set_select)
         {
+            string[] selections = set_select;
             List<JobModel> jobs = JobService.GetAllJobs();
-            return Json(jobs);
+            List<JobModel> new_jobs = new List<JobModel>();
+            List<JobOwnerModel> jobs_owner = JobOwner.GetJobOwner();
+            List<string> _jobs = new List<string>();
+            List<string> _except_job = jobs.Where(w => !jobs_owner.Any(x => x.job_id == w.job_id)).Select(s => s.job_id).ToList();
+            for (int i = 0; i < jobs_owner.Count; i++)
+            {
+                for (int j = 0; j < selections.Length; j++)
+                {
+                    if (jobs_owner[i].job_department == selections[j])
+                    {
+                        _jobs.Add(jobs_owner[i].job_id);
+                        continue;
+                    }
+                }
+            }
+            for (int i = 0; i < _except_job.Count; i++)
+            {
+                _jobs.Add(_except_job[i]);
+            }
+
+            for (int i = 0; i < jobs.Count; i++)
+            {
+                for (int j = 0; j < _jobs.Count; j++)
+                {
+                    if (jobs[i].job_id == _jobs[j])
+                    {
+                        new_jobs.Add(jobs[i]);
+                        continue;
+                    }
+                }
+            }
+            var data = new { jobs = new_jobs, jobs_owner = jobs_owner };
+            return Json(data);
         }
 
         [HttpGet]

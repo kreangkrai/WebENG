@@ -1482,10 +1482,16 @@ namespace WebENG.Service
                                 {
                                     if (_wd[i].workings[j].task_id.Contains("O")) //Office
                                     {
-                                        if (_wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
+                                        if (_wd[i].workings[j].start_time <= new TimeSpan(17, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
                                         {
                                             ot15 += _wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0);
                                             regular = new TimeSpan(17, 30, 0) - _wd[i].workings[j].start_time;
+                                            chk_after_office = true;
+                                        }
+                                        if (_wd[i].workings[j].start_time > new TimeSpan(17, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
+                                        {
+                                            ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
+                                            regular = new TimeSpan(0, 0, 0);
                                             chk_after_office = true;
                                         }
                                     }

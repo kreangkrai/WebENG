@@ -7,6 +7,54 @@
     #table_job_file {
         cursor: pointer;
     }
+
+    .multiselect {
+        width: 300px;
+    }
+
+    .selectBox {
+        position: relative;
+    }
+
+        .selectBox select {
+            width: 100%;
+            font-weight: bold;
+        }
+
+    .overSelect {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    #checkboxes {
+        display: none;
+        border: 1px #dadada solid;
+    }
+
+        #checkboxes label {
+            display: block;
+        }
+
+            #checkboxes label:hover {
+                background-color: #1e90ff;
+            }
+
+    #checkcolumnboxes {
+        display: none;
+        border: 1px #dadada solid;
+    }
+
+        #checkcolumnboxes label {
+            display: block;
+        }
+
+            #checkcolumnboxes label:hover {
+                background-color: #1e90ff;
+            }
+            
 </style>
 <div class="row p-3">
     @if (Model.role == "Admin")
@@ -15,6 +63,18 @@
             <button id="btn_create" type="button" class="btn btn-primary form-control elevation-1">
                 <i class="fas fa-plus"></i> Create Job
             </button>
+        </div>
+        <div class="col-xl-2">
+            <div class="multiselect">
+                <div class="selectBox" onclick="showColumnCheckboxes()">
+                    <select class="form-control">
+                        <option>Select Department</option>
+                    </select>
+                    <div class="overSelect"></div>
+                </div>
+                <div id="checkcolumnboxes">
+                </div>
+            </div>
         </div>
     }
     <div class="col-xl-1 pb-3">
@@ -896,6 +956,7 @@
 
         let update = false;
         let jobs = [];
+        let jobs_owner = [];
         let users = [];
         let quots = [];
         let statuses = [];
@@ -907,12 +968,9 @@
         let set_systems = [];
         let set_invoice = [];
         let job_files = [];
+        let set_select = ["ENG","CIS","AIS"];
         let status_invoices = ['', 'วางบิลแล้ว', 'คาดว่าจะวางบิลได้ภายในเดือน', 'อยู่ระหว่างรอลูกค้าตรวจรับงาน', 'ยังไม่เริ่มงาน', 'เลื่อน', 'งานยกเลิก'];
         //Change these parameters to true to show result
-        let debug_jobs = false;
-        let debug_user = false;
-        let debug_job_string = false;
-        let debug_quots = false;
 
         $(document).ready(async function () {
             await GetStatus();
@@ -925,20 +983,19 @@
             await GenerateSystemOption();
             await GenerateAllUser();
             await GenerateResponsible();
-            GetJobs();
+            GetJobs(set_select);
+            GenerateSelectCheckBox();
         });
 
-        async function GetJobs() {
+        async function GetJobs(set_select) {
             await $.ajax({
-                type: "GET",
+                type: "POST",
                 url: '@Url.Action("GetJobs", "Job")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { },
+                data: { set_select: set_select },
                 success: function (response) {
-                    jobs = response;
-                    if (debug_jobs) {
-                        console.log(jobs);
-                    }
+                    jobs = response.jobs;
+                    jobs_owner = response.jobs_owner;
                     GenerateTable(jobs);
                 }
             });
@@ -952,9 +1009,6 @@
                 data: { },
                 success: function (response) {
                     users = response;
-                    if (debug_user) {
-                        console.log(users);
-                    }
                 }
             });
         }
@@ -969,9 +1023,6 @@
                 data: { },
                 success: function (response) {
                     quots = response;
-                    if (debug_quots) {
-                        console.log(quots);
-                    }
                 }
             });
         }
@@ -1323,8 +1374,6 @@
             GenerateTableInvoice(set_invoice);
             GenerateTableInvoice(set_invoice);
 
-            //await GetQuotations();
-            //await GenerateQuotationOptions();
             Prepmodal();
         });
 
@@ -1361,14 +1410,15 @@
             $('#retention').val(0);
             $('#group_finished_date').hide();
             $('#group_warranty_period').hide();
+            document.getElementById("chk_eng").checked = false;
+            document.getElementById("chk_cis").checked = false;
+            document.getElementById("chk_ais").checked = false;
             $('#modal_job').modal();
         };
 
-        $('#table_job tbody').on('click', 'tr', async function () {
-            let admin = '@Model.role' == "Admin" ? true : false;
+        $('#table_job tbody').on('click', 'tr', async function () {           
+            let admin = '@Model.role' == "Admin" ? true : false;           
             if (admin) {
-                //await GetQuotations();
-                //await GenerateQuotationOptions();
                 let job_id = table.row(this).data()[0];
                 await GetJobFile(job_id);
                 await EditJob(table.row(this).data());
@@ -1478,6 +1528,52 @@
             $('#bg_finish').val(bg_finish);
             $('#retention').val(retention);
             $('#select_responsible').val(responsible);
+
+            //Check Job Owner
+            let job_owner = jobs_owner.filter(f => f.job_id === job_id).map(m => m);
+            if (job_owner === null) {
+                document.getElementById('chk_eng').checked = false;
+                document.getElementById('chk_cis').checked = false;
+                document.getElementById('chk_ais').checked = false;
+
+                $('#job_eng_in_hand').attr('disabled', true);
+                $('#job_cis_in_hand').attr('disabled', true);
+                $('#job_ais_in_hand').attr('disabled', true);
+                $('#eng_cost').attr('disabled', true);
+                $('#cis_cost').attr('disabled', true);
+                $('#ais_cost').attr('disabled', true);
+            } else {
+                let chk_eng = job_owner.filter(f => f.job_department === "ENG");
+                if (chk_eng.length > 0) {
+                    document.getElementById('chk_eng').checked = true;
+                    $('#job_eng_in_hand').attr('disabled', false);
+                    $('#eng_cost').attr('disabled', false);
+                } else {
+                    document.getElementById('chk_eng').checked = false;
+                    $('#job_eng_in_hand').attr('disabled', true);
+                    $('#eng_cost').attr('disabled', true);
+                }
+                let chk_cis = job_owner.filter(f => f.job_department === "CIS");
+                if (chk_cis.length > 0) {
+                    document.getElementById('chk_cis').checked = true;
+                    $('#job_cis_in_hand').attr('disabled', false);
+                    $('#cis_cost').attr('disabled', false);
+                } else {
+                    document.getElementById('chk_cis').checked = false;
+                    $('#job_cis_in_hand').attr('disabled', true);
+                    $('#cis_cost').attr('disabled', true);
+                }
+                let chk_ais = job_owner.filter(f => f.job_department === "AIS");
+                if (chk_ais.length > 0) {
+                    document.getElementById('chk_ais').checked = true;
+                    $('#job_ais_in_hand').attr('disabled', false);
+                    $('#ais_cost').attr('disabled', false);
+                } else {
+                    document.getElementById('chk_ais').checked = false;
+                    $('#job_ais_in_hand').attr('disabled', true);
+                    $('#ais_cost').attr('disabled', true);
+                }                
+            }
 
             let finish_status = statuses.filter(f=>f.status_id == status).map(m=> m.status_name);
             if (finish_status[0] === "Warranty") {
@@ -1747,10 +1843,6 @@
                 "retention": retention,
                 "responsible":responsible
             });
-
-            if (debug_job_string) {
-                console.log(job_string);
-            }
 
             if (update) {
                 UpdateJob(job_string);
@@ -2211,91 +2303,156 @@
             let chk = document.getElementById("chk_eng").checked;
             let job_id = $('#job_id').val();
             let job_department = "ENG";
-            if (chk === true) {
-                await $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("InsertJobOwner", "Job")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        job_id, job_department
-                    },
-                    success: function (response) {
-                        alert(response);
-                    }
-                });
-            } else {
-                await $.ajax({
-                    type: "DELETE",
-                    url: '@Url.Action("DeleteJobOwner", "Job")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        job_id, job_department
-                    },
-                    success: function (response) {
-                        alert(response);
-                    }
-                });
+            if (job_id !== "") {
+                if (chk === true) {
+                    await $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("InsertJobOwner", "Job")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            job_id, job_department
+                        },
+                        success: function (response) {
+                            alert(response);
+                            $('#job_eng_in_hand').attr('disabled', false);
+                            $('#eng_cost').attr('disabled', false);
+                        }
+                    });
+                } else {
+                    await $.ajax({
+                        type: "DELETE",
+                        url: '@Url.Action("DeleteJobOwner", "Job")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            job_id, job_department
+                        },
+                        success: function (response) {
+                            alert(response);
+                            $('#job_eng_in_hand').attr('disabled', true);
+                            $('#eng_cost').attr('disabled', true);
+                        }
+                    });
+                }
+                GetJobs(set_select);
             }
         });
         $('#chk_cis').on('change', async function () {
             let chk = document.getElementById("chk_cis").checked;
             let job_id = $('#job_id').val();
             let job_department = "CIS";
-            if (chk === true) {
-                await $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("InsertJobOwner", "Job")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        job_id, job_department
-                    },
-                    success: function (response) {
-                        alert(response);
-                    }
-                });
-            } else {
-                await $.ajax({
-                    type: "DELETE",
-                    url: '@Url.Action("DeleteJobOwner", "Job")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        job_id, job_department
-                    },
-                    success: function (response) {
-                        alert(response);
-                    }
-                });
+            if (job_id !== "") {
+                if (chk === true) {
+                    await $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("InsertJobOwner", "Job")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            job_id, job_department
+                        },
+                        success: function (response) {
+                            alert(response);
+                            $('#job_cis_in_hand').attr('disabled', false);
+                            $('#cis_cost').attr('disabled', false);
+                        }
+                    });
+                } else {
+                    await $.ajax({
+                        type: "DELETE",
+                        url: '@Url.Action("DeleteJobOwner", "Job")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            job_id, job_department
+                        },
+                        success: function (response) {
+                            alert(response);
+                            $('#job_cis_in_hand').attr('disabled', true);
+                            $('#cis_cost').attr('disabled', true);
+                        }
+                    });
+                }
+                GetJobs(set_select);
             }
         });
         $('#chk_ais').on('change', async function () {
             let chk = document.getElementById("chk_ais").checked;
             let job_id = $('#job_id').val();
             let job_department = "AIS";
-            if (chk === true) {
-                await $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("InsertJobOwner", "Job")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        job_id, job_department
-                    },
-                    success: function (response) {
-                        alert(response);
-                    }
-                });
-            } else {
-                await $.ajax({
-                    type: "DELETE",
-                    url: '@Url.Action("DeleteJobOwner", "Job")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        job_id, job_department
-                    },
-                    success: function (response) {
-                        alert(response);
-                    }
-                });
+            if (job_id !== "") {
+                if (chk === true) {
+                    await $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("InsertJobOwner", "Job")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            job_id, job_department
+                        },
+                        success: function (response) {
+                            alert(response);
+                            $('#job_ais_in_hand').attr('disabled', false);
+                            $('#ais_cost').attr('disabled', false);
+                        }
+                    });
+                } else {
+                    await $.ajax({
+                        type: "DELETE",
+                        url: '@Url.Action("DeleteJobOwner", "Job")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        data: {
+                            job_id, job_department
+                        },
+                        success: function (response) {
+                            alert(response);
+                            $('#job_ais_in_hand').attr('disabled', true);
+                            $('#ais_cost').attr('disabled', true);
+                        }
+                    });
+                }
+                GetJobs(set_select);
             }
         });
+
+        var expanded = false;
+        function showColumnCheckboxes() {
+            var checkboxes = document.getElementById("checkcolumnboxes");
+            if (!expanded) {
+                checkboxes.style.display = "block";
+                expanded = true;
+            } else {
+                checkboxes.style.display = "none";
+                expanded = false;
+            }
+        }
+
+        function GenerateSelectCheckBox() {
+            $('#checkcolumnboxes').empty();
+            let str = `<div class="row">
+                           <label for="SELECT_ENG" class="form-check-label pl-3">
+                               <input type="checkbox" id="SELECT_ENG" value="ENG" onchange="SelectCheckChange('SELECT_ENG')" checked/>ENG</label>
+                       </div>
+                       <div class="row">
+                           <label for="SELECT_CIS" class="form-check-label pl-3">
+                               <input type="checkbox" id="SELECT_CIS" value="CIS" onchange="SelectCheckChange('SELECT_CIS')" checked/>CIS</label>
+                       </div>
+                        <div class="row">
+                        <label for="SELECT_AIS" class="form-check-label pl-3">
+                           <input type="checkbox" id="SELECT_AIS" value="AIS" onchange="SelectCheckChange('SELECT_AIS')" checked/>AIS</label>
+                       </div>`;
+            $('#checkcolumnboxes').append(str);
+        }
+
+        function SelectCheckChange(select) {
+            let chk = $(`#${select}`).prop('checked');
+            let value = $(`#${select}`).val();
+            if (!chk) {
+                const index = set_select.indexOf(value);
+                if (index > -1) {
+                    set_select.splice(index, 1);
+                }
+            } else {
+                set_select.push(value);
+            }
+            GetJobs(set_select);
+        };
+
     </script>
 }

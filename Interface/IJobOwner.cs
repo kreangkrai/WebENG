@@ -8,6 +8,7 @@ namespace WebENG.Interface
 {
     interface IJobOwner
     {
+        List<JobOwnerModel> GetJobOwner();
         List<JobOwnerModel> GetJobOwnerByJob(string job_id);
         string DeleteByJobDepartment(string job_id, string job_department);
         string Insert(string job_id, string job_department);
