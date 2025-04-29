@@ -121,13 +121,16 @@ namespace WebENG.Service
             try
             {
                 string string_command = string.Format($@"
-                    INSERT INTO 
-                        JobOwner(job_id,
-                                 job_department
-                        )
-                        VALUES(@job_id,
-                               @job_department
-                        )");
+                    IF NOT EXISTS ( SELECT 1 FROM JobOwner WHERE job_id = '{job_id}' AND job_department = '{job_department}' )
+                        BEGIN
+                            INSERT INTO 
+                                JobOwner(job_id,
+                                         job_department
+                                )
+                                VALUES(@job_id,
+                                       @job_department
+                                )
+                        END");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;

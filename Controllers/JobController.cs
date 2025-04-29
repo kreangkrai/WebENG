@@ -107,8 +107,11 @@ namespace WebENG.Controllers
                 {
                     if (jobs_owner[i].job_department == selections[j])
                     {
-                        _jobs.Add(jobs_owner[i].job_id);
-                        continue;
+                        if (!_jobs.Any(a => a == jobs_owner[i].job_id))
+                        {
+                            _jobs.Add(jobs_owner[i].job_id);
+                            continue;
+                        }
                     }
                 }
             }
