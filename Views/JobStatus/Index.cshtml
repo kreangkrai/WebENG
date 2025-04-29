@@ -125,9 +125,7 @@
                         else
                         {
                             <div class="col-xl-3" hidden>
-                                <select id="user_name" class="form-control">
-                                    <option value="" selected disabled>Please Select User</option>
-                                </select>
+                                <input id="user_name" type="text" />
                             </div>
                         }
                         <div class="col-xl-1">
@@ -587,7 +585,6 @@
                 let total_invoice = jobs[i].invoices.map(m => m.invoice).reduce((acc, b) => acc + b, 0);
                 let remaining = (parseFloat(jobs[i].job_in_hand) - parseFloat(total_invoice)).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 
-                console.log(jobs[i]);
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
@@ -809,7 +806,7 @@
                 let job_name = data_job.job_name;
                 let job_in_hand = data_job.job_in_hand;
                 let responsible = data_job.responsible;
-                console.log(data_job);
+
                 let invoice = 0;
                 if (data_job.invoices.length > 0){
                     invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
