@@ -972,7 +972,7 @@ namespace WebENG.Service
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q'");
+                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'AIS') > 0");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -1114,7 +1114,7 @@ namespace WebENG.Service
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q'");
+                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'CIS') > 0");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -1195,7 +1195,7 @@ namespace WebENG.Service
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q'");
+                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'ENG') > 0");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)

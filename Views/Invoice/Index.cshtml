@@ -160,17 +160,19 @@
         await GetAccInvoice(department, year);
         await GetSummaryQuarter(department, year);
         await GetOrderInTake(department, year);
-        if (department === "ENG") {
+
+        if (department === "ENG") {          
             GenerateENGChartInvoice(year, invoices);
             GenerateENGChartAccInvoice(year, acc_invoices);
             GenerateENGTable(summary_quarters);
             GenerateENGOrderInTake(year, orders_in_take);
         }
         if (department === "CIS") {
-            GenerateCISChartInvoice(year, invoices);
+            
             GenerateCISChartAccInvoice(year, acc_invoices);
             GenerateCISTable(summary_quarters);
             GenerateCISOrderInTake(year, orders_in_take);
+            GenerateCISChartInvoice(year, invoices);
         }
         if (department === "AIS") {
             GenerateAISChartInvoice(year, invoices);
@@ -245,7 +247,6 @@
         });
     }
     function GenerateCISChartInvoice(year, invoices) {
-
         let colors = ['#04CA13', '#F0390C'];
 
         let months = invoices.map(m => m.month);

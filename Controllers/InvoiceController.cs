@@ -56,12 +56,12 @@ namespace WebENG.Controllers
             }
             if (department == "CIS")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
+                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryCISInvoice(year);
                 return Json(invoices);
             }
             if (department == "AIS")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
+                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAISInvoice(year);
                 return Json(invoices);
             }
             return Json(null);
