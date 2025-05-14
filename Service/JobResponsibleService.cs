@@ -15,11 +15,10 @@ namespace WebENG.Service
             List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
             try
             {
-                string string_command = string.Format($@"
-                    SELECT
+                string string_command = string.Format($@"SELECT
 	                    JobResponsible.job_id,
 	                    Jobs.job_name,
-                        Quotation.customer,
+                        Jobs.customer_name as customer,
 	                    JobResponsible.user_id,
 	                    Authen.name AS user_name,
 	                    Authen.department AS department,
@@ -30,7 +29,6 @@ namespace WebENG.Service
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
                         LEFT JOIN Authen AS Authen ON JobResponsible.user_id = Authen.user_id
-                        LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     WHERE LOWER(Authen.name) = '{user_name}' AND Jobs.status <> 'STA999'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
@@ -77,17 +75,15 @@ namespace WebENG.Service
             List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
             try
             {
-                string string_command = string.Format($@"
-                    SELECT
+                string string_command = string.Format($@"SELECT
 	                    Jobs.job_id,
                         Jobs.job_name,
-                        Quotation.customer,
+                        Jobs.customer_name as customer,
 	                    JobResponsible.user_id,
                         Authen.name
                     FROM Jobs
                     LEFT JOIN JobResponsible ON Jobs.job_id = JobResponsible.job_id
                     LEFT JOIN Authen ON JobResponsible.user_id = Authen.user_id
-                    LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     ORDER BY Jobs.job_id, JobResponsible.user_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
@@ -174,11 +170,10 @@ namespace WebENG.Service
             List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
             try
             {
-                string string_command = string.Format($@"
-                    SELECT
+                string string_command = string.Format($@"SELECT
 	                    JobResponsible.job_id,
 	                    Jobs.job_name,
-                        Quotation.customer,
+                        Jobs.customer_name as customer,
 	                    JobResponsible.user_id,
 	                    Authen.name AS user_name,
 	                    Authen.department AS department,
@@ -189,7 +184,6 @@ namespace WebENG.Service
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
                         LEFT JOIN Authen ON JobResponsible.user_id = Authen.user_id
-                        LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                     WHERE  JobResponsible.job_id = '{job_id}'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
