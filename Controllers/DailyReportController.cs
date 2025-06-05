@@ -100,6 +100,7 @@ namespace WebENG.Controllers
                 Model = form_model,
                 PageOrientation = Rotativa.AspNetCore.Options.Orientation.Landscape,
                 PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageMargins = new Rotativa.AspNetCore.Options.Margins { Top = 2, Left = 5, Right = 5, Bottom = 2 },
                 /*CustomSwitches = footer*/
             };
             return form_dailyreport;
