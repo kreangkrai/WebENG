@@ -1227,6 +1227,7 @@ namespace WebENG.Service
                         TimeSpan leave = new TimeSpan(0, 0, 0);
                         for (int j = 0; j < _wd[i].workings.Count; j++)
                         {
+                            chk_after_office = false;
                             regular = new TimeSpan(0, 0, 0);
                             ot15 = new TimeSpan(0, 0, 0);
                             ot3 = new TimeSpan(0, 0, 0);
@@ -1480,14 +1481,36 @@ namespace WebENG.Service
                                 }
                                 else
                                 {
-                                    if (_wd[i].workings[j].task_id.Contains("O")) //Office
+                                    if (_wd[i].workings[j].task_id.Contains("O") || _wd[i].workings[j].task_id.Contains("H")) //Office,Home
                                     {
                                         if (_wd[i].workings[j].start_time <= new TimeSpan(17, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
                                         {
                                             ot15 += _wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0);
                                             regular = new TimeSpan(17, 30, 0) - _wd[i].workings[j].start_time;
                                             chk_after_office = true;
+
+                                            if (_wd[i].workings[j].dinner_full)
+                                            {
+                                                if (ot15 != default(TimeSpan))
+                                                {
+                                                    ot15 -= new TimeSpan(1, 0, 0);
+                                                }
+                                            }
+                                            if (_wd[i].workings[j].dinner_half)
+                                            {
+                                                if (ot15 != default(TimeSpan))
+                                                {
+                                                    ot15 -= new TimeSpan(0, 30, 0);
+                                                }
+                                            }
                                         }
+                                        if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time < new TimeSpan(8, 30, 0))
+                                        {
+                                            ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
+                                            regular = new TimeSpan(0, 0, 0);
+                                            chk_after_office = true;
+                                        }
+
                                         if (_wd[i].workings[j].start_time > new TimeSpan(17, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
                                         {
                                             ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
@@ -1507,34 +1530,38 @@ namespace WebENG.Service
                                             regular += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
                                         }
                                     }
+                                    
                                 }
-                            
-                                if (_wd[i].workings[j].lunch_full)
+
+                                if (!chk_after_office)
                                 {
-                                    if (regular != default(TimeSpan))
+                                    if (_wd[i].workings[j].lunch_full)
                                     {
-                                        regular -= new TimeSpan(1, 0, 0);
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(1, 0, 0);
+                                        }
                                     }
-                                }
-                                if (_wd[i].workings[j].lunch_half)
-                                {
-                                    if (regular != default(TimeSpan))
+                                    if (_wd[i].workings[j].lunch_half)
                                     {
-                                        regular -= new TimeSpan(0, 30, 0);
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(0, 30, 0);
+                                        }
                                     }
-                                }
-                                if (_wd[i].workings[j].dinner_full)
-                                {
-                                    if (regular != default(TimeSpan))
+                                    if (_wd[i].workings[j].dinner_full)
                                     {
-                                        regular -= new TimeSpan(1, 0, 0);
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(1, 0, 0);
+                                        }
                                     }
-                                }
-                                if (_wd[i].workings[j].dinner_half)
-                                {
-                                    if (regular != default(TimeSpan))
+                                    if (_wd[i].workings[j].dinner_half)
                                     {
-                                        regular -= new TimeSpan(0, 30, 0);
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(0, 30, 0);
+                                        }
                                     }
                                 }
 
@@ -1544,7 +1571,10 @@ namespace WebENG.Service
                                 if (sum_regular > new TimeSpan(8, 0, 0))
                                 {
                                     regular = new TimeSpan(8, 0, 0) - (sum_regular - regular);
-                                    ot15 = sum_regular - new TimeSpan(8, 0, 0);
+                                    if (!chk_after_office)
+                                    {
+                                        ot15 = sum_regular - new TimeSpan(8, 0, 0);
+                                    }
                                 }
 
                                 wh = new WorkingHoursModel()
