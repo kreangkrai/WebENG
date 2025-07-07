@@ -9,6 +9,7 @@ namespace WebENG.Interface
     interface IHoliday
     {
         List<HolidayModel> GetHolidays(string year);
+        List<HolidayModel> GetAllHolidays();
         string CreateHoliday(HolidayModel model);
     }
 }

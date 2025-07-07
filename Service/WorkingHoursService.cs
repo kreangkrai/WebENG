@@ -49,7 +49,8 @@ namespace WebENG.Service
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
-						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID");
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
+                    Where WorkingHours.job_id NOT LIKE 'Q%' AND WorkingHours.job_id <> 'J999999'");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -278,6 +279,96 @@ namespace WebENG.Service
             return wd;
         }
 
+        public List<WorkingDayModel> GetAllWorkingHours()
+        {
+            List<WorkingDayModel> wd = new List<WorkingDayModel>();
+            List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+            try
+            {
+                string string_command = string.Format($@"
+                    SELECT
+                        WorkingHours.ind,
+                        WorkingHours.user_id,
+                        Authen.name,
+                        Authen.department,
+                        WorkingHours.working_date,
+                        WorkingHours.week_number,
+                        WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
+                        Jobs.job_name,
+                        WorkingHours.task_id,
+                        Tasks.task_name,
+                        WorkingHours.start_time,
+                        WorkingHours.stop_time,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
+                        WorkingHours.note
+                    FROM WorkingHours
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
+                        LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        WorkingHoursModel wh = new WorkingHoursModel()
+                        {
+                            index = dr["ind"].ToString(),
+                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
+                            working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
+                            week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            process_id = dr["process_id"] != DBNull.Value ? dr["process_id"].ToString() : "",
+                            process_name = dr["process_name"] != DBNull.Value ? dr["process_name"].ToString() : "",
+                            system_id = dr["system_id"] != DBNull.Value ? dr["system_id"].ToString() : "",
+                            system_name = dr["system_name"] != DBNull.Value ? dr["system_name"].ToString() : "",
+                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
+                            task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
+                            start_time = dr["start_time"] != DBNull.Value ? TimeSpan.Parse(dr["start_time"].ToString()) : default(TimeSpan),
+                            stop_time = dr["stop_time"] != DBNull.Value ? TimeSpan.Parse(dr["stop_time"].ToString()) : default(TimeSpan),
+                            lunch_full = dr["lunch_full"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_full"].ToString()) : default(bool),
+                            lunch_half = dr["lunch_half"] != DBNull.Value ? Convert.ToBoolean(dr["lunch_half"].ToString()) : default(bool),
+                            dinner_full = dr["dinner_full"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_full"].ToString()) : default(bool),
+                            dinner_half = dr["dinner_half"] != DBNull.Value ? Convert.ToBoolean(dr["dinner_half"].ToString()) : default(bool),
+                            note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
+                        };
+                        whs.Add(wh);
+                    }
+                    dr.Close();
+
+                    wd = whs.GroupBy(g => g.working_date).Select(s => new WorkingDayModel()
+                    {
+                        date = s.Key,
+                        workings = whs.Where(w => w.working_date.Date == s.Key.Date).ToList()
+                    }).ToList();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return wd;
+        }
         public List<WorkingHoursModel> GetWorkingHours(string user_name, DateTime working_date)
         {
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();

@@ -41,4 +41,15 @@ namespace WebENG.Models
         public DateTime date { get; set; }
         public List<WorkingHoursModel> workings { get; set; }
     }
+
+    public class JobsWorkingHoursModel
+    {
+        public string index { get; set; }
+        public string user_id { get; set; }
+        public string user_name { get; set; }
+        public string job_id { get; set; }
+        public double normal { get; set; }
+        public double ot1_5 { get; set; }
+        public double ot3_0 { get; set; }
+    }
 }
