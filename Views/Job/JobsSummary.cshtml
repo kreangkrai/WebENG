@@ -13,7 +13,7 @@
             <div class="card-header">
                 <span>Jobs Summary</span>
             </div>
-            <div class="card-body">
+            <div class="card-body" style="overflow-x:auto">
                 <table id="tableJobs" class="table table-bordered table-hover table-sm text-center w-100">
                     <thead>
                         <tr>
@@ -28,6 +28,8 @@
                             <th>Factor</th>
                             <th>Total Manhours</th>
                             <th>Remaining Cost</th>
+                            <th>Total Manhours With OT</th>
+                            <th>Remaining Cost With OT </th>
                             <th>Process</th>
                             <th>System</th>
                             <th>Job Status</th>
@@ -46,6 +48,8 @@
                             <th>Factor</th>
                             <th>Total Manhours</th>
                             <th>Remaining Cost</th>
+                            <th>Total Manhours With OT</th>
+                            <th>Remaining Cost With OT </th>
                             <th>Process</th>
                             <th>System</th>
                             <th>Job Status</th>
@@ -77,9 +81,15 @@
                                 <canvas id="taskDistribution"></canvas>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div id="manpowerRatio" style="height:500px;width:100%"></div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div id="manpowerRatio" style="height:500px;width:100%"></div>
+                            </div>
+                            <div class="col-6">
+                                <div id="manpowerOTRatio" style="height:500px;width:100%"></div>
+                            </div>
                         </div>
+                        
                         <div class="col-12">
                             <div style="height:500px;width:100%">
                                 <canvas id="manpowerDistribution"></canvas>
@@ -303,7 +313,8 @@
     <script type="text/javascript">
          google.charts.load("current", {packages:["corechart"]});
          google.charts.setOnLoadCallback(GenerateChartTaskRatio);
-         google.charts.setOnLoadCallback(GenerateChartManpowerRatio);
+        google.charts.setOnLoadCallback(GenerateChartManpowerRatio);
+        google.charts.setOnLoadCallback(GenerateChartManpowerOTRatio);
         let processes = [];
         let systems = [];
         let set_processes = [];
@@ -315,6 +326,7 @@
         let trs = [];
         let tds = [];
         let mrs = [];
+        let mrs_ot = [];
         let mds = [];
         let chartTaskRatio;
         let chartTaskDistribution;
@@ -323,7 +335,7 @@
         let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff','#912AB4','#D32D67','#3973DF','#298ED9','#73E5AE','#EFC67A','#CAEF7A','#485E1A','#93A6DA','#0B717A'];
 
         $(document).ready(async function () {
-            
+
             await GetStatus();
             await GenerateStatusOption();
             await GetProcess();
@@ -362,7 +374,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    processes = response;                   
+                    processes = response;
                 }
             });
         }
@@ -373,7 +385,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
-                    systems = response;               
+                    systems = response;
                 }
             });
         }
@@ -431,6 +443,8 @@
                     jobsSummary[i].factor,
                     jobsSummary[i].totalManhour.toFixed(2),
                     jobsSummary[i].remainingCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    jobsSummary[i].totalOTManhour.toFixed(2),
+                    jobsSummary[i].remainingOTCost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     jobsSummary[i].process,
                     jobsSummary[i].system,
                     jobsSummary[i].status
@@ -451,7 +465,7 @@
                 ],
                 paging: false,
                 rowCallback: function (row, data) {
-                    let code_status = data[13];
+                    let code_status = data[15];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
                     if(code_status === "STA999"){
@@ -460,7 +474,7 @@
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
 
-                    $('td:eq(13)', row).html(status_str);
+                    $('td:eq(15)', row).html(status_str);
                 }
             });
         }
@@ -497,7 +511,7 @@
             let total_man_hours = job.totalManhour.toFixed(2);
             let remain_cost = job.remainingCost;
             let list_process = [];
-            
+
             let countProcess = (job.process.match(/,/g) || []).length;
 
             for (let k=0;k<=countProcess;k++){
@@ -529,15 +543,15 @@
             $('#job_total_man_hours').val(total_man_hours);
             $('#job_remain_cost').val(remain_cost);
             //Process
-            for (let i=0;i<list_process.length;i++){      
-                let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];         
-                set_processes.push({'process_id': process_id ,'process_name': list_process[i]});               
+            for (let i=0;i<list_process.length;i++){
+                let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];
+                set_processes.push({'process_id': process_id ,'process_name': list_process[i]});
             }
-            
+
             //System
-            for (let i=0;i<list_system.length;i++){      
+            for (let i=0;i<list_system.length;i++){
                 let system_id = systems.filter(f=>f.system_name == list_system[i] ).map(m=>m.system_id)[0];
-                set_systems.push({'system_id': system_id ,'system_name': list_system[i]});               
+                set_systems.push({'system_id': system_id ,'system_name': list_system[i]});
             }
 
             GenerateTableProcess(set_processes);
@@ -548,6 +562,7 @@
             await GetTaskRatio(jobId);
             await GetTaskDistribution(jobId);
             await GetManpowerRatio(jobId);
+            await GetManpowerOTRatio(jobId);
             await GetManpowerDistribution(jobId);
         }
 
@@ -736,51 +751,20 @@
                 }
             });
         }
-
-        @*function GenerateChartManpowerRatio() {
-            let mrs_data = [];
-            for (let i = 0; i < mrs.length; i++) {
-                mrs_data.push(
-                    {
-                        y: mrs[i].hours,
-                        indexLabel: mrs[i].percents.toFixed(2) + " % - " + mrs[i].user_name,
-                        indexLabelFontSize: 14,
-                        indexLabelFontFamily: "san-seriff",
-                        indexLabelFontColor: "white",
-                        legendText: mrs[i].user_name,
-                    }
-                );
-            }
-
-            chartManpowerRatio = new CanvasJS.Chart("manpowerRatio",
-                {
-                    title: {
-                        text: "Manpower Ratio",
-                        fontSize: 18,
-                        fontFamily: "san-seriff",
-                        fontWeight: "bold",
-                        fontColor: "white",
-                    },
-                    legend: {
-                        fontSize: 14,
-                        fontFamily: "san-seriff",
-                        fontColor: "white",
-                        fontWeight: "normal",
-                    },
-                    backgroundColor: "transparent",
-                    data: [{
-                        type: "doughnut",
-                        radius: "100%",
-                        startAngle: -90,
-                        showInLegend: true,
-                        toolTipContent: "{y} Hours - {legendText}",
-                        legendText: "{legendText}",
-                        dataPoints: mrs_data,
-                    }],
+        async function GetManpowerOTRatio(job_id) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetManpowerOTRatio", "Job")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    job_id
+                },
+                success: function (response) {
+                    mrs_ot = response;
+                    GenerateChartManpowerOTRatio();
                 }
-            );
-            chartManpowerRatio.render();
-        }*@
+            });
+        }
 
         function GenerateChartManpowerRatio() {
             setTimeout(function(){
@@ -810,14 +794,42 @@
             },300);
         }
 
+        function GenerateChartManpowerOTRatio() {
+            setTimeout(function () {
+                let datas = [];
+                datas.push(["Name", "Hours"]);
+                for (let i = 0; i < mrs_ot.length; i++) {
+                    let name = mrs_ot[i].user_name;
+                    datas.push([name, mrs_ot[i].hours]);
+                }
+                var data = google.visualization.arrayToDataTable(datas);
+
+                var options = {
+                    title: 'Manpower OT Ratio',
+                    titleTextStyle: { color: 'white', fontSize: 16 },
+                    pieHole: 0.65,
+                    colors: colors,
+                    pieSliceText: 'percentage',
+                    is3D: false,
+                    backgroundColor: '#343A40',
+                    legend: { position: 'bottom', textStyle: { color: 'white', fontSize: 14 } },
+                    pieStartAngle: 90,
+                    pieSliceBorderColor: '#343A40',
+                };
+
+                var chart = new google.visualization.PieChart(document.getElementById('manpowerOTRatio'));
+                chart.draw(data, options);
+            }, 300);
+        }
+
         function GenerateTableProcess(processes) {
             let datas = [];
             if (table_process !== null)
                 $('#table_process').DataTable().destroy();
 
             for (let i = 0; i < processes.length; i++) {
-                
-                let process = processes[i].process_name;            
+
+                let process = processes[i].process_name;
                 datas.push([
                     process
                 ]);
@@ -832,11 +844,11 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
-                    
+
                 },
                 searching: false,
                 ordering: false,
@@ -852,8 +864,8 @@
                 $('#table_system').DataTable().destroy();
 
             for (let i = 0; i < systems.length; i++) {
-                
-                let system = systems[i].system_name;            
+
+                let system = systems[i].system_name;
                 datas.push([
                     system
                 ]);
@@ -868,11 +880,11 @@
                 },
                 columnDefs: [
                     {
-                        
+
                     },
                 ],
                 rowCallback: function (row, data) {
-                    
+
                 },
                 searching: false,
                 ordering: false,
@@ -988,7 +1000,7 @@
         });
 
         $('#add_process').on('click',function(){
-            let _process = $('#select_process').val();       
+            let _process = $('#select_process').val();
             let process = processes.filter(f=>f.process_id === _process ).map(m=>m.process_name)[0];
             let check_process = set_processes.find(f=>f.process_name == process);
             if (check_process == undefined){
@@ -998,7 +1010,7 @@
         });
 
         $('#add_system').on('click',function(){
-            let _system = $('#select_system').val();       
+            let _system = $('#select_system').val();
             let system = systems.filter(f=>f.system_id === _system ).map(m=>m.system_name)[0];
             let check_system = set_systems.find(f=>f.system_name == system);
             if (check_system == undefined){
@@ -1060,7 +1072,7 @@
                     str_process += list_process[k];
                 }else{
                     str_process += list_process[k] + ",";
-                }               
+                }
             }
 
             for(let k=0 ;k<list_system.length;k++){
@@ -1068,11 +1080,11 @@
                     str_system += list_system[k];
                 }else{
                     str_system += list_system[k] + ",";
-                }               
+                }
             }
 
             let job_string = JSON.stringify({
-                "job_id": job_id,               
+                "job_id": job_id,
                 "process":str_process,
                 "system": str_system,
             });

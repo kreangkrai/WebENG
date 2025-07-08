@@ -51,5 +51,6 @@ namespace WebENG.Models
         public double normal { get; set; }
         public double ot1_5 { get; set; }
         public double ot3_0 { get; set; }
+        public double total { get; set; }
     }
 }

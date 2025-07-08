@@ -18,10 +18,12 @@ namespace WebENG.Models
         public double ais_cost { get; set; }
         public double factor { get; set; }
         public double totalManhour { get; set; }
+        public double totalOTManhour { get; set; }
         public double totalCost { get; set; }
         public string status { get; set; }
         public string process { get; set; }
         public string system { get; set; }
         public double remainingCost { get; set; }
+        public double remainingOTCost { get; set; }
     }
 }

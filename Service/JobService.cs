@@ -302,7 +302,7 @@ namespace WebENG.Service
                             cis_cost = dr["cis_cost"] != DBNull.Value ? Convert.ToInt32(dr["cis_cost"]) : 0,
                             ais_cost = dr["ais_cost"] != DBNull.Value ? Convert.ToInt32(dr["ais_cost"]) : 0,
                             factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 1,
-                            totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"]) : 0,
+                            totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"].ToString()) * (dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"]) : 1 ) : 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1",
                             process = dr["process"] != DBNull.Value ? dr["process"].ToString() : "",
                             system = dr["system"] != DBNull.Value ? dr["system"].ToString() : "",

@@ -275,5 +275,65 @@ namespace WebENG.Service
             }
             return "Success";
         }
+
+        public List<JobResponsibleModel> GetJobsResponsible()
+        {
+            List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
+            try
+            {
+                string string_command = string.Format($@"SELECT
+	                    JobResponsible.job_id,
+	                    Jobs.job_name,
+                        Jobs.customer_name as customer,
+	                    JobResponsible.user_id,
+	                    Authen.name AS user_name,
+	                    Authen.department AS department,
+                        JobResponsible.levels as level,
+	                    JobResponsible.role,
+	                    JobResponsible.assign_by,
+	                    JobResponsible.assign_date
+                    FROM JobResponsible
+                        LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
+                        LEFT JOIN Authen AS Authen ON JobResponsible.user_id = Authen.user_id
+                    WHERE Jobs.status <> 'STA999'
+                    ORDER BY JobResponsible.job_id");
+                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
+                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                    ConnectSQL.OpenConnect();
+                }
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        JobResponsibleModel jr = new JobResponsibleModel()
+                        {
+                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
+                            level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 1,
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
+                            role = dr["role"] != DBNull.Value ? dr["role"].ToString() : "",
+                            assign_by = dr["assign_by"] != DBNull.Value ? dr["assign_by"].ToString() : "",
+                            assign_date = dr["assign_date"] != DBNull.Value ? Convert.ToDateTime(dr["assign_date"]) : default(DateTime),
+                        };
+                        jrs.Add(jr);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                {
+                    ConnectSQL.CloseConnect();
+                }
+            }
+            return jrs;
+        }
     }
 }

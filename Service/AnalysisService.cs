@@ -170,10 +170,12 @@ namespace WebENG.Service
                     SELECT 
 	                    WorkingHours.user_id,
 	                    Authen.name,
+						Authen.user_id,
 	                    WorkingHours.job_id,
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
 	                    Tasks.task_name,
+						JobResponsible.levels,
 	                    CAST(SUM(
 						case when lunch_full = 1 then 
 							case when dinner_full = 1 then
@@ -201,9 +203,10 @@ namespace WebENG.Service
                     LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
-                    WHERE WorkingHours.job_id = '{job_id}'
-                    GROUP BY WorkingHours.user_id, Authen.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
-                    ORDER BY user_id");
+					LEFT JOIN JobResponsible ON JobResponsible.user_id = WorkingHours.user_id AND JobResponsible.job_id = WorkingHours.job_id
+                    Where WorkingHours.job_id = '{job_id}'                    
+                    GROUP BY WorkingHours.user_id, Authen.name,Authen.user_id,JobResponsible.levels, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
+                    ORDER BY WorkingHours.user_id");
                 SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
                 if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                 {
@@ -221,7 +224,7 @@ namespace WebENG.Service
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
-                            hours = dr["hours"] != DBNull.Value ? Convert.ToDouble(dr["hours"]) : 0,
+                            hours = dr["hours"] != DBNull.Value ? Math.Truncate(Convert.ToDouble(dr["hours"])) * (dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"].ToString()) : 1) : 0,
                             percents = 0
                         };
                         mrs.Add(mr);
