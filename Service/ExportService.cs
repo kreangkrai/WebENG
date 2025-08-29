@@ -167,6 +167,7 @@ namespace WebENG.Service
                         worksheet.Cells["AK" + (i + startRows)].Value = jobs[i].retention;
                         worksheet.Cells["AL" + (i + startRows)].Value = statuses.Where(w=>w.status_id == jobs[i].status).Select(s=>s.status_name).FirstOrDefault();
                         worksheet.Cells["AM" + (i + startRows)].Value = jobs[i].responsible;
+                        worksheet.Cells["AN" + (i + startRows)].Value = jobs[i].note;
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;
