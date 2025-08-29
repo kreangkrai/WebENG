@@ -153,7 +153,7 @@ namespace WebENG.Service
                         WorkingHours.user_id,
 	                    EngineerUsers.user_name,
                         Quotation.customer,
-                        note
+                        WorkingHours.note
                     FROM WorkingHours 
                     LEFT JOIN EngineerUsers ON WorkingHours.user_id = EngineerUsers.user_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
