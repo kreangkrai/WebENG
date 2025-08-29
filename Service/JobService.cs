@@ -90,6 +90,8 @@ namespace WebENG.Service
 						Term_Payment.as_built,
 						Term_Payment.warranty,
 						Term_Payment.finished,
+                        Term_Payment.complete,
+                        Term_Payment.after_hmc,
 						Jobs.job_in_hand,
                         Jobs.job_eng_in_hand,
                         Jobs.job_cis_in_hand,
@@ -103,7 +105,8 @@ namespace WebENG.Service
 						Jobs.bg_start,
 						Jobs.bg_finish,
 						Jobs.retention,
-                        Jobs.responsible
+                        Jobs.responsible,
+                        Jobs.note
                     FROM Jobs
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
                     ORDER BY Jobs.job_id");
@@ -138,7 +141,9 @@ namespace WebENG.Service
                             startup = dr["startup"] != DBNull.Value ? Convert.ToInt32(dr["startup"]) : 0,
                             as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
                             warranty = dr["warranty"] != DBNull.Value ? Convert.ToInt32(dr["warranty"]) : 0,
-                            finished = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0
+                            finished = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0,
+                            after_hmc = dr["after_hmc"] != DBNull.Value ? Convert.ToInt32(dr["after_hmc"]) : 0,
+                            complete = dr["complete"] != DBNull.Value ? Convert.ToInt32(dr["complete"]) : 0,
                         };
                         JobModel job = new JobModel()
                         {
@@ -180,6 +185,7 @@ namespace WebENG.Service
                             bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
                             retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"].ToString()) : 0,
                             responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
+                            note = dr["note"].ToString()
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -362,7 +368,8 @@ namespace WebENG.Service
                             bg_start,
                             bg_finish,
                             retention,
-                            responsible
+                            responsible,
+                            note
                         )
                         VALUES(@job_id,
                             @job_name,
@@ -394,7 +401,8 @@ namespace WebENG.Service
                             @bg_start,
                             @bg_finish,
                             @retention,
-                            @responsible
+                            @responsible,
+                            @note
                         )");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -430,6 +438,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@bg_finish", job.bg_finish);
                     cmd.Parameters.AddWithValue("@retention", job.retention);
                     cmd.Parameters.AddWithValue("@responsible", job.responsible);
+                    cmd.Parameters.AddWithValue("@note", job.note);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -494,7 +503,8 @@ namespace WebENG.Service
                         bg_start = @bg_start,
                         bg_finish = @bg_finish,
                         retention = @retention,
-                        responsible = @responsible
+                        responsible = @responsible,
+                        note = @note
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
                 {
@@ -532,6 +542,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@bg_finish", job.bg_finish);
                     cmd.Parameters.AddWithValue("@retention", job.retention);
                     cmd.Parameters.AddWithValue("@responsible", job.responsible);
+                    cmd.Parameters.AddWithValue("@note", job.note);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -801,6 +812,8 @@ namespace WebENG.Service
                              startup,
                              as_built,
                              warranty,
+                             complete,
+                             after_hmc,
                              finished
                         )
                         VALUES(@job_id,
@@ -838,6 +851,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@startup", term_Payment.startup);
                     cmd.Parameters.AddWithValue("@as_built", term_Payment.as_built);
                     cmd.Parameters.AddWithValue("@warranty", term_Payment.warranty);
+                    cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
+                    cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
@@ -881,6 +896,8 @@ namespace WebENG.Service
                         startup = @startup,
                         as_built = @as_built,
                         warranty = @warranty,
+                        complete = @complete,
+                        after_hmc = @after_hmc,
                         finished = @finished
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
@@ -901,6 +918,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@startup", term_Payment.startup);
                     cmd.Parameters.AddWithValue("@as_built", term_Payment.as_built);
                     cmd.Parameters.AddWithValue("@warranty", term_Payment.warranty);
+                    cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
+                    cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {

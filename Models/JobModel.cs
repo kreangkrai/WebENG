@@ -52,6 +52,7 @@ namespace WebENG.Models
         public DateTime bg_finish { get; set; }
         public int retention { get; set; }
         public string responsible { get; set; }
+        public string note { get; set; }
     }
 
     public class InvoiceModel
@@ -83,6 +84,8 @@ namespace WebENG.Models
         public int as_built { get; set; }
         public int warranty { get; set; }
         public int finished { get; set; }
+        public int complete { get; set; }
+        public int after_hmc { get; set; }
     }
 
     public class JobProcessSystemModel

@@ -105,6 +105,7 @@
                             <th>Name</th>
                             <th>Quotation</th>
                             <th>Customer</th>
+                            <th>Status</th>
                             <th>End User</th>
                             <th>Sale Name</th>
                             <th>Department</th>
@@ -119,7 +120,6 @@
                             <th>MP</th>
                             <th>Cost/MP</th>
                             <th>OT MP</th>
-                            <th>Status</th>
                             <th>C SAT.</th>
                             <th>GP</th>
                             <th>EST Cost</th>
@@ -135,6 +135,7 @@
                             <th>Name</th>
                             <th>Quotation</th>
                             <th>Customer</th>
+                            <th>Status</th>
                             <th>End User</th>
                             <th>Sale Name</th>
                             <th>Department</th>
@@ -147,7 +148,6 @@
                             <th>MP</th>
                             <th>Cost/MP</th>
                             <th>OT MP</th>
-                            <th>Status</th>
                             <th>C SAT.</th>
                             <th>GP</th>
                             <th>EST Cost</th>
@@ -740,6 +740,25 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="card" style="overflow-x:auto">
+                        <div class="card-header" style="background-color:#42D5D8">
+                            <span style="font-weight:bold">Note</span>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                    <i class="fas fa-minus" style="color:black"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="col-sm-12 col-md-12 col-xl-12">
+                                    <textarea id="note" class="form-control">
+                                    </textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -1150,6 +1169,7 @@
                     jobs[i].job_name,
                     jobs[i].quotation_no,
                     jobs[i].customer,
+                    jobs[i].status,
                     jobs[i].enduser,
                     jobs[i].sale_name,
                     jobs[i].department,
@@ -1163,8 +1183,7 @@
                     jobs[i].md_rate * jobs[i].pd_rate, //Factor
                     jobs[i].manpower,
                     jobs[i].cost_per_manpower,
-                    jobs[i].ot_manpower,
-                    jobs[i].status,
+                    jobs[i].ot_manpower,                   
                     "", //Customer Satisfaction
                     jobs[i].gp,
                     jobs[i].est_cost,
@@ -1182,14 +1201,14 @@
                 },
                 columnDefs: [
                     {
-                        targets: [4, 5, 6, 12, 13, 15, 16, 17,20,21,22,23],
+                        targets: [5, 6, 12, 13, 15, 16, 17,19,20,21,22,23],
                         visible: false
                     },
                 ],
                 rowCallback: function (row, data) {
                     $('td:eq(1)', row).addClass("text-left");
                     $('td:eq(3)', row).addClass("text-left");
-                    let code_status = data[18];
+                    let code_status = data[4];
                     let status = statuses.filter(f=>f.status_id === code_status).map(m=>m.status_name);
                     let status_str =  '';
                     if (code_status === "STA999"){
@@ -1198,7 +1217,7 @@
                         status_str = `<span class="badge badge-warning">${status}</span>`;
                     }
 
-                    $('td:eq(10)', row).html(status_str);
+                    $('td:eq(4)', row).html(status_str);
                 }
             });
         };
@@ -1482,18 +1501,19 @@
 
             let list_invoice = job.invoices;
 
-            let eng_cost = data[9].replaceAll(",", "");
-            let cis_cost = data[10].replaceAll(",", "");
-            let ais_cost = data[11].replaceAll(",", "");
-            let md = data[12];
-            let pd = data[13];
-            let status = data[18];
+            let eng_cost = data[10].replaceAll(",", "");
+            let cis_cost = data[11].replaceAll(",", "");
+            let ais_cost = data[12].replaceAll(",", "");
+            let md = data[13];
+            let pd = data[14];
+            let status = data[4];
             let gp = data[20];
             let est_cost = data[21];
             let total_cost = data[22];
             let remaining_cost = data[23];
             let finished_date = jobs.filter(f => f.job_id == job_id).map(m => m.finished_date)[0];
             let responsible = job.responsible;
+            let note = job.note;
 
             $('#job_id').val(job_id);
             $('#job_id').attr('disabled', true);
@@ -1520,6 +1540,7 @@
             $('#job_cis_in_hand').val(job.job_cis_in_hand);
             $('#job_ais_in_hand').val(job.job_ais_in_hand);
             $('#due_date').val(job.due_date.split('T')[0]);
+            $('#note').val(note);
 
             $('#finished_date').val(finished_date.split('T')[0]);
             $('#warranty_period').val(job.warranty_period);
@@ -1607,22 +1628,25 @@
             datas_percent.push(job.term_payment.commissioning);
             datas_percent.push(job.term_payment.startup);
             datas_percent.push(job.term_payment.as_built);
-            datas_percent.push(job.term_payment.warranty);
+            datas_percent.push(job.term_payment.warranty);          
+            datas_percent.push(job.term_payment.complete);
+            datas_percent.push(job.term_payment.after_hmc);
             datas_percent.push(job.term_payment.finished);
 
             for (let i =0;i<statuses.length;i++){
                 set_payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
             }
-
+     
             //Term Payment
             let new_payments = [];
             for (let i=0;i<set_payments.length;i++){
                 if (set_payments[i].percent > 0){
                     new_payments.push(set_payments[i]);
                 }
+                
             }
             set_payments = new_payments;
-
+            
             //Process
             for (let i=0;i<list_process.length;i++){
                 let process_id = processes.filter(f=>f.process_name == list_process[i] ).map(m=>m.process_id)[0];
@@ -1733,6 +1757,7 @@
             let bg_finish = $('#bg_finish').val();
             let retention = $('#retention').val();
             let responsible = $('#select_responsible').val();
+            let note = $('#note').val();
             if (status === null) {
                 status = 1;
             }
@@ -1751,7 +1776,9 @@
             let commissioning = set_payments.filter(f=>f.payment_id == "STA011").map(m=>m.percent)[0];
             let startup = set_payments.filter(f=>f.payment_id == "STA012").map(m=>m.percent)[0];
             let as_built = set_payments.filter(f=>f.payment_id == "STA013").map(m=>m.percent)[0];
-            let warranty = set_payments.filter(f=>f.payment_id == "STA014").map(m=>m.percent)[0];
+            let warranty = set_payments.filter(f => f.payment_id == "STA014").map(m => m.percent)[0];
+            let complete = set_payments.filter(f => f.payment_id == "STA015").map(m => m.percent)[0];
+            let after_hmc = set_payments.filter(f => f.payment_id == "STA016").map(m => m.percent)[0];
             let finished = set_payments.filter(f=>f.payment_id == "STA999").map(m=>m.percent)[0];
 
             term_payment.job_id = job_id;
@@ -1768,7 +1795,9 @@
             term_payment.commissioning = commissioning;
             term_payment.startup = startup;
             term_payment.as_built = as_built;
-            term_payment.warranty = warranty;
+            term_payment.warranty = warranty;           
+            term_payment.complete = complete;
+            term_payment.after_hmc = after_hmc;
             term_payment.finished = finished;
 
             let invoices = [];
@@ -1841,7 +1870,8 @@
                 "bg_start": bg_start,
                 "bg_finish": bg_finish,
                 "retention": retention,
-                "responsible":responsible
+                "responsible": responsible,
+                "note":note
             });
 
             if (update) {

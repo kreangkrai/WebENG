@@ -47,7 +47,9 @@ namespace WebENG.Service
                             startup = dr["startup"] != DBNull.Value ? Convert.ToInt32(dr["startup"]) : 0,
                             as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
                             warranty = dr["warranty"] != DBNull.Value ? Convert.ToInt32(dr["warranty"]) : 0,
-                            finished = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0
+                            finished = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0,
+                            after_hmc = dr["after_hmc"] != DBNull.Value ? Convert.ToInt32(dr["after_hmc"]) : 0,
+                            complete = dr["complete"] != DBNull.Value ? Convert.ToInt32(dr["complete"]) : 0,
                         };
                     }
                 }
@@ -82,7 +84,9 @@ namespace WebENG.Service
                                             startup,
                                             as_built,
                                             warranty,
-                                            finished
+                                            finished,
+                                            complete,
+                                            after_hmc
                                             )
                                      VALUES(@job_id,
                                             @down_payment,
@@ -99,7 +103,9 @@ namespace WebENG.Service
                                             @startup,
                                             @as_built,
                                             @warranty,
-                                            @finished
+                                            @finished,
+                                            @complete,
+                                            @after_hmc
                                             )");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
@@ -120,6 +126,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@as_built", term_Payment.as_built);
                     cmd.Parameters.AddWithValue("@warranty", term_Payment.warranty);
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
+                    cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
+                    cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
@@ -159,7 +167,9 @@ namespace WebENG.Service
                         startup = @startup,
                         as_built = @as_built,
                         warranty = @warranty,
-                        finished = @finished
+                        finished = @finished,
+                        complete = @complete
+                        after_hmc = @after_hmc
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
                 {
@@ -179,6 +189,8 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@as_built", term_Payment.as_built);
                     cmd.Parameters.AddWithValue("@warranty", term_Payment.warranty);
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
+                    cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
+                    cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
                     if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
                     {
                         ConnectSQL.CloseConnect();
