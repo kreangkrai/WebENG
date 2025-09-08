@@ -831,6 +831,8 @@ namespace WebENG.Service
                                 @startup,
                                 @as_built,
                                 @warranty,
+                                @complete,
+                                @after_hmc,
                                 @finished
                         )");
                 using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
