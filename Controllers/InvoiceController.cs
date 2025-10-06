@@ -94,7 +94,7 @@ namespace WebENG.Controllers
             if (department == "ENG")
             {
                 List<QuarterENGModel> datas = SummaryJobInHand.GetsSummaryENGQuarter(year);
-                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J").ToList();
+                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_eng_in_hand > 0).ToList();
 
                 List<SummaryENGQuarterModel> quarters = new List<SummaryENGQuarterModel>();
 
@@ -203,7 +203,7 @@ namespace WebENG.Controllers
             if (department == "CIS")
             {
                 List<QuarterCISModel> datas = SummaryJobInHand.GetsSummaryCISQuarter(year);
-                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J").ToList();
+                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_cis_in_hand > 0).ToList();
 
                 List<SummaryCISQuarterModel> quarters = new List<SummaryCISQuarterModel>();
 
@@ -312,7 +312,7 @@ namespace WebENG.Controllers
             if (department == "AIS")
             {
                 List<QuarterAISModel> datas = SummaryJobInHand.GetsSummaryAISQuarter(year);
-                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J").ToList();
+                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_ais_in_hand > 0).ToList();
 
                 List<SummaryAISQuarterModel> quarters = new List<SummaryAISQuarterModel>();
 
