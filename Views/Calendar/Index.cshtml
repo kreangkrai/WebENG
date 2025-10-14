@@ -864,7 +864,7 @@
                 $('#lunch_full').attr('disabled', true);
                 $('#lunch_half').attr('disabled', true);
 
-                if (total_minute_stop >= 1050) {  // >= 17:30
+                if (total_minute_stop > 1050) {  // > 17:30
                     $('#dinner_full').attr('checked', true);
                     $('#dinner_half').attr('checked', false);
                     $('#dinner_full').attr('disabled', false);
@@ -878,7 +878,7 @@
 
             }
 
-            if (total_minute_start < 720 && total_minute_stop < 720) {  // < 12:00
+            if (total_minute_start <= 720 && total_minute_stop <= 720) {  // < 12:00
                 $('#dinner_full').attr('checked', false);
                 $('#dinner_half').attr('checked', false);
                 $('#dinner_full').attr('disabled', true);
@@ -896,7 +896,7 @@
                 $('#dinner_half').attr('disabled', false);
             }
 
-            if (total_minute_start >= 1050 && total_minute_stop >= 1050) {  // < 12:00
+            if (total_minute_start > 1050 && total_minute_stop > 1050) {  // < 12:00
                 $('#dinner_full').attr('checked', true);
                 $('#dinner_half').attr('checked', false);
                 $('#dinner_full').attr('disabled', false);
@@ -908,7 +908,7 @@
                 $('#dinner_half').attr('disabled', true);
             }
 
-            if (total_minute_stop >= 1050) {  // > 17:30
+            if (total_minute_stop > 1050) {  // > 17:30
                 $('#dinner_full').attr('checked', true);
                 $('#dinner_half').attr('checked', false);
                 $('#dinner_full').attr('disabled', false);

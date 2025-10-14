@@ -1299,6 +1299,7 @@ namespace WebENG.Service
             {
                 day = date.DayOfWeek.ToString();
                 List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date).ToList();
+                //_wd = _wd.Where(w => w.date == new DateTime(2025, 10, 15)).ToList();
                 bool isHoliday = holidays.Where(w => w.date.Date == date.Date).Count() > 0 ? true : false;
                 bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
                 if (isHoliday)
@@ -1309,6 +1310,8 @@ namespace WebENG.Service
                 {
                     for (int i = 0; i < _wd.Count; i++)
                     {
+                        _wd[i].workings = _wd[i].workings.OrderBy(o => o.start_time).ToList();
+
                         bool chk_after_office = false;
                         working_date = new TimeSpan(0, 0, 0);
 
@@ -1316,6 +1319,43 @@ namespace WebENG.Service
                         TimeSpan ot15 = new TimeSpan(0, 0, 0);
                         TimeSpan ot3 = new TimeSpan(0, 0, 0);
                         TimeSpan leave = new TimeSpan(0, 0, 0);
+
+                        // Last index Customer of Work Day
+                        int last_customer_index = _wd[i].workings.Count-1;
+                        int first_customer_index = 0;
+                        bool all_traveling = _wd[i].workings.All(a => a.task_name == "Traveling");
+                        if (all_traveling)
+                        {
+                            last_customer_index = -1;
+                            first_customer_index = -1;
+                        }
+                        else
+                        {
+                            for (int k = _wd[i].workings.Count - 1; k >= 0; k--)
+                            {
+                                if (_wd[i].workings[k].task_name != "Traveling")
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    last_customer_index--;
+                                }
+                            }
+
+                            for (int k = 0; k < _wd[i].workings.Count; k++)
+                            {
+                                if (_wd[i].workings[k].task_name != "Traveling")
+                                {
+                                    break;
+                                }
+                                else
+                                {
+                                    first_customer_index++;
+                                }
+                            }
+                        }
+
                         for (int j = 0; j < _wd[i].workings.Count; j++)
                         {
                             chk_after_office = false;
@@ -1475,11 +1515,25 @@ namespace WebENG.Service
                                 };
                                 monthly.Add(wh);
                             }
-                            else
+                            else  // Regular day
                             {
                                 day = _wd[i].workings[j].working_date.DayOfWeek.ToString();
-                                if (_wd[i].workings[j].task_name == "Traveling")
+
+                                // Last Traveling exclude working hours
+                                                                                           
+                                if (_wd[i].workings[j].task_name == "Traveling" && j > last_customer_index)
+                                //if (_wd[i].workings[j].task_name == "Traveling")
                                 {
+                                    if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time >= new TimeSpan (8,30,0))
+                                    {
+                                        _wd[i].workings[j].start_time = new TimeSpan(8, 30, 0);
+                                    }
+                                    else if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time < new TimeSpan(8, 30, 0))
+                                    {
+                                        _wd[i].workings[j].start_time = new TimeSpan(8, 30, 0);
+                                        _wd[i].workings[j].stop_time = new TimeSpan(8, 30, 0);
+                                    }
+
                                     regular = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
                                     ot15 = default(TimeSpan);
                                     ot3 = default(TimeSpan);
@@ -1535,7 +1589,7 @@ namespace WebENG.Service
                                     monthly.Add(wh);
                                     regular = new TimeSpan(0, 0, 0);
                                     continue;
-                                }
+                                }                                
                                 else if (_wd[i].workings[j].task_name == "Leave")
                                 {
                                     regular = default(TimeSpan);
@@ -1609,6 +1663,21 @@ namespace WebENG.Service
                                             chk_after_office = true;
                                         }
                                     }
+                                    else if (_wd[i].workings[j].task_name == "Traveling")
+                                    {
+                                        if (first_customer_index != -1 && first_customer_index > j)
+                                        {
+                                            if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time >= new TimeSpan(8, 30, 0))
+                                            {
+                                                _wd[i].workings[j].start_time = new TimeSpan(8, 30, 0);
+                                            }
+                                            else if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time < new TimeSpan(8, 30, 0))
+                                            {
+                                                _wd[i].workings[j].start_time = new TimeSpan(8, 30, 0);
+                                                _wd[i].workings[j].stop_time = new TimeSpan(8, 30, 0);
+                                            }
+                                        }
+                                    }
 
                                     if (!chk_after_office)
                                     {
@@ -1657,7 +1726,9 @@ namespace WebENG.Service
                                 }
 
                                 //Check Sum Regular
-                                TimeSpan sum_regular = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Traveling" && w.task_name != "Leave").ToList().Aggregate(
+                                //TimeSpan sum_regular = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Traveling" && w.task_name != "Leave").ToList().Aggregate(
+                                  // TimeSpan.Zero, (sum_reg, next_reg) => sum_reg + next_reg.normal) + regular;
+                                TimeSpan sum_regular = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Leave").ToList().Aggregate(
                                     TimeSpan.Zero, (sum_reg, next_reg) => sum_reg + next_reg.normal) + regular;
                                 if (sum_regular > new TimeSpan(8, 0, 0))
                                 {
