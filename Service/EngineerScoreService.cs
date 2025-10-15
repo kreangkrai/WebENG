@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,14 @@ namespace WebENG.Service
 {
     public class EngineerScoreService : IScore
     {
-        public List<EngineerScoreModel> GetScores(string user_id, string department)
+		ConnectSQL connect = null;
+		SqlConnection con = null;
+        public EngineerScoreService()
+        {
+			connect = new ConnectSQL();
+			con = connect.OpenConnect();
+		}
+		public List<EngineerScoreModel> GetScores(string user_id, string department)
         {
 			string cost = "";
 			if (department == "ENG")
@@ -33,6 +41,10 @@ namespace WebENG.Service
 			{				
 				try
 				{
+					if (con.State == ConnectionState.Closed)
+					{
+						con.Open();
+					}
 					string string_command = string.Format($@"                                       
                 with t2 as (
 					SELECT t.job_id,CAST(SUM(t.total_manpower * t. level) AS decimal(18,1)) as total_manpower ,
@@ -193,12 +205,7 @@ namespace WebENG.Service
                     INNER JOIN t3					
                     ON t1.job_id = t3.job_id
                  WHERE t1.user_id = '{user_id}'");
-					SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-					if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-					{
-						ConnectSQL.CloseConnect();
-						ConnectSQL.OpenConnect();
-					}
+					SqlCommand cmd = new SqlCommand(string_command, con);
 					SqlDataReader dr = cmd.ExecuteReader();
 					if (dr.HasRows)
 					{
@@ -228,9 +235,9 @@ namespace WebENG.Service
 				}
 				finally
 				{
-					if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+					if (con.State == ConnectionState.Open)
 					{
-						ConnectSQL.CloseConnect();
+						con.Close();
 					}
 				}
 			}

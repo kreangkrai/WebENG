@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,9 +12,13 @@ namespace WebENG.Service
     public class QuotationSummaryService : IQuotationSummary
     {
         private IJob Job;
+        ConnectSQL connect = null;
+        SqlConnection con = null;
         public QuotationSummaryService()
         {
             Job = new JobService();
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
         }
         public List<QuotationSummaryModel> GetQuotationSummaries()
         {
@@ -23,6 +28,10 @@ namespace WebENG.Service
             List<QuotationSummaryModel> quotations = new List<QuotationSummaryModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"SELECT job_id,
 	                                                        job_name,
 	                                                        job_date,
@@ -32,12 +41,7 @@ namespace WebENG.Service
 	                                                        sale_department,
 	                                                        job_type 
                                                         FROM Jobs WHERE job_id LIKE 'Q%'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -67,9 +71,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return quotations;

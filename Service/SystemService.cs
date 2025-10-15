@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,18 +11,24 @@ namespace WebENG.Service
 {
     public class SystemService : ISystem
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public SystemService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<EngSystemModel> GetSystems()
         {
             List<EngSystemModel> systems = new List<EngSystemModel>();
             try
             {
-                string string_command = string.Format($@"SELECT [No], System_ID, System_Name, System_Description FROM Eng_System");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT [No], System_ID, System_Name, System_Description FROM Eng_System");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -41,9 +48,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return systems;
@@ -54,13 +61,12 @@ namespace WebENG.Service
             int id = 0;
             try
             {
-                string string_command = string.Format($@"SELECT TOP 1 System_ID FROM Eng_System ORDER BY System_ID DESC");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT TOP 1 System_ID FROM Eng_System ORDER BY System_ID DESC");
+                SqlCommand cmd = new SqlCommand(string_command,con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -73,9 +79,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return id;
@@ -85,28 +91,27 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO Eng_System(System_ID, System_Name, System_Description)
                     VALUES(@System_ID, @System_Name, @System_Description)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@System_ID", system.system_id);
                     cmd.Parameters.AddWithValue("@System_Name", system.system_name);
                     cmd.Parameters.AddWithValue("@System_Description", system.system_description);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -116,31 +121,30 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE Eng_System
                     SET
                         System_Name = @System_Name,
                         System_Description = @System_Description
                     WHERE System_ID = @System_ID");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@System_Name", system.system_name);
                     cmd.Parameters.AddWithValue("@System_Description", system.system_description);
                     cmd.Parameters.AddWithValue("@System_ID", system.system_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -150,24 +154,23 @@ namespace WebENG.Service
         {
             try
             {
-                string string_command = string.Format($@"DELETE FROM Eng_System WHERE System_ID = @System_ID");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                if (con.State == ConnectionState.Closed)
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    con.Open();
+                }
+                string string_command = string.Format($@"DELETE FROM Eng_System WHERE System_ID = @System_ID");
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
+                {
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@System_ID", system.system_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

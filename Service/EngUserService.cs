@@ -6,23 +6,32 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Service;
+using System.Data;
 
 namespace WebENG.Service
 {
     public class EngUserService : IEngUser
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        SqlConnection con_gps = null;
+        public EngUserService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+            con_gps = connect.Open_db_gps_Connect();
+        }
         public bool CheckAllowEditable(string user_name)
         {
             bool allow = false;
             try
             {
-                string string_command = string.Format($@"SELECT allow_edit FROM EngineerUsers Where LOWER(user_name) = '{user_name}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (cmd.Connection.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    cmd.Connection.Close();
-                    cmd.Connection.Open();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT allow_edit FROM EngineerUsers Where LOWER(user_name) = '{user_name}'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -35,9 +44,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return allow;
@@ -48,13 +57,12 @@ namespace WebENG.Service
             List<EngUserModel> users = new List<EngUserModel>();
             try
             {
-                string string_command = string.Format($@"SELECT * FROM Sale_User");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.Open_db_gps_Connect());
-                if (cmd.Connection.State != System.Data.ConnectionState.Open)
+                if (con_gps.State == ConnectionState.Closed)
                 {
-                    cmd.Connection.Close();
-                    cmd.Connection.Open();
+                    con_gps.Open();
                 }
+                string string_command = string.Format($@"SELECT * FROM Sale_User");
+                SqlCommand cmd = new SqlCommand(string_command, con_gps);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -76,9 +84,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con_db_gps.State == System.Data.ConnectionState.Open)
+                if (con_gps.State == ConnectionState.Open)
                 {
-                    ConnectSQL.Close_db_gps_Connect();
+                    con_gps.Close();
                 }
             }
             return users.GroupBy(g => g.user_name).Select(s => s.FirstOrDefault()).ToList();
@@ -89,6 +97,10 @@ namespace WebENG.Service
             List<EngUserModel> engineers = new List<EngUserModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT 
                         user_id,
@@ -97,12 +109,7 @@ namespace WebENG.Service
                         role,
                         allow_edit
                     FROM EngineerUsers");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (cmd.Connection.State != System.Data.ConnectionState.Open)
-                {
-                    cmd.Connection.Close();
-                    cmd.Connection.Open();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -123,9 +130,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return engineers;
@@ -136,6 +143,10 @@ namespace WebENG.Service
             List<EngUserModel> engineers = new List<EngUserModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT 
                         user_id,
@@ -145,12 +156,7 @@ namespace WebENG.Service
                         allow_edit
                     FROM EngineerUsers
                     WHERE LOWER(user_name) = '{user_name}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (cmd.Connection.State != System.Data.ConnectionState.Open)
-                {
-                    cmd.Connection.Close();
-                    cmd.Connection.Open();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -171,9 +177,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             EngUserModel engineer = engineers.Where(w => w.user_name.ToLower() == user_name).FirstOrDefault();
@@ -184,30 +190,29 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO 
                         EngineerUsers(user_id, user_name, department, allow_edit)
                         VALUES(@user_id, @user_name, @department, @allow_edit)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@user_id", engineer.user_id);
                     cmd.Parameters.AddWithValue("@user_name", engineer.user_name);
                     cmd.Parameters.AddWithValue("@department", engineer.department);
                     cmd.Parameters.AddWithValue("@allow_edit", engineer.allow_edit);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -217,6 +222,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE EngineerUsers 
                     SET
@@ -224,26 +233,21 @@ namespace WebENG.Service
                         department = @department,
                         allow_edit = @allow_edit
                     WHERE user_id = @user_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@user_id", engineer.user_id);
                     cmd.Parameters.AddWithValue("@user_name", engineer.user_name);
                     cmd.Parameters.AddWithValue("@department", engineer.department);
                     cmd.Parameters.AddWithValue("@allow_edit", engineer.allow_edit);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

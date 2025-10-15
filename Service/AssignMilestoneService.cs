@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,22 @@ namespace WebENG.Service
 {
     public class AssignMilestoneService : IAssignMilestone
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public AssignMilestoneService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<AssignMilestoneModel> GetAssignedEngineers()
         {
             List<AssignMilestoneModel> engs = new List<AssignMilestoneModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string strCmd = string.Format($@"
                 SELECT 
 	                AssignMilestone.No,
@@ -49,7 +60,7 @@ namespace WebENG.Service
 	                ) AS T1 
                 ON AssignMilestone.Job_Milestone_ID = T1.Job_Milestone_ID AND AssignMilestone.User_ID = T1.User_ID
                 ORDER BY Jobs.Job_ID, Milestones.Milestone_ID ASC");
-                SqlCommand command = new SqlCommand(strCmd, connection);
+                SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -79,7 +90,10 @@ namespace WebENG.Service
             }
             finally
             {
-                connection.Close();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return engs;
         }
@@ -87,9 +101,12 @@ namespace WebENG.Service
         public List<AssignMilestoneModel> GetEngineerAssignedJobs(string engId)
         {
             List<AssignMilestoneModel> engs = new List<AssignMilestoneModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string strCmd = string.Format($@"
                 SELECT 
 	                AssignMilestone.No,
@@ -124,7 +141,7 @@ namespace WebENG.Service
                 ON AssignMilestone.Job_Milestone_ID = T1.Job_Milestone_ID AND AssignMilestone.User_ID = T1.User_ID
                 WHERE AssignMilestone.User_ID = '{engId}'
                 ORDER BY Jobs.Job_ID, Milestones.Milestone_ID ASC");
-                SqlCommand command = new SqlCommand(strCmd, connection);
+                SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -154,7 +171,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return engs;
         }
@@ -162,9 +182,12 @@ namespace WebENG.Service
         public List<AssignMilestoneModel> GetJobAssignedEngineers(string jobId)
         {
             List<AssignMilestoneModel> engs = new List<AssignMilestoneModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string strCmd = string.Format($@"
                 SELECT 
 	                AssignMilestone.No,
@@ -199,7 +222,7 @@ namespace WebENG.Service
                 ON AssignMilestone.Job_Milestone_ID = T1.Job_Milestone_ID AND AssignMilestone.User_ID = T1.User_ID
                 WHERE Jobs.Job_ID = '{jobId}'
                 ORDER BY Jobs.Job_ID, Milestones.Milestone_ID ASC");
-                SqlCommand command = new SqlCommand(strCmd, connection);
+                SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -229,16 +252,22 @@ namespace WebENG.Service
             }
             catch
             {
-                connection.Close();
+                if(con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return engs;
         }
 
         public string AddEngineer(AssignMilestoneModel asgEng)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 INSERT INTO AssignMilestone (
                     Job_Milestone_ID,
@@ -249,8 +278,8 @@ namespace WebENG.Service
                     @User_ID,
                     @Days
                 )");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@Job_Milestone_ID", asgEng.job_milestone_id);
                 command.Parameters.AddWithValue("@User_ID", asgEng.user_id);
                 command.Parameters.AddWithValue("@Days", asgEng.days);
@@ -262,20 +291,26 @@ namespace WebENG.Service
             }
             finally
             {
-                connection.Close();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }
 
         public string EditEngineer(AssignMilestoneModel asgEng)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 UPDATE AssignMilestone SET Days = @Days WHERE Job_Milestone_ID = @Job_Milestone_ID AND User_ID = @User_ID");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@Job_Milestone_ID", asgEng.job_milestone_id);
                 command.Parameters.AddWithValue("@User_ID", asgEng.user_id);
                 command.Parameters.AddWithValue("@Days", asgEng.days);
@@ -287,21 +322,27 @@ namespace WebENG.Service
             }
             finally
             {
-                connection.Close();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }
 
         public string DeleteEngineer(AssignMilestoneModel asgEng)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 DELETE FROM AssignMilestone WHERE Job_Milestone_ID = @Job_Milestone_ID AND User_ID = @User_ID;
                 DELETE FROM PlanManday WHERE Job_Milestone_ID = @Job_Milestone_ID AND User_ID = @User_ID;");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@Job_Milestone_ID", asgEng.job_milestone_id);
                 command.Parameters.AddWithValue("@User_ID", asgEng.user_id);
                 command.ExecuteNonQuery();
@@ -312,7 +353,10 @@ namespace WebENG.Service
             }
             finally
             {
-                connection.Close();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }

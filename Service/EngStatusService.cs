@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,32 +11,38 @@ namespace WebENG.Service
 {
     public class EngStatusService : IStatus
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public EngStatusService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public string CreateStatus(EngStatusModel status)
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO Eng_Status(Status_ID, Status_Name, Status_Description)
                     VALUES(@Status_ID, @Status_Name, @Status_Description)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@Status_ID", status.status_id);
                     cmd.Parameters.AddWithValue("@Status_Name", status.status_name);
                     cmd.Parameters.AddWithValue("@Status_Description", status.status_description);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -45,24 +52,23 @@ namespace WebENG.Service
         {
             try
             {
-                string string_command = string.Format($@"DELETE FROM Eng_Status WHERE Status_ID = @Status_ID");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                if (con.State == ConnectionState.Closed)
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    con.Open();
+                }
+                string string_command = string.Format($@"DELETE FROM Eng_Status WHERE Status_ID = @Status_ID");
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
+                {
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@Status_ID", status.status_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -72,31 +78,30 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE Eng_Status 
                     SET
                         Status_Name = @Status_Name,
                         Status_Description = @Status_Description
                     WHERE Status_ID = @Status_ID");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@Status_Name", status.status_name);
                     cmd.Parameters.AddWithValue("@Status_Description", status.status_description);
                     cmd.Parameters.AddWithValue("@Status_ID", status.status_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -107,13 +112,12 @@ namespace WebENG.Service
             int id = 0;
             try
             {
-                string string_command = string.Format($@"SELECT TOP 1 Status_ID FROM Eng_Status ORDER BY Status_ID DESC");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT TOP 1 Status_ID FROM Eng_Status ORDER BY Status_ID DESC");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -126,9 +130,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return id;
@@ -139,13 +143,12 @@ namespace WebENG.Service
             List<EngStatusModel> statuses = new List<EngStatusModel>();
             try
             {
-                string string_command = string.Format($@"SELECT [No], Status_ID, Status_Name, Status_Description FROM Eng_Status");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT [No], Status_ID, Status_Name, Status_Description FROM Eng_Status");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -165,9 +168,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return statuses;

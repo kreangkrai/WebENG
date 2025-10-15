@@ -6,11 +6,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
 using WebENG.Service;
+using System.Data;
 
 namespace WebENG.Services
 {
     public class CalculateOvertimeService : ICalculateWorkingHours
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public CalculateOvertimeService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public WorkingHoursModel CalculateOvertime(WorkingHoursModel wh)
         {
             DateTime date = wh.working_date;
@@ -107,6 +115,10 @@ namespace WebENG.Services
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
 		            WITH main AS (
 		                SELECT 
@@ -179,12 +191,7 @@ namespace WebENG.Services
 			                    GROUP BY s.user_id, s.working_date, s.wh_type ) AS s1
 		                    GROUP BY s1.user_id )
 		            SELECT * FROM main ORDER BY main.working_date DESC, main.user_id, main.start_time");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -207,9 +214,9 @@ namespace WebENG.Services
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;

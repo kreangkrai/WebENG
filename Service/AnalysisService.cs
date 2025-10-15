@@ -6,16 +6,28 @@ using System.Threading.Tasks;
 using WebENG.Service;
 using WebENG.Interface;
 using WebENG.Models;
+using System.Data;
 
 namespace WebENG.Service
 {
     public class AnalysisService : IAnalysis
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public AnalysisService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<TaskRatioModel> GetTaskRatio(string job_id)
         {
             List<TaskRatioModel> trs = new List<TaskRatioModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 
                     SELECT 
@@ -52,12 +64,7 @@ namespace WebENG.Service
                     WHERE WorkingHours.job_id = '{job_id}'
                     GROUP BY WorkingHours.task_id, Tasks.task_name, WorkingHours.job_id, Jobs.job_name
                     ORDER BY hours desc");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -79,9 +86,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return trs;
@@ -92,6 +99,10 @@ namespace WebENG.Service
             List<TaskDistributionModel> tds = new List<TaskDistributionModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT 
 	                    WorkingHours.job_id,
@@ -127,12 +138,7 @@ namespace WebENG.Service
                     WHERE WorkingHours.job_id = '{job_id}'
                     GROUP BY WorkingHours.task_id, Tasks.task_name, WorkingHours.job_id, Jobs.job_name
                     ORDER BY hours desc");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -153,9 +159,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return tds;
@@ -166,6 +172,10 @@ namespace WebENG.Service
             List<ManpowerRatioModel> mrs = new List<ManpowerRatioModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT 
 	                    WorkingHours.user_id,
@@ -207,12 +217,7 @@ namespace WebENG.Service
                     Where WorkingHours.job_id = '{job_id}'                    
                     GROUP BY WorkingHours.user_id, Authen.name,Authen.user_id,JobResponsible.levels, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
                     ORDER BY WorkingHours.user_id");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -234,9 +239,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return mrs;
@@ -247,6 +252,10 @@ namespace WebENG.Service
             List<ManpowerDistributionModel> mds = new List<ManpowerDistributionModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT 
 	                    WorkingHours.user_id,
@@ -285,12 +294,7 @@ namespace WebENG.Service
                     WHERE WorkingHours.job_id = '{job_id}'
                     GROUP BY WorkingHours.user_id, Authen.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
                     ORDER BY user_id");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -313,9 +317,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return mds;

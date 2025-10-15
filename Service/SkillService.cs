@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,18 +11,24 @@ namespace WebENG.Service
 {
     public class SkillService : ISkill
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public SkillService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<EngSkillModel> GetSkills()
         {
             List<EngSkillModel> skills = new List<EngSkillModel>();
             try
             {
-                string string_command = string.Format($@"SELECT [No], Skill_ID, Skill_Name, Skill_Description FROM Eng_Skill");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT [No], Skill_ID, Skill_Name, Skill_Description FROM Eng_Skill");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -41,9 +48,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return skills;
@@ -54,13 +61,12 @@ namespace WebENG.Service
             int id = 0;
             try
             {
-                string string_command = string.Format($@"SELECT TOP 1 Skill_ID FROM Eng_Skill ORDER BY Skill_ID DESC");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT TOP 1 Skill_ID FROM Eng_Skill ORDER BY Skill_ID DESC");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -73,9 +79,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return id;
@@ -85,28 +91,27 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO Eng_Skill(Skill_ID, Skill_Name, Skill_Description)
                     VALUES(@Skill_ID, @Skill_Name, @Skill_Description)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@Skill_ID", skill.skill_id);
                     cmd.Parameters.AddWithValue("@Skill_Name", skill.skill_name);
                     cmd.Parameters.AddWithValue("@Skill_Description", skill.skill_description);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -116,31 +121,30 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE Eng_Skill 
                     SET
                         Skill_Name = @Skill_Name,
                         Skill_Description = @Skill_Description
                     WHERE Skill_ID = @Skill_ID");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@Skill_Name", skill.skill_name);
                     cmd.Parameters.AddWithValue("@Skill_Description", skill.skill_description);
                     cmd.Parameters.AddWithValue("@Skill_ID", skill.skill_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -150,24 +154,23 @@ namespace WebENG.Service
         {
             try
             {
-                string string_command = string.Format($@"DELETE FROM Eng_Skill WHERE Skill_ID = @Skill_ID");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                if (con.State == ConnectionState.Closed)
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    con.Open();
+                }
+                string string_command = string.Format($@"DELETE FROM Eng_Skill WHERE Skill_ID = @Skill_ID");
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
+                {
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@Skill_ID", skill.skill_id);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

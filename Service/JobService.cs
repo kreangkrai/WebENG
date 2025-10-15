@@ -6,11 +6,19 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Service;
+using System.Data;
 
 namespace WebENG.Service
 {
     public class JobService : IJob
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public JobService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<JobModel> GetAllJobs()
         {
             List<JobModel> jobs = new List<JobModel>();
@@ -18,6 +26,10 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string command_invoice = string.Format($@"SELECT job_id,
                                                                 milestone,
                                                                 invoice,
@@ -28,12 +40,7 @@ namespace WebENG.Service
                                                                 new_plan_date
                                                         FROM Invoice");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
-                cmd = new SqlCommand(command_invoice, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                cmd = new SqlCommand(command_invoice, con);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -53,7 +60,15 @@ namespace WebENG.Service
                         invoices.Add(invoice);
                     }
                 }
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
 
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         Jobs.job_id,
@@ -110,12 +125,7 @@ namespace WebENG.Service
                     FROM Jobs
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
                     ORDER BY Jobs.job_id");
-                cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                cmd = new SqlCommand(string_command, con);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -196,9 +206,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobs;
@@ -209,6 +219,10 @@ namespace WebENG.Service
             List<JobSummaryModel> jobsSummaries = new List<JobSummaryModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"               
                     WITH T1 AS (
                         SELECT
@@ -286,12 +300,7 @@ namespace WebENG.Service
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
 					LEFT JOIN JobResponsible ON JobResponsible.user_id = T1.user_id AND JobResponsible.job_id = T1.job_id
                     ORDER BY Jobs.job_id");
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -324,9 +333,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -336,6 +345,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO 
                         Jobs(job_id,
@@ -404,7 +417,7 @@ namespace WebENG.Service
                             @responsible,
                             @note
                         )");
-                using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command,con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", job.job_id.Replace("-", String.Empty));
@@ -439,11 +452,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@retention", job.retention);
                     cmd.Parameters.AddWithValue("@responsible", job.responsible);
                     cmd.Parameters.AddWithValue("@note", job.note);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -453,9 +461,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -465,6 +473,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 if (job.finished_date.Date == new DateTime(1, 1, 1).Date)
                 {
                     job.finished_date = new DateTime(1900, 1, 1);
@@ -506,7 +518,7 @@ namespace WebENG.Service
                         responsible = @responsible,
                         note = @note
                     WHERE job_id = @job_id");
-                using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command,con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", job.job_id.Replace("-", String.Empty));
@@ -543,11 +555,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@retention", job.retention);
                     cmd.Parameters.AddWithValue("@responsible", job.responsible);
                     cmd.Parameters.AddWithValue("@note", job.note);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }catch(Exception ex)
@@ -556,9 +563,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -569,18 +576,17 @@ namespace WebENG.Service
             List<JobQuotationModel> quots = new List<JobQuotationModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         quotation_no,
                         customer,
                         product_type
                     FROM Quotation");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -599,9 +605,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return quots;
@@ -612,13 +618,12 @@ namespace WebENG.Service
             List<EngProcessModel> processes = new List<EngProcessModel>();
             try
             {
-                string string_command = string.Format($@"SELECT Jobs.process_id FROM Jobs WHERE job_id ='{job}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT Jobs.process_id FROM Jobs WHERE job_id ='{job}'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -635,9 +640,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
 
@@ -667,13 +672,12 @@ namespace WebENG.Service
             List<EngSystemModel> systems = new List<EngSystemModel>();
             try
             {
-                string string_command = string.Format($@"SELECT Jobs.system_id FROM Jobs WHERE job_id ='{job}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT Jobs.system_id FROM Jobs WHERE job_id ='{job}'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -690,9 +694,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
 
@@ -722,13 +726,12 @@ namespace WebENG.Service
             List<EngProcessModel> processes = new List<EngProcessModel>();
             try
             {
-                string string_command = string.Format($@"SELECT process_id,process_name FROM Eng_Process");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT process_id,process_name FROM Eng_Process");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -746,9 +749,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return processes;
@@ -759,13 +762,12 @@ namespace WebENG.Service
             List<EngSystemModel> systems = new List<EngSystemModel>();
             try
             {
-                string string_command = string.Format($@"SELECT system_id,system_name FROM Eng_System");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT system_id,system_name FROM Eng_System");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -783,9 +785,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return systems;
@@ -795,6 +797,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO 
                         Term_Payment(job_id,
@@ -835,7 +841,7 @@ namespace WebENG.Service
                                 @after_hmc,
                                 @finished
                         )");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", term_Payment.job_id.Replace("-", String.Empty));
@@ -856,11 +862,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
                     cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }catch(Exception ex)
@@ -869,9 +870,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -881,6 +882,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE Term_Payment 
                     SET
@@ -902,7 +907,7 @@ namespace WebENG.Service
                         after_hmc = @after_hmc,
                         finished = @finished
                     WHERE job_id = @job_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", term_Payment.job_id.Replace("-", String.Empty));
@@ -923,11 +928,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
                     cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -937,9 +937,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -950,13 +950,12 @@ namespace WebENG.Service
             List<EngProcessModel> processes = new List<EngProcessModel>();
             try
             {
-                string string_command = string.Format($@"SELECT DISTINCT Jobs.process_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT DISTINCT Jobs.process_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -973,9 +972,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
 
@@ -1017,13 +1016,12 @@ namespace WebENG.Service
             List<EngSystemModel> systems = new List<EngSystemModel>();
             try
             {
-                string string_command = string.Format($@"SELECT DISTINCT Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT DISTINCT Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1040,9 +1038,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
 
@@ -1084,14 +1082,13 @@ namespace WebENG.Service
             List<JobProcessSystemModel> jobProcessSystems = new List<JobProcessSystemModel>();
             List<EngProcessSystemModel> jobs = new List<EngProcessSystemModel>();
             try
-            {                
-                string string_command = string.Format($@"SELECT Jobs.job_id, Jobs.process_id,Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+            {
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT Jobs.job_id, Jobs.process_id,Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1110,9 +1107,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
 
@@ -1166,23 +1163,22 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
             UPDATE Jobs 
             SET
                 status = @status,
                 warranty_period = @warranty_period
             WHERE job_id = @job_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", job.Replace("-", String.Empty));
                     cmd.Parameters.AddWithValue("@status", "STA999");
                     cmd.Parameters.AddWithValue("@warranty_period", 0);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -1192,9 +1188,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -1205,18 +1201,17 @@ namespace WebENG.Service
             List<string> jobs = new List<string>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
              SELECT job_id,finished_date FROM (SELECT job_id,finished_date,warranty_period,DATEADD(day,warranty_period,GETDATE()) as arride_date FROM Jobs 
                  LEFT JOIN Eng_Status ON Eng_Status.Status_ID = Jobs.status
                  WHERE Eng_Status.Status_Name = 'Warranty'
                  ) as temp
                  WHERE temp.arride_date < temp.finished_date");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1229,9 +1224,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobs;

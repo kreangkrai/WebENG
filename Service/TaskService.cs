@@ -6,23 +6,30 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Service;
+using System.Data;
 
 namespace WebENG.Service
 {
     public class TaskService : ITask
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public TaskService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<TaskModel> GetAllTasks()
         {
             List<TaskModel> tasks = new List<TaskModel>();
             try
             {
-                string string_command = string.Format($"SELECT * FROM Tasks");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($"SELECT * FROM Tasks");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -40,9 +47,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return tasks;
@@ -53,13 +60,12 @@ namespace WebENG.Service
             List<TaskModel> tasks = new List<TaskModel>();
             try
             {
-                string string_command = string.Format($"SELECT * FROM Tasks WHERE Tasks.task_id LIKE 'O%'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($"SELECT * FROM Tasks WHERE Tasks.task_id LIKE 'O%'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -77,9 +83,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return tasks;
@@ -90,13 +96,12 @@ namespace WebENG.Service
             List<TaskModel> tasks = new List<TaskModel>();
             try
             {
-                string string_command = string.Format($"SELECT * FROM Tasks WHERE Tasks.task_id LIKE 'S%'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($"SELECT * FROM Tasks WHERE Tasks.task_id LIKE 'S%'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -114,9 +119,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return tasks;
@@ -127,13 +132,12 @@ namespace WebENG.Service
             List<TaskModel> tasks = new List<TaskModel>();
             try
             {
-                string string_command = string.Format($"SELECT * FROM Tasks WHERE Tasks.task_id LIKE 'T%'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($"SELECT * FROM Tasks WHERE Tasks.task_id LIKE 'T%'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -151,9 +155,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return tasks;
@@ -163,25 +167,24 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"INSERT INTO Tasks(task_id, task_name) VALUES(@task_id, @task_name)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@task_id", task.task_id);
                     cmd.Parameters.AddWithValue("@task_name", task.task_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -191,29 +194,28 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 UPDATE TASKS 
                 SET
                     task_name = @task_name
                 WHERE task_id = @task_id");
-                using (SqlCommand cmd = new SqlCommand(string_command,ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command,con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@task_id", task.task_id);
                     cmd.Parameters.AddWithValue("@task_name", task.task_name);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

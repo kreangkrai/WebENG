@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,20 +11,26 @@ namespace WebENG.Service
 {
     public class JobOwnerService : IJobOwner
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public JobOwnerService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public string DeleteByJobDepartment(string job_id, string job_department)
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 job_id = job_id.Replace("-", String.Empty);
                 string string_command = string.Format($@"DELETE FROM JobOwner WHERE job_id ='{job_id}' AND job_department='{job_department}'");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
+                    cmd.CommandType = CommandType.Text;
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -33,9 +40,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -46,13 +53,12 @@ namespace WebENG.Service
             List<JobOwnerModel> jobs = new List<JobOwnerModel>();
             try
             {
-                string stringCommand = string.Format($@"SELECT job_id,job_department FROM JobOwner");
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string stringCommand = string.Format($@"SELECT job_id,job_department FROM JobOwner");
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -70,9 +76,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobs;
@@ -83,14 +89,13 @@ namespace WebENG.Service
             List<JobOwnerModel> jobs = new List<JobOwnerModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 job_id = job_id.Replace("-", String.Empty);
                 string stringCommand = string.Format($@"SELECT job_id,job_department FROM JobOwner WHERE job_id = '{job_id}'");
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -108,9 +113,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobs;
@@ -120,6 +125,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     IF NOT EXISTS ( SELECT 1 FROM JobOwner WHERE job_id = '{job_id}' AND job_department = '{job_department}' )
                         BEGIN
@@ -131,16 +140,11 @@ namespace WebENG.Service
                                        @job_department
                                 )
                         END");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", job_id.Replace("-", String.Empty));
                     cmd.Parameters.AddWithValue("@job_department", job_department);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -150,9 +154,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

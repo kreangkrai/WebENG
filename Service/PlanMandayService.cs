@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,22 @@ namespace WebENG.Service
 {
     public class PlanMandayService : IPlanManday
     {
-        public List<PlanMandayModel> GetJobsPlans()
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public PlanMandayService()
         {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
+        public List<PlanMandayModel> GetJobsPlans()
+        {           
             List<PlanMandayModel> plans = new List<PlanMandayModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 SELECT 
 	                PlanManday.No,
@@ -36,7 +47,7 @@ namespace WebENG.Service
                 LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
                 LEFT JOIN Milestones ON JobMilestone.Milestone_ID = Milestones.Milestone_ID
                 LEFT JOIN EngineerUsers ON PlanManday.User_ID = EngineerUsers.User_ID");
-                SqlCommand command = new SqlCommand(string_command, connection);
+                SqlCommand command = new SqlCommand(string_command, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -64,7 +75,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return plans;
         }
@@ -72,9 +86,12 @@ namespace WebENG.Service
         public List<PlanMandayModel> GetJobPlans(string jobId)
         {
             List<PlanMandayModel> plans = new List<PlanMandayModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 SELECT 
 	                PlanManday.No,
@@ -96,7 +113,7 @@ namespace WebENG.Service
                 LEFT JOIN Milestones ON JobMilestone.Milestone_ID = Milestones.Milestone_ID
                 LEFT JOIN EngineerUsers ON PlanManday.User_ID = EngineerUsers.User_ID
                 WHERE Jobs.Job_ID = '{jobId}'");
-                SqlCommand command = new SqlCommand(string_command, connection);
+                SqlCommand command = new SqlCommand(string_command, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -124,7 +141,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if(con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return plans;
         }
@@ -132,9 +152,12 @@ namespace WebENG.Service
         public List<PlanMandayModel> GetEngPlans(string engId)
         {
             List<PlanMandayModel> plans = new List<PlanMandayModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 SELECT 
 	                PlanManday.No,
@@ -156,7 +179,7 @@ namespace WebENG.Service
                 LEFT JOIN Milestones ON JobMilestone.Milestone_ID = Milestones.Milestone_ID
                 LEFT JOIN EngineerUsers ON PlanManday.User_ID = EngineerUsers.User_ID
                 WHERE PlanManday.User_ID = '{engId}'");
-                SqlCommand command = new SqlCommand(string_command, connection);
+                SqlCommand command = new SqlCommand(string_command, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -184,7 +207,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return plans;
         }
@@ -192,9 +218,12 @@ namespace WebENG.Service
         public List<PlanMandayModel> GetEngPlansByDate(string engId, DateTime date)
         {
             List<PlanMandayModel> plans = new List<PlanMandayModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 SELECT 
 	                PlanManday.No,
@@ -216,7 +245,7 @@ namespace WebENG.Service
                 LEFT JOIN Milestones ON JobMilestone.Milestone_ID = Milestones.Milestone_ID
                 LEFT JOIN EngineerUsers ON PlanManday.User_ID = EngineerUsers.User_ID
                 WHERE PlanManday.User_ID = '{engId}' AND PlanManday.Date LIKE '{date.ToString("yyyy-MM-dd")}'");
-                SqlCommand command = new SqlCommand(string_command, connection);
+                SqlCommand command = new SqlCommand(string_command, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -244,7 +273,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return plans;
         }
@@ -252,9 +284,12 @@ namespace WebENG.Service
         public List<PlanMandayModel> GetPlansBetweenDates(DateTime startDate, DateTime stopDate)
         {
             List<PlanMandayModel> plans = new List<PlanMandayModel>();
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 SELECT 
 	                PlanManday.No,
@@ -276,7 +311,7 @@ namespace WebENG.Service
                 LEFT JOIN Milestones ON JobMilestone.Milestone_ID = Milestones.Milestone_ID
                 LEFT JOIN EngineerUsers ON PlanManday.User_ID = EngineerUsers.User_ID
                 WHERE PlanManday.Date BETWEEN '{startDate.ToString("yyyy-MM-dd")}' AND '{stopDate.ToString("yyyy-MM-dd")}'");
-                SqlCommand command = new SqlCommand(string_command, connection);
+                SqlCommand command = new SqlCommand(string_command, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -304,16 +339,22 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if(con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return plans;
         }
 
         public string CreatePlan(PlanMandayModel plan)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 IF EXISTS(
 	                SELECT Job_Milestone_ID, User_ID, Date, Hours FROM PlanManday
@@ -328,8 +369,8 @@ namespace WebENG.Service
 	                INSERT INTO PlanManday ( Job_Milestone_ID, Job_ID, Milestone_ID, User_ID, Date, Hours )
                     VALUES ( @Job_Milestone_ID, @Job_ID, @Milestone_ID, @User_ID, @Date, @Hours )
                 END");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@Job_Milestone_ID", plan.job_milestone_id);
                 command.Parameters.AddWithValue("@Job_ID", plan.job_id);
                 command.Parameters.AddWithValue("@Milestone_ID", plan.milestone_id);
@@ -344,23 +385,29 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }
 
         public string EditPlan(PlanMandayModel plan)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 UPDATE PlanManday SET 
                     Date = @Date,
                     Hours = @Hours
                 WHERE No = @No");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@Date", plan.date);
                 command.Parameters.AddWithValue("@Hours", plan.hours);
                 command.Parameters.AddWithValue("@No", plan.no);
@@ -372,24 +419,29 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }
 
         public string DeletePlan(PlanMandayModel plan)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
-            connection.Open();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 DELETE FROM PlanManday 
                 WHERE Job_Milestone_ID = @Job_Milestone_ID 
                 AND User_ID = @User_ID 
                 AND Date = @Date");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@Job_Milestone_ID", plan.job_milestone_id);
                 command.Parameters.AddWithValue("@User_ID", plan.user_id);
                 command.Parameters.AddWithValue("@Date", plan.date);
@@ -401,7 +453,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if(con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }

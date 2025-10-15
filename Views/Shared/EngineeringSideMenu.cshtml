@@ -2,7 +2,7 @@
 @model WebENG.Models.UserModel;
 <aside class="main-sidebar sidebar-dark-primary elevation-2">
     <a class="brand-link text-center" asp-controller="Calendar" asp-action="Index">
-        <span class="brand-text text-bold">ENG MODULE</span>
+        <span class="brand-text text-bold">OPERATION MODULE</span>
     </a>
 
     <div class="sidebar" style="padding-left:5px">
@@ -20,6 +20,13 @@
                     <a class="nav-link" asp-controller="WorkingHours" asp-action="Index">
                         <i class="nav-icon fas fa-file-alt"></i>
                         <p class="text-bold">WORKING HOURS</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Leave" asp-action="Index">
+                        <i class="nav-icon fas fa-file"></i>
+                        <p class="text-bold">LEAVE</p>
                     </a>
                 </li>
 
@@ -54,7 +61,8 @@
                     <i class="nav-icon fas fa-search"></i>
                     <p class="text-bold">JOBS SUMMARY</p>
                 </a>
-            </li>}
+            </li>
+}
                 @if (Model.role == "Admin" || Model.role != "User")
                 {
             <li class="nav-item">
@@ -62,7 +70,8 @@
                     <i class="nav-icon fas fa-search"></i>
                     <p class="text-bold">QUOTATION SUMMARY</p>
                 </a>
-            </li>}
+            </li>
+}
 
                 @if (Model.role == "Admin")
                 {
@@ -91,8 +100,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-}
+            </li>}
                 @if (Model.role == "Admin")
                 {
             <li class="nav-item">
@@ -114,8 +122,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-}
+            </li>}
 
                 @if (Model.role == "Admin")
                 {
@@ -189,8 +196,7 @@
                                 </a>
                             </li>*@
                                 </ul>
-                            </li>
-}
+                            </li>}
 
                 @if (Model.role == "Admin")
                 {
@@ -213,8 +219,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-}
+            </li>}
 
                 @if (Model.role == "Admin")
                 {
@@ -231,8 +236,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-}
+            </li>}
 
                 @if (Model.role == "Admin")
                 {
@@ -285,8 +289,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-}
+            </li>}
 
                 @if (Model.role == "Admin")
                 {
@@ -363,8 +366,24 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-}
+            </li>}
+
+                @if (Model.role == "Admin")
+                {
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-cogs"></i>
+                    <p class="text-bold">ADMIN LEAVE<i class="right fas fa-angle-left"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Job" asp-action="Index">
+                            <i class="nav-icon fas fa-project-diagram"></i>
+                            <p>Leave</p>
+                        </a>
+                    </li>                    
+                </ul>
+            </li>}
 
                 <li class="nav-item pt-2">
                     <a class="nav-link" href="http://cup.contrologic.co.th">

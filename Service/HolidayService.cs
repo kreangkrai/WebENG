@@ -6,16 +6,27 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Service;
+using System.Data;
 
 namespace WebENG.Service
 {
     public class HolidayService : IHoliday
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public HolidayService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public string CreateHoliday(HolidayModel model)
         {
-            SqlConnection connection = ConnectSQL.OpenConnect();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                 INSERT INTO Holidays (
                     date,
@@ -24,8 +35,8 @@ namespace WebENG.Service
                     @date,
                     @name
                 )");
-                SqlCommand command = new SqlCommand(string_command, connection);
-                command.CommandType = System.Data.CommandType.Text;
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@date", model.date);
                 command.Parameters.AddWithValue("@name", model.name);
                 command.ExecuteNonQuery();
@@ -36,7 +47,10 @@ namespace WebENG.Service
             }
             finally
             {
-                ConnectSQL.CloseConnect();
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
             }
             return "Success";
         }
@@ -46,13 +60,12 @@ namespace WebENG.Service
             List<HolidayModel> holidays = new List<HolidayModel>();
             try
             {
-                string string_command = string.Format($@"SELECT * FROM Holidays");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT * FROM Holidays");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -71,9 +84,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return holidays.OrderBy(o => o.date).ToList();
@@ -84,13 +97,12 @@ namespace WebENG.Service
             List<HolidayModel> holidays = new List<HolidayModel>();
             try
             {
-                string string_command = string.Format($@"SELECT * FROM Holidays WHERE date LIKE '{year}%'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if(ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT * FROM Holidays WHERE date LIKE '{year}%'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -109,9 +121,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return holidays.OrderBy(o => o.date).ToList();

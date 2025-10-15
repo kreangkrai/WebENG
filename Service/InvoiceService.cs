@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,28 +11,34 @@ namespace WebENG.Service
 {
     public class InvoiceService : IInvoice
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public InvoiceService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public string Delete(string job)
         {
             try
             {
-                string string_command = string.Format($@"DELETE FROM Invoice WHERE job_id = @job_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                if (con.State == ConnectionState.Closed)
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    con.Open();
+                }
+                string string_command = string.Format($@"DELETE FROM Invoice WHERE job_id = @job_id");
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
+                {
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", job);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -42,6 +49,10 @@ namespace WebENG.Service
             List<InvoiceModel> invoices = new List<InvoiceModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"SELECT job_id,
                                                                 milestone,
                                                                 invoice,
@@ -51,12 +62,7 @@ namespace WebENG.Service
                                                                 remark,
                                                                 new_plan_date
                                                           FROM Invoice WHERE job_id='{job}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -80,9 +86,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return invoices;
@@ -92,6 +98,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 for (int i = 0; i < invoices.Count; i++)
                 {
                     string string_command = string.Format($@"
@@ -111,7 +121,7 @@ namespace WebENG.Service
                             @status,
                             @remark,
                             @new_plan_date)");
-                    using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                    using (SqlCommand cmd = new SqlCommand(string_command, con))
                     {
                         cmd.CommandType = System.Data.CommandType.Text;
                         cmd.Parameters.AddWithValue("@job_id", invoices[i].job_id.Replace("-",String.Empty));
@@ -122,20 +132,15 @@ namespace WebENG.Service
                         cmd.Parameters.AddWithValue("@status", invoices[i].status);
                         cmd.Parameters.AddWithValue("@remark", invoices[i].remark);
                         cmd.Parameters.AddWithValue("@new_plan_date", invoices[i].new_plan_date);
-                        if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                        {
-                            ConnectSQL.CloseConnect();
-                            ConnectSQL.OpenConnect();
-                        }
                         cmd.ExecuteNonQuery();
                     }
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

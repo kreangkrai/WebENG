@@ -11,24 +11,35 @@ namespace WebENG.Service
 {
     public class TargetService : ITarget
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public TargetService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<TargetModel> getData(int year, string type)
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 List<TargetModel> targets = new List<TargetModel>();
                 SqlCommand cmd = null;
                 SqlDataReader dr = null;
                 if (type == "Project")
                 {
-                    cmd = new SqlCommand($"select month,target from Target_Project WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
+                    cmd = new SqlCommand($"select month,target from Target_Project WHERE month LIKE '{year}%'", con);
                 }
                 if (type == "Service")
                 {
-                    cmd = new SqlCommand($"select month,target from Target_Service WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
+                    cmd = new SqlCommand($"select month,target from Target_Service WHERE month LIKE '{year}%'", con);
                 }
                 if (type == "Invoice")
                 {
-                    cmd = new SqlCommand($"select month,target from Target_Invoice_ENG WHERE month LIKE '{year}%'", ConnectSQL.OpenConnect());
+                    cmd = new SqlCommand($"select month,target from Target_Invoice_ENG WHERE month LIKE '{year}%'", con);
                 }
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -48,9 +59,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
         }
@@ -59,6 +70,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 for (int i = 0; i < targets.Count; i++)
                 {
                     string command = "";
@@ -75,18 +90,11 @@ namespace WebENG.Service
                         command = @"INSERT INTO Target_Invoice_ENG(month,target) VALUES (@month,@target)";
                     }
                     
-                    using (SqlCommand cmd = new SqlCommand(command, ConnectSQL.OpenConnect()))
+                    using (SqlCommand cmd = new SqlCommand(command,con))
                     {
                         cmd.CommandType = CommandType.Text;
-                        cmd.Connection = ConnectSQL.OpenConnect();
                         cmd.Parameters.AddWithValue("@month", targets[i].month);
                         cmd.Parameters.AddWithValue("@target", targets[i].target);
-
-                        if (ConnectSQL.con.State != ConnectionState.Open)
-                        {
-                            ConnectSQL.CloseConnect();
-                            ConnectSQL.OpenConnect();
-                        }
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -97,9 +105,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -108,6 +116,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 for (int i = 0; i < targets.Count; i++)
                 {
                     string command = "";
@@ -129,7 +141,7 @@ namespace WebENG.Service
                     SqlDataReader reader;
                     SqlCommand cmd = new SqlCommand(command);
                     cmd.CommandType = CommandType.Text;
-                    cmd.Connection = ConnectSQL.OpenConnect();
+                    cmd.Connection = con;
                     reader = cmd.ExecuteReader();
                     reader.Close();
                 }
@@ -140,9 +152,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

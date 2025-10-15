@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,9 +12,13 @@ namespace WebENG.Service
     public class SummayInvoiceService : ISummaryInvoice
     {
         readonly ITarget Target;
+        ConnectSQL connect = null;
+        SqlConnection con = null;
         public SummayInvoiceService()
         {
             Target = new TargetService();
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
         }
 
         public List<SummaryInvoiceModel> GetsAISInvoice(int year)
@@ -21,6 +26,10 @@ namespace WebENG.Service
             List<SummaryInvoiceModel> jobsSummaries = new List<SummaryInvoiceModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     SELECT month,SUM(invoice_ais) as invoice_ais FROM (
 	                    select Invoice.job_id,
@@ -35,12 +44,7 @@ namespace WebENG.Service
 	                ) as mian
 	                GROUP BY month");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -58,9 +62,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -71,6 +75,10 @@ namespace WebENG.Service
             List<SummaryInvoiceModel> jobsSummaries = new List<SummaryInvoiceModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     SELECT month,SUM(invoice_cis) as invoice_cis FROM (
 	                    select Invoice.job_id,
@@ -85,12 +93,7 @@ namespace WebENG.Service
 	                ) as mian
 	                GROUP BY month");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -108,9 +111,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -121,6 +124,10 @@ namespace WebENG.Service
             List<SummaryInvoiceModel> jobsSummaries = new List<SummaryInvoiceModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     SELECT month,SUM(invoice_eng) as invoice_eng FROM (
 	                    select Invoice.job_id,
@@ -135,12 +142,7 @@ namespace WebENG.Service
 	                ) as mian
 	                GROUP BY month");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -158,9 +160,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;

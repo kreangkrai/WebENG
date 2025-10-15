@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,12 +11,16 @@ namespace WebENG.Service
 {
     public class SummaryJobInHandService : ISummaryJobInHand
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
         readonly ITarget Target;
         readonly IJobStatus JobStatus;
         public SummaryJobInHandService()
         {
             Target = new TargetService();
             JobStatus = new JobStatusService();
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
         }
 
         public OrderInTakeAISModel GetOrderAISInTake(int year)
@@ -24,6 +29,10 @@ namespace WebENG.Service
             List<QuarterAISModel> jobs = new List<QuarterAISModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
@@ -37,12 +46,7 @@ namespace WebENG.Service
 				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -76,9 +80,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return orderInTake;
@@ -90,6 +94,10 @@ namespace WebENG.Service
             List<QuarterCISModel> jobs = new List<QuarterCISModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
@@ -103,12 +111,7 @@ namespace WebENG.Service
 				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -142,9 +145,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return orderInTake;
@@ -156,6 +159,10 @@ namespace WebENG.Service
             List<QuarterENGModel> jobs = new List<QuarterENGModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
@@ -169,12 +176,7 @@ namespace WebENG.Service
 				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -208,9 +210,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return orderInTake;
@@ -321,6 +323,10 @@ namespace WebENG.Service
             List<JobAISInhandModel> jobsSummaries = new List<JobAISInhandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     select Jobs.job_id,
 		                Jobs.job_name,
@@ -337,12 +343,7 @@ namespace WebENG.Service
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -378,9 +379,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -391,6 +392,10 @@ namespace WebENG.Service
             List<JobAISInhandModel> jobsSummaries = new List<JobAISInhandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     select Jobs.job_id,
 	                    customer_name,
@@ -406,12 +411,7 @@ namespace WebENG.Service
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     where FORMAT(job_date,'yyyy') = '{year}'");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -447,9 +447,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -460,6 +460,10 @@ namespace WebENG.Service
             List<JobCISInhandModel> jobsSummaries = new List<JobCISInhandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     select Jobs.job_id,
 		                Jobs.job_name,
@@ -476,12 +480,7 @@ namespace WebENG.Service
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -517,9 +516,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -530,6 +529,10 @@ namespace WebENG.Service
             List<JobCISInhandModel> jobsSummaries = new List<JobCISInhandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     select Jobs.job_id,
 	                    customer_name,
@@ -545,12 +548,7 @@ namespace WebENG.Service
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     where FORMAT(job_date,'yyyy') = '{year}'");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -586,9 +584,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -599,6 +597,10 @@ namespace WebENG.Service
             List<JobENGInhandModel> jobsSummaries = new List<JobENGInhandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     select Jobs.job_id,
 		                Jobs.job_name,
@@ -615,12 +617,7 @@ namespace WebENG.Service
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -656,9 +653,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -669,6 +666,10 @@ namespace WebENG.Service
             List<JobENGInhandModel> jobsSummaries = new List<JobENGInhandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                     select Jobs.job_id,
 	                    customer_name,
@@ -684,12 +685,7 @@ namespace WebENG.Service
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     where FORMAT(job_date,'yyyy') = '{year}'");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -725,9 +721,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -876,6 +872,10 @@ namespace WebENG.Service
             List<SummaryAISJobInHandModel> jobsSummaries = new List<SummaryAISJobInHandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = "";
                 if (type == "ALL")
                 {
@@ -901,12 +901,7 @@ namespace WebENG.Service
 	                    ) as t1
                     group by t1.Month");
                 }
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -924,9 +919,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -937,6 +932,10 @@ namespace WebENG.Service
             List<QuarterAISModel> jobsSummaries = new List<QuarterAISModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
@@ -974,12 +973,7 @@ namespace WebENG.Service
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
                  WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'AIS') > 0");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1005,9 +999,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -1018,6 +1012,10 @@ namespace WebENG.Service
             List<SummaryCISJobInHandModel> jobsSummaries = new List<SummaryCISJobInHandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = "";
                 if (type == "ALL")
                 {
@@ -1043,12 +1041,7 @@ namespace WebENG.Service
 	                    ) as t1
                     group by t1.Month");
                 }
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1066,9 +1059,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -1079,6 +1072,10 @@ namespace WebENG.Service
             List<QuarterCISModel> jobsSummaries = new List<QuarterCISModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
@@ -1116,12 +1113,7 @@ namespace WebENG.Service
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
                  WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'CIS') > 0");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1147,9 +1139,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -1160,6 +1152,10 @@ namespace WebENG.Service
             List<QuarterENGModel> jobsSummaries = new List<QuarterENGModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = string.Format($@"
                 select  Jobs.job_id,
 						job_date,
@@ -1197,12 +1193,7 @@ namespace WebENG.Service
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
                  WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'ENG') > 0");
 
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1228,9 +1219,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;
@@ -1241,6 +1232,10 @@ namespace WebENG.Service
             List<SummaryENGJobInHandModel> jobsSummaries = new List<SummaryENGJobInHandModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string stringCommand = "";
                 if (type == "ALL")
                 {
@@ -1266,12 +1261,7 @@ namespace WebENG.Service
 	                    ) as t1
                     group by t1.Month");
                 }
-                SqlCommand cmd = new SqlCommand(stringCommand, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -1289,9 +1279,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return jobsSummaries;

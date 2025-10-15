@@ -6,21 +6,30 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Service;
+using System.Data;
 
 namespace WebENG.Service
 {
     public class WorkingHoursService : IWorkingHours
     {
         IHoliday Holiday;
+        ConnectSQL connect = null;
+        SqlConnection con = null;
         public WorkingHoursService()
         {
             Holiday = new HolidayService();
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
         }
         public List<WorkingHoursModel> GetWorkingHours()
         {
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
@@ -51,12 +60,7 @@ namespace WebENG.Service
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     Where WorkingHours.job_id NOT LIKE 'Q%' AND WorkingHours.job_id <> 'J999999'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -93,9 +97,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;
@@ -106,6 +110,10 @@ namespace WebENG.Service
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
@@ -136,12 +144,7 @@ namespace WebENG.Service
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE LOWER(Authen.name) = '{user_name}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -178,9 +181,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;
@@ -192,6 +195,10 @@ namespace WebENG.Service
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
@@ -223,12 +230,7 @@ namespace WebENG.Service
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE WorkingHours.working_date like '{year}-{month}%' 
                     AND LOWER(Authen.name) ='{user_name}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -271,9 +273,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return wd;
@@ -285,6 +287,10 @@ namespace WebENG.Service
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
@@ -314,12 +320,7 @@ namespace WebENG.Service
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -362,9 +363,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return wd;
@@ -374,6 +375,10 @@ namespace WebENG.Service
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
@@ -405,12 +410,7 @@ namespace WebENG.Service
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE LOWER(Authen.name) = '{user_name}'
                     AND WorkingHours.working_date LIKE '{working_date.ToString("yyyy-MM-dd")}'");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -446,9 +446,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;
@@ -458,12 +458,16 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO WorkingHours(
                         ind,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch_full,lunch_half, dinner_full,dinner_half, note)
                     VALUES (
                         @ind,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch_full,@lunch_half, @dinner_full,@dinner_half, @note)");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@ind", wh.index);
@@ -505,11 +509,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@dinner_full", wh.dinner_full);
                     cmd.Parameters.AddWithValue("@dinner_half", wh.dinner_half);
                     cmd.Parameters.AddWithValue("@note", wh.note);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -519,9 +518,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -531,6 +530,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE WorkingHours 
                     SET
@@ -549,7 +552,7 @@ namespace WebENG.Service
                         dinner_half = @dinner_half,
                         note = @note
                     WHERE ind = @ind");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
@@ -590,11 +593,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@dinner_half", wh.dinner_half);
                     cmd.Parameters.AddWithValue("@note", wh.note);
                     cmd.Parameters.AddWithValue("@ind", wh.index);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -604,9 +602,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -616,6 +614,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE WorkingHours 
                     SET lunch_full = @lunch_full,
@@ -628,7 +630,7 @@ namespace WebENG.Service
                         AND task_id = @task_id
                         AND start_time = @start_time
                         AND stop_time = @stop_time");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@lunch_full", wh.lunch_full);
@@ -641,11 +643,6 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
                     cmd.Parameters.AddWithValue("@start_time", wh.start_time);
                     cmd.Parameters.AddWithValue("@stop_time", wh.stop_time);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                     Console.WriteLine("Pass");
                 }
@@ -656,9 +653,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -668,20 +665,19 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     DELETE FROM WorkingHours
                     WHERE user_id = @user_id
                         AND ind = @ind");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@ind", wh.index);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -691,9 +687,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -704,6 +700,10 @@ namespace WebENG.Service
             List<JobWeeklyWorkingHoursModel> whs = new List<JobWeeklyWorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT DISTINCT 
                         WorkingHours.job_id,
@@ -725,12 +725,7 @@ namespace WebENG.Service
                         GROUP BY job_id, week_number) AS a ON WorkingHours.job_id = a.job_id
                     LEFT JOIN Jobs on WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Quotation on Jobs.quotation_no = Quotation.quotation_no");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -752,9 +747,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;
@@ -765,6 +760,10 @@ namespace WebENG.Service
             List<EngWeeklyWorkingHoursModel> whs = new List<EngWeeklyWorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT 
 	                    DISTINCT user_id,
@@ -783,12 +782,7 @@ namespace WebENG.Service
 	                    WHERE working_date LIKE '{year}%' AND week_number = {week}
 	                    GROUP BY user_id) AS a
                     ");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -808,9 +802,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;
@@ -821,6 +815,10 @@ namespace WebENG.Service
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
@@ -851,12 +849,7 @@ namespace WebENG.Service
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE WorkingHours.working_date LIKE '{year}%' AND WorkingHours.week_number = {week}");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -893,9 +886,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return whs;
@@ -906,13 +899,12 @@ namespace WebENG.Service
             int id = 0;
             try
             {
-                string string_command = string.Format($@"SELECT TOP 1 ind FROM WorkingHours WHERE ind LIKE 'WH%' ORDER BY ind DESC");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Closed)
                 {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
+                    con.Open();
                 }
+                string string_command = string.Format($@"SELECT TOP 1 ind FROM WorkingHours WHERE ind LIKE 'WH%' ORDER BY ind DESC");
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -925,9 +917,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return id;

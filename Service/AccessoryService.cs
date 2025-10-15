@@ -11,12 +11,23 @@ namespace WebENG.Service
 {
     public class AccessoryService : IAccessory
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public AccessoryService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<UserModel> getAllUser()
         {
             List<UserModel> users = new List<UserModel>();
             try
             {
-                SqlCommand cmd = new SqlCommand(@"SELECT name,department,role,user_id FROM Authen ORDER BY name", ConnectSQL.OpenConnect());
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                SqlCommand cmd = new SqlCommand(@"SELECT name,department,role,user_id FROM Authen ORDER BY name", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -36,9 +47,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return users;
@@ -49,13 +60,17 @@ namespace WebENG.Service
             List<UserModel> users = new List<UserModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 SqlCommand cmd = new SqlCommand(@"SELECT DISTINCT Authen.user_id,
 				                                                    Authen.name,
 				                                                    Authen.department,
 				                                                    Authen.role 
                                                     FROM WorkingHours 
                                                     LEFT JOIN Authen ON Authen.user_id = WorkingHours.user_id 
-                                                    ORDER BY Authen.name", ConnectSQL.OpenConnect());
+                                                    ORDER BY Authen.name", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -78,9 +93,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return users;
@@ -91,6 +106,10 @@ namespace WebENG.Service
             List<UserModel> users = new List<UserModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 SqlCommand cmd = new SqlCommand($@"SELECT DISTINCT Authen.user_id,
 				                                                    Authen.name,
 				                                                    Authen.department,
@@ -98,7 +117,7 @@ namespace WebENG.Service
                                                     FROM WorkingHours 
                                                     LEFT JOIN Authen ON Authen.user_id = WorkingHours.user_id
                                                     Where working_date between '{start.ToString("yyyy-MM-dd")}' AND '{stop.ToString("yyyy-MM-dd")}'
-                                                    ORDER BY Authen.name", ConnectSQL.OpenConnect());
+                                                    ORDER BY Authen.name", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -121,9 +140,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return users;

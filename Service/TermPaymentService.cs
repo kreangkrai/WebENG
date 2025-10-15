@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +11,13 @@ namespace WebENG.Service
 {
     public class TermPaymentService : ITermPayment
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public TermPaymentService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public Term_PaymentModel GetByJob(string job)
         {
             Term_PaymentModel term_Payment = new Term_PaymentModel();
@@ -17,14 +25,13 @@ namespace WebENG.Service
             SqlDataReader dr = null;
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string command = string.Format($@"SELECT * FROM Term_Payment WHERE job_id='{job}'");
                 List<InvoiceModel> invoices = new List<InvoiceModel>();
-                cmd = new SqlCommand(command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                cmd = new SqlCommand(command, con);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -56,9 +63,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return term_Payment;
@@ -68,6 +75,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     INSERT INTO Term_Payment(job_id,
                                             down_payment,
@@ -107,7 +118,7 @@ namespace WebENG.Service
                                             @complete,
                                             @after_hmc
                                             )");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", term_Payment.job_id);
@@ -128,19 +139,14 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
                     cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
                     cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";
@@ -150,6 +156,10 @@ namespace WebENG.Service
         {
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     UPDATE Term_Payment 
                     SET
@@ -171,7 +181,7 @@ namespace WebENG.Service
                         complete = @complete
                         after_hmc = @after_hmc
                     WHERE job_id = @job_id");
-                using (SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect()))
+                using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.Parameters.AddWithValue("@job_id", term_Payment.job_id);
                     cmd.Parameters.AddWithValue("@down_payment", term_Payment.down_payment);
@@ -191,19 +201,14 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@finished", term_Payment.finished);
                     cmd.Parameters.AddWithValue("@complete", term_Payment.complete);
                     cmd.Parameters.AddWithValue("@after_hmc", term_Payment.after_hmc);
-                    if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                    {
-                        ConnectSQL.CloseConnect();
-                        ConnectSQL.OpenConnect();
-                    }
                     cmd.ExecuteNonQuery();
                 }
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return "Success";

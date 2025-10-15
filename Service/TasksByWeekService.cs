@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,11 +11,22 @@ namespace WebENG.Service
 {
     public class TasksByWeekService : ITasksByWeek
     {
+        ConnectSQL connect = null;
+        SqlConnection con = null;
+        public TasksByWeekService()
+        {
+            connect = new ConnectSQL();
+            con = connect.OpenConnect();
+        }
         public List<TasksByWeekModel> GetTasksByWeek(string year, string week)
         {
             List<TasksByWeekModel> tasks = new List<TasksByWeekModel>();
             try
             {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
                 string string_command = string.Format($@"
                     SELECT
 	                    WorkingHours.user_id,
@@ -37,12 +49,7 @@ namespace WebENG.Service
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     WHERE working_date LIKE '{year}%' AND week_number = {week}
                     ORDER BY user_id, working_date");
-                SqlCommand cmd = new SqlCommand(string_command, ConnectSQL.OpenConnect());
-                if (ConnectSQL.con.State != System.Data.ConnectionState.Open)
-                {
-                    ConnectSQL.CloseConnect();
-                    ConnectSQL.OpenConnect();
-                }
+                SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -71,9 +78,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (ConnectSQL.con.State == System.Data.ConnectionState.Open)
+                if (con.State == ConnectionState.Open)
                 {
-                    ConnectSQL.CloseConnect();
+                    con.Close();
                 }
             }
             return tasks;
