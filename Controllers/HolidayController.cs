@@ -13,12 +13,12 @@ namespace WebENG.Controllers
 {
     public class HolidayController : Controller
     {
-        readonly IHoliday HolidayService;
+        readonly CTLInterfaces.IHoliday HolidayService;
         readonly IAccessory Accessory;
 
         public HolidayController()
         {
-            HolidayService = new HolidayService();
+            HolidayService = new CTLServices.HolidayService();
             Accessory = new AccessoryService();
         }
 
@@ -44,16 +44,16 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetHolidays(string year)
         {
-            List<HolidayModel> holidays = HolidayService.GetHolidays(year);
+            List<CTLModels.HolidayModel> holidays = HolidayService.GetHolidays(year);
             return Json(holidays);
         }
 
-        [HttpPost]
-        public string CreateHoliday(string str)
-        {
-            HolidayModel h = JsonConvert.DeserializeObject<HolidayModel>(str);
-            string result = HolidayService.CreateHoliday(h);
-            return result;
-        }
+        //[HttpPost]
+        //public string CreateHoliday(string str)
+        //{
+        //    HolidayModel h = JsonConvert.DeserializeObject<HolidayModel>(str);
+        //    string result = HolidayService.CreateHoliday(h);
+        //    return result;
+        //}
     }
 }

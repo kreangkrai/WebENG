@@ -12,11 +12,11 @@
             <i class="fas fa-sync"></i> Load
         </button>              
     </div>
-    <div class="col-xl-1 col-md-3 pb-3">
+    @*<div class="col-xl-1 col-md-3 pb-3">
         <button id="btn_add_holiday" class="btn btn-success form-control elevation-1">
             <i class="fas fa-plus"></i> Holiday
         </button>          
-    </div>
+    </div>*@
     <div class="col-xl-12">
         <div class="card card-dark">
             <div class="card-header">
@@ -28,17 +28,15 @@
                         <table id="table_holiday" class="table table-sm border compact table-striped table-hover w-100">
                             <thead class="text-center">
                                 <tr>
-                                    <th>No</th>
                                     <th style="width:15%">Date</th>
-                                    <th>Name</th>
+                                    <th>Detail</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                             <tfoot class="text-center">
                                 <tr>
-                                    <th>No</th>
                                     <th>Date</th>
-                                    <th>Name</th>
+                                    <th>Detail</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -114,10 +112,6 @@
                 data: { year },
                 success: function (response) {
                     holidays = response;
-                    if (debug_holiday) {
-                        console.log("Holidays");
-                        console.log(holidays);
-                    }
                     GenerateTable(holidays);
                 }
             });
@@ -128,9 +122,8 @@
 
             for (var i = 0; i < holidays.length; i++) {
                 datas.push([
-                    i+1,
                     holidays[i].date.split("T")[0],
-                    holidays[i].name
+                    holidays[i].detail
                 ]);
             }
 
@@ -143,12 +136,8 @@
                 data: datas,
                 columnDefs: [
                     {
-                        targets: [1, 2],
+                        targets: [1],
                         className: "border-left",
-                    },
-                    {
-                        targets: [0],
-                        visible: false
                     }
                 ],
                 ordering: false,
@@ -162,19 +151,8 @@
             var year = $('#year').val();
             GetHolidays(year);
         });
-        
-        $('#btn_add_holiday').on('click', async function () {
-            $('#modal_holiday').modal();
-        });
-        $('#btn_accept').on('click', async function () {
-            let str = JSON.stringify({
-                "date": $('#date_id').val(),
-                "name": $('#date_holiday').val(),
-            });
-            await CreateHoliday(str);
-        });
-
-        async function CreateHoliday(str) {
+       
+        @*async function CreateHoliday(str) {
             await $.ajax({
                 type: "POST",
                 url: '@Url.Action("CreateHoliday", "Holiday")',
@@ -188,6 +166,6 @@
                     }
                 }
             });
-        }
+        }*@
     </script>
 }

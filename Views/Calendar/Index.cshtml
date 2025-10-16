@@ -535,8 +535,8 @@
             for (let i = 0; i < holidays.length; i++) {
                 e_holidays.push(
                     {
-                        id: holidays[i].no,
-                        title: holidays[i].name,
+                        id: (i+1),
+                        title: holidays[i].detail,
                         start: holidays[i].date.split("T")[0],
                         display: 'background',
                         color: "#FF9999",
