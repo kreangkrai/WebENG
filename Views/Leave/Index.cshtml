@@ -14,114 +14,138 @@
 </div>
 
 <!-- Task Modal -->
-<div class="modal fade" id="modal_task" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
-    <div class="modal modal-dialog modal-dialog-centered modal-lg" role="document">
+<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modal_task_title">Add Tasks</h5>
+                <h5 class="modal-title" id="modal_leave_title">ยื่นการลา</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="overflow-y:auto">
+            <div class="modal-body" style="overflow-y:auto;height:600px">
                 <form>
-                    <div class="form-group" hidden>
-                        <label for="user_id">User</label>
-                        <select id="user_id" class="form-control" disabled></select>
-                    </div>
-                    <div id="working_date_group" class="form-group row">
-                        <div class="col-4 col-md-4">
-                            <label for="working_hour_id">Working Hours</label>
-                            <input id="working_hour_id" type="text" class="form-control" disabled />
+                    <div class="form-group row">
+                        <div class="col-xl-6 col-md-6 col-sm-12">
+                            <label for="request_id">ประเภทการลา</label>
+                            <select id="" class="form-control">
+                                <option value="">ลาพักร้อน (5)</option>
+                                <option value="">ลาป่วย (30)</option>
+                            </select>
                         </div>
-                        <div class="col-4 col-md-4">
-                            <label for="working_date">Date</label>
-                            <input id="working_date" type="date" class="form-control" disabled />
-                        </div>
-                        <div class="col-4 col-md-4pt-5">
-                            <div class="form-check">
-                                <input id="leave" class="form-check-input" type="checkbox" />
-                                <label for="leave">Leave</label>
+                        <div class="col-xl-6 col-md-6 col-sm-12">
+                            <label for="working_date">ช่วงเวลา</label>
+                            <div class="row">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button id="leave_full" type="button" class="btn btn-outline-primary">ทั้งวัน</button>
+                                    <button id="leave_hours" type="button" class="btn btn-outline-secondary">ชั่วโมง</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <hr />
                     <div id="date_group" class="form-group row">
-                        <div class="col-6 col-md-6">
-                            <label for="start_date">From</label>
+                        <div class="col-xl-4 col-md-4 col-sm-6">
+                            <label for="start_date">ลาตั้งแต่วันที่</label>
                             <input id="start_date" type="date" class="form-control" />
                         </div>
-                        <div class="col-6 col-md-6">
-                            <label for="stop_date">To</label>
-                            <input id="stop_date" type="date" class="form-control" />
+                        <div class="col-xl-2 col-md-2 col-sm-6">
+                            <label for="stop_date">จำนวน</label>
+                            <input id="stop_date" type="number" class="form-control" value="1" />
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div id="form_customers" class="col-6 col-md-6">
-                                <label for="customers">Filter By Customers</label>
-                                <select id="customers" class="form-control"></select>
-                            </div>
-                            <div id="form_job" class="col-6 col-md-6">
-                                <label for="job_id">Job</label>
-                                <select id="job_id" class="form-control"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-6 col-md-6">
-                            <label for="process">Process</label>
-                            <select id="process" class="form-control"></select>
-                        </div>
-                        <div class="col-6 col-md-6">
-                            <label for="system">System</label>
-                            <select id="system" class="form-control"></select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-6 col-md-6">
-                            <label for="location">Location</label>
-                            <select id="location" class="form-control"></select>
-                        </div>
-                        <div class="col-6 col-md-6">
-                            <label for="task_id">Task</label>
-                            <select id="task_id" class="form-control"></select>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-4 col-md-4">
-                            <label for="start_time">From</label>
+                        <div class="col-xl-3 col-md-3 col-sm-6">
+                            <label for="start_time">เวลาเริ่มต้น</label>
                             <input id="start_time" type="time" class="form-control" />
                         </div>
-                        <div class="col-4 col-md-4">
-                            <label for="stop_time">To</label>
+                        <div class="col-xl-3 col-md-3 col-sm-6">
+                            <label for="stop_time">เวลาสิ้นสุด</label>
                             <input id="stop_time" type="time" class="form-control" />
                         </div>
-                        <div class="col-2 col-md-2 pt-4">
-                            <div class="form-check">
-                                <input id="lunch_full" class="form-check-input" type="checkbox" checked />
-                                <label class="form-check-label">Lunch Full</label>
-                            </div>
-                            <div class="form-check">
-                                <input id="lunch_half" class="form-check-input" type="checkbox" />
-                                <label class="form-check-label">Lunch Half</label>
-                            </div>
-                        </div>
-                        <div class="col-2 col-md-2 pt-4">
-                            <div class="form-check">
-                                <input id="dinner_full" class="form-check-input" type="checkbox" />
-                                <label class="form-check-label">Break Full</label>
-                            </div>
-                            <div class="form-check">
-                                <input id="dinner_half" class="form-check-input" type="checkbox" />
-                                <label class="form-check-label">Break Half</label>
+                    </div>
+                    <hr />
+                    <div id="date_group" class="form-group row">
+                        <div class="col-12">
+                            <label for="start_date">แนบไฟล์</label>
+                            <div id="uploadForm" enctype="multipart/form-data">
+                                <div id="fileInputs">
+                                    <div class="file-input">
+                                        <div class="row">
+                                            <div class="col-9">
+                                                <input type="file" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" />
+                                            </div>
+
+                                            <div class="col-3">
+                                                <button type="button" id="addFileInput" class="btn btn-primary">เพิ่มไฟล์</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <hr />
+                    <div id="date_group" class="form-group row">
+                        <div class="col-12">
+                            <label for="start_date">เอกสาร</label>
+                            <div class="row">
+                                <div class="col-6">
+                                    <ul>
+                                        <li>AAAAAAAA</li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" id="addFileInput" class="btn btn-danger">ลบ</button>
+                                </div>
+                                <div class="col-6">
+                                    <ul>
+                                        <li>BBBBB</li>
+                                    </ul>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" id="addFileInput" class="btn btn-danger">ลบ</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
                     <div class="form-group row">
-                        <div class="col-12 col-md-12">
+                        <div class="col-12">
                             <div class="form-group">
-                                <label for="note">Note</label>
+                                <label for="note">รายละเอียด</label>
                                 <textarea id="note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <label for="start_date">ผู้อนุมัติ</label>
+                            <div class="col-12">
+                                <label for="start_date" style="font-size:14px">ผู้จัดการ</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <ul>
+                                            <li>AAAAA</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-6">
+                                        <label style="font-size:14px">รออนุมัติ</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-12">
+                                <label for="start_date" style="font-size:14px">แอดมิน</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <ul>
+                                            <li>BBBBB</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-6">
+                                        <label style="font-size:14px">รออนุมัติ</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -129,13 +153,13 @@
             </div>
             <div class="modal-footer d-flex">
                 <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                    <i class="fas fa-trash-alt"></i> Delete
+                    <i class="fas fa-trash-alt"></i> ลบ
                 </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Close
+                    <i class="fas fa-times"></i> ยกเลิก
                 </button>
                 <button id="btn_accept" type="button" class="btn btn-primary elevation-1">
-                    <i class="fas fa-check"></i> Accept
+                    <i class="fas fa-check"></i> ส่งเอกสาร
                 </button>
             </div>
         </div>
@@ -197,7 +221,7 @@
 {
     <script type="text/javascript">
         let users = [];
-        let holidays = [];      
+        let holidays = [];
         let calendar;
         let calendarEl;
         let drag = false;
@@ -331,10 +355,11 @@
                     if (date_diff === 0 || isNaN(date_diff)) {
                         console.log(info);
                         console.log(date_end);
-                       // AddTask(date_start)
+
+                        AddTasks(date_start, date_end)
                     }
                     else {
-                        //AddTasks(date_start,date_end)
+                        AddTasks(date_start,date_end)
                     }
                 },
                 eventClick: async function (info) {
@@ -372,6 +397,57 @@
 
             calendar.addEventSource(e_holidays);
             calendar.render();
+        }
+
+        async function AddTasks(date_start, date_end) {
+            let show_modal = 0;
+            let today = new Date();
+            let edit_date = new Date(date_start);
+            let date_diff = Math.floor((today - edit_date) / (1000 * 60 * 60 * 24));
+
+            if (date_diff < 15) {
+                show_modal = 1;
+            }
+            else {
+                show_modal = await CheckAllowEditable();
+            }
+
+            if (show_modal) {
+                update = false;
+                //await GetLastWorkingHoursID();
+                //await GetUsers();
+                //await GenerateUsersOption();
+                //await GetJobs();
+                //await GetQuotations();
+                //await GenerateCustomerOptions();
+                //await GenerateJobsOption();
+                //await GenerateLocationOption();
+                //await GetTasks();
+                //await GenerateTasksOption();
+                PrepmodalTasks(date_start, date_end);
+
+            }
+        }
+
+         function PrepmodalTasks(date_start, date_end) {
+            $('#modal_leave').modal();
+            $('#modal_task_title').text("Add Tasks");
+            let user_name = '@Model.name.ToLower()';
+            let user_id = users.filter(f => f.name.toLowerCase() === user_name).map(m => m.user_id);
+            $('$working_hour_id').val(last_id);
+            $('#user_id').val(user_id);
+            $('#working_date_group').hide();
+            $('#working_date').attr('disabled', true);
+            $('#working_date').val(null);
+            $('#date_group').show();
+            $('#start_date').val(date_start);
+            $('#stop_date').val(date_end);
+            $('#location').attr('disabled', true);
+            $('#task_id').attr('disabled', true);
+            $('#start_time').val("08:30");
+            $('#stop_time').val("17:30");
+            $('#note').val(null);
+            $('#btn_delete').hide();
         }
 
         async function CheckAddOverlap(wh_string) {
@@ -497,6 +573,6 @@
             }
             return false;
         }
-     
+
     </script>
 }
