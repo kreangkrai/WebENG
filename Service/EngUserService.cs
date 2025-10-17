@@ -14,12 +14,12 @@ namespace WebENG.Service
     {
         ConnectSQL connect = null;
         SqlConnection con = null;
-        SqlConnection con_gps = null;
+        SqlConnection con_ctl = null;
         public EngUserService()
         {
             connect = new ConnectSQL();
             con = connect.OpenConnect();
-            con_gps = connect.Open_db_gps_Connect();
+            con_ctl = connect.OpenCTLConnect();
         }
         public bool CheckAllowEditable(string user_name)
         {
@@ -57,12 +57,12 @@ namespace WebENG.Service
             List<EngUserModel> users = new List<EngUserModel>();
             try
             {
-                if (con_gps.State == ConnectionState.Closed)
+                if (con_ctl.State == ConnectionState.Closed)
                 {
-                    con_gps.Open();
+                    con_ctl.Open();
                 }
-                string string_command = string.Format($@"SELECT * FROM Sale_User");
-                SqlCommand cmd = new SqlCommand(string_command, con_gps);
+                string string_command = string.Format($@"SELECT * FROM Employees");
+                SqlCommand cmd = new SqlCommand(string_command, con_ctl);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -70,11 +70,11 @@ namespace WebENG.Service
                     {
                         EngUserModel user = new EngUserModel()
                         {
-                            user_id = dr["Login"] != DBNull.Value ? dr["Login"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString().ToLower() : "",
-                            department = dr["Department2"] != DBNull.Value ? dr["Department2"].ToString() : "",
+                            user_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString().ToLower() : "",
+                            department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             allow_edit = false,
-                            group = dr["Group"] != DBNull.Value ? dr["Group"].ToString().ToLower() : "",
+                            group = dr["group"] != DBNull.Value ? dr["group"].ToString().ToLower() : "",
                             active = dr["active"] != DBNull.Value ? Convert.ToBoolean(dr["active"].ToString()) : false,
                         };
                         users.Add(user);
@@ -84,9 +84,9 @@ namespace WebENG.Service
             }
             finally
             {
-                if (con_gps.State == ConnectionState.Open)
+                if (con_ctl.State == ConnectionState.Open)
                 {
-                    con_gps.Close();
+                    con_ctl.Close();
                 }
             }
             return users.GroupBy(g => g.user_name).Select(s => s.FirstOrDefault()).ToList();
