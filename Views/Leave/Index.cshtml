@@ -3,6 +3,143 @@
 @{
     ViewData["Title"] = "Leave";
 }
+
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+<style>
+    .kanit-thin {
+        font-family: "Kanit", sans-serif;
+        font-weight: 100;
+        font-style: normal;
+    }
+
+    .kanit-extralight {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: normal;
+    }
+
+    .kanit-light {
+        font-family: "Kanit", sans-serif;
+        font-weight: 300;
+        font-style: normal;
+    }
+
+    .kanit-regular {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .kanit-medium {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    .kanit-semibold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    .kanit-bold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+    }
+
+    .kanit-extrabold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: normal;
+    }
+
+    .kanit-black {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: normal;
+    }
+
+    .kanit-thin-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 100;
+        font-style: italic;
+    }
+
+    .kanit-extralight-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: italic;
+    }
+
+    .kanit-light-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .kanit-regular-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    .kanit-medium-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: italic;
+    }
+
+    .kanit-semibold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: italic;
+    }
+
+    .kanit-bold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: italic;
+    }
+
+    .kanit-extrabold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: italic;
+    }
+
+    .kanit-black-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: italic;
+    }
+    /* สไตล์สำหรับ input */
+    input[type="text"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="text"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="text"]:not(:disabled) {
+            opacity: 1;
+        }
+    /* สไตล์สำหรับ input */
+    input[type="number"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="number"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="number"]:not(:disabled) {
+            opacity: 1;
+        }
+</style>
+
 <div class="row p-3">
     <div class="col-xl-12">
         <div class="card">
@@ -16,17 +153,17 @@
 <!-- Task Modal -->
 <div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
     <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
                 <h5 class="modal-title" id="modal_leave_title">ยื่นการลา</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="overflow-y:auto;height:600px">
+            <div class="modal-body" style="overflow-y:auto;height:600px; color:#555555">
                 <form>
                     <div class="form-group row">
-                        <div class="col-xl-6 col-md-6 col-sm-12">
+                        <div class="col-xl-6 col-md-6 col-sm-12 ">
                             <label for="request_id">ประเภทการลา</label>
                             <select id="" class="form-control">
                                 <option value="">ลาพักร้อน (5)</option>
@@ -38,13 +175,14 @@
                             <div class="row">
                                 <div class="btn-group" role="group" aria-label="Basic example">
                                     <button id="leave_full" type="button" class="btn btn-outline-primary">ทั้งวัน</button>
-                                    <button id="leave_hours" type="button" class="btn btn-outline-secondary">ชั่วโมง</button>
+                                    <button id="leave_half" type="button" class="btn btn-outline-info">ครึ่งวัน</button>
+                                    <button id="leave_hours" type="button" class="btn btn-outline-secondary">รายชั่วโมง</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <hr />
-                    <div id="date_group" class="form-group row">
+                    @* <div id="date_group" class="form-group row">
                         <div class="col-xl-4 col-md-4 col-sm-6">
                             <label for="start_date">ลาตั้งแต่วันที่</label>
                             <input id="start_date" type="date" class="form-control" />
@@ -61,6 +199,46 @@
                             <label for="stop_time">เวลาสิ้นสุด</label>
                             <input id="stop_time" type="time" class="form-control" />
                         </div>
+                    </div> *@
+                    <div id="date_group" class="form-group row">
+                        <div class="col-xl-4 col-md-4 col-sm-12">
+                            <label for="amount_leave">ลาจำนวน</label>
+                            <div class="input-group">
+                                <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">วัน</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 col-sm-6">
+                            <label for="start_date">ลาตั้งแต่วันที่</label>
+                            <input id="start_date" type="date" class="form-control" />
+                        </div>
+                        <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
+                            <label for="start_date">ถึงวันที่</label>
+                            <input id="stop_date" type="text" class="form-control" />
+                        </fieldset>
+                    </div>
+                    <div id="time_group" class="form-group row">
+                        <div class="col-xl-4 col-md-4 col-sm-12">
+                            <label for="stop_date">ระยะเวลา</label>
+                            <div class="input-group">
+                                <select id="" class="form-control">
+                                    <option value="">Select...</option>
+                                    <option value="">2 ชั่วโมง</option>
+                                    <option value="">4 ชั่วโมง</option>
+                                    <option value="">6 ชั่วโมง</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-4 col-sm-6">
+                            <label for="start_time">ตั้งแต่เวลา</label>
+                            <input id="start_time" type="time" class="form-control" />
+                        </div>
+                        <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
+                            <label for="stop_time">ถึงเวลา</label>
+                            <input id="stop_time" type="time" class="form-control" />
+                        </fieldset>
                     </div>
                     <hr />
                     <div id="date_group" class="form-group row">
@@ -75,7 +253,7 @@
                                             </div>
 
                                             <div class="col-3">
-                                                <button type="button" id="addFileInput" class="btn btn-primary">เพิ่มไฟล์</button>
+                                                <button type="button" id="addFileInput" class="btn btn-success" style="border-radius:20px">เพิ่มไฟล์ +</button>
                                             </div>
                                         </div>
                                     </div>
@@ -87,14 +265,24 @@
                     <div id="date_group" class="form-group row">
                         <div class="col-12">
                             <label for="start_date">เอกสาร</label>
-                            <div class="row">
-                                <div class="col-6">
+                            <div class="row" style="border-radius:20px; border:thin; border-color:lightgrey; padding:10px;">
+                                <div class="list-group" id="fileList">
+                                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <a href="#" class="file-link">File_001.png</a>
+                                        <button class="btn btn-danger btn-sm delete-btn" data-file="File_001.png">Delete</button>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <a href="#" class="file-link">File_002.pdf</a>
+                                        <button class="btn btn-danger btn-sm delete-btn" data-file="File_002.pdf">Delete</button>
+                                    </div>
+                                </div>
+                                @* <div class="col-6">
                                     <ul>
                                         <li>AAAAAAAA</li>
                                     </ul>
                                 </div>
                                 <div class="col-6">
-                                    <button type="button" id="addFileInput" class="btn btn-danger">ลบ</button>
+                                    <button type="button" id="addFileInput" class="btn btn-danger" style="border-radius:20px">ลบไฟล์</button>
                                 </div>
                                 <div class="col-6">
                                     <ul>
@@ -103,7 +291,7 @@
                                 </div>
                                 <div class="col-6">
                                     <button type="button" id="addFileInput" class="btn btn-danger">ลบ</button>
-                                </div>
+                                </div> *@
                             </div>
                         </div>
                     </div>
@@ -574,5 +762,118 @@
             return false;
         }
 
+    </script>
+
+    <script>
+        // ฟังก์ชันสำหรับจัดการการแสดงผลเมื่อกดปุ่ม
+        document.addEventListener('DOMContentLoaded', function () {
+            // ดึง element ของปุ่มและกลุ่มฟอร์ม
+            const leaveFullBtn = document.getElementById('leave_full');
+            const leaveHalfBtn = document.getElementById('leave_half');
+            const leaveHoursBtn = document.getElementById('leave_hours');
+            const dateGroup = document.getElementById('date_group');
+            const timeGroup = document.getElementById('time_group');
+            const durationSelect = timeGroup.querySelector('select');
+            const startTimeInput = document.getElementById('start_time');
+            const stopTimeInput = document.getElementById('stop_time');
+            const daysInput = dateGroup.querySelector('input[type="number"]'); // ช่องลาจำนวน
+            // ฟังก์ชันรีเซ็ตการเลือกปุ่ม (ลบ active class)
+            function resetButtonStyles() {
+                leaveFullBtn.classList.remove('active');
+                leaveHalfBtn.classList.remove('active');
+                leaveHoursBtn.classList.remove('active');
+            }
+            // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_half
+            function setHalfDayOptions() {
+                durationSelect.innerHTML = `
+                    <option value="">Select...</option>
+                    <option value="morning">ครึ่งวันเช้า</option>
+                    <option value="afternoon">ครึ่งวันบ่าย</option>
+                `;
+                // เพิ่ม event listener สำหรับการเปลี่ยนแปลงใน select
+                durationSelect.onchange = function () {
+                    if (this.value === 'morning') {
+                        startTimeInput.value = '08:30';
+                        stopTimeInput.value = '12:00';
+                        startTimeInput.disabled = true; // Disable start_time
+                    } else if (this.value === 'afternoon') {
+                        startTimeInput.value = '13:00';
+                        stopTimeInput.value = '17:30';
+                        startTimeInput.disabled = true; // Disable start_time
+                    } else {
+                        startTimeInput.value = '';
+                        stopTimeInput.value = '';
+                        startTimeInput.disabled = false; // Enable start_time
+                    }
+                };
+            }
+            // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_hours
+            function setHourlyOptions() {
+                durationSelect.innerHTML = `
+                    <option value="">Select...</option>
+                    <option value="2">2 ชั่วโมง</option>
+                    <option value="4">4 ชั่วโมง</option>
+                    <option value="6">6 ชั่วโมง</option>
+                `;
+                // รีเซ็ตค่าเวลาและ enable start_time เมื่อเปลี่ยนเป็นรายชั่วโมง
+                durationSelect.onchange = function () {
+                    startTimeInput.value = '';
+                    stopTimeInput.value = '';
+                    startTimeInput.disabled = false; // Enable start_time
+                };
+            }
+            // ฟังก์ชันจัดการ animation เมื่อแสดงหรือซ่อน
+            function toggleGroupDisplay(group, show) {
+                if (show) {
+                    group.style.display = 'flex';
+                    group.style.opacity = '0';
+                    group.style.transition = 'opacity 0.3s ease-in-out';
+                    setTimeout(() => {
+                        group.style.opacity = '1';
+                    }, 10);
+                } else {
+                    group.style.opacity = '0';
+                    group.style.transition = 'opacity 0.3s ease-in-out';
+                    setTimeout(() => {
+                        group.style.display = 'none';
+                        // รีเซ็ตค่าใน time_group เมื่อซ่อน
+                        if (group === timeGroup) {
+                            startTimeInput.value = '';
+                            stopTimeInput.value = '';
+                            durationSelect.value = '';
+                            startTimeInput.disabled = false; // Enable start_time
+                        }
+                    }, 300);
+                }
+            }
+            // เมื่อกดปุ่ม "ทั้งวัน"
+            leaveFullBtn.addEventListener('click', function () {
+                resetButtonStyles();
+                leaveFullBtn.classList.add('active');
+                toggleGroupDisplay(dateGroup, true); // แสดง date_group
+                toggleGroupDisplay(timeGroup, false); // ซ่อน time_group
+                daysInput.disabled = false; // ENABLE ลาจำนวน
+            });
+            // เมื่อกดปุ่ม "ครึ่งวัน"
+            leaveHalfBtn.addEventListener('click', function () {
+                resetButtonStyles();
+                leaveHalfBtn.classList.add('active');
+                toggleGroupDisplay(dateGroup, true); // แสดง date_group
+                toggleGroupDisplay(timeGroup, true); // แสดง time_group
+                setHalfDayOptions(); // เปลี่ยนตัวเลือกเป็นครึ่งวันเช้า/บ่าย
+                daysInput.disabled = true; // DISABLE ลาจำนวน
+            });
+            // เมื่อกดปุ่ม "รายชั่วโมง"
+            leaveHoursBtn.addEventListener('click', function () {
+                resetButtonStyles();
+                leaveHoursBtn.classList.add('active');
+                toggleGroupDisplay(dateGroup, true); // แสดง date_group
+                toggleGroupDisplay(timeGroup, true); // แสดง time_group
+                setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
+                daysInput.disabled = true; // DISABLE ลาจำนวน
+            });
+            // เริ่มต้นด้วยการเลือก "ทั้งวัน" เป็นค่าเริ่มต้น
+            leaveFullBtn.click();
+        });
     </script>
 }
