@@ -8,6 +8,7 @@ namespace WebENG.LeaveModels
     public class LeaveTypeModel
     {
         public string leave_type_id { get; set; }
+        public string leave_type_code { get; set; }
         public string leave_name_th { get; set; }
         public string leave_name_en { get; set; }
         public string description { get; set; }
