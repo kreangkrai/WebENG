@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebENG.CTLInterfaces;
+using WebENG.CTLModels;
+using WebENG.CTLServices;
 using WebENG.Interface;
 using WebENG.Models;
 using WebENG.Service;
@@ -13,9 +16,11 @@ namespace WebENG.Controllers
     public class LeaveController : Controller
     {
         readonly IAccessory Accessory;
+        readonly IHierarchy Hierarchy;
         public LeaveController()
         {
             Accessory = new AccessoryService();
+            Hierarchy = new HierarchyService();
         }
         public IActionResult Index()
         {
@@ -34,6 +39,10 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
+
+                List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
+                List<HierarchyDepartmentModel> hierarchies_depaartmenr = Hierarchy.GetDepartmentHierarchies();
+
                 return View(u);
             }
             else

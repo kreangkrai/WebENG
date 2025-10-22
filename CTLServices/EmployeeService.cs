@@ -50,7 +50,7 @@ namespace WebENG.CTLServices
                         {
                             emp_id = dr["emp_id"].ToString(),
                             name = dr["name"].ToString(),
-                            department = dr[""].ToString(),
+                            department = dr["department"].ToString(),
                             location = dr["location"].ToString(),
                             start_date = dr["start_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_date"].ToString()) : DateTime.MinValue,
                             position = dr["position"].ToString(),
