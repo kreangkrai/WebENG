@@ -9,6 +9,7 @@ namespace WebENG.LeaveInterfaces
     public interface IRequest
     {
         List<RequestModel> GetRequests();
+        RequestModel GetRequestByID(string request_id);
         string Insert(RequestModel request);
         string Update(RequestModel request);
     }

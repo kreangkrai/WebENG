@@ -47,7 +47,7 @@ namespace WebENG.LeaveServices
                                                           ,[created_by]
                                                           ,[updated_at]
                                                           ,[updated_by]
-                                                      FROM [dbo].[leave_type] WHERE [leave_type_id] <> NULL");
+                                                      FROM [dbo].[leave_type] WHERE [leave_type_id] IS NOT NULL");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -90,7 +90,77 @@ namespace WebENG.LeaveServices
             }
             return leaves;
         }
-
+        public LeaveTypeModel GetLeaveTypeByID(string leave_type_id)
+        {
+            LeaveTypeModel leave = new LeaveTypeModel();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"SELECT [leave_type_id]
+                                                          ,[leave_type_code]
+                                                          ,[leave_name_th]
+                                                          ,[leave_name_en]
+                                                          ,[description]
+                                                          ,[min_request_hours]
+                                                          ,[request_timing]
+                                                          ,[max_consecutive]
+                                                          ,[max_consecutive_days]
+                                                          ,[gender_restriction]
+                                                          ,[attachment_required]
+                                                          ,[attachment_threshold_days]
+                                                          ,[count_holidays_as_leave]
+                                                          ,[is_unpaid]
+                                                          ,[is_active]
+                                                          ,[created_at]
+                                                          ,[created_by]
+                                                          ,[updated_at]
+                                                          ,[updated_by]
+                                                      FROM [dbo].[leave_type] WHERE [leave_type_id] = @leave_type_id");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                command.Parameters.AddWithValue("@leave_type_id", leave_type_id);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        leave = new LeaveTypeModel()
+                        {
+                            leave_type_id = dr["leave_type_id"].ToString(),
+                            leave_type_code = dr["leave_type_code"].ToString(),
+                            leave_name_en = dr["leave_name_en"].ToString(),
+                            leave_name_th = dr["leave_name_th"].ToString(),
+                            description = dr["description"].ToString(),
+                            min_request_hours = dr["min_request_hours"] != DBNull.Value ? Convert.ToDecimal(dr["min_request_hours"].ToString()) : 1,
+                            request_timing = dr["request_timing"].ToString(),
+                            max_consecutive = dr["max_consecutive"] != DBNull.Value ? Convert.ToBoolean(dr["max_consecutive"].ToString()) : false,
+                            max_consecutive_days = dr["max_consecutive_days"] != DBNull.Value ? Convert.ToDecimal(dr["max_consecutive_days"].ToString()) : 1,
+                            gender_restriction = dr["gender_restriction"].ToString(),
+                            attachment_required = dr["attachment_required"] != DBNull.Value ? Convert.ToBoolean(dr["attachment_required"].ToString()) : false,
+                            attachment_threshold_days = dr["attachment_threshold_days"] != DBNull.Value ? Convert.ToDecimal(dr["attachment_threshold_days"].ToString()) : 1,
+                            count_holidays_as_leave = dr["count_holidays_as_leave"] != DBNull.Value ? Convert.ToBoolean(dr["count_holidays_as_leave"].ToString()) : false,
+                            is_unpaid = dr["is_unpaid"] != DBNull.Value ? Convert.ToBoolean(dr["is_unpaid"].ToString()) : false,
+                            is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false,
+                            created_at = dr["created_at"] != DBNull.Value ? Convert.ToDateTime(dr["created_at"].ToString()) : DateTime.MinValue,
+                            created_by = dr["created_by"].ToString(),
+                            updated_at = dr["updated_at"] != DBNull.Value ? Convert.ToDateTime(dr["updated_at"].ToString()) : DateTime.MinValue,
+                            updated_by = dr["updated_by"].ToString()
+                        };
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return leave;
+        }
         public string Insert(LeaveTypeModel leave)
         {
             try
@@ -170,7 +240,6 @@ namespace WebENG.LeaveServices
             }
             return "Success";
         }
-
         public string Update(LeaveTypeModel leave)
         {
             try
