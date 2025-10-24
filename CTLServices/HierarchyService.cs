@@ -40,7 +40,8 @@ namespace WebENG.CTLServices
             hierarchies_operation = operations.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
-                name = operations.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(), 
+                name = operations.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(),
+                gender = operations.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = operations.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = operations.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
                 location = operations.Where(w => w.emp_id == s.Key).Select(c => c.location).FirstOrDefault(),
@@ -52,6 +53,7 @@ namespace WebENG.CTLServices
             {
                 emp_id = s.Key,
                 name = managers.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(),
+                gender = managers.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = managers.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = managers.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
                 location = managers.Where(w => w.emp_id == s.Key).Select(c => c.location).FirstOrDefault(),
@@ -63,6 +65,7 @@ namespace WebENG.CTLServices
             {
                 emp_id = s.Key,
                 name = directors.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(),
+                gender = directors.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = directors.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = directors.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
                 location = directors.Where(w => w.emp_id == s.Key).Select(c => c.location).FirstOrDefault(),

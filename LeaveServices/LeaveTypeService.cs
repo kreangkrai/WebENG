@@ -44,10 +44,13 @@ namespace WebENG.LeaveServices
                                                           ,[is_unpaid]
                                                           ,[is_active]
                                                           ,[created_at]
-                                                          ,[created_by]
+                                                          ,emp1.name_en as created_by
                                                           ,[updated_at]
-                                                          ,[updated_by]
-                                                      FROM [dbo].[leave_type] WHERE [leave_type_id] IS NOT NULL");
+                                                          ,emp2.name_en as updated_by
+                                                      FROM [dbo].[leave_type]
+													  LEFT JOIN Employees emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
+													  LEFT JOIN Employees emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
+													  WHERE [leave_type_id] IS NOT NULL");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -115,10 +118,13 @@ namespace WebENG.LeaveServices
                                                           ,[is_unpaid]
                                                           ,[is_active]
                                                           ,[created_at]
-                                                          ,[created_by]
+                                                          ,emp1.name_en as created_by
                                                           ,[updated_at]
-                                                          ,[updated_by]
-                                                      FROM [dbo].[leave_type] WHERE [leave_type_id] = @leave_type_id");
+                                                          ,emp2.name_en as updated_by
+                                                      FROM [dbo].[leave_type]
+													  LEFT JOIN Employees emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
+													  LEFT JOIN Employees emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
+													  WHERE [leave_type_id] = @leave_type_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@leave_type_id", leave_type_id);
                 SqlDataReader dr = command.ExecuteReader();
@@ -169,7 +175,7 @@ namespace WebENG.LeaveServices
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"INSERT INTO [dbo].[leave_type]
+                string strCmd = string.Format($@"INSERT INTO [ELEAVE].[dbo].[leave_type]
                                                ([leave_type_id]
                                                ,[leave_type_code]
                                                ,[leave_name_th]
@@ -229,7 +235,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@created_by", leave.created_by);
                 command.Parameters.AddWithValue("@updated_at", leave.updated_at);
                 command.Parameters.AddWithValue("@updated_by", leave.updated_by);
-
+                command.ExecuteNonQuery();
             }
             finally
             {
@@ -288,7 +294,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@created_by", leave.created_by);
                 command.Parameters.AddWithValue("@updated_at", leave.updated_at);
                 command.Parameters.AddWithValue("@updated_by", leave.updated_by);
-
+                command.ExecuteNonQuery();
             }
             finally
             {

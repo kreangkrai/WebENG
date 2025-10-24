@@ -19,6 +19,30 @@ namespace WebENG.LeaveServices
             connect = new ConnectSQL();
             con = connect.OpenLeaveConnect();
         }
+
+        public string Delete(string leave_id)
+        {
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"DELETE FROM [dbo].[leave_entitlement_rule] WHERE leave_type_id = @leave_type_id");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                command.Parameters.AddWithValue("@leave_type_id", leave_id);
+                command.ExecuteNonQuery();
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return "Success";
+        }
+
         public List<LeaveEntitlementRuleModel> GetLeaveEntitlementRules()
         {
             List<LeaveEntitlementRuleModel> leaves = new List<LeaveEntitlementRuleModel>();
@@ -29,17 +53,12 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"SELECT [entitlement_rule_id]
+                                                          ,[position]
                                                           ,[leave_type_id]
-                                                          ,[position_group_id]
-                                                          ,[min_tenure_months]
-                                                          ,[max_tenure_months]
-                                                          ,[gender_filter]
+                                                          ,[start_age]
+                                                          ,[before_age]
                                                           ,[days_per_year]
-                                                          ,[is_active]
-                                                          ,[created_at]
-                                                          ,[created_by]
-                                                          ,[updated_at]
-                                                          ,[updated_by]
+                                                          ,[hours_per_year]
                                                       FROM [dbo].[leave_entitlement_rule]");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
@@ -50,17 +69,12 @@ namespace WebENG.LeaveServices
                         LeaveEntitlementRuleModel leave = new LeaveEntitlementRuleModel()
                         {
                             entitlement_rule_id = dr["entitlement_rule_id"].ToString(),
+                            position = dr["position"].ToString(),
                             leave_type_id = dr["leave_type_id"].ToString(),
-                            position_group_id = dr["position_group_id"].ToString(),
-                            min_tenure_months = dr["min_tenure_months"] != DBNull.Value ? Convert.ToInt32(dr["min_tenure_months"].ToString()) : 1,
-                            max_tenure_months = dr["max_tenure_months"] != DBNull.Value ? Convert.ToInt32(dr["max_tenure_months"].ToString()) : 1,
-                            gender_filter = dr["gender_filter"].ToString(),
-                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToDecimal(dr["days_per_year"].ToString()) : 1,
-                            is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false,
-                            created_at = dr["created_at"] != DBNull.Value ? Convert.ToDateTime(dr["created_at"].ToString()) : DateTime.MinValue,
-                            created_by = dr["created_by"].ToString(),
-                            updated_at = dr["updated_at"] != DBNull.Value ? Convert.ToDateTime(dr["updated_at"].ToString()) : DateTime.MinValue,
-                            updated_by = dr["updated_by"].ToString()
+                            start_age = Convert.ToDecimal(dr["start_age"].ToString()),
+                            before_age = Convert.ToDecimal(dr["before_age"].ToString()),
+                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 1,
+                            hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 1
                         };
                         leaves.Add(leave);
                     }
@@ -77,7 +91,57 @@ namespace WebENG.LeaveServices
             return leaves;
         }
 
-        public string Insert(LeaveEntitlementRuleModel leave)
+        public List<LeaveEntitlementRuleModel> GetLeaveEntitlementRulesByLeaveID(string leave_type_id)
+        {
+            List<LeaveEntitlementRuleModel> leaves = new List<LeaveEntitlementRuleModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"SELECT [entitlement_rule_id]
+                                                          ,[position]
+                                                          ,[leave_type_id]
+                                                          ,[start_age]
+                                                          ,[before_age]
+                                                          ,[days_per_year]
+                                                          ,[hours_per_year]
+                                                      FROM [dbo].[leave_entitlement_rule]
+                                                      WHERE [leave_type_id] = @leave_type_id");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                command.Parameters.AddWithValue("@leave_type_id", leave_type_id);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        LeaveEntitlementRuleModel leave = new LeaveEntitlementRuleModel()
+                        {
+                            entitlement_rule_id = dr["entitlement_rule_id"].ToString(),
+                            position = dr["position"].ToString(),
+                            leave_type_id = dr["leave_type_id"].ToString(),
+                            start_age = Convert.ToDecimal(dr["start_age"].ToString()),
+                            before_age = Convert.ToDecimal(dr["before_age"].ToString()),
+                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 1,
+                            hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 1
+                        };
+                        leaves.Add(leave);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return leaves;
+        }
+
+        public string Insert(List<LeaveEntitlementRuleModel> leaves)
         {
             try
             {
@@ -87,43 +151,40 @@ namespace WebENG.LeaveServices
                 }
                 string strCmd = string.Format($@"INSERT INTO [ELEAVE].[dbo].[leave_entitlement_rule]
                                                    ([entitlement_rule_id]
+                                                   ,[position]
                                                    ,[leave_type_id]
-                                                   ,[position_group_id]
-                                                   ,[min_tenure_months]
-                                                   ,[max_tenure_months]
-                                                   ,[gender_filter]
+                                                   ,[start_age]
+                                                   ,[before_age]
                                                    ,[days_per_year]
-                                                   ,[is_active]
-                                                   ,[created_at]
-                                                   ,[created_by]
-                                                   ,[updated_at]
-                                                   ,[updated_by])
+                                                   ,[hours_per_year])
                                              VALUES
                                                    (@entitlement_rule_id
+                                                   ,@position
                                                    ,@leave_type_id
-                                                   ,@position_group_id
-                                                   ,@min_tenure_months
-                                                   ,@max_tenure_months
-                                                   ,@gender_filter
+                                                   ,@start_age
+                                                   ,@before_age
                                                    ,@days_per_year
-                                                   ,@is_active
-                                                   ,@created_at
-                                                   ,@created_by
-                                                   ,@updated_at
-                                                   ,@updated_by)");
+                                                   ,@hours_per_year)");
                 SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@entitlement_rule_id", leave.entitlement_rule_id);
-                command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
-                command.Parameters.AddWithValue("@position_group_id", leave.position_group_id);
-                command.Parameters.AddWithValue("@min_tenure_months", leave.min_tenure_months);
-                command.Parameters.AddWithValue("@max_tenure_months", leave.max_tenure_months);
-                command.Parameters.AddWithValue("@gender_filter", leave.gender_filter);
-                command.Parameters.AddWithValue("@days_per_year", leave.days_per_year);
-                command.Parameters.AddWithValue("@is_active", leave.is_active);
-                command.Parameters.AddWithValue("@created_at", leave.created_at);
-                command.Parameters.AddWithValue("@created_by", leave.created_by);
-                command.Parameters.AddWithValue("@updated_at", leave.updated_at);
-                command.Parameters.AddWithValue("@updated_by", leave.updated_by);
+                command.Parameters.Add("@entitlement_rule_id",SqlDbType.Text);
+                command.Parameters.Add("@position", SqlDbType.Text);
+                command.Parameters.Add("@leave_type_id", SqlDbType.Text);
+                command.Parameters.Add("@start_age", SqlDbType.Decimal);
+                command.Parameters.Add("@before_age", SqlDbType.Decimal);
+                command.Parameters.Add("@days_per_year", SqlDbType.Int);
+                command.Parameters.Add("@hours_per_year", SqlDbType.Int);
+                for(int i = 0; i < leaves.Count; i++)
+                {
+                    command.Parameters[0].Value = leaves[i].entitlement_rule_id;
+                    command.Parameters[1].Value = leaves[i].position;
+                    command.Parameters[2].Value = leaves[i].leave_type_id;
+                    command.Parameters[3].Value = leaves[i].start_age;
+                    command.Parameters[4].Value = leaves[i].before_age;
+                    command.Parameters[5].Value = leaves[i].days_per_year;
+                    command.Parameters[6].Value = leaves[i].hours_per_year;
+                    command.ExecuteNonQuery();
+                }
+                
             }
             finally
             {
@@ -135,49 +196,6 @@ namespace WebENG.LeaveServices
             return "Success";
         }
 
-        public string Update(LeaveEntitlementRuleModel leave)
-        {
-            try
-            {
-                if (con.State == ConnectionState.Closed)
-                {
-                    con.Open();
-                }
-                string strCmd = string.Format($@"UPDATE [dbo].[leave_entitlement_rule]
-                                                   SET [leave_type_id] = @leave_type_id
-                                                      ,[position_group_id] = @position_group_id
-                                                      ,[min_tenure_months] = @min_tenure_months
-                                                      ,[max_tenure_months] = @max_tenure_months
-                                                      ,[gender_filter] = @gender_filter
-                                                      ,[days_per_year] = @days_per_year
-                                                      ,[is_active] = @is_active
-                                                      ,[created_at] = @created_at
-                                                      ,[created_by] = @created_by
-                                                      ,[updated_at] = @updated_at
-                                                      ,[updated_by] = @updated_by
-                                                 WHERE [entitlement_rule_id] = @entitlement_rule_id");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@entitlement_rule_id", leave.entitlement_rule_id);
-                command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
-                command.Parameters.AddWithValue("@position_group_id", leave.position_group_id);
-                command.Parameters.AddWithValue("@min_tenure_months", leave.min_tenure_months);
-                command.Parameters.AddWithValue("@max_tenure_months", leave.max_tenure_months);
-                command.Parameters.AddWithValue("@gender_filter", leave.gender_filter);
-                command.Parameters.AddWithValue("@days_per_year", leave.days_per_year);
-                command.Parameters.AddWithValue("@is_active", leave.is_active);
-                command.Parameters.AddWithValue("@created_at", leave.created_at);
-                command.Parameters.AddWithValue("@created_by", leave.created_by);
-                command.Parameters.AddWithValue("@updated_at", leave.updated_at);
-                command.Parameters.AddWithValue("@updated_by", leave.updated_by);
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            return "Success";
-        }
+        
     }
 }

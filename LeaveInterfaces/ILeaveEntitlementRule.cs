@@ -9,7 +9,8 @@ namespace WebENG.LeaveInterfaces
     public interface ILeaveEntitlementRule
     {
         List<LeaveEntitlementRuleModel> GetLeaveEntitlementRules();
-        string Insert(LeaveEntitlementRuleModel leave);
-        string Update(LeaveEntitlementRuleModel leave);
+        List<LeaveEntitlementRuleModel> GetLeaveEntitlementRulesByLeaveID(string leave_type_id);
+        string Insert(List<LeaveEntitlementRuleModel> leaves);
+        string Delete(string leave_id);
     }
 }
