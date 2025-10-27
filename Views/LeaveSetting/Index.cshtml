@@ -255,7 +255,7 @@
 
                                                     </div>
                                                 </div>
-                                                <div class="row pt-3">
+                                                <div id="div_leave_attachment_threshold_days" class="row pt-3" hidden>
                                                     <div class="col-8">
                                                         <span class="kanit-light">เมื่อลาตั้งแต่</span>
                                                     </div>
@@ -496,6 +496,28 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered"role="document">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color:#034694">
+                <h5 class="modal-title" id="modal_confirm_title">ตั้งค่าประเภทการลา</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="confirm_content" class="text-center">
+                    <p class="kanit-light" style="font-size:20px">คุณต้องการจะบันทึกหรือไม่?</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" id="confirm_ok">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+</div>
 <partial name="ModalSpin" />
 
 @section Scripts
@@ -540,6 +562,17 @@
         });
 
         async function UpdateSave() {
+            if (last_leave_id !== "") {
+                $('#modal_confirm').modal();
+            } else {
+                alert('กรุณาเลือกประเภทการลา');
+            }
+        }
+        $('#confirm_ok').on('click', async function () {
+            await ConfirmUpdateSave();
+        });
+
+        async function ConfirmUpdateSave() {
             $('#SpinModal').modal();
             let leave_type_id = last_leave_id;
             let leave_name_th = $('#update_type_leave_th').val();
@@ -599,7 +632,6 @@
             }
             $('#SpinModal').modal('hide');
         }
-
         async function GetLeaveGroup() {
             await $.ajax({
                 type: "GET",
@@ -608,7 +640,7 @@
                 data: {},
                 success: function (response) {
                     leaves = response.leaves;
-                    entitlements = response.entitlements;                    
+                    entitlements = response.entitlements;
                     GenerateLeaveGroup(leaves);
                 }
             });
@@ -636,7 +668,7 @@
 
             data_entitlement_manager = [];
             data_entitlement_operation = [];
-            
+
             let datas_entitlement_manager = entitlements.filter(f => f.leave_type_id === last_leave_id && f.position === "Manager").map(m => m);
             let datas_entitlement_operation = entitlements.filter(f => f.leave_type_id === last_leave_id && f.position === "Operation").map(m => m);
             for (let i = 0; i < datas_entitlement_manager.length; i++) {
@@ -671,6 +703,14 @@
             $('#update_leave_request_timing').val(leave.request_timing);
             $('#update_leave_gender').val(leave.gender_restriction);
             leave.attachment_required === true ? $('#update_leave_require_attachment').attr('checked', true) : $('#update_leave_require_attachment').attr('checked', false);
+
+            let chk = $('#update_leave_require_attachment').prop('checked');
+            if (chk === true) {
+                $('#div_leave_attachment_threshold_days').attr('hidden', false);
+            } else {
+                $('#div_leave_attachment_threshold_days').attr('hidden', true);
+                
+            }
             $('#update_leave_attachment_threshold_days').val(leave.attachment_threshold_days);
             leave.is_unpaid === true ? $('#update_leave_is_unpaid').attr('checked', true) : $('#update_leave_is_unpaid').attr('checked', false);
             leave.count_holidays_as_leave === true ? $('#update_leave_count_holidays_as_leave').attr('checked', true) : $('#update_leave_count_holidays_as_leave').attr('checked', false);
@@ -681,6 +721,17 @@
             CreateEntitlementManager();
             CreateEntitlementOperation();
         }
+
+        $('#update_leave_require_attachment').on('change', function () {
+            let chk = $('#update_leave_require_attachment').prop('checked');
+            if (chk === true) {
+                $('#div_leave_attachment_threshold_days').attr('hidden', false);
+                $('#update_leave_attachment_threshold_days').val(3);
+            } else {
+                $('#div_leave_attachment_threshold_days').attr('hidden', true);
+                $('#update_leave_attachment_threshold_days').val(0);
+            }
+        });
 
         /*
          =============== Entitlement Manager ================
