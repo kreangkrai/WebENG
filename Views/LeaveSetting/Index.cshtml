@@ -7,8 +7,8 @@
 <style>
 
     .custom-control-input:not(:checked) ~ .custom-control-label::before {
-        background-color: gray;
-        border-color: gray;
+        background-color: lightgray;
+        border-color: lightgray;
     }
 
     .custom-control-input:checked ~ .custom-control-label::before {
@@ -17,9 +17,9 @@
     }
 
     .kanit-thin {
-        font-family: "Kanit", sans-serif;
-        font-weight: 100;
-        font-style: normal;
+        font-family: "Kanit", sans-serif !important;
+        font-weight: 100 !important;
+        font-style: normal !important;
     }
 
     .kanit-extralight {
@@ -29,9 +29,9 @@
     }
 
     .kanit-light {
-        font-family: "Kanit", sans-serif;
-        font-weight: 300;
-        font-style: normal;
+        font-family: "Kanit", sans-serif !important;
+        font-weight: 300 !important;
+        font-style: normal !important;
     }
 
     .kanit-regular {
@@ -153,13 +153,13 @@
         <span class="kanit-bold" style="font-size:24px;color:dimgrey">ประเภทการลา</span>
         <hr style="border:solid;color:gray;border-width:1px" />
     </div>
-   
+
     <div class="col-xl-2 col-md-3 col-sm-12">
         <div class="card card-dark">
             <div class="card-body" style="height:760px; overflow-y:auto">
                 <form>
                     <div class="form-group row">
-                        <button type="button" id="addLeave" class="btn btn-outline-info form-control kanit-bold" style="border-radius:1px">+ เพิ่มประเภทการลา</button>
+                        <input type="button" id="addLeave" class="btn btn-outline-info form-control kanit-bold" style="border-radius:1px" value="+ เพิ่มประเภทการลา" />
                     </div>
                     <div id="leave_group">
 
@@ -180,244 +180,186 @@
                             <li class="nav-item">
                                 <a class="nav-link kanit-light" href="#Entitlement" data-toggle="tab">สิทธิ์การลา</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link kanit-light" href="#Condition" data-toggle="tab">เงื่อนไขการอนุมัติ</a>
-                            </li>
                         </ul>
-                    </div>                   
+                    </div>
                     <div class="tab-content">
-                        <div class="tab-pane fade show active" id="Leave">                           
+                        <div class="tab-pane fade show active" id="Leave">
                             <div class="container d-flex justify-content-center">
                                 <div class="col-xl-8 col-md-8 col-sm-12">
-                                <div class="row">
-                                    <div class="col-xl-6 col-md-6 col-sm-12">
-                                        <div class="form-group ">
-                                            <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (TH)</label>
-                                            <input id="amount_leave" type="text" class="form-control" style="text-align:start" />
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-12">
-                                        <div class="form-group ">
-                                            <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (EN)</label>
-                                            <input id="amount_leave" type="text" class="form-control" style="text-align:start" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-xl-4 col-md-4 col-sm-12">
-                                        <div class="form-group ">
-                                            <label class="kanit-light" style="color:dimgrey">ประเภทการลา : </label>
-                                            <label class="kanit-light">
-                                                ลาพักร้อน
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label class="kanit-light" style="color:dimgrey">รายละเอียด</label>
-                                            <textarea id="amount_leave" class="form-control" style="text-align:start" placeholder="รายละเอียดเพิ่มเติม"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group ">
-                                            <label class="kanit-light" style="color:dimgrey">การขอลา</label>
-                                            <div class="row">
-                                            <div class="col-8">
-                                                <span class="kanit-light">เงื่อนไขการขอลา</span>
-                                            </div>                                           
-                                                <div class="col-4 kanit-light d-flex justify-content-end">
-                                                    <select class="form-control">
-                                                            <option value="ลาล่วงหน้าและย้อนหลังได้">ลาล่วงหน้าและย้อนหลังได้</option>
-                                                            <option value="ลาล่วงหน้า">ลาล่วงหน้า</option>
-                                                            <option value="ลาย้อนหลัง">ลาย้อนหลัง</option>
-                                                        </select>
-                                                    </div>                                             
+                                    <div class="row">
+                                        <div class="col-xl-6 col-md-6 col-sm-12">
+                                            <div class="form-group ">
+                                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (TH)</label>
+                                                <input id="update_type_leave_th" type="text" class="form-control" style="text-align:start" />
                                             </div>
-                                            <div class="row pt-1">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">เพศ</span>
-                                                </div>
-                                                <div class="col-4 kanit-light d-flex justify-content-end">
-                                                    <select class="form-control">
-                                                            <option value="ลาได้ทุกเพศ">ลาได้ทุกเพศ</option>
-                                                            <option value="เพศชาย">เพศชาย</option>
-                                                            <option value="เพศหญิง">เพศหญิง</option>
-                                                        </select>
-                                                    </div>                                               
+                                        </div>
+                                        <div class="col-xl-6 col-md-6 col-sm-12">
+                                            <div class="form-group ">
+                                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (EN)</label>
+                                                <input id="update_type_leave_en" type="text" class="form-control" style="text-align:start" />
                                             </div>
-                                            <div class="row pt-1">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">ต้องแนบไฟล์</span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-4 col-md-4 col-sm-12">
+                                            <div class="form-group ">
+                                                <label class="kanit-light" style="color:dimgrey">รหัสการลา</label>
+                                                <input id="update_type_leave_code" type="text" class="form-control" style="text-align:start" />
+                                            </div>
+                                        </div>
+                                        <div class="col-xl-8 col-md-8 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="kanit-light" style="color:dimgrey">รายละเอียด</label>
+                                                <textarea id="update_leave_description" class="form-control" style="text-align:start" placeholder="รายละเอียดเพิ่มเติม" rows="1"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group ">
+                                                <label class="kanit-light" style="color:dimgrey">การขอลา</label>
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เงื่อนไขการขอลา</span>
+                                                    </div>
+                                                    <div class="col-4 kanit-light d-flex justify-content-end">
+                                                        <select id="update_leave_request_timing"class="form-control">
+                                                            <option value="Both">ลาล่วงหน้าและย้อนหลังได้</option>
+                                                            <option value="Future">ลาล่วงหน้า</option>
+                                                            <option value="Past">ลาย้อนหลัง</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                                <div class="col-4 d-flex justify-content-end">
-                                             
+                                                <div class="row pt-1">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เพศ</span>
+                                                    </div>
+                                                    <div class="col-4 kanit-light d-flex justify-content-end">
+                                                        <select id="update_leave_gender" class="form-control">
+                                                            <option value="Both">ลาได้ทุกเพศ</option>
+                                                            <option value="Male">เพศชาย</option>
+                                                            <option value="Femal">เพศหญิง</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row pt-1">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">ต้องแนบไฟล์</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
                                                         <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                                            <label class="custom-control-label" for="customSwitch1" style="transform:scale(1.2)">
+                                                            <input type="checkbox" class="custom-control-input" id="update_leave_require_attachment">
+                                                            <label class="custom-control-label" for="update_leave_require_attachment" style="transform:scale(1.2)">
                                                             </label>
                                                         </div>
-                                                    
+
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="row pt-3">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">เมื่อลาตั้งแต่</span>
-                                                </div>
-                                                <div class="col-4 d-flex justify-content-end">
-                                                    
+                                                <div class="row pt-3">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เมื่อลาตั้งแต่</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
                                                         <div class="input-group">
-                                                        <input id="retention" type="number" class="form-control" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text kanit-light">วัน</span>
+                                                            <input id="update_leave_attachment_threshold_days" type="number" class="form-control" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text kanit-light">วัน</span>
                                                             </div>
                                                         </div>
-                                                   
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group ">
-                                            <label class="kanit-light" style="color:dimgrey">เงื่อนไข</label>                                          
-                                            <div class="row">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">ไม่ได้รับค่าจ้าง</span>
-                                                </div>
-                                                <div class="col-4 d-flex justify-content-end">
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                                        <label class="custom-control-label" for="customSwitch1" style="transform:scale(1.2)">
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">นับวันหยุดเป็นวันลา</span>
-                                                </div>
-                                                <div class="col-4 d-flex justify-content-end">
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                                        <label class="custom-control-label" for="customSwitch1" style="transform:scale(1.2)">
-                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group ">
-                                            <label class="kanit-light" style="color:dimgrey">แก้ไขล่าสุด</label>
-
-                                            <div class="row">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">ชื่อ</span>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group ">
+                                                <label class="kanit-light" style="color:dimgrey">เงื่อนไข</label>
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">ไม่ได้รับค่าจ้าง</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="update_leave_is_unpaid">
+                                                            <label class="custom-control-label" for="update_leave_is_unpaid" style="transform:scale(1.2)">
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="col-4 d-flex justify-content-end">        
-                                                        <label class="kanit-light">
-                                                            kriangkrai
-                                                        </label>                                                  
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">นับวันหยุดเป็นวันลา</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="update_leave_count_holidays_as_leave">
+                                                            <label class="custom-control-label" for="update_leave_count_holidays_as_leave" style="transform:scale(1.2)">
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="row">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">เวลา</span>
-                                                </div>
-                                                <div class="col-4 d-flex justify-content-end">                                                
-                                                        <label class="kanit-light">
-                                                            23/10/2025 09:00
-                                                        </label>                                                   
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-8">
-                                                    <span class="kanit-light">เปิดใช้งาน</span>
-                                                </div>
-                                                <div class="col-4 d-flex justify-content-end">
-
-                                                    <div class="custom-control custom-switch">
-                                                        <input type="checkbox" class="custom-control-input" id="customSwitch1">
-                                                        <label class="custom-control-label kanit-light" for="customSwitch1" style="transform:scale(1.2)">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group ">
+                                                <label class="kanit-light" style="color:dimgrey">แก้ไขล่าสุด</label>
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">ชื่อ</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <label id="update_leave_edit_by"class="kanit-light">
+                                                            
                                                         </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เวลา</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <label id="update_leave_edit_at" class="kanit-light">   
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เปิดใช้งาน</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="custom-control custom-switch">
+                                                            <input type="checkbox" class="custom-control-input" id="update_leave_is_active">
+                                                            <label class="custom-control-label kanit-light" for="update_leave_is_active" style="transform:scale(1.2)">
+                                                            </label>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="Entitlement">
                             <div class="container d-flex justify-content-center">
-                                <div class="col-xl-12 col-md-12 col-sm-12">                                  
-                                    <div class="row">
-                                        <div class="col-xl-12 col-md-12 col-sm-12">
-                                        <div class="card collapsed-card">
-                                            <div class="card-header">
-                                                <div class="row">
-                                                    <div class="col-xl-4 col-md-4 col-sm-12">
-                                                         <span class="kanit-bold" style="color:dimgrey">ผู้จัดการขึ้นไป</span>                           
-                                                    </div>
-                                                    <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
-                                                        <div class="row">                                                               
-                                                            <div class="col-6">
-                                                                    <div class="card-tools">
-                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
-                                                                            <i class="fas fa-chevron-down"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                        </div>
-                                                
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="row" style="row-gap:1px">
-                                                    <div class="col-12">
-                                                            <div id="div_entitlement_manager">
-                                                            </div>                                                        
-                                                            <div class="row">
-                                                                <div class="col-xl-1 col-md-1 col-sm-6">
-                                                                <button class="kanit-light form-control btn btn-outline-info" onclick="EntitlementManagerClicked()">+ เพิ่ม</button>
-                                                                </div>
-                                                            </div>                                                          
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                     </div>
-                                    </div>
+                                <div class="col-xl-12 col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col-xl-12 col-md-12 col-sm-12">
                                             <div class="card collapsed-card">
-                                                <div class="card-header">
+                                                <div class="card-header" style="background-color:powderblue">
                                                     <div class="row">
                                                         <div class="col-xl-4 col-md-4 col-sm-12">
-                                                            <span class="kanit-bold" style="color:dimgrey">พนักงานทั่วไป</span>
+                                                            <span class="kanit-bold" style="color:dimgrey">ผู้จัดการขึ้นไป</span>
                                                         </div>
                                                         <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
                                                             <div class="row">
                                                                 <div class="col-6">
                                                                     <div class="card-tools">
-                                                                        <button type="button" class="btn btn-tool" style="color:black">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6">
-                                                                    <div class="card-tools">
                                                                         <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
-                                                                            <i class="fas fa-plus"></i>
+                                                                            <i class="fas fa-chevron-down"></i>
                                                                         </button>
                                                                     </div>
                                                                 </div>
@@ -427,9 +369,52 @@
                                                     </div>
                                                 </div>
                                                 <div class="card-body">
-                                                    <div class="row" style="row-gap:10px">
-                                                        <div class="col-xl-12">
-                                                            <input id="btn_export_hq" value="รายงานประจำวัน" type="button" class="btn btn-warning form-control" style="color:blue;background-color:#CE8232" />
+                                                    <div class="row" style="row-gap:1px">
+                                                        <div class="col-12">
+                                                            <div id="div_entitlement_manager">
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-xl-1 col-md-1 col-sm-6">
+                                                                    <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementManagerClicked()" value="+ เพิ่ม" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-12 col-md-12 col-sm-12">
+                                            <div class="card collapsed-card">
+                                                <div class="card-header" style="background-color:powderblue">
+                                                    <div class="row">
+                                                        <div class="col-xl-4 col-md-4 col-sm-12">
+                                                            <span class="kanit-bold" style="color:dimgrey">พนักงานทั่วไป</span>
+                                                        </div>
+                                                        <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
+                                                            <div class="row">         
+                                                                <div class="col-6">
+                                                                    <div class="card-tools">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
+                                                                            <i class="fas fa-chevron-down"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row" style="row-gap:1px">
+                                                        <div class="col-12">
+                                                            <div id="div_entitlement_operation">
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-xl-1 col-md-1 col-sm-6">
+                                                                    <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementOperationClicked()" value="+ เพิ่ม" />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -439,10 +424,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="Condition">
-                                <p>นี่คือเนื้อหาของ Link 2</p>
-                            </div>
-                        </div>
+                    </div>
                 </form>
             </div>
             <div class="card-footer" style="background-color:white">
@@ -454,29 +436,169 @@
                                     <button class="form-control kanit-light" style="background-color:red;color:white">ยกเลิก</button>
                                 </div>
                                 <div class="col-6">
-                                    <button class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
+                                    <button class="form-control kanit-light" onclick="UpdateSave()" style="background-color:#034694;color:white">บันทึก</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>      
+        </div>
     </div>
 </div>
-
-
+<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title" id="modal_leave_title">เพิ่มประเภทการลา</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height:250px; color:#555555">
+                <form>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">รหัสการลา</label>
+                                <input id="add_type_leave_code" type="text" class="form-control" style="text-align:start" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (TH)</label>
+                                <input id="add_type_leave_th" type="text" class="form-control" style="text-align:start" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (EN)</label>
+                                <input id="add_type_leave_en" type="text" class="form-control" style="text-align:start" />
+                            </div>
+                        </div>
+                    </div>                       
+                </form>
+            </div>
+            <div class="modal-footer d-flex">
+                <div class="container d-flex justify-content-end">
+                    <div class="col-xl-8 col-md-8 col-sm-12">
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="form-control kanit-light" style="background-color:red;color:white" data-dismiss="modal">ยกเลิก</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btn_add_save" class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="ModalSpin" />
 
 @section Scripts
 {
     <script type="text/javascript">
-        
+        let entitlements = [];
         let data_entitlement_manager = [];
         let entitlement_manager = 0;
-
+        let data_entitlement_operation = [];
+        let entitlement_operation = 0;
+        let leaves = [];
+        let last_leave_id = "";
         $(document).ready(async function () {
             await GetLeaveGroup();
         });
+
+        $('#addLeave').on('click', function () {
+            $('#modal_leave').modal();
+        });
+
+        $('#btn_add_save').on('click', async function () {
+            let leave_code = $('#add_type_leave_code').val();
+            let leave_th = $('#add_type_leave_th').val();
+            let leave_en = $('#add_type_leave_en').val();
+            if (leave_code.trim() !== "" && leave_code !== null && leave_th.trim() !== "" && leave_th !== null && leave_en.trim() !== "" && leave_en !== null) {
+                await $.ajax({
+                type: "POST",
+                url: '@Url.Action("CreateLeaveGroup", "LeaveSetting")',
+                contentType: 'application/x-www-form-urlencoded',
+                    data: { leave_code, leave_th, leave_en},
+                success: function (response) {
+                    let message = response;
+                    if (message === "Success") {
+                        location.reload();
+                    }
+                }
+            });
+            } else {
+                alert("กรุณากรอกข้อมูลให้ครบ");
+            }
+
+        });
+
+        async function UpdateSave() {
+            $('#SpinModal').modal();
+            let leave_type_id = last_leave_id;
+            let leave_name_th = $('#update_type_leave_th').val();
+            let leave_name_en = $('#update_type_leave_en').val();
+            let leave_type_code = $('#update_type_leave_code').val();
+            let description = $('#update_leave_description').val();
+            let request_timing = $('#update_leave_request_timing').val();
+            let gender_restriction = $('#update_leave_gender').val();
+            let attachment_required = $('#update_leave_require_attachment').prop('checked');
+            let attachment_threshold_days = $('#update_leave_attachment_threshold_days').val();
+            let is_unpaid = $('#update_leave_is_unpaid').prop('checked');
+            let count_holidays_as_leave = $('#update_leave_count_holidays_as_leave').prop('checked');
+            let updated_by = $('#update_leave_edit_by').text();
+            let updated_at = $('#update_leave_edit_at').text();
+            let is_active = $('#update_leave_is_active').prop('checked');
+            if (leave_name_th.trim() !== "" &&
+                leave_name_en.trim() !== "" &&
+                leave_type_code.trim() !== "" &&
+                data_entitlement_manager.length > 0 &&
+                data_entitlement_operation.length > 0) {
+                var leave = JSON.stringify({
+                    "leave_type_id": leave_type_id,
+                    "leave_name_th": leave_name_th,
+                    "leave_name_en": leave_name_en,
+                    "leave_type_code": leave_type_code,
+                    "description": description,
+                    "request_timing": request_timing,
+                    "gender_restriction": gender_restriction,
+                    "attachment_required": attachment_required,
+                    "attachment_threshold_days": attachment_threshold_days,
+                    "is_unpaid": is_unpaid,
+                    "count_holidays_as_leave": count_holidays_as_leave,
+                    "updated_by": updated_by,
+                    "updated_at": updated_at,
+                    "is_active": is_active
+                });
+                var entitlement_manager = JSON.stringify({
+                    "entitlement": data_entitlement_manager
+                });
+                var entitlement_operation = JSON.stringify({
+                    "entitlement": data_entitlement_operation
+                });
+                await $.ajax({
+                    type: "PUT",
+                    url: '@Url.Action("UpdateLeaveGroup", "LeaveSetting")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { leave, entitlement_manager, entitlement_operation },
+                    success: function (response) {
+                        let message = response;
+                        if (message === "Success") {
+                            location.reload();
+                        }
+                    }
+                });
+            } else {
+                alert("กรุณากรอกข้อมูลให้ครบ");
+            }
+            $('#SpinModal').modal('hide');
+        }
 
         async function GetLeaveGroup() {
             await $.ajax({
@@ -485,17 +607,18 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: {},
                 success: function (response) {
-                    let leaves = response;
-                    CreateLeaveGroup(leaves);
+                    leaves = response.leaves;
+                    entitlements = response.entitlements;                    
+                    GenerateLeaveGroup(leaves);
                 }
             });
         }
 
-        function CreateLeaveGroup(leaves) {
+        function GenerateLeaveGroup(leaves) {
             var html = '';
             for (var i = 0; i < leaves.length; i++) {
                 html += `<div class="form-group row">
-                               <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium" 
+                               <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium"
                                style="border-radius:20px" onClick="LeaveGroupClicked('${leaves[i].leave_type_id}')">
                                ${leaves[i].leave_name_th}
                                </button>
@@ -507,17 +630,69 @@
         }
 
         function LeaveGroupClicked(leave_type_id) {
-            alert(leave_type_id);
+            last_leave_id = leave_type_id;
+
+            //Get Entitlement
+
+            data_entitlement_manager = [];
+            data_entitlement_operation = [];
+            
+            let datas_entitlement_manager = entitlements.filter(f => f.leave_type_id === last_leave_id && f.position === "Manager").map(m => m);
+            let datas_entitlement_operation = entitlements.filter(f => f.leave_type_id === last_leave_id && f.position === "Operation").map(m => m);
+            for (let i = 0; i < datas_entitlement_manager.length; i++) {
+                data_entitlement_manager.push({
+                    "id": entitlement_manager,
+                    "start_age": datas_entitlement_manager[i].start_age,
+                    "before_age": datas_entitlement_manager[i].before_age,
+                    "days": datas_entitlement_manager[i].days_per_year,
+                    "hours": datas_entitlement_manager[i].hours_per_year
+                });
+                entitlement_manager++;
+            }
+
+            for (let i = 0; i < datas_entitlement_operation.length; i++) {
+                data_entitlement_operation.push({
+                    "id": entitlement_operation,
+                    "start_age": datas_entitlement_operation[i].start_age,
+                    "before_age": datas_entitlement_operation[i].before_age,
+                    "days": datas_entitlement_operation[i].days_per_year,
+                    "hours": datas_entitlement_operation[i].hours_per_year
+                });
+                entitlement_operation++;
+            }
+
+            console.log(entitlements);
+
+            let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+            $('#update_type_leave_th').val(leave.leave_name_th);
+            $('#update_type_leave_en').val(leave.leave_name_en);
+            $('#update_type_leave_code').val(leave.leave_type_code);
+            $('#update_leave_description').val(leave.description);
+            $('#update_leave_request_timing').val(leave.request_timing);
+            $('#update_leave_gender').val(leave.gender_restriction);
+            leave.attachment_required === true ? $('#update_leave_require_attachment').attr('checked', true) : $('#update_leave_require_attachment').attr('checked', false);
+            $('#update_leave_attachment_threshold_days').val(leave.attachment_threshold_days);
+            leave.is_unpaid === true ? $('#update_leave_is_unpaid').attr('checked', true) : $('#update_leave_is_unpaid').attr('checked', false);
+            leave.count_holidays_as_leave === true ? $('#update_leave_count_holidays_as_leave').attr('checked', true) : $('#update_leave_count_holidays_as_leave').attr('checked', false);
+            $('#update_leave_edit_by').text(leave.updated_by);
+            $('#update_leave_edit_at').text(leave.updated_at.replace('T', ' '));
+            leave.is_active === true ? $('#update_leave_is_active').attr('checked', true) : $('#update_leave_is_active').attr('checked', false);
+
+            CreateEntitlementManager();
+            CreateEntitlementOperation();
         }
 
+        /*
+         =============== Entitlement Manager ================
+        */
         function EntitlementManagerClicked() {
-            
-            data_entitlement_manager.push({ "id": entitlement_manager, "start_age": 0, "before_age": 0, "days": 0, "hours": 0 });
+
+            data_entitlement_manager.push({ "id": entitlement_manager, "start_age": 1, "before_age": 1, "days": 1, "hours": 0 });
             CreateEntitlementManager();
             entitlement_manager++;
-           
+
         }
-        function CreateEntitlementManager(){
+        function CreateEntitlementManager() {
             $('#div_entitlement_manager').empty();
             for (let i = 0; i < data_entitlement_manager.length; i++) {
 
@@ -526,11 +701,11 @@
                                                                                     <div class="form-group">
                                                                                         <label class="kanit-light" style="color:dimgrey">อายุงานตั้งแต่</label>
                                                                                         <div class="input-group">
-                                                                                                <input id="entitlement_manager_start_age_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerStartAgeAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="#" value="${data_entitlement_manager[i].start_age}" step="1" min="1" max="12" style="text-align:end" />
+                                                                                                <input id="entitlement_manager_start_age_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerStartAgeAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="1" value="${data_entitlement_manager[i].start_age}" step="1" min="1" max="12" style="text-align:end" />
                                                                                             <div class="input-group-append">
                                                                                                     <select id = "entitlement_manager_start_age_select${data_entitlement_manager[i].id}" onChange="EntitlementManagerStartAgeSelectChanged(${data_entitlement_manager[i].id})" class="kanit-light form-control">
                                                                                                     <option value="month">เดือน</option>
-                                                                                                    <option value="year">ปี</option>
+                                                                                                    <option value="year" selected>ปี</option>
                                                                                                 </select>
                                                                                             </div>
                                                                                         </div>
@@ -540,11 +715,11 @@
                                                                                     <div class="form-group">
                                                                                         <label class="kanit-light" style="color:dimgrey">แต่ไม่ถึง</label>
                                                                                         <div class="input-group">
-                                                                                            <input id="retention" type="number" class="form-control" placeholder="#" value="3" step="1" min="1" max="30" style="text-align:end" />
+                                                                                            <input id="entitlement_manager_before_age_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerBeforeAgeAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="#" value="${data_entitlement_manager[i].before_age}" step="1" min="1" max="30" style="text-align:end" />
                                                                                             <div class="input-group-append">
-                                                                                                <select class="kanit-light form-control">
+                                                                                                <select id = "entitlement_manager_before_age_select${data_entitlement_manager[i].id}" onChange="EntitlementManagerBeforeAgeSelectChanged(${data_entitlement_manager[i].id})" class="kanit-light form-control" disabled>
                                                                                                     <option value="month">เดือน</option>
-                                                                                                    <option value="year">ปี</option>
+                                                                                                    <option value="year" selected>ปี</option>
                                                                                                 </select>
                                                                                             </div>
                                                                                         </div>
@@ -554,7 +729,7 @@
                                                                                     <div class="form-group">
                                                                                         <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
                                                                                         <div class="input-group">
-                                                                                            <input id="retention" type="number" class="form-control" placeholder="#" value="3" step="1" min="1" max="12" style="text-align:end" />
+                                                                                            <input id="entitlement_manager_day_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerDayAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="#" value="${data_entitlement_manager[i].days}" step="1" min="1" max="16" style="text-align:end" />
                                                                                             <div class="input-group-append">
                                                                                                 <span class="input-group-text kanit-light">วัน</span>
                                                                                             </div>
@@ -566,7 +741,7 @@
                                                                                     <div class="form-group">
                                                                                         <label class="kanit-light" style="color:dimgrey">จำนวนชั่วโมง</label>
                                                                                         <div class="input-group">
-                                                                                            <input id="retention" type="number" class="form-control" placeholder="#" value="3" step="1" min="1" max="12" style="text-align:end" />
+                                                                                            <input id="entitlement_manager_hour_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerHourAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="1" value="${data_entitlement_manager[i].hours}" step="1" min="1" max="24" style="text-align:end" />
                                                                                         <div class="input-group-append">
                                                                                             <span class="input-group-text kanit-light">ชั่วโมง</span>
                                                                                         </div>
@@ -587,7 +762,6 @@
 
 
                 $('#div_entitlement_manager').append(html);
-
             }
         }
         function EntitlementManagerDelete(id) {
@@ -599,11 +773,11 @@
             CreateEntitlementManager();
         }
 
-        function EntitlementManagerStartAgeAmountChanged(id){
+        function EntitlementManagerStartAgeAmountChanged(id) {
             let tag = "#entitlement_manager_start_age_amount" + id;
             let tag_year = "#entitlement_manager_start_age_select" + id;
             let type = $(tag_year).val();
-            let amount = $(tag).val();
+            let amount = parseInt($(tag).val());
 
             if (type === "month"){
                 amount = (amount / 12.0).toFixed(1);
@@ -615,17 +789,248 @@
         }
 
         function EntitlementManagerStartAgeSelectChanged(id){
-            let tag = "#entitlement_manager_start_age_amount" + id;
-            let tag_year = "#entitlement_manager_start_age_select" + id;
+            let tag = "#entitlement_manager_before_age_amount" + id;
+            let before_age_year = "#entitlement_manager_before_age_select" + id;
+            let start_age_year = "#entitlement_manager_start_age_select" + id;
+            let type_start_age = $(start_age_year).val();
+            let type_before_age = $(before_age_year).val();
+            let amount = parseInt($(tag).val());
+
+            if (type_start_age === "month") {
+                if (type_before_age === "month") {
+                    amount = (amount / 12.0).toFixed(1);
+                }
+                $(before_age_year).attr('disabled', false);
+            }
+            if (type_start_age === "year") {
+                $(before_age_year).attr('disabled', true);
+                $(before_age_year).val(type_start_age);
+            }
+
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+            data_entitlement_manager[index].start_age = amount;
+            console.log(data_entitlement_manager);
+        }
+
+        function EntitlementManagerBeforeAgeAmountChanged(id) {
+            let tag = "#entitlement_manager_before_age_amount" + id;
+            let tag_year = "#entitlement_manager_before_age_select" + id;
             let type = $(tag_year).val();
-            let amount = $(tag).val();
+            let amount = parseInt($(tag).val());
 
             if (type === "month") {
                 amount = (amount / 12.0).toFixed(1);
             }
             const index = data_entitlement_manager.findIndex(item => item.id === id);
-            data_entitlement_manager[index].start_age = amount;
+            data_entitlement_manager[index].before_age = amount;
+
             console.log(data_entitlement_manager);
+        }
+
+        function EntitlementManagerBeforeAgeSelectChanged(id) {
+            let tag = "#entitlement_manager_before_age_amount" + id;
+            let before_age_year = "#entitlement_manager_before_age_select" + id;
+            let type_before_age = $(before_age_year).val();
+            let amount = parseInt($(tag).val());
+
+            if (type_before_age === "month") {
+                amount = (amount / 12.0).toFixed(1);
+            }
+
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+            data_entitlement_manager[index].before_age = amount;
+            console.log(data_entitlement_manager);
+        }
+
+        function EntitlementManagerDayAmountChanged(id) {
+            let tag = "#entitlement_manager_day_amount" + id;
+            let amount = parseInt($(tag).val());
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+            data_entitlement_manager[index].days = amount;
+            console.log(data_entitlement_manager);
+        }
+        function EntitlementManagerHourAmountChanged(id) {
+            let tag = "#entitlement_manager_hour_amount" + id;
+            let amount = parseInt($(tag).val());
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+            data_entitlement_manager[index].hours = amount;
+            console.log(data_entitlement_manager);
+        }
+
+        /*
+         =============== Entitlement Operation ================
+        */
+        function EntitlementOperationClicked() {
+
+            data_entitlement_operation.push({ "id": entitlement_operation, "start_age": 1, "before_age": 1, "days": 1, "hours": 0 });
+            CreateEntitlementOperation();
+            entitlement_operation++;
+
+        }
+
+        function CreateEntitlementOperation() {
+            $('#div_entitlement_operation').empty();
+            for (let i = 0; i < data_entitlement_operation.length; i++) {
+
+                let html = `<div class="row">
+                                                                            <div class="col-xl-3 col-md-3 col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label class="kanit-light" style="color:dimgrey">อายุงานตั้งแต่</label>
+                                                                                        <div class="input-group">
+                                                                                                <input id="entitlement_operation_start_age_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationStartAgeAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="1" value="${data_entitlement_operation[i].start_age}" step="1" min="1" max="12" style="text-align:end" />
+                                                                                            <div class="input-group-append">
+                                                                                                    <select id = "entitlement_operation_start_age_select${data_entitlement_operation[i].id}" onChange="EntitlementoperationStartAgeSelectChanged(${data_entitlement_operation[i].id})" class="kanit-light form-control">
+                                                                                                    <option value="month">เดือน</option>
+                                                                                                    <option value="year" selected>ปี</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-xl-3 col-md-3 col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label class="kanit-light" style="color:dimgrey">แต่ไม่ถึง</label>
+                                                                                        <div class="input-group">
+                                                                                            <input id="entitlement_operation_before_age_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationBeforeAgeAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="#" value="${data_entitlement_operation[i].before_age}" step="1" min="1" max="30" style="text-align:end" />
+                                                                                            <div class="input-group-append">
+                                                                                                <select id = "entitlement_operation_before_age_select${data_entitlement_operation[i].id}" onChange="EntitlementOperationBeforeAgeSelectChanged(${data_entitlement_operation[i].id})" class="kanit-light form-control" disabled>
+                                                                                                    <option value="month">เดือน</option>
+                                                                                                    <option value="year" selected>ปี</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-xl-3 col-md-3 col-sm-6">
+                                                                                    <div class="form-group">
+                                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
+                                                                                        <div class="input-group">
+                                                                                            <input id="entitlement_operation_day_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationDayAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="#" value="${data_entitlement_operation[i].days}" step="1" min="1" max="16" style="text-align:end" />
+                                                                                            <div class="input-group-append">
+                                                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                <div class="col-xl-2 col-md-2 col-sm-5">
+                                                                                    <div class="form-group">
+                                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนชั่วโมง</label>
+                                                                                        <div class="input-group">
+                                                                                            <input id="entitlement_operation_hour_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationHourAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="1" value="${data_entitlement_operation[i].hours}" step="1" min="1" max="24" style="text-align:end" />
+                                                                                        <div class="input-group-append">
+                                                                                            <span class="input-group-text kanit-light">ชั่วโมง</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                        </div>
+                                                                                </div>
+                                                                                <div class="col-1">
+                                                                                    <div class="form-group">
+                                                                                        <label class="kanit-light" style="color:dimgrey">ยกเลิก</label>
+                                                                                        <div class="input-group d-flex justify-content-start">
+                                                                                                <button type="button" class="btn btn-tool pt-3" style="color:red" onClick="EntitlementOperationDelete(${data_entitlement_operation[i].id})">
+                                                                                            <i class="fas fa-trash" style="transform:scale(1.2)"></i>
+                                                                                        </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>`
+
+
+                $('#div_entitlement_operation').append(html);
+            }
+        }
+        function EntitlementOperationDelete(id) {
+
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            if (index !== -1) {
+                data_entitlement_operation.splice(index, 1);
+            }
+            CreateEntitlementOperation();
+        }
+
+        function EntitlementOperationStartAgeAmountChanged(id) {
+            let tag = "#entitlement_operation_start_age_amount" + id;
+            let tag_year = "#entitlement_operation_start_age_select" + id;
+            let type = $(tag_year).val();
+            let amount = parseInt($(tag).val());
+
+            if (type === "month") {
+                amount = (amount / 12.0).toFixed(1);
+            }
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            data_entitlement_operation[index].start_age = amount;
+
+            console.log(data_entitlement_operation);
+        }
+
+        function EntitlementOperationStartAgeSelectChanged(id) {
+            let tag = "#entitlement_operation_before_age_amount" + id;
+            let before_age_year = "#entitlement_operation_before_age_select" + id;
+            let start_age_year = "#entitlement_operation_start_age_select" + id;
+            let type_start_age = $(start_age_year).val();
+            let type_before_age = $(before_age_year).val();
+            let amount = parseInt($(tag).val());
+
+            if (type_start_age === "month") {
+                if (type_before_age === "month") {
+                    amount = (amount / 12.0).toFixed(1);
+                }
+                $(before_age_year).attr('disabled', false);
+            }
+            if (type_start_age === "year") {
+                $(before_age_year).attr('disabled', true);
+                $(before_age_year).val(type_start_age);
+            }
+
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            data_entitlement_operation[index].start_age = amount;
+            console.log(data_entitlement_operation);
+        }
+
+        function EntitlementOperationBeforeAgeAmountChanged(id) {
+            let tag = "#entitlement_operation_before_age_amount" + id;
+            let tag_year = "#entitlement_operation_before_age_select" + id;
+            let type = $(tag_year).val();
+            let amount = parseInt($(tag).val());
+
+            if (type === "month") {
+                amount = (amount / 12.0).toFixed(1);
+            }
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            data_entitlement_operation[index].before_age = amount;
+
+            console.log(data_entitlement_operation);
+        }
+
+        function EntitlementOperationBeforeAgeSelectChanged(id) {
+            let tag = "#entitlement_operation_before_age_amount" + id;
+            let before_age_year = "#entitlement_operation_before_age_select" + id;
+            let type_before_age = $(before_age_year).val();
+            let amount = parseInt($(tag).val());
+
+            if (type_before_age === "month") {
+                amount = (amount / 12.0).toFixed(1);
+            }
+
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            data_entitlement_operation[index].before_age = amount;
+            console.log(data_entitlement_operation);
+        }
+
+        function EntitlementOperationDayAmountChanged(id) {
+            let tag = "#entitlement_operation_day_amount" + id;
+            let amount = parseInt($(tag).val());
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            data_entitlement_operation[index].days = amount;
+            console.log(data_entitlement_operation);
+        }
+        function EntitlementOperationHourAmountChanged(id) {
+            let tag = "#entitlement_operation_hour_amount" + id;
+            let amount = parseInt($(tag).val());
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+            data_entitlement_operation[index].hours = amount;
+            console.log(data_entitlement_operation);
         }
     </script>
 }

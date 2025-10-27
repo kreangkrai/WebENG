@@ -12,6 +12,7 @@ namespace WebENG.CTLModels
         public string department { get; set; }
         public string position { get; set; }
         public string location { get; set; }
+        public string gender { get; set; }
         public List<EmployeeModel> managers { get; set; }
         public List<EmployeeModel> directors { get; set; }
     }
