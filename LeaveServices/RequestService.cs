@@ -32,11 +32,11 @@ namespace WebENG.LeaveServices
                                                           ,[emp_id]
                                                           ,[leave_type_id]
                                                           ,[is_full_day]
-                                                          ,[start_date]
-                                                          ,[end_date]
+                                                          ,[start_request_date]
+                                                          ,[end_request_date]
                                                           ,[amount_leave_day]
-                                                          ,[start_time]
-                                                          ,[end_time]
+                                                          ,[start_request_time]
+                                                          ,[end_request_time]
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
@@ -61,11 +61,11 @@ namespace WebENG.LeaveServices
                             emp_id = dr["emp_id"].ToString(),
                             leave_type_id = dr["leave_type_id"].ToString(),
                             is_full_day = dr["is_full_day"] != DBNull.Value ? Convert.ToBoolean(dr["is_full_day"].ToString()) : false,
-                            start_date = dr["start_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_date"].ToString()) : DateTime.MinValue,
-                            end_date = dr["end_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_date"].ToString()) : DateTime.MinValue,
+                            start_request_date = dr["start_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_request_date"].ToString()) : DateTime.MinValue,
+                            end_request_date = dr["end_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_request_date"].ToString()) : DateTime.MinValue,
                             amount_leave_day = dr["amount_leave_day"] != DBNull.Value ? Convert.ToInt32(dr["amount_leave_day"].ToString()) : 0,
-                            start_time = dr["start_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["start_time"].ToString()).Ticks) : new TimeSpan(0,0,0),
-                            end_time = dr["end_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["end_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            start_request_time = dr["start_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["start_request_time"].ToString()).Ticks) : new TimeSpan(0,0,0),
+                            end_request_time = dr["end_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["end_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
@@ -105,11 +105,11 @@ namespace WebENG.LeaveServices
                                                           ,[emp_id]
                                                           ,[leave_type_id]
                                                           ,[is_full_day]
-                                                          ,[start_date]
-                                                          ,[end_date]
+                                                          ,[start_request_date]
+                                                          ,[end_request_date]
                                                           ,[amount_leave_day]
-                                                          ,[start_time]
-                                                          ,[end_time]
+                                                          ,[start_request_time]
+                                                          ,[end_request_time]
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
@@ -135,11 +135,11 @@ namespace WebENG.LeaveServices
                             emp_id = dr["emp_id"].ToString(),
                             leave_type_id = dr["leave_type_id"].ToString(),
                             is_full_day = dr["is_full_day"] != DBNull.Value ? Convert.ToBoolean(dr["is_full_day"].ToString()) : false,
-                            start_date = dr["start_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_date"].ToString()) : DateTime.MinValue,
-                            end_date = dr["end_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_date"].ToString()) : DateTime.MinValue,
+                            start_request_date = dr["start_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_request_date"].ToString()) : DateTime.MinValue,
+                            end_request_date = dr["end_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_request_date"].ToString()) : DateTime.MinValue,
                             amount_leave_day = dr["amount_leave_day"] != DBNull.Value ? Convert.ToInt32(dr["amount_leave_day"].ToString()) : 0,
-                            start_time = dr["start_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["start_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
-                            end_time = dr["end_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["end_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            start_request_time = dr["start_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["start_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            end_request_time = dr["end_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["end_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
@@ -179,11 +179,11 @@ namespace WebENG.LeaveServices
                                                    ,[emp_id]
                                                    ,[leave_type_id]
                                                    ,[is_full_day]
-                                                   ,[start_date]
-                                                   ,[end_date]
+                                                   ,[start_request_date]
+                                                   ,[end_request_date]
                                                    ,[amount_leave_day]
-                                                   ,[start_time]
-                                                   ,[end_time]
+                                                   ,[start_request_time]
+                                                   ,[end_request_time]
                                                    ,[amount_leave_hour]
                                                    ,[path_file]
                                                    ,[request_date]
@@ -200,11 +200,11 @@ namespace WebENG.LeaveServices
                                                    ,@emp_id
                                                    ,@leave_type_id
                                                    ,@is_full_day
-                                                   ,@start_date
-                                                   ,@end_date
+                                                   ,@start_request_date
+                                                   ,@end_request_date
                                                    ,@amount_leave_day
-                                                   ,@start_time
-                                                   ,@end_time
+                                                   ,@start_request_time
+                                                   ,@end_request_time
                                                    ,@amount_leave_hour
                                                    ,@path_file
                                                    ,@request_date
@@ -221,11 +221,11 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@emp_id", request.emp_id);
                 command.Parameters.AddWithValue("@leave_type_id", request.leave_type_id);
                 command.Parameters.AddWithValue("@is_full_day", request.is_full_day);
-                command.Parameters.AddWithValue("@start_date", request.start_date);
-                command.Parameters.AddWithValue("@end_date", request.end_date);
+                command.Parameters.AddWithValue("@start_request_date", request.start_request_date);
+                command.Parameters.AddWithValue("@end_request_date", request.end_request_date);
                 command.Parameters.AddWithValue("@amount_leave_day", request.amount_leave_day);
-                command.Parameters.AddWithValue("@start_time", request.start_time);
-                command.Parameters.AddWithValue("@end_time", request.end_time);
+                command.Parameters.AddWithValue("@start_request_time", request.start_request_time);
+                command.Parameters.AddWithValue("@end_request_time", request.end_request_time);
                 command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
                 command.Parameters.AddWithValue("@path_file", request.path_file);
                 command.Parameters.AddWithValue("@request_date", request.request_date);
@@ -259,11 +259,11 @@ namespace WebENG.LeaveServices
                 string strCmd = string.Format($@"UPDATE [dbo].[request]
                                                    SET [leave_type_id] = @leave_type_id
                                                       ,[is_full_day] = @is_full_day
-                                                      ,[start_date] = @start_date
-                                                      ,[end_date] = @end_date
+                                                      ,[start_request_date] = @start_request_date
+                                                      ,[end_request_date] = @end_request_date
                                                       ,[amount_leave_day] = @amount_leave_day
-                                                      ,[start_time] = @start_time
-                                                      ,[end_time] = @end_time
+                                                      ,[start_request_time] = @start_request_time
+                                                      ,[end_request_time] = @end_request_time
                                                       ,[amount_leave_hour] = @amount_leave_hour
                                                       ,[path_file] = @path_file
                                                       ,[request_date] = @request_date
@@ -281,11 +281,11 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@emp_id", request.emp_id);
                 command.Parameters.AddWithValue("@leave_type_id", request.leave_type_id);
                 command.Parameters.AddWithValue("@is_full_day", request.is_full_day);
-                command.Parameters.AddWithValue("@start_date", request.start_date);
-                command.Parameters.AddWithValue("@end_date", request.end_date);
+                command.Parameters.AddWithValue("@start_request_date", request.start_request_date);
+                command.Parameters.AddWithValue("@end_request_date", request.end_request_date);
                 command.Parameters.AddWithValue("@amount_leave_day", request.amount_leave_day);
-                command.Parameters.AddWithValue("@start_time", request.start_time);
-                command.Parameters.AddWithValue("@end_time", request.end_time);
+                command.Parameters.AddWithValue("@start_request_time", request.start_request_time);
+                command.Parameters.AddWithValue("@end_request_time", request.end_request_time);
                 command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
                 command.Parameters.AddWithValue("@path_file", request.path_file);
                 command.Parameters.AddWithValue("@request_date", request.request_date);
