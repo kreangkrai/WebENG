@@ -190,56 +190,114 @@
             transform: translateY(-2px);
         }
 
-     /* สไตล์สำหรับ dropzone */
+    /* สไตล์สำหรับ dropzone */
     .dropzone {
         position: relative;
         transition: all 0.3s ease;
         cursor: pointer;
     }
-    .dropzone:hover {
-        background: #e9ecef;
-        border-color: #007bff;
+
+        .dropzone:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+        }
+
+        .dropzone.dragover {
+            background: #e3f2fd;
+            border-color: #007bff;
+            transform: scale(1.02);
+        }
+
+        .dropzone input[type="file"] {
+            z-index: 1000;
+        }
+
+    /* สไตล์สำหรับปุ่มเลือกไฟล์ */
+    .select-file-btn {
+        transition: all 0.3s ease;
     }
-    .dropzone.dragover {
-        background: #e3f2fd;
-        border-color: #007bff;
-        transform: scale(1.02);
-    }
-    .dropzone * {
-        pointer-events: none; /* ป้องกันการรบกวนจาก element ลูก */
-    }
-    .dropzone input[type="file"] {
-        pointer-events: auto; /* อนุญาตให้ input รับ event */
-    }
+
+        .select-file-btn:hover {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+            transform: translateY(-2px);
+        }
 
     /* สไตล์สำหรับรายการไฟล์ */
     .file-item {
         padding: 10px 15px;
-        border-bottom: 1px solid #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+        transition: opacity 0.3s ease; /* ใช้ transition แทน keyframes */
     }
-    .file-item:last-child {
-        border-bottom: none;
-    }
-    .file-item:hover {
-        background: #f8f9fa;
-    }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: #f8f9fa;
+        }
+
+        .file-item.added {
+            background: #e3f2fd; /* Highlight สีฟ้าเมื่อเพิ่ม */
+            opacity: 0; /* เริ่มจากโปร่งใส */
+        }
+
+            .file-item.added.show {
+                opacity: 1; /* Fade-in ถึงทึบ */
+            }
+
+        .file-item.removing {
+            background: #f8d7da; /* Highlight สีแดงเมื่อลบ */
+            opacity: 0; /* Fade-out ถึงโปร่งใส */
+        }
+
     .file-link {
         color: #007bff;
         text-decoration: none;
         transition: color 0.3s ease;
     }
-    .file-link:hover {
-        color: #0056b3;
-        text-decoration: underline;
-    }
+
+        .file-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
     .delete-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
         transition: all 0.3s ease;
     }
-    .delete-btn:hover {
-        background: #dc3545;
-        color: white;
-        transform: translateY(-2px);
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .delete-btn i {
+            font-size: 14px;
+        }
+
+    /* Responsive design */
+    .responsive-file-item {
+        flex-direction: column;
+        align-items: flex-start;
     }
+
+    .responsive-delete-btn {
+        margin-top: 10px;
+    }
+
+    .responsive-select-file-btn {
+        width: 100%;
+    }
+
 
 </style>
 
@@ -284,7 +342,6 @@
                             </div>
                         </div>
                     </div>
-                    <hr />
                     @* <div id="date_group" class="form-group row">
                         <div class="col-xl-4 col-md-4 col-sm-6">
                             <label for="start_date">ลาตั้งแต่วันที่</label>
@@ -343,8 +400,7 @@
                             <input id="stop_time" type="time" class="form-control" />
                         </fieldset>
                     </div>
-                    <hr />
-                    <div id="date_group" class="form-group row">
+                    @* <div id="date_group" class="form-group row">
                         <div class="col-12">
                             <label for="start_date">แนบไฟล์</label>
                             <div id="uploadForm" enctype="multipart/form-data">
@@ -379,7 +435,7 @@
                                         <button class="btn btn-danger btn-sm delete-btn" style="border-radius:20px" data-file="File_002.pdf">ลบไฟล์</button>
                                     </div>
                                 </div>
-                                @* <div class="col-6">
+                                 <div class="col-6">
                                     <ul>
                                         <li>AAAAAAAA</li>
                                     </ul>
@@ -394,10 +450,10 @@
                                 </div>
                                 <div class="col-6">
                                     <button type="button" id="addFileInput" class="btn btn-danger">ลบ</button>
-                                </div> *@
+                                </div> 
                             </div>
                         </div>
-                    </div>
+                    </div> *@
                     <hr />
                     <div class="form-group row">
                         <div class="col-12">
@@ -414,12 +470,12 @@
                     <div id="date_group" class="form-group row">
                         <div class="col-12">
                             <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
-                            <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 100px;">
+                            <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
                                 <div class="text-center">
                                     <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
                                     <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ (.pdf, .jpg, .png, .xls, .xlsx)</p>
-                                    <input type="file" id="fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="display: none;" />
-                                    <button type="button" id="selectFileBtn" class="btn btn-outline-primary kanit-medium">เลือกไฟล์</button>
+                                    <input type="file" id="fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
+                                    <button type="button" id="selectFileBtn" class="btn btn-outline-primary btn-sm kanit-medium select-file-btn">เลือกไฟล์</button>
                                 </div>
                             </div>
                         </div>
@@ -432,18 +488,18 @@
                             <div class="card" style="border-radius: 10px; overflow: hidden;">
                                 <div class="list-group" id="fileListContainer">
                                     <!-- ตัวอย่างไฟล์ -->
-                                    <div class="list-group-item d-flex align-items-center file-item" style="transition: all 0.3s ease;">
+                                    <div class="list-group-item d-flex align-items-center file-item">
                                         <i class="fas fa-file-image text-primary mr-2"></i>
                                         <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
-                                        <button class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 20px;" data-file="File_001.png">
-                                            <i class="fas fa-trash-alt"></i> ลบ
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_001.png" title="ลบไฟล์">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
-                                    <div class="list-group-item d-flex align-items-center file-item" style="transition: all 0.3s ease;">
+                                    <div class="list-group-item d-flex align-items-center file-item">
                                         <i class="fas fa-file-pdf text-danger mr-2"></i>
                                         <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
-                                        <button class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 20px;" data-file="File_002.pdf">
-                                            <i class="fas fa-trash-alt"></i> ลบ
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_002.pdf" title="ลบไฟล์">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -1024,25 +1080,34 @@
         });
 
                 // การจัดการอัปโหลดและลบไฟล์
-                        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('fileInput');
             const selectFileBtn = document.getElementById('selectFileBtn');
             const uploadForm = document.getElementById('uploadForm');
             const fileListContainer = document.getElementById('fileListContainer');
 
-            // ตรวจสอบว่า element ทั้งหมดโหลดครบ
+            // ตรวจสอบว่า element โหลดครบ
             if (!fileInput || !selectFileBtn || !uploadForm || !fileListContainer) {
-                console.error('ไม่พบ element ที่จำเป็นสำหรับการอัปโหลดไฟล์');
+                console.error('ไม่พบ element ที่จำเป็น: ', { fileInput, selectFileBtn, uploadForm, fileListContainer });
+                showAlert('เกิดข้อผิดพลาด: ไม่พบองค์ประกอบที่จำเป็นสำหรับการอัปโหลดไฟล์');
                 return;
             }
 
             // คลิกปุ่มเลือกไฟล์
-            selectFileBtn.addEventListener('click', () => {
+            selectFileBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 console.log('คลิกปุ่มเลือกไฟล์');
                 fileInput.click();
             });
 
             // การจัดการ drag-and-drop
+            uploadForm.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Drag enter dropzone');
+                uploadForm.classList.add('dragover');
+            });
+
             uploadForm.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1069,13 +1134,14 @@
             fileInput.addEventListener('change', () => {
                 console.log('เลือกไฟล์ผ่าน input', fileInput.files);
                 handleFiles(fileInput.files);
-                fileInput.value = ''; // รีเซ็ต input เพื่อให้เลือกไฟล์เดิมซ้ำได้
+                fileInput.value = '';
             });
 
             // ฟังก์ชันจัดการไฟล์
             function handleFiles(files) {
                 if (!files || files.length === 0) {
                     console.warn('ไม่มีไฟล์ถูกเลือกหรือวาง');
+                    showAlert('ไม่มีไฟล์ถูกเลือกหรือวาง');
                     return;
                 }
 
@@ -1084,38 +1150,43 @@
                     const allowedTypes = ['pdf', 'jpg', 'png', 'xls', 'xlsx'];
                     if (!allowedTypes.includes(fileType)) {
                         console.warn(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}`);
-                        showAlert('ประเภทไฟล์ไม่ถูกต้อง! กรุณาอัปโหลดไฟล์ .pdf, .jpg, .png, .xls, หรือ .xlsx');
+                        showAlert(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}. กรุณาอัปโหลดไฟล์ .pdf, .jpg, .png, .xls, หรือ .xlsx`);
                         continue;
                     }
 
                     console.log(`เพิ่มไฟล์: ${file.name}`);
                     const fileItem = document.createElement('div');
-                    fileItem.className = 'list-group-item d-flex align-items-center file-item';
-                    fileItem.style.opacity = '0';
+                    fileItem.className = 'list-group-item d-flex align-items-center file-item added';
                     fileItem.innerHTML = `
-                        <i class="fas fa-file-${fileType === 'pdf' ? 'pdf text-danger' : 'image text-primary'} mr-2"></i>
-                        <a href="#" class="file-link kanit-regular flex-grow-1">${file.name}</a>
-                        <button class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 20px;" data-file="${file.name}">
-                            <i class="fas fa-trash-alt"></i> ลบ
-                        </button>
-                    `;
+                                <i class="fas fa-file-${fileType === 'pdf' ? 'pdf text-danger' : 'image text-primary'} mr-2"></i>
+                                <a href="#" class="file-link kanit-regular flex-grow-1">${file.name}</a>
+                                <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="${file.name}" title="ลบไฟล์">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            `;
                     fileListContainer.appendChild(fileItem);
 
-                    // แอนิเมชัน fade-in
+                    // เริ่ม fade-in
                     setTimeout(() => {
-                        fileItem.style.opacity = '1';
+                        fileItem.classList.add('show');
                     }, 10);
+
+                    // ลบ class added หลัง 1 วินาทีเพื่อลบ highlight
+                    setTimeout(() => {
+                        fileItem.classList.remove('added');
+                    }, 1000);
                 }
             }
 
             // การจัดการลบไฟล์
             fileListContainer.addEventListener('click', (e) => {
+                e.preventDefault(); // ป้องกันการ submit ฟอร์ม
                 const btn = e.target.closest('.delete-btn');
                 if (btn) {
                     const fileItem = btn.closest('.file-item');
                     const fileName = btn.dataset.file;
                     console.log(`ลบไฟล์: ${fileName}`);
-                    fileItem.style.opacity = '0';
+                    fileItem.classList.add('removing');
                     setTimeout(() => {
                         fileItem.remove();
                     }, 300);
@@ -1126,8 +1197,13 @@
             function showAlert(message) {
                 const modalAlert = document.getElementById('modal_alert');
                 const alertContent = document.getElementById('alert_content');
-                alertContent.innerHTML = `<p class="kanit-regular">${message}</p>`;
-                $(modalAlert).modal('show');
+                if (modalAlert && alertContent) {
+                    alertContent.innerHTML = `<p class="kanit-regular">${message}</p>`;
+                    $(modalAlert).modal('show');
+                } else {
+                    console.error('ไม่พบ modal_alert หรือ alert_content');
+                    alert(message);
+                }
             }
         });
 
