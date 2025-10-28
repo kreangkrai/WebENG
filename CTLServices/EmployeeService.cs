@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.DirectoryServices;
+using System.Reflection.PortableExecutable;
 using WebENG.CTLInterfaces;
 using WebENG.CTLModels;
 using WebENG.Service;
@@ -75,6 +77,53 @@ namespace WebENG.CTLServices
                 }
             }
             return employees;
+        }
+
+        public List<EmpModel> GetEmps()
+        {
+            List<EmpModel> emps = new List<EmpModel>();
+            try
+            {              
+                using (System.DirectoryServices.DirectoryEntry directoryEntry = new System.DirectoryServices.DirectoryEntry("LDAP://192.168.15.1"))
+                {
+                    using (DirectorySearcher searcher = new DirectorySearcher(directoryEntry))
+                    {
+                        searcher.Filter = "(&(objectClass=user)(thumbnailPhoto=*))";
+                        searcher.PropertiesToLoad.Add("displayname");
+                        searcher.PropertiesToLoad.Add("thumbnailPhoto");
+
+                        SearchResultCollection results = searcher.FindAll();
+
+                        foreach (SearchResult adsSearchResult in results)
+                        {
+                            if (adsSearchResult.Properties["displayname"].Count > 0)
+                            {
+                                string name = adsSearchResult.Properties["displayname"][0]?.ToString();
+                                string photo = null;
+
+                                if (adsSearchResult.Properties["thumbnailPhoto"].Count > 0)
+                                {
+                                    byte[] b = adsSearchResult.Properties["thumbnailPhoto"][0] as byte[];
+                                    photo = Convert.ToBase64String(b);
+                                }
+
+                                EmpModel emp = new EmpModel()
+                                {
+                                    name = name,
+                                    img = photo
+                                };
+
+                                emps.Add(emp);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return emps;
+            }
+            return emps;
         }
     }
 }

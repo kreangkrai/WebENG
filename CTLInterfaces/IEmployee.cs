@@ -6,5 +6,6 @@ namespace WebENG.CTLInterfaces
     public interface IEmployee
     {
         List<EmployeeModel> GetEmployees();
+        List<EmpModel> GetEmps();
     }
 }
