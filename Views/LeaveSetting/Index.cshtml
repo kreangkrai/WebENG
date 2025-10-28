@@ -147,11 +147,102 @@
         input[type="number"]:not(:disabled) {
             opacity: 1;
         }
+
+    /* สไตล์สำหรับปุ่ม leave_group */
+    .leave-group-btn {
+        transition: all 0.3s ease; /* เหมือน dropzone */
+    }
+
+        .leave-group-btn.active {
+            background-color: #0056b3 !important; /* น้ำเงินเข้มเมื่อเลือก */
+            color: white !important; /* ตัวอักษรขาว */
+            border-color: #0056b3 !important; /* ขอบน้ำเงินเข้ม */
+            box-shadow: 0 4px 8px rgba(0, 86, 179, 0.3); /* เงาเล็กน้อย */
+        }
+
+        .leave-group-btn:hover {
+            background-color: #007bff; /* สีน้ำเงินปกติเมื่อ hover */
+            color: white;
+            transform: translateY(-2px); /* ยกขึ้นเหมือน dropzone */
+        }
+
+    /****************************************************/
+
+    /* สไตล์สำหรับเงื่อนไข */
+    .condition-group {
+        padding: 5px 0; /* เพิ่ม padding รอบ ๆ เพื่อความโปร่ง */
+    }
+
+    .condition-row {
+        margin-bottom: 0px; /* ช่องว่างระหว่างแถว */
+        padding: 5px 0; /* เพิ่ม padding ในแถว */
+        transition: all 0.3s ease; /* แอนิเมชันลื่นไหล */
+    }
+
+        .condition-row:hover {
+            background: #f8f9fa; /* Highlight เหมือน dropzone */
+        }
+
+    /* สไตล์สำหรับสวิตช์ */
+    .modern-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+        margin-right: 10px;
+    }
+
+        .modern-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .modern-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 28px;
+            transition: 0.3s;
+        }
+
+            .modern-switch .slider:before {
+                position: absolute;
+                content: "";
+                height: 24px;
+                width: 24px;
+                left: 2px;
+                bottom: 2px;
+                background-color: white;
+                border-radius: 50%;
+                transition: 0.3s;
+            }
+
+        .modern-switch input:checked + .slider {
+            background-color: #007bff;
+        }
+
+            .modern-switch input:checked + .slider:before {
+                transform: translateX(22px);
+            }
+
+        .modern-switch:hover .slider {
+            background-color: #b3d7ff;
+        }
 </style>
-<div class="row" style="row-gap:1px">
-    <div class="col-12">
-        <span class="kanit-bold" style="font-size:24px;color:dimgrey">ประเภทการลา</span>
-        <hr style="border:solid;color:gray;border-width:1px" />
+
+<div class="row" style="row-gap:1px; padding:10px">
+    <div class="col-12 kanit-bold">
+        @* <span class="kanit-bold" style="font-size:24px;color:dimgrey">ประเภทการลา</span> 
+        <hr style="border:solid;color:gray;border-width:1px" />*@
+        <h4 style="letter-spacing:2px; padding:10px; padding-left:15px; color:white; border-top-left-radius:20px; border-top-right-radius:20px; background: #2178BE;
+                    background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);">
+            ประเภทการลา
+        </h4>
     </div>
 
     <div class="col-xl-2 col-md-3 col-sm-12">
@@ -159,7 +250,7 @@
             <div class="card-body" style="height:760px; overflow-y:auto">
                 <form>
                     <div class="form-group row">
-                        <input type="button" id="addLeave" class="btn btn-outline-info form-control kanit-bold" style="border-radius:1px" value="+ เพิ่มประเภทการลา" />
+                        <input type="button" id="addLeave" class="btn btn-outline-info form-control kanit-medium" style="border-radius:5px; letter-spacing:1px" value="+ เพิ่มประเภทการลา" />
                     </div>
                     <div id="leave_group">
 
@@ -175,10 +266,10 @@
                     <div class="form-group row">
                         <ul class="nav nav-tabs">
                             <li class="nav-item">
-                                <a class="nav-link active kanit-light" href="#Leave" data-toggle="tab">การลา</a>
+                                <a class="nav-link active kanit-medium" style="letter-spacing:2px; font-size:18px" href="#Leave" data-toggle="tab">การลา</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link kanit-light" href="#Entitlement" data-toggle="tab">สิทธิ์การลา</a>
+                                <a class="nav-link kanit-medium" style="letter-spacing:2px; font-size:18px" href="#Entitlement" data-toggle="tab">สิทธิ์การลา</a>
                             </li>
                         </ul>
                     </div>
@@ -190,13 +281,13 @@
                                         <div class="col-xl-6 col-md-6 col-sm-12">
                                             <div class="form-group ">
                                                 <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (TH)</label>
-                                                <input id="update_type_leave_th" type="text" class="form-control" style="text-align:start" />
+                                                <input id="update_type_leave_th" type="text" class="form-control kanit-light" style="text-align:start" />
                                             </div>
                                         </div>
                                         <div class="col-xl-6 col-md-6 col-sm-12">
                                             <div class="form-group ">
                                                 <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (EN)</label>
-                                                <input id="update_type_leave_en" type="text" class="form-control" style="text-align:start" />
+                                                <input id="update_type_leave_en" type="text" class="form-control kanit-light" style="text-align:start" />
                                             </div>
                                         </div>
                                     </div>
@@ -210,15 +301,16 @@
                                         <div class="col-xl-8 col-md-8 col-sm-12">
                                             <div class="form-group">
                                                 <label class="kanit-light" style="color:dimgrey">รายละเอียด</label>
-                                                <textarea id="update_leave_description" class="form-control" style="text-align:start" placeholder="รายละเอียดเพิ่มเติม" rows="1"></textarea>
+                                                <textarea id="update_leave_description" class="form-control kanit-light" style="text-align:start" placeholder="รายละเอียดเพิ่มเติม" rows="1"></textarea>
                                             </div>
                                         </div>
                                     </div>
+                                    <hr /> <!------------------------------------------------------------------------------------------------------->
                                     <div class="row">
                                         <div class="col-12">
-                                            <div class="form-group ">
-                                                <label class="kanit-light" style="color:dimgrey">การขอลา</label>
-                                                <div class="row">
+                                            <div class="form-group condition-group">
+                                                <label class="kanit-light" style="color:dimgrey; font-size:18px">การขอลา</label>
+                                                <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">เงื่อนไขการขอลา</span>
                                                     </div>
@@ -230,7 +322,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="row pt-1">
+                                                <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">เพศ</span>
                                                     </div>
@@ -242,14 +334,18 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div class="row pt-1">
+                                                <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">ต้องแนบไฟล์</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="update_leave_require_attachment">
-                                                            <label class="custom-control-label" for="update_leave_require_attachment" style="transform:scale(1.2)">
+                                                            @* <input type="checkbox" class="custom-control-input" id="update_leave_require_attachment">
+                                                            <label class="custom-control-label" for="update_leave_require_attachment" style="transform:scale(1.5)">
+                                                            </label> *@
+                                                            <label class="modern-switch">
+                                                                <input type="checkbox" id="update_leave_require_attachment">
+                                                                <span class="slider"></span>
                                                             </label>
                                                         </div>
 
@@ -261,7 +357,7 @@
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <div class="input-group">
-                                                            <input id="update_leave_attachment_threshold_days" type="number" class="form-control" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
+                                                            <input id="update_leave_attachment_threshold_days" type="number" class="form-control kanit-light" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text kanit-light">วัน</span>
                                                             </div>
@@ -271,42 +367,49 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <hr /> <!------------------------------------------------------------------------------------------------------->
+
                                     <div class="row">
                                         <div class="col-12">
-                                            <div class="form-group ">
-                                                <label class="kanit-light" style="color:dimgrey">เงื่อนไข</label>
-                                                <div class="row">
+                                            <div class="form-group condition-group">
+                                                <label class="kanit-light" style="color: dimgrey; font-size:18px">เงื่อนไข</label>
+                                                <!-- แถวที่ 1 -->
+                                                <div class="row condition-row">
                                                     <div class="col-8">
-                                                        <span class="kanit-light">ไม่ได้รับค่าจ้าง</span>
+                                                        <span class="kanit-regular">ไม่ได้รับค่าจ้าง</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
-                                                        <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="update_leave_is_unpaid">
-                                                            <label class="custom-control-label" for="update_leave_is_unpaid" style="transform:scale(1.2)">
-                                                            </label>
-                                                        </div>
+                                                        <label class="modern-switch">
+                                                            <input type="checkbox" id="update_leave_is_unpaid">
+                                                            <span class="slider"></span>
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div class="row">
+
+                                                <!-- แถวที่ 2 -->
+                                                <div class="row condition-row">
                                                     <div class="col-8">
-                                                        <span class="kanit-light">นับวันหยุดเป็นวันลา</span>
+                                                        <span class="kanit-regular">นับวันหยุดเป็นวันลา</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
-                                                        <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="update_leave_count_holidays_as_leave">
-                                                            <label class="custom-control-label" for="update_leave_count_holidays_as_leave" style="transform:scale(1.2)">
-                                                            </label>
-                                                        </div>
+                                                        <label class="modern-switch">
+                                                            <input type="checkbox" id="update_leave_count_holidays_as_leave">
+                                                            <span class="slider"></span>
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <hr /> <!------------------------------------------------------------------------------------------------------->
+
                                     <div class="row">
                                         <div class="col-12">
-                                            <div class="form-group ">
-                                                <label class="kanit-light" style="color:dimgrey">แก้ไขล่าสุด</label>
-                                                <div class="row">
+                                            <div class="form-group condition-group">
+                                                <label class="kanit-light" style="color:dimgrey; font-size:18px">แก้ไขล่าสุด</label>
+                                                <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">ชื่อ</span>
                                                     </div>
@@ -316,7 +419,7 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                <div class="row">
+                                                <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">เวลา</span>
                                                     </div>
@@ -325,14 +428,18 @@
                                                         </label>
                                                     </div>
                                                 </div>
-                                                <div class="row">
+                                                <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">เปิดใช้งาน</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <div class="custom-control custom-switch">
-                                                            <input type="checkbox" class="custom-control-input" id="update_leave_is_active">
+                                                            @* <input type="checkbox" class="custom-control-input" id="update_leave_is_active">
                                                             <label class="custom-control-label kanit-light" for="update_leave_is_active" style="transform:scale(1.2)">
+                                                            </label> *@
+                                                            <label class="modern-switch">
+                                                                <input type="checkbox" id="update_leave_is_active">
+                                                                <span class="slider"></span>
                                                             </label>
                                                         </div>
                                                     </div>
@@ -455,7 +562,7 @@
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="height:250px; color:#555555">
+            <div class="modal-body mb-4" style="height:250px; color:#555555">
                 <form>
                     <div class="row">
                         <div class="col-12">
@@ -481,13 +588,17 @@
             </div>
             <div class="modal-footer d-flex">
                 <div class="container d-flex justify-content-end">
-                    <div class="col-xl-8 col-md-8 col-sm-12">
+                    <div class="col-xl-12 col-md-12 col-sm-12">
                         <div class="row">
                             <div class="col-6">
-                                <button class="form-control kanit-light" style="background-color:red;color:white" data-dismiss="modal">ยกเลิก</button>
+                                <button class="form-control kanit-light" style="background-color:red; color:white; border-radius:8px" data-dismiss="modal">
+                                    ยกเลิก
+                                </button>
                             </div>
                             <div class="col-6">
-                                <button id="btn_add_save" class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
+                                <button id="btn_add_save" class="form-control kanit-light" style="background-color:#034694; color:white; border-radius:8px">
+                                    บันทึก
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -556,7 +667,7 @@
                 }
             });
             } else {
-                alert("กรุณากรอกข้อมูลให้ครบ");
+                alert("กรุณากรอกข้อมูลให้ครบถ้วน");
             }
 
         });
@@ -646,13 +757,14 @@
             });
         }
 
+        /* action เพิ่มประเภทการลา */
         function GenerateLeaveGroup(leaves) {
             var html = '';
             for (var i = 0; i < leaves.length; i++) {
                 html += `<div class="form-group row">
-                               <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium"
-                               style="border-radius:20px" onClick="LeaveGroupClicked('${leaves[i].leave_type_id}')">
-                               ${leaves[i].leave_name_th}
+                                       <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                       style="border-radius:10px" onClick="LeaveGroupClicked('${leaves[i].leave_type_id}', this)">
+                                    ${leaves[i].leave_name_th}
                                </button>
                          </div>`;
             }
@@ -661,7 +773,15 @@
             $('#leave_group').append(html);
         }
 
-        function LeaveGroupClicked(leave_type_id) {
+        function LeaveGroupClicked(leave_type_id, button) {
+
+            // ลบ class active จากทุกปุ่มก่อน
+            const buttons = document.querySelectorAll('.leave-group-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // เพิ่ม class active ให้ปุ่มที่ถูกคลิก
+            button.classList.add('active');
+
             last_leave_id = leave_type_id;
 
             //Get Entitlement
@@ -930,7 +1050,7 @@
                                                                                         <div class="input-group">
                                                                                                 <input id="entitlement_operation_start_age_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationStartAgeAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="1" value="${data_entitlement_operation[i].start_age}" step="1" min="1" max="12" style="text-align:end" />
                                                                                             <div class="input-group-append">
-                                                                                                    <select id = "entitlement_operation_start_age_select${data_entitlement_operation[i].id}" onChange="EntitlementoperationStartAgeSelectChanged(${data_entitlement_operation[i].id})" class="kanit-light form-control">
+                                                                                                    <select id = "entitlement_operation_start_age_select${data_entitlement_operation[i].id}" onChange="EntitlementOperationStartAgeSelectChanged(${data_entitlement_operation[i].id})" class="kanit-light form-control">
                                                                                                     <option value="month">เดือน</option>
                                                                                                     <option value="year" selected>ปี</option>
                                                                                                 </select>

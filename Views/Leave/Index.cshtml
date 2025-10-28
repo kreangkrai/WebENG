@@ -298,7 +298,49 @@
         width: 100%;
     }
 
+    /* สไตล์สำหรับส่วนผู้อนุมัติ */
+    .approver-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #dee2e6;
+        transition: all 0.3s ease; /* เหมือน dropzone */
+    }
 
+        .approver-item:last-child {
+            border-bottom: none;
+        }
+
+        .approver-item:hover {
+            background: #f8f9fa; /* Highlight เหมือน file-item */
+            transform: translateY(-2px); /* ยกขึ้นเล็กน้อย */
+        }
+
+        .approver-item i {
+            font-size: 16px;
+        }
+
+    #approver-note {
+        font-size: 14px;
+        background: #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .badge {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 12px; /* ขอบโค้งทันสมัย */
+    }
+
+    .badge-warning {
+        background-color: #ffc107; /* รออนุมัติ = เหลือง */
+    }
+
+    .badge-success {
+        background-color: #28a745; /* อนุมัติ = เขียว */
+    }
+
+    .badge-danger {
+        background-color: #dc3545; /* ไม่อนุมัติ = แดง */
+    }
 </style>
 
 <div class="row p-3">
@@ -473,9 +515,13 @@
                             <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
                                 <div class="text-center">
                                     <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-                                    <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ (.pdf, .jpg, .png, .xls, .xlsx)</p>
+                                    <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
                                     <input type="file" id="fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
-                                    <button type="button" id="selectFileBtn" class="btn btn-outline-primary btn-sm kanit-medium select-file-btn">เลือกไฟล์</button>
+                                    <button type="button" id="selectFileBtn"
+                                            class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
+                                            style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
+                                        เลือกไฟล์
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -508,7 +554,7 @@
                     </div>
                     <!-------------------------------------------------------------------------------------------------------------------------------->
                     <hr />
-                    <div class="form-group row">
+                    @* <div class="form-group row">
                         <div class="col-12">
                             <label for="start_date">ผู้อนุมัติ</label>
                             <div class="col-12">
@@ -539,12 +585,55 @@
                                 </div>
                             </div>
                         </div>
+                    </div> *@
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <label for="approvers" class="kanit-medium">ผู้อนุมัติ</label>
+                            <div class="card" style="border-radius: 10px; overflow: hidden;">
+                                <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
+                                <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
+                                    <i class="fas fa-info-circle mr-2"></i>เลือกอนุมัติโดย 1 ใน 2 ผู้จัดการด้านล่าง
+                                </div>
+                                <div class="list-group" id="approverList">
+                                    <!-- ผู้อนุมัติคนที่ 1 -->
+                                    <div class="list-group-item d-flex align-items-center approver-item">
+                                        <div class="col-6">
+                                            <i class="fas fa-user-check mr-2 text-primary"></i>
+                                            <span class="kanit-regular">Chakrit R.</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="kanit-regular text-muted">Manager</span>
+                                        </div>
+                                    </div>
+                                    <!-- ผู้อนุมัติคนที่ 2 (ถ้ามี) -->
+                                    <div class="list-group-item d-flex align-items-center approver-item">
+                                        <div class="col-6">
+                                            <i class="fas fa-user-check mr-2 text-primary"></i>
+                                            <span class="kanit-regular">Kriangkrai R.</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="kanit-regular text-muted">Manager</span>
+                                        </div>
+                                    </div>
+                                    <!-- ผู้อนุมัติคนที่ 3 -->
+                                    <div class="list-group-item d-flex align-items-center approver-item">
+                                        <div class="col-6">
+                                            <i class="fas fa-user-check mr-2 text-primary"></i>
+                                            <span class="kanit-regular">Siriporn S.</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="kanit-regular text-muted">Admin</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer d-flex">
                 <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                    <i class="fas fa-trash-alt"></i> ลบ
+                    <i class="fas fa-trash-alt" ></i> ลบ
                 </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
                     <i class="fas fa-times"></i> ยกเลิก
