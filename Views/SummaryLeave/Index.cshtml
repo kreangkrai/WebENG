@@ -1,6 +1,6 @@
 ﻿@model WebENG.Models.UserModel;
 @{
-    ViewData["Title"] = "Leave Management";
+    ViewData["Title"] = "Leave Summary";
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
@@ -164,123 +164,103 @@
     table.dataTable tfoot th {
         border-bottom: 1px solid #111; /* เก็บเส้นแนวนอนไว้ */
     }
+
+    .freeze-pane {
+        overflow: auto;
+        height: 600px;
+        position: relative;
+    }
+
+    .freeze-head {
+        position: sticky;
+        top: 0;
+        background: lightgrey;
+        z-index: 10;
+    }
+
+    .freeze-left {
+        position: sticky;
+        left: 0;
+        background: white;
+        z-index: 5;
+    }
+
+    .freeze-corner {
+        z-index: 15 !important;
+    }
+
+    .half-left {
+        background: linear-gradient(90deg, green 50%, transparent 50%);
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+        /* ถ้าต้องการให้เส้นแบ่งตรงกลางคมชัด (optional) */
+        .half-left::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: lightgrey;
+            transform: translateX(-50%);
+        }
+    .half-right {
+        background: linear-gradient(90deg, transparent 50%, #007bff 50%);
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+        /* เส้นแบ่งตรงกลาง (ถ้าต้องการ) */
+        .half-right::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: lightgrey;
+            transform: translateX(-50%);
+        }
+       
 </style>
 <div class="row" style="row-gap:1px">
     <div class="col-12">
-        <span class="kanit-bold" style="font-size:24px;color:dimgrey">บริหารข้อมูลการลาพนักงาน</span>
+        <span class="kanit-bold" style="font-size:24px;color:dimgrey">สถานะการลาพนักงาน</span>
         <hr style="border:solid;color:gray;border-width:1px" />
     </div>
-
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark">
             <div class="card-body" style="height:700px; overflow-y:auto">
                 <form>
                     <div class="form-group">
-                        <div class="d-flex justify-content-end">
-                            <div class="col-xl-2 col-md-2 col-sm-6">
-                                <select class="kanit-light form-control">
-                                    <option value="Pending">รออนุมัติ</option>
-                                    <option value="Approved">อนุมัติแล้ว</option>
-                                </select>
-                            </div>
+                        <div class="mb-3 d-flex justify-content-center">
+                            <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<"/>
+                            <input type="month" id="monthPicker" class="form-control" style="width:200px; display:inline-block;">
+                            <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <table id="table_leave" class="table table-sm table-bordered table-hover text-center w-100">
-                            <thead class="kanit-light" style="background-color:lightgrey">
-                                <tr>
-                                    <th>รหัสพนักงาน</th>
-                                    <th>รายชื่อ</th>
-                                    <th>ระดับ</th>
-                                    <th>แผนก</th>
-                                    <th>วันที่เริ่มทำงาน</th>
-                                    <th>สถานะ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>          
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
-    <div class="modal modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content kanit-regular">
-            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title" id="modal_leave_title">เพิ่มประเภทการลา</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="color: white;">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" style="height:250px; color:#555555">
-                <form>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="form-group ">
-                                <label class="kanit-light" style="color:dimgrey">รหัสการลา</label>
-                                <input id="add_type_leave_code" type="text" class="form-control" style="text-align:start" />
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group ">
-                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (TH)</label>
-                                <input id="add_type_leave_th" type="text" class="form-control" style="text-align:start" />
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="form-group ">
-                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (EN)</label>
-                                <input id="add_type_leave_en" type="text" class="form-control" style="text-align:start" />
-                            </div>
+                        <div class="freeze-pane">
+                            <table id="table_leave" class="table table-sm compact table-bordered table-hover text-center w-100">
+                                <thead class="kanit-light" style="background-color:lightgrey">
+                                    <tr id="headerRow">
+                                        <th rowspan="2" class="kanit-bold freeze-head freeze-left freeze-corner" style="vertical-align:middle;background-color:lightgrey">รายชื่อ</th>
+                                    </tr>
+                                    <tr id="dateRow">
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer d-flex">
-                <div class="container d-flex justify-content-end">
-                    <div class="col-xl-8 col-md-8 col-sm-12">
-                        <div class="row">
-                            <div class="col-6">
-                                <button class="form-control kanit-light" style="background-color:red;color:white" data-dismiss="modal">ยกเลิก</button>
-                            </div>
-                            <div class="col-6">
-                                <button id="btn_add_save" class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header text-white" style="background-color:#034694">
-                <h5 class="modal-title" id="modal_confirm_title">ตั้งค่าประเภทการลา</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="confirm_content" class="text-center">
-                    <p class="kanit-light" style="font-size:20px">คุณต้องการจะบันทึกหรือไม่?</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
-                <button type="button" class="btn btn-success" id="confirm_ok">ยืนยัน</button>
-            </div>
-        </div>
-    </div>
-</div>
-<partial name="ModalSpin" />
-
 @section Scripts
 {
     <script type="text/javascript">
@@ -289,20 +269,50 @@
         $(document).ready(async function () {
             //await GetData();
             init();
+            const now = new Date();
+            const currentYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            $('#monthPicker').val(currentYearMonth);
+
+            generateDateHeaders();            
+        });
+        function generateDateHeaders() {
+            const monthPicker = $('#monthPicker');
+            //const headerRow = $('#headerRow');
+            const dateRow = $('#dateRow');
+            const [year, month] = monthPicker.val().split('-');
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            dateRow.empty();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month - 1, day);
+                const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
+                dateRow.append(`<th class="kanit-bold freeze-head" style="min-width:40px;">${day}<br><small>${dayName}</small></th>`);
+            }
+        }
+        $('#monthPicker').on('change', function () {
+            init();
+            generateDateHeaders();
         });
 
-        async function GetData() {
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetData", "ManagementLeave")',
-	            contentType: 'application/x-www-form-urlencoded',
-                data: {  },
-                success: function (response) {
-                    leaves = response;
-                    init(leaves);
-                }
-            });
-        }
+        $('#prevMonth').on('click', function () {
+            let monthPicker = new Date($('#monthPicker').val());
+            monthPicker.setMonth(monthPicker.getMonth() - 1);
+            const currentYearMonth = monthPicker.getFullYear() + '-' + String(monthPicker.getMonth() + 1).padStart(2, '0');
+            $('#monthPicker').val(currentYearMonth);
+            init();
+            generateDateHeaders();
+        });
+
+        $('#nextMonth').on('click', function () {
+            let monthPicker = new Date($('#monthPicker').val());
+            monthPicker.setMonth(monthPicker.getMonth() + 1);
+            const currentYearMonth = monthPicker.getFullYear() + '-' + String(monthPicker.getMonth() + 1).padStart(2, '0');
+            $('#monthPicker').val(currentYearMonth);
+            init();
+            generateDateHeaders();
+        });
+
 
         function init() {
             $(document).ready(function () {
@@ -315,9 +325,10 @@
                     },
                     columnDefs: [
                         {
-                            targets: 1,
+                            targets: 0,
+                            width: 200,
                             render: function (data, type, row) {
-                                var imgSrc = '/images/default-avatar.png'; 
+                                var imgSrc = '/images/default-avatar.png';
 
                                 if (row.img) {
                                     imgSrc = 'data:image/jpeg;base64,' + row.img;
@@ -325,14 +336,14 @@
 
                                 return `
                         <div class="row">
-                            <div class="col-1 d-flex align-items-center justify-content-start">
+                            <div class="col-2 d-flex justify-content-start">
                                 <img src="${imgSrc}"
                                     class="rounded-circle me-2"
                                     style="width: 32px; height: 32px; object-fit: cover;"
                                     alt="${row.name}" />                    
                                 
                              </div>
-                             <div class="col-11 d-flex align-items-center justify-content-start">
+                             <div class="col-10 d-flex justify-content-start">
                                 <div>
                                     <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
                                     <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
@@ -342,18 +353,46 @@
                             }
                         },
                         {
-                            targets: 5,
+                            targets: 1,
                             render: function (data, type, row) {
                                 return `
-                                    <input type="button" class="kanit-light btn btn-primary" value="OK" />`;
+                                    <input type="button" class="kanit-light btn btn-primary half-left" style="width:30px;height:30px;border-radius:15px"  />`;
                             }
+
+                        },
+                        {
+                            targets: 2,
+                            render: function (data, type, row) {
+                                return `
+                                    <input type="button" class="kanit-light btn btn-success half-right" style="width:30px;height:30px;border-radius:15px"  />`;
+                            }
+
+                        },
+                        {
+                            targets: 3,
+                            render: function (data, type, row) {
+                                return `
+                                    <input type="button" class="kanit-light btn btn-danger" style="width:30px;height:30px;border-radius:15px"  />`;
+                            }
+
                         },
                     ],
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
-                    }
+                    },
+                    "info": false,
+                    "paging": false,
+                    "searching": false,
+                    "ordering": false,
+                    fixedColumns: {
+                        left: 1
+                    },
+                    scrollX: false,
+                    scrollCollapse: true,
+                    fixedHeader:true,
                 });
             });
         }
     </script>
 }
+
