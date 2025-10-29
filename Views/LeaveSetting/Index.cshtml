@@ -177,6 +177,8 @@
         margin-bottom: 0px; /* ช่องว่างระหว่างแถว */
         padding: 5px 0; /* เพิ่ม padding ในแถว */
         transition: all 0.3s ease; /* แอนิเมชันลื่นไหล */
+        display: flex; /* ทำให้เป็น Flexbox container */
+        align-items: center; /* จัดกึ่งกลางในแนวตั้ง */
     }
 
         .condition-row:hover {
@@ -351,7 +353,7 @@
 
                                                     </div>
                                                 </div>
-                                                <div id="div_leave_attachment_threshold_days" class="row pt-3" hidden>
+                                                <div id="div_leave_attachment_threshold_days" class="row condition-row" hidden>
                                                     <div class="col-8">
                                                         <span class="kanit-light">เมื่อลาตั้งแต่</span>
                                                     </div>
@@ -377,7 +379,7 @@
                                                 <!-- แถวที่ 1 -->
                                                 <div class="row condition-row">
                                                     <div class="col-8">
-                                                        <span class="kanit-regular">ไม่ได้รับค่าจ้าง</span>
+                                                        <span class="kanit-light">ไม่ได้รับค่าจ้าง</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <label class="modern-switch">
@@ -390,7 +392,7 @@
                                                 <!-- แถวที่ 2 -->
                                                 <div class="row condition-row">
                                                     <div class="col-8">
-                                                        <span class="kanit-regular">นับวันหยุดเป็นวันลา</span>
+                                                        <span class="kanit-light">นับวันหยุดเป็นวันลา</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <label class="modern-switch">
