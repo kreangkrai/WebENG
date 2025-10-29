@@ -1,0 +1,360 @@
+﻿@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Leave Management";
+}
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+<style>
+
+    .custom-control-input:not(:checked) ~ .custom-control-label::before {
+        background-color: lightgray;
+        border-color: lightgray;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: green;
+        border-color: green;
+    }
+
+    .kanit-thin {
+        font-family: "Kanit", sans-serif !important;
+        font-weight: 100 !important;
+        font-style: normal !important;
+    }
+
+    .kanit-extralight {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: normal;
+    }
+
+    .kanit-light {
+        font-family: "Kanit", sans-serif !important;
+        font-weight: 300 !important;
+        font-style: normal !important;
+    }
+
+    .kanit-regular {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .kanit-medium {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    .kanit-semibold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    .kanit-bold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+    }
+
+    .kanit-extrabold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: normal;
+    }
+
+    .kanit-black {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: normal;
+    }
+
+    .kanit-thin-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 100;
+        font-style: italic;
+    }
+
+    .kanit-extralight-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: italic;
+    }
+
+    .kanit-light-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .kanit-regular-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    .kanit-medium-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: italic;
+    }
+
+    .kanit-semibold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: italic;
+    }
+
+    .kanit-bold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: italic;
+    }
+
+    .kanit-extrabold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: italic;
+    }
+
+    .kanit-black-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: italic;
+    }
+    /* สไตล์สำหรับ input */
+    input[type="text"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="text"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="text"]:not(:disabled) {
+            opacity: 1;
+        }
+    /* สไตล์สำหรับ input */
+    input[type="number"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="number"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="number"]:not(:disabled) {
+            opacity: 1;
+        }
+
+    table.dataTable tbody td {
+        border-left: none !important;
+        border-right: none !important;
+        border-top: none !important; /* ถ้าต้องการลบเส้นแนวนอนด้วย ให้ uncomment */
+    }
+
+    /* สำหรับ header ถ้าต้องการลบแนวตั้ง */
+    table.dataTable thead th {
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    /* ลบเส้นล่างของ footer ถ้ามี */
+    table.dataTable tfoot th {
+        border-bottom: 1px solid #111; /* เก็บเส้นแนวนอนไว้ */
+    }
+</style>
+<div class="row" style="row-gap:1px">
+    <div class="col-12">
+        <span class="kanit-bold" style="font-size:24px;color:dimgrey">บริหารข้อมูลการลาพนักงาน</span>
+        <hr style="border:solid;color:gray;border-width:1px" />
+    </div>
+
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <div class="card card-dark">
+            <div class="card-body" style="height:700px; overflow-y:auto">
+                <form>
+                    <div class="form-group">
+                        <div class="d-flex justify-content-end">
+                            <div class="col-xl-2 col-md-2 col-sm-6">
+                                <select class="form-control">
+                                    <option value="Pending">รออนุมัติ</option>
+                                    <option value="Approved">อนุมัติแล้ว</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <table id="table_leave" class="table table-sm table-bordered table-hover text-center w-100">
+                            <thead>
+                                <tr>
+                                    <th>รหัสพนักงาน</th>
+                                    <th>รายชื่อ</th>
+                                    <th>ระดับ</th>
+                                    <th>แผนก</th>
+                                    <th>วันที่เริ่มทำงาน</th>
+                                    <th>สถานะ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>          
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title" id="modal_leave_title">เพิ่มประเภทการลา</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height:250px; color:#555555">
+                <form>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">รหัสการลา</label>
+                                <input id="add_type_leave_code" type="text" class="form-control" style="text-align:start" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (TH)</label>
+                                <input id="add_type_leave_th" type="text" class="form-control" style="text-align:start" />
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">ชื่อประเภท (EN)</label>
+                                <input id="add_type_leave_en" type="text" class="form-control" style="text-align:start" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex">
+                <div class="container d-flex justify-content-end">
+                    <div class="col-xl-8 col-md-8 col-sm-12">
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="form-control kanit-light" style="background-color:red;color:white" data-dismiss="modal">ยกเลิก</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btn_add_save" class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-white" style="background-color:#034694">
+                <h5 class="modal-title" id="modal_confirm_title">ตั้งค่าประเภทการลา</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="confirm_content" class="text-center">
+                    <p class="kanit-light" style="font-size:20px">คุณต้องการจะบันทึกหรือไม่?</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-success" id="confirm_ok">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+</div>
+<partial name="ModalSpin" />
+
+@section Scripts
+{
+    <script type="text/javascript">
+        let table_leave = null;
+        let leaves = [];
+        $(document).ready(async function () {
+            //await GetData();
+            init();
+        });
+
+        async function GetData() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetData", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    leaves = response;
+                    init(leaves);
+                }
+            });
+        }
+
+        function init() {
+            $(document).ready(function () {
+                $('#table_leave').DataTable({
+                    ajax: {
+                        type: "GET",
+                        url: '@Url.Action("GetData", "ManagementLeave")',
+                        contentType: 'application/x-www-form-urlencoded',
+                        dataSrc: ''
+                    },
+                    columnDefs: [
+                        {
+                            targets: 1,
+                            render: function (data, type, row) {
+                                var imgSrc = '/images/default-avatar.png'; 
+
+                                if (row.img) {
+                                    imgSrc = 'data:image/jpeg;base64,' + row.img;
+                                }
+
+                                return `
+                        <div class="row">
+                            <div class="col-1 d-flex align-items-center justify-content-start">
+                                <img src="${imgSrc}"
+                                    class="rounded-circle me-2"
+                                    style="width: 32px; height: 32px; object-fit: cover;"
+                                    alt="${row.name}" />                    
+                                
+                             </div>
+                             <div class="col-11 d-flex align-items-center justify-content-start">
+                                <div>
+                                    <span class="d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
+                                    <span class="d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
+                                </div>
+                            </div>                        
+                       </div>`;
+                            }
+                        },
+                        {
+                            targets: 5,
+                            render: function (data, type, row) {
+                                return `
+                                    <input type="button" class="btn btn-primary" value="OK" />
+                        `;
+                            }
+                        },
+                    ],
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
+                    }
+                });
+            });
+        }
+    </script>
+}
