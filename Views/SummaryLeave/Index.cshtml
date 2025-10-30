@@ -190,13 +190,11 @@
     }
 
     .half-left {
-        background: linear-gradient(90deg, green 50%, transparent 50%);
+        background: linear-gradient(90deg, green 50%, lightgrey 50%);
         border: none;
         position: relative;
         overflow: hidden;
     }
-
-        /* ถ้าต้องการให้เส้นแบ่งตรงกลางคมชัด (optional) */
         .half-left::before {
             content: '';
             position: absolute;
@@ -207,14 +205,13 @@
             background: lightgrey;
             transform: translateX(-50%);
         }
+
     .half-right {
-        background: linear-gradient(90deg, transparent 50%, #007bff 50%);
+        background: linear-gradient(90deg, lightgrey 50%, green 50%);
         border: none;
         position: relative;
         overflow: hidden;
     }
-
-        /* เส้นแบ่งตรงกลาง (ถ้าต้องการ) */
         .half-right::before {
             content: '';
             position: absolute;
@@ -225,7 +222,16 @@
             background: lightgrey;
             transform: translateX(-50%);
         }
-       
+
+    .leave-warning {
+        background-color: #f8d7da !important;
+        border-left: 4px solid #dc3545 !important;
+    }
+
+    .leave-info {
+        background-color: #d1ecf1 !important;
+        border-left: 4px solid #17a2b8 !important;
+    }
 </style>
 <div class="row" style="row-gap:1px">
     <div class="col-12">
@@ -238,7 +244,7 @@
                 <form>
                     <div class="form-group">
                         <div class="mb-3 d-flex justify-content-center">
-                            <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<"/>
+                            <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
                             <input type="month" id="monthPicker" class="form-control" style="width:200px; display:inline-block;">
                             <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
                         </div>
@@ -261,21 +267,31 @@
         </div>
     </div>
 </div>
+<partial name="ModalSpin" />
 @section Scripts
 {
     <script type="text/javascript">
         let table_leave = null;
         let leaves = [];
+        let index_today = 0;
+        let is_this_month = true;
+        let day_of_month = 0;
+        var table;
         $(document).ready(async function () {
-            //await GetData();
-            init();
+            refreshTable();
             const now = new Date();
-            const currentYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            index_today = now.getDate();
+            
+            const currentYearMonth = year + '-' + String(month).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
+            day_of_month = new Date(year, month, 0).getDate();
 
-            generateDateHeaders();            
+            generateDateHeaders();
         });
         function generateDateHeaders() {
+            $('#SpinModal').modal();
             const monthPicker = $('#monthPicker');
             //const headerRow = $('#headerRow');
             const dateRow = $('#dateRow');
@@ -289,10 +305,17 @@
                 const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
                 dateRow.append(`<th class="kanit-bold freeze-head" style="min-width:40px;">${day}<br><small>${dayName}</small></th>`);
             }
+            $('#SpinModal').modal('hide');
         }
         $('#monthPicker').on('change', function () {
-            init();
+            if (is_this_month) {
+                is_this_month = false;
+            } else {
+                is_this_month = true;
+            }
+            
             generateDateHeaders();
+            refreshTable();
         });
 
         $('#prevMonth').on('click', function () {
@@ -300,8 +323,8 @@
             monthPicker.setMonth(monthPicker.getMonth() - 1);
             const currentYearMonth = monthPicker.getFullYear() + '-' + String(monthPicker.getMonth() + 1).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
-            init();
             generateDateHeaders();
+            refreshTable();
         });
 
         $('#nextMonth').on('click', function () {
@@ -309,74 +332,85 @@
             monthPicker.setMonth(monthPicker.getMonth() + 1);
             const currentYearMonth = monthPicker.getFullYear() + '-' + String(monthPicker.getMonth() + 1).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
-            init();
             generateDateHeaders();
+            refreshTable();
         });
 
-
+        function refreshTable() {
+            
+                init();
+            
+        }
         function init() {
-            $(document).ready(function () {
-                $('#table_leave').DataTable({
+            $(document).ready(async function () {
+                if (table !== undefined) {
+                    table.destroy();
+                }
+                table = $('#table_leave').DataTable({
                     ajax: {
                         type: "GET",
                         url: '@Url.Action("GetData", "ManagementLeave")',
                         contentType: 'application/x-www-form-urlencoded',
                         dataSrc: ''
                     },
-                    columnDefs: [
-                        {
-                            targets: 0,
-                            width: 200,
-                            render: function (data, type, row) {
-                                var imgSrc = '/images/default-avatar.png';
+                    
+                    columnDefs: (() => {
+                        const defs = [];
+                        for (let i = 0; i <= day_of_month; i++) {
+                            const colors = ['primary', 'success', 'danger'];
+                            const classes = ['half-left', 'half-right', ''];
 
-                                if (row.img) {
-                                    imgSrc = 'data:image/jpeg;base64,' + row.img;
+                            if (i == 0) {
+                                defs.push({
+                                    targets: i,
+                                    render: function (data, type, row) {
+                                        var imgSrc = '/images/default-avatar.png';
+                                        if (row.img) {
+                                            imgSrc = 'data:image/jpeg;base64,' + row.img;
+                                        }
+                                        return `
+                                            <div class="row">
+                                                <div class="col-2 d-flex justify-content-start">
+                                                    <img src="${imgSrc}"
+                                                        class="rounded-circle me-2"
+                                                        style="width: 32px; height: 32px; object-fit: cover;"
+                                                        alt="${row.name}" />
+
+                                                 </div>
+                                                 <div class="col-10 d-flex justify-content-start">
+                                                    <div>
+                                                        <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
+                                                        <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
+                                                    </div>
+                                                </div>
+                                           </div>`;
+                                    }
+                                });
+                            }                             
+                            else {
+                                defs.push({
+                                    targets: i,
+                                    render: function (data, type, row) {
+                                        return `
+                                            <input type="button" 
+                                                   class="kanit-light btn btn-${colors[0]} ${classes[0]}" 
+                                                   style="width:30px;height:30px;border-radius:15px"/>
+                                        `;
+                                    }
+                                });
+                            }
+                        }
+                        return defs;
+                    })(),
+                    rowCallback: function (row, data, index) {
+                        if (is_this_month) {
+                            $('td', row).each(function (colIndex) {
+                                if (colIndex === index_today) {
+                                    $('td:eq(' + index_today + ')', row).addClass('leave-info');
                                 }
-
-                                return `
-                        <div class="row">
-                            <div class="col-2 d-flex justify-content-start">
-                                <img src="${imgSrc}"
-                                    class="rounded-circle me-2"
-                                    style="width: 32px; height: 32px; object-fit: cover;"
-                                    alt="${row.name}" />                    
-                                
-                             </div>
-                             <div class="col-10 d-flex justify-content-start">
-                                <div>
-                                    <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
-                                    <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
-                                </div>
-                            </div>                        
-                       </div>`;
-                            }
-                        },
-                        {
-                            targets: 1,
-                            render: function (data, type, row) {
-                                return `
-                                    <input type="button" class="kanit-light btn btn-primary half-left" style="width:30px;height:30px;border-radius:15px"  />`;
-                            }
-
-                        },
-                        {
-                            targets: 2,
-                            render: function (data, type, row) {
-                                return `
-                                    <input type="button" class="kanit-light btn btn-success half-right" style="width:30px;height:30px;border-radius:15px"  />`;
-                            }
-
-                        },
-                        {
-                            targets: 3,
-                            render: function (data, type, row) {
-                                return `
-                                    <input type="button" class="kanit-light btn btn-danger" style="width:30px;height:30px;border-radius:15px"  />`;
-                            }
-
-                        },
-                    ],
+                            });
+                        }
+                    },
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
                     },
@@ -389,7 +423,8 @@
                     },
                     scrollX: false,
                     scrollCollapse: true,
-                    fixedHeader:true,
+                    fixedHeader: true,
+                    destroy: true,
                 });
             });
         }
