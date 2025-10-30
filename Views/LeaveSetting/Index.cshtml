@@ -241,13 +241,14 @@
 
     /* Modern Button Styles */
     .modern-btn {
-        padding: 12px 20px;
+        padding: 8px 0px;
         border-radius: 8px;
         font-size: 18px;
         transition: all 0.3s ease;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         border: none;
         width: 100%; /* เต็มความกว้างของ column */
+        height: 100%;
         text-align: center;
     }
 
@@ -289,7 +290,29 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
 
+    /* Add Button */
+    .btn-add {
+        background-color: #53cc67;
+        color: white !important;
+    }
+
+        .btn-add:hover {
+            background-color: #42a052; /* ฟ้าเข้มเมื่อ hover */
+            color: white !important;
+        }
+
+    /* Delete Button */
+    .delete-btn {
+        transition: all 0.3s ease;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
 </style>
+<!-------------------------------------------------------------------------------------------------------------------->
 
 <div class="row" style="row-gap:1px; padding:10px">
     <div class="col-12 kanit-bold">
@@ -319,7 +342,7 @@
         <div class="card card-dark">
             <!-- เพิ่มส่วนนี้ใหม่ - nav-tabs แยกออกมา -->
             <form>
-                <div class="card-header-tabs" style="padding-left:10px">
+                <div class="card-header-tabs mb-0" style="padding-left:10px">
                 <ul class="nav nav-tabs sticky-tabs">
                     <li class="nav-item">
                         <a class="nav-link active kanit-medium" style="letter-spacing:2px; font-size:18px" href="#Leave" data-toggle="tab">การลา</a>
@@ -330,9 +353,9 @@
                 </ul>
             </div>
             </form>
-            <div class="card-body" style="height:640px; overflow-y:auto; padding-top:20px">
+            <div class="card-body" style="height:660px; overflow-y:auto;">
                 <form>
-                    <div class="tab-content" style="padding-top:10px">
+                    <div class="tab-content" style="padding-top:20px">
                         <div class="tab-pane fade show active" id="Leave">
                             <div class="container d-flex justify-content-center">
                                 <div class="col-xl-8 col-md-8 col-sm-12">
@@ -510,23 +533,25 @@
                                 </div>
                             </div>
                         </div>
+                        <!-------------------------------------------------------------------------------------------------------------------------->
+
+                        <!-- สิทธิ์การลา -->
                         <div class="tab-pane fade" id="Entitlement">
-                            <div class="container d-flex justify-content-center">
+                            <div class="container d-flex justify-content-center" >
                                 <div class="col-xl-12 col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col-xl-12 col-md-12 col-sm-12">
                                             <div class="card collapsed-card">
-                                                <div class="card-header" style=" background: #049ac7;
-background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 100%);">
+                                                <div class="card-header" style=" background: #EEE;">
                                                     <div class="row">
                                                         <div class="col-xl-4 col-md-4 col-sm-12">
-                                                            <span class="kanit-medium" style="color:white; font-size:20px; letter-spacing:2px">ผู้จัดการขึ้นไป</span>
+                                                            <span class="kanit-medium" style="color:#555; font-size:20px; letter-spacing:2px">ผู้จัดการขึ้นไป</span>
                                                         </div>
                                                         <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
                                                             <div class="row">
                                                                 <div class="col-6">
                                                                     <div class="card-tools">
-                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:white ; font-size:20px">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:#555 ; font-size:20px">
                                                                             <i class="fas fa-chevron-down"></i>
                                                                         </button>
                                                                     </div>
@@ -543,7 +568,7 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                                             </div>
                                                             <div class="row">
                                                                 <div class="col-xl-1 col-md-1 col-sm-6">
-                                                                    <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementManagerClicked()" value="+ เพิ่ม" />
+                                                                    <input type="button" class="kanit-light btn modern-btn btn-add" onclick="EntitlementManagerClicked()" value="+ เพิ่ม" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -552,6 +577,7 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                             </div>
                                         </div>
                                     </div>
+                                    <!-------------------------------------------------------------------------------------------------------------------------->
                                     <div class="row">
                                         <div class="col-xl-12 col-md-12 col-sm-12">
                                             <div class="card collapsed-card">
@@ -565,7 +591,7 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                                             <div class="row">         
                                                                 <div class="col-6">
                                                                     <div class="card-tools">
-                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:#555 ; font-size:20px">
                                                                             <i class="fas fa-chevron-down"></i>
                                                                         </button>
                                                                     </div>
@@ -581,7 +607,7 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                                             </div>
                                                             <div class="row">
                                                                 <div class="col-xl-1 col-md-1 col-sm-6">
-                                                                    <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementOperationClicked()" value="+ เพิ่ม" />
+                                                                    <input type="button" class="kanit-light btn modern-btn btn-add" onclick="EntitlementOperationClicked()" value="+ เพิ่ม" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -596,10 +622,12 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                     </div>
                 </form>
             </div>
-            <div class="card-footer" style="background-color:white; padding: 15px;">
+
+            <!-- ปุ่มบันทึก & ยกเลิก (หลัก)-->
+            <div class="card-footer" style="background-color:white;">
                 <div class="row justify-content-center" style="row-gap: 10px;">
                     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-5">
-                        <button class="btn modern-btn btn-cancel kanit-medium" type="button">ยกเลิก</button>
+                        <button class="btn modern-btn btn-cancel kanit-medium"  type="button">ยกเลิก</button>
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-5">
                         <button class="btn modern-btn btn-save kanit-medium" onclick="UpdateSave()" type="button">บันทึก</button>
@@ -609,12 +637,15 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
         </div>
     </div>
 </div>
+
+<!-- Modal : เพิ่มประเภทการลา -->
 <div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
     <div class="modal modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content kanit-regular">
-            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title" id="modal_leave_title">เพิ่มประเภทการลา</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-content" style="border-radius: 10px; overflow: hidden;">
+            <div class="modal-header" style="background: #53CC67;
+background: linear-gradient(90deg,rgba(83, 204, 103, 1) 0%, rgba(59, 138, 72, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title kanit-medium" style="color: white; font-size: 20px; letter-spacing: 1px;" id="modal_leave_title">เพิ่มประเภทการลา</h5>
+                <button type="button" class="close" style="color: white;" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
             </div>
@@ -646,7 +677,7 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                 <div class="container d-flex justify-content-end">
                     <div class="col-xl-12 col-md-12 col-sm-12">
                         <div class="row">
-                            <div class="col-6">
+                            @* <div class="col-6">
                                 <button class="form-control kanit-light" style="background-color:red; color:white; border-radius:8px" data-dismiss="modal">
                                     ยกเลิก
                                 </button>
@@ -655,8 +686,28 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                 <button id="btn_add_save" class="form-control kanit-light" style="background-color:#034694; color:white; border-radius:8px">
                                     บันทึก
                                 </button>
+                            </div> *@
+                            <div class="col-6">
+                                <button class="btn modern-btn btn-cancel kanit-medium" style="background-color:red; color:white; border-radius:8px" data-dismiss="modal">
+                                    ยกเลิก
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btn_add_save" class="btn modern-btn btn-save kanit-medium" style="background-color:#034694; color:white; border-radius:8px">
+                                    บันทึก
+                                </button>
                             </div>
                         </div>
+                        @* <div class="modal-footer" style="border-top: none; padding: 15px 30px; background-color: #f8f9fa;">
+                            <div class="row justify-content-center" style=" width: 100%;">
+                                <div class="col-xl-4 col-md-4 col-sm-4">
+                                    <button type="button" class="btn modern-btn btn-cancel kanit-medium" data-dismiss="modal">ยกเลิก</button>
+                                </div>
+                                <div class="col-xl-4 col-md-4 col-sm-4">
+                                    <button type="button" class="btn modern-btn btn-save kanit-medium" id="confirm_ok">ยืนยัน</button>
+                                </div>
+                            </div>
+                        </div> *@
                     </div>
                 </div>
             </div>
@@ -664,6 +715,7 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
     </div>
 </div>
 
+<!-- Modal : บันทึกการตั้งค่า-->
 <div class="modal fade" id="modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered"role="document">
         @* <div class="modal-content">
@@ -1004,11 +1056,11 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                                                                 </div>
                                                                                 <div class="col-1">
                                                                                     <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">ยกเลิก</label>
-                                                                                        <div class="input-group d-flex justify-content-start">
-                                                                                                <button type="button" class="btn btn-tool pt-3" style="color:red" onClick="EntitlementManagerDelete(${data_entitlement_manager[i].id})">
-                                                                                            <i class="fas fa-trash" style="transform:scale(1.2)"></i>
-                                                                                        </button>
+                                                                                                <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">ยกเลิก</label>
+                                                                                        <div class="input-group d-flex justify-content-center">
+                                                                                                                 <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%; transform:scale(1.1);" onClick="EntitlementManagerDelete(${data_entitlement_manager[i].id})">
+                                                                                                    <i class="fas fa-trash-alt"></i>
+                                                                                                </button>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -1180,11 +1232,11 @@ background: linear-gradient(90deg,rgba(4, 154, 199, 1) 0%, rgba(9, 86, 121, 1) 1
                                                                                 </div>
                                                                                 <div class="col-1">
                                                                                     <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">ยกเลิก</label>
-                                                                                        <div class="input-group d-flex justify-content-start">
-                                                                                                <button type="button" class="btn btn-tool pt-3" style="color:red" onClick="EntitlementOperationDelete(${data_entitlement_operation[i].id})">
-                                                                                            <i class="fas fa-trash" style="transform:scale(1.2)"></i>
-                                                                                        </button>
+                                                                                                <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">ยกเลิก</label>
+                                                                                        <div class="input-group d-flex justify-content-center">
+                                                                                             <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%; transform:scale(1.1);" onClick="EntitlementOperationDelete(${data_entitlement_operation[i].id})">
+                                                                                                 <i class="fas fa-trash-alt"></i>
+                                                                                             </button>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
