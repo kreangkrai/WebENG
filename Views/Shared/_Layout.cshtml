@@ -1,6 +1,12 @@
 ﻿@model WebENG.Models.UserModel;
-@using Microsoft.AspNetCore.Http
-
+@using Microsoft.AspNetCore.Http;
+@using WebENG.LeaveInterfaces;
+@using WebENG.LeaveModels;
+@using WebENG.LeaveServices;
+@{ 
+    INotification Notification = new NotificationService();
+    List<NotificationModel> notifications = Notification.GetNotificationsByEMPID(Model.emp_id);
+}
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,27 +16,187 @@
     <title>@ViewData["Title"] - Contrologic</title>
     <partial name="Style" />
     <link rel="icon" href="~/img/AdminLTELogo.png" />
+    <style>
+        .navbar-custom-menu {
+            float: right;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            width: 350px;
+            max-height: 100vh;
+            overflow-y: auto;
+            padding: 0;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+
+        /* หัวข้อ */
+        .dropdown-header {
+            background: #007bff;
+            color: white;
+            padding: 12px 16px;
+            font-weight: bold;
+            border-radius: 0 0;
+            font-size: 16px;
+        }
+
+        /* รายการแจ้งเตือน */
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: flex-start;
+        }
+
+            .notification-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .notification-item.unread {
+                background-color: #e3f2fd;
+                font-weight: 600;
+            }
+
+            .notification-item i {
+                margin-right: 10px;
+                color: #007bff;
+                font-size: 18px;
+            }
+
+            .notification-item .text {
+                flex: 1;
+                font-size: 14px;
+            }
+
+            .notification-item .time {
+                font-size: 11px;
+                color: #888;
+                margin-top: 4px;
+            }
+
+        /* ปุ่มดูทั้งหมด */
+        .dropdown-footer {
+            text-align: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 0 0;
+        }
+
+            .dropdown-footer a {
+                color: #007bff;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .dropdown-footer a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Badge */
+        .badge-notif {
+            position: absolute;
+            top: -10px;
+            right: 5px;
+            background: red;
+            color: white;
+            font-size: 14px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+        }
+        .notification-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            padding: 10px;
+        }
+
+            .notification-link:hover {
+                background-color: #f5f5f5;
+            }
+    </style>
 </head>
 <body class="hold-transition layout-fixed layout-footer-fixed layout-navbar-fixed">
     <div class="wrapper">
         <nav class="main-header navbar navbar-dark navbar-expand" style="background-color:#034694">
-            <ul class="navbar-nav d-flex justify-content-between w-100">
+            <ul class="navbar-nav d-flex justify-content-start w-100">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+            <ul class="navbar-nav d-flex justify-content-end w-100">
+                <li class="nav-item mt-2 pr-3">
+                    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                        <span class="sr-only">Toggle navigation</span>
+                    </a>
+                    <div class="navbar-custom-menu">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown user user-menu">
+                                <a href="#" class="dropdown-toggle bell-circle position-relative" data-toggle="dropdown">
+                                    <i class="fas fa-bell" style="color:white;transform:scale(1.5)"></i>
+                                    @if (notifications.Count > 0 && notifications.Where(w => w.status == "Pending").Count() > 0)
+                                    {
+                        <span class="badge-notif">@notifications.Where(w => w.status == "Pending").Count()</span>
+                                    }
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-right">
+
+                                    <li class="dropdown-header">
+                                        <i class="fas fa-bell"></i> การแจ้งเตือนใหม่ (@notifications.Where(w => w.status == "Pending").Count())
+                                    </li>
+                                    @for (int i = 0; i < notifications.Count; i++)
+                                    {
+                                <a asp-controller="ManagementLeave" asp-action="Index" target="_blank" rel="noopener" class="notification-link">
+                                <li class="notification-item">
+                                    <i class="fas fa-envelope"></i>
+
+                                    <div class="text">
+                                        <div class="notif-title"><strong>แจ้งเตือนระบบการลา</strong></div>
+                                        <div class="notif-content">@notifications[i].notification_issue</div>
+                                        @{double total_minute = (DateTime.Now - notifications[i].notification_date).TotalMinutes;}
+                                        @if (total_minute < 60.0)
+                                        {
+                                <div class="time">@Convert.ToInt32(total_minute) นาทีที่แล้ว</div> }
+                                        else if (total_minute >= 60 && total_minute < 1440)
+                                        {
+                                <div class="time">@Convert.ToInt32((total_minute / 60)) ชั่วโมงที่แล้ว</div> }
+                                        else if (total_minute >= 1440)
+                                        {
+                                <div class="time">@Convert.ToInt32((total_minute / 1440)) วันที่แล้ว</div>}
+                                    </div>
+
+                                </li>
+                                
+                                </a>
+                                            }
+                                            </ul>
+                                    
+                            </li>
+                        </ul>
+                                                        
+                    </div>
                 </li>
                 <li class="nav-item mt-2">
                     <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
                         <span class="sr-only">Toggle navigation</span>
                     </a>
-                    @{
-                        var userId = Context.Session.GetString("userId");
+                    @{ var userId = Context.Session.GetString("userId");
                         byte[] image = Context.Session.Get("Image");
                         //byte[] image = new byte[128];
                         if (userId == null)
                         {
                             //Context.Response.Redirect("/Account");
-                        }
-                    }
+                        } }
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
                             <!-- User Account Menu -->
@@ -38,29 +204,21 @@
                                 <!-- Menu Toggle Button -->
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <!-- The user image in the navbar-->
-                                    @{
-                                        var base64 = Convert.ToBase64String(image);
+                                    @{ var base64 = Convert.ToBase64String(image);
                                         var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
                                         if (@imgSrc != null)
                                         {
-                                        // <img src="~/images/user.png" class="user-image" alt="User Image">
-                                            <img src="@imgSrc" class="user-image" alt="User Image">
-                                        }
-                                        <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                                        @if (@userId != null)
-                                        {
-                                            <span class="hidden-xs" style="color:white">@userId</span>
-                                        }
-                                    }
+                                            // <img src="~/images/user.png" class="user-image" alt="User Image">
+                            <img src="@imgSrc" class="user-image" alt="User Image"> } <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                                    @if (@userId != null)
+                                    {
+                        <span class="hidden-xs" style="color:white">@userId</span>} }
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li class="user-header" style="background-color:#034694;color:white">
-                                        @{
-                                            if (imgSrc != null)
+                                        @{ if (imgSrc != null)
                                             {
-                                                <img src="@imgSrc" class="img-circle" alt="User Image">
-                                            }
-                                        }
+                                <img src="@imgSrc" class="img-circle" alt="User Image"> } }
 
                                         <p>
                                             @userId
@@ -70,7 +228,6 @@
                                         <div class="pull-left">
                                             <a class="btn btn-secondary" style="color:white;" asp-area="" asp-controller="Account" asp-action="Logout">Log Out</a>
                                         </div>
-
                                     </li>
                                 </ul>
                             </li>

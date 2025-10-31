@@ -27,7 +27,14 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                SqlCommand cmd = new SqlCommand(@"SELECT name,department,role,user_id FROM Authen ORDER BY name", con);
+                SqlCommand cmd = new SqlCommand(@"SELECT [MES].dbo.Authen.name,
+                                                    [MES].dbo.Authen.department,
+                                                    role,
+                                                    user_id,
+                                                    emp.emp_id
+                                                    FROM [MES].dbo.Authen
+                                                    LEFT JOIN [CTL].dbo.[Employees] emp ON [MES].dbo.Authen.name = emp.name
+                                                    ORDER BY [MES].dbo.Authen.name", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -36,6 +43,7 @@ namespace WebENG.Service
                         UserModel u = new UserModel()
                         {
                             user_id = dr["user_id"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             name = dr["name"].ToString().ToLower(),
                             department = dr["department"].ToString(),
                             role = dr["role"].ToString()

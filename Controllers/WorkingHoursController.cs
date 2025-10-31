@@ -36,7 +36,9 @@ namespace WebENG.Controllers
                     name = s.name,
                     department = s.department, 
                     role = s.role,
-                    user_id = s.user_id}).FirstOrDefault();
+                    user_id = s.user_id,
+                    emp_id = s.emp_id
+                }).FirstOrDefault();
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
