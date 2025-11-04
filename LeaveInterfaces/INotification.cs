@@ -12,5 +12,6 @@ namespace WebENG.LeaveInterfaces
         List<NotificationModel> GetNotificationsByEMPID(string emp_id);
         string Insert(NotificationModel notification);
         string Update(NotificationModel notification);
+        string UpdateStatus(string emp_id,string status);
     }
 }

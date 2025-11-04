@@ -153,5 +153,36 @@ namespace WebENG.LeaveServices
             }
             return "Success";
         }
+
+        public string UpdateStatus(string emp_id,string status)
+        {
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string string_command = string.Format($@"UPDATE [ELEAVE].[dbo].[notification]
+                                                           SET [status] = @status
+                                                         WHERE [emp_id] = @emp_id");
+                SqlCommand command = new SqlCommand(string_command, con);
+                command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@emp_id", emp_id);
+                command.Parameters.AddWithValue("@status", status);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return "Success";
+        }
     }
 }

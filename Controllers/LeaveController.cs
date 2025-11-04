@@ -8,6 +8,8 @@ using WebENG.CTLInterfaces;
 using WebENG.CTLModels;
 using WebENG.CTLServices;
 using WebENG.Interface;
+using WebENG.LeaveInterfaces;
+using WebENG.LeaveServices;
 using WebENG.Models;
 using WebENG.Service;
 
@@ -17,10 +19,12 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly IHierarchy Hierarchy;
+        readonly INotification Notification;
         public LeaveController()
         {
             Accessory = new AccessoryService();
             Hierarchy = new HierarchyService();
+            Notification = new NotificationService();
         }
         public IActionResult Index()
         {
@@ -50,6 +54,13 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        [HttpPatch]
+        public IActionResult ClearNotification(string emp_id)
+        {            
+            string message = Notification.UpdateStatus(emp_id,"Read");
+            return Json(message);
         }
     }
 }

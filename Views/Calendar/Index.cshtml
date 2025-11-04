@@ -3,6 +3,344 @@
 @{
     ViewData["Title"] = "Calendar";
 }
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+<style>
+    .kanit-thin {
+        font-family: "Kanit", sans-serif;
+        font-weight: 100;
+        font-style: normal;
+    }
+
+    .kanit-extralight {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: normal;
+    }
+
+    .kanit-light {
+        font-family: "Kanit", sans-serif;
+        font-weight: 300;
+        font-style: normal;
+    }
+
+    .kanit-regular {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .kanit-medium {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    .kanit-semibold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    .kanit-bold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+    }
+
+    .kanit-extrabold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: normal;
+    }
+
+    .kanit-black {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: normal;
+    }
+
+    .kanit-thin-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 100;
+        font-style: italic;
+    }
+
+    .kanit-extralight-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: italic;
+    }
+
+    .kanit-light-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .kanit-regular-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    .kanit-medium-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: italic;
+    }
+
+    .kanit-semibold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: italic;
+    }
+
+    .kanit-bold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: italic;
+    }
+
+    .kanit-extrabold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: italic;
+    }
+
+    .kanit-black-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: italic;
+    }
+    /* สไตล์สำหรับ input */
+    input[type="text"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="text"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="text"]:not(:disabled) {
+            opacity: 1;
+        }
+    /* สไตล์สำหรับ input */
+    input[type="number"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="number"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="number"]:not(:disabled) {
+            opacity: 1;
+        }
+
+    /* สไตล์สำหรับส่วนอัปโหลดไฟล์ */
+    #uploadForm {
+        transition: all 0.3s ease;
+    }
+
+        #uploadForm:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+        }
+
+        #uploadForm.dragover {
+            background: #e3f2fd;
+            border-color: #007bff;
+            transform: scale(1.02);
+        }
+
+    /* สไตล์สำหรับรายการไฟล์ */
+    .file-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: #f8f9fa;
+        }
+
+    .file-link {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        .file-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+    .delete-btn {
+        transition: all 0.3s ease;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* สไตล์สำหรับ dropzone */
+    .dropzone {
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .dropzone:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+        }
+
+        .dropzone.dragover {
+            background: #e3f2fd;
+            border-color: #007bff;
+            transform: scale(1.02);
+        }
+
+        .dropzone input[type="file"] {
+            z-index: 1000;
+        }
+
+    /* สไตล์สำหรับปุ่มเลือกไฟล์ */
+    .select-file-btn {
+        transition: all 0.3s ease;
+    }
+
+        .select-file-btn:hover {
+            background: #007bff;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+    /* สไตล์สำหรับรายการไฟล์ */
+    .file-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #dee2e6;
+        transition: opacity 0.3s ease; /* ใช้ transition แทน keyframes */
+    }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: #f8f9fa;
+        }
+
+        .file-item.added {
+            background: #e3f2fd; /* Highlight สีฟ้าเมื่อเพิ่ม */
+            opacity: 0; /* เริ่มจากโปร่งใส */
+        }
+
+            .file-item.added.show {
+                opacity: 1; /* Fade-in ถึงทึบ */
+            }
+
+        .file-item.removing {
+            background: #f8d7da; /* Highlight สีแดงเมื่อลบ */
+            opacity: 0; /* Fade-out ถึงโปร่งใส */
+        }
+
+    .file-link {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        .file-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+    .delete-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: all 0.3s ease;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .delete-btn i {
+            font-size: 14px;
+        }
+
+    /* Responsive design */
+    .responsive-file-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .responsive-delete-btn {
+        margin-top: 10px;
+    }
+
+    .responsive-select-file-btn {
+        width: 100%;
+    }
+
+    /* สไตล์สำหรับส่วนผู้อนุมัติ */
+    .approver-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #dee2e6;
+        transition: all 0.3s ease; /* เหมือน dropzone */
+    }
+
+        .approver-item:last-child {
+            border-bottom: none;
+        }
+
+        .approver-item:hover {
+            background: #f8f9fa; /* Highlight เหมือน file-item */
+            transform: translateY(-2px); /* ยกขึ้นเล็กน้อย */
+        }
+
+        .approver-item i {
+            font-size: 16px;
+        }
+
+    #approver-note {
+        font-size: 14px;
+        background: #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .badge {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 12px; /* ขอบโค้งทันสมัย */
+    }
+
+    .badge-warning {
+        background-color: #ffc107; /* รออนุมัติ = เหลือง */
+    }
+
+    .badge-success {
+        background-color: #28a745; /* อนุมัติ = เขียว */
+    }
+
+    .badge-danger {
+        background-color: #dc3545; /* ไม่อนุมัติ = แดง */
+    }
+</style>
 <div class="row p-3">
     <div class="col-xl-12">
         <div class="card">
@@ -14,12 +352,12 @@
 </div>
 
 <!-- Task Modal -->
-<div class="modal fade" id="modal_task" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+<div class="modal" id="modal_task" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
     <div class="modal modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_task_title">Add Tasks</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" id="task_close" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -36,13 +374,12 @@
                         </div>
                         <div class="col-4 col-md-4">
                             <label for="working_date">Date</label>
-                            <input id="working_date" type="date" class="form-control" disabled/>
+                            <input id="working_date" type="date" class="form-control" disabled />
                         </div>
                         <div class="col-4 col-md-4pt-5">
-                            <div class="form-check">
-                                <input id="leave" class="form-check-input" type="checkbox" />
-                                <label for="leave">Leave</label>
-                            </div>
+                            <label for="leave">Leave</label>
+                            <input id="leave" class="btn btn-primary form-control" type="button" value="ยื่นวันลา" />
+
                         </div>
                     </div>
                     <div id="date_group" class="form-group row">
@@ -98,11 +435,11 @@
                         </div>
                         <div class="col-2 col-md-2 pt-4">
                             <div class="form-check">
-                                <input id="lunch_full" class="form-check-input" type="checkbox" checked/>
+                                <input id="lunch_full" class="form-check-input" type="checkbox" checked />
                                 <label class="form-check-label">Lunch Full</label>
                             </div>
                             <div class="form-check">
-                                <input id="lunch_half" class="form-check-input" type="checkbox"/>
+                                <input id="lunch_half" class="form-check-input" type="checkbox" />
                                 <label class="form-check-label">Lunch Half</label>
                             </div>
                         </div>
@@ -117,20 +454,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group row">                       
+                    <div class="form-group row">
                         <div class="col-12 col-md-12">
-                             <div class="form-group">
+                            <div class="form-group">
                                 <label for="note">Note</label>
                                 <textarea id="note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
                             </div>
                         </div>
-                    </div>                  
+                    </div>
                 </form>
             </div>
             <div class="modal-footer d-flex">
-                <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
                     <i class="fas fa-times"></i> Close
                 </button>
@@ -193,6 +527,243 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title" id="modal_leave_title">ยื่นการลา</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow-y:auto;height:600px; color:#555555">
+                <form>
+                    <div class="form-group row">
+                        <div class="col-xl-6 col-md-6 col-sm-12 ">
+                            <label for="request_id">ประเภทการลา</label>
+                            <select id="select_leave_type" class="form-control">
+                                <option value="">ลาพักร้อน</option>
+                                <option value="">ลาป่วย</option>
+                            </select>
+                        </div>
+                        <div class="col-xl-6 col-md-6 col-sm-12">
+                            <label for="working_date">ช่วงเวลา</label>
+                            <div class="row">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button id="leave_full" type="button" class="btn btn-outline-primary">ทั้งวัน</button>
+                                    <button id="leave_half" type="button" class="btn btn-outline-info">ครึ่งวัน</button>
+                                    <button id="leave_hours" type="button" class="btn btn-outline-secondary">รายชั่วโมง</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div div class="col-8">
+                            <label class="kanit-bold">สิทธิ์การลา</label>
+                        </div>
+                        <div div class="col-4 d-flex justify-content-end">
+                            <span class="kanit-light">5 วัน</span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-xl-12 col-md-12 col-sm-12">
+                            <div class="card collapsed-card">
+                                <div class="card-header" style=" background: #EEE;cursor:pointer" data-card-widget="collapse">
+                                    <div class="row">
+                                        <div class="col-11 d-flex justify-content-end">
+                                            <span class="kanit-bold" style="color:#555;">เงื่อนไขการลา</span>
+                                        </div>
+                                        <div class="col-1 d-flex justify-content-end">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" style="color:#555 ; font-size:20px">
+                                                            <i class="fas fa-chevron-down"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row" style="row-gap:1px">
+                                        <div class="col-12">
+                                            <div id="div_entitlement_manager">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <span class="kanit-light">
+                                                        หลักการ: ลูกจ้างมีสิทธิลาเพื่อกิจธุระอันจำเป็นได้ปีละไม่น้อยกว่า 3 วันทำงาน โดยนายจ้างต้องจ่ายค่าจ้างตามปกติ
+                                                        การขอลา: ต้องยื่นใบลาต่อผู้บังคับบัญชา และต้องได้รับอนุญาตก่อนจึงจะหยุดได้
+                                                        ข้อยกเว้น: หากมีเหตุจำเป็นที่ไม่สามารถรอการอนุญาตได้ทัน สามารถลาไปก่อนได้ แต่ต้องชี้แจงเหตุผลให้ผู้บังคับบัญชาทราบโดยเร็ว
+                                                        ข้อสังเกต: จำนวนวันที่ลาติดต่อกันขึ้นอยู่กับดุลยพินิจของนายจ้างและความเหมาะสมของแต่ละกรณี
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="date_group" class="form-group row">
+                        <div class="col-xl-4 col-md-6 col-sm-6">
+                            <label for="start_date">ลาตั้งแต่วันที่</label>
+                            <input id="start_date" type="date" class="form-control" />
+                        </div>
+                        <div class="col-xl-4 col-md-4 col-sm-12">
+                            <label for="amount_leave">ลาจำนวน</label>
+                            <div class="input-group">
+                                <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text">วัน</span>
+                                </div>
+                            </div>
+                        </div>
+                        <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
+                            <label for="start_date">ถึงวันที่</label>
+                            <input id="stop_date" type="text" class="form-control" />
+                        </fieldset>
+                    </div>
+                    <div id="time_group" class="form-group row">
+                        <div class="col-xl-4 col-md-4 col-sm-12">
+                            <label for="stop_date">ระยะเวลา</label>
+                            <div class="input-group">
+                                <select id="" class="form-control">
+                                    <option value="">Select...</option>
+                                    <option value="">2 ชั่วโมง</option>
+                                    <option value="">4 ชั่วโมง</option>
+                                    <option value="">6 ชั่วโมง</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-4 col-sm-6">
+                            <label for="start_time">ตั้งแต่เวลา</label>
+                            <input id="start_time" type="time" class="form-control" />
+                        </div>
+                        <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
+                            <label for="stop_time">ถึงเวลา</label>
+                            <input id="stop_time" type="time" class="form-control" />
+                        </fieldset>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="note">รายละเอียด</label>
+                                <textarea id="note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- ส่วนอัปโหลดไฟล์ -->
+                    <div id="date_group" class="form-group row">
+                        <div class="col-12">
+                            <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
+                            <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
+                                <div class="text-center">
+                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                    <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
+                                    <input type="file" id="fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
+                                    <button type="button" id="selectFileBtn"
+                                            class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
+                                            style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
+                                        เลือกไฟล์
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนแสดงรายการไฟล์ -->
+                    <div id="fileList" class="form-group row">
+                        <div class="col-12">
+                            <label class="kanit-medium">เอกสารที่แนบ</label>
+                            <div class="card" style="border-radius: 10px; overflow: hidden;">
+                                <div class="list-group" id="fileListContainer">
+                                    <!-- ตัวอย่างไฟล์ -->
+                                    <div class="list-group-item d-flex align-items-center file-item">
+                                        <i class="fas fa-file-image text-primary mr-2"></i>
+                                        <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_001.png" title="ลบไฟล์">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                    <div class="list-group-item d-flex align-items-center file-item">
+                                        <i class="fas fa-file-pdf text-danger mr-2"></i>
+                                        <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
+                                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_002.pdf" title="ลบไฟล์">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-------------------------------------------------------------------------------------------------------------------------------->
+                    <hr />
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <label for="approvers" class="kanit-medium">ผู้อนุมัติ</label>
+                            <div class="card" style="border-radius: 10px; overflow: hidden;">
+                                <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
+                                <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
+                                    <i class="fas fa-info-circle mr-2"></i>เลือกอนุมัติโดย 1 ใน 2 ผู้จัดการด้านล่าง
+                                </div>
+                                <div class="list-group" id="approverList">
+                                    <!-- ผู้อนุมัติคนที่ 1 -->
+                                    <div class="list-group-item d-flex align-items-center approver-item">
+                                        <div class="col-6">
+                                            <i class="fas fa-user-check mr-2 text-primary"></i>
+                                            <span class="kanit-regular">Chakrit R.</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="kanit-regular text-muted">Manager</span>
+                                        </div>
+                                    </div>
+                                    <!-- ผู้อนุมัติคนที่ 2 (ถ้ามี) -->
+                                    <div class="list-group-item d-flex align-items-center approver-item">
+                                        <div class="col-6">
+                                            <i class="fas fa-user-check mr-2 text-primary"></i>
+                                            <span class="kanit-regular">Kriangkrai R.</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="kanit-regular text-muted">Manager</span>
+                                        </div>
+                                    </div>
+                                    <!-- ผู้อนุมัติคนที่ 3 -->
+                                    <div class="list-group-item d-flex align-items-center approver-item">
+                                        <div class="col-6">
+                                            <i class="fas fa-user-check mr-2 text-primary"></i>
+                                            <span class="kanit-regular">Siriporn S.</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <span class="kanit-regular text-muted">Admin</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex">
+                <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
+                    <i class="fas fa-trash-alt"></i> ลบ
+                </button>
+                <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
+                    <i class="fas fa-times"></i> ยกเลิก
+                </button>
+                <button id="btn_accept" type="button" class="btn btn-primary elevation-1">
+                    <i class="fas fa-check"></i> ส่งเอกสาร
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts
 {
     <script type="text/javascript">
@@ -226,7 +797,7 @@
         let debug_edit = false;
         let debug_drop = false;
 
-        $(document).ready(async function () {            
+        $(document).ready(async function () {
             await GetHolidays();
             await GetEngineerUser("@Model.name.ToLower()");
             await GetWorkingHours("@Model.name.ToLower()");
@@ -266,7 +837,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { job_id },
                 success: function (response) {
-                    processes = response;                   
+                    processes = response;
                 }
             });
         }
@@ -277,7 +848,7 @@
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { job_id },
                 success: function (response) {
-                    systems = response;                   
+                    systems = response;
                 }
             });
         }
@@ -422,7 +993,7 @@
                             "user_id": whs[i].user_id,
                             "user_name": whs[i].user_name,
                             "working_date": whs[i].working_date,
-                            "job_id": whs[i].job_id,                           
+                            "job_id": whs[i].job_id,
                             "job_name": whs[i].job_name,
                             "process_id": whs[i].process_id,
                             "process_name":whs[i].process_name,
@@ -821,8 +1392,8 @@
         });
 
         $('#start_time').on('change focus', function () {
-           
-            let start_time = $('#start_time').val();            
+
+            let start_time = $('#start_time').val();
             document.getElementById("stop_time").min = start_time;
             $('#stop_time').attr('disabled', false);
             $('#stop_time').val(start_time);
@@ -900,7 +1471,7 @@
                 $('#dinner_full').attr('checked', true);
                 $('#dinner_half').attr('checked', false);
                 $('#dinner_full').attr('disabled', false);
-                $('#dinner_half').attr('disabled', false);              
+                $('#dinner_half').attr('disabled', false);
             } else {
                 $('#dinner_full').attr('checked', false);
                 $('#dinner_half').attr('checked', false);
@@ -1239,7 +1810,7 @@
             if (job_id !== "J999999"){
                 let _processes = job.processes;
                 let _systems = job.systems;
-         
+
                 await GenerateProcessOption(_processes);
                 await GenerateSystemOption(_systems);
             }else{
@@ -1254,7 +1825,7 @@
             await GenerateCustomerOptions();
             await GenerateJobsOption();
             await GenerateLocationOption();
-            
+
             PrepmodalEditTask(event.extendedProps);
 
         }
@@ -1436,5 +2007,253 @@
         $('#dinner_half').on('click',function(){
             $('#dinner_full').prop('checked',false);
         });
+
+
+        // Leave
+
+        $('#leave').on('click', function () {
+            $('#modal_leave').modal();
+            $('#modal_task').modal('hide');
+        });
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+  
+            const leaveFullBtn = document.getElementById('leave_full');
+            const leaveHalfBtn = document.getElementById('leave_half');
+            const leaveHoursBtn = document.getElementById('leave_hours');
+            const dateGroup = document.getElementById('date_group');
+            const timeGroup = document.getElementById('time_group');
+            const durationSelect = timeGroup.querySelector('select');
+            const startTimeInput = document.getElementById('start_time');
+            const stopTimeInput = document.getElementById('stop_time');
+            const daysInput = dateGroup.querySelector('input[type="number"]'); // ช่องลาจำนวน
+            // ฟังก์ชันรีเซ็ตการเลือกปุ่ม (ลบ active class)
+            function resetButtonStyles() {
+                leaveFullBtn.classList.remove('active');
+                leaveHalfBtn.classList.remove('active');
+                leaveHoursBtn.classList.remove('active');
+            }
+            // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_half
+            function setHalfDayOptions() {
+                durationSelect.innerHTML = `
+                        <option value="">Select...</option>
+                        <option value="morning">ครึ่งวันเช้า</option>
+                        <option value="afternoon">ครึ่งวันบ่าย</option>
+                    `;
+                // เพิ่ม event listener สำหรับการเปลี่ยนแปลงใน select
+                durationSelect.onchange = function () {
+                    if (this.value === 'morning') {
+                        startTimeInput.value = '08:30';
+                        stopTimeInput.value = '12:00';
+                        startTimeInput.disabled = true; // Disable start_time
+                    } else if (this.value === 'afternoon') {
+                        startTimeInput.value = '13:00';
+                        stopTimeInput.value = '17:30';
+                        startTimeInput.disabled = true; // Disable start_time
+                    } else {
+                        startTimeInput.value = '';
+                        stopTimeInput.value = '';
+                        startTimeInput.disabled = false; // Enable start_time
+                    }
+                };
+            }
+            // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_hours
+            function setHourlyOptions() {
+                durationSelect.innerHTML = `
+                        <option value="">Select...</option>
+                        <option value="2">2 ชั่วโมง</option>
+                        <option value="4">4 ชั่วโมง</option>
+                        <option value="6">6 ชั่วโมง</option>
+                    `;
+                // รีเซ็ตค่าเวลาและ enable start_time เมื่อเปลี่ยนเป็นรายชั่วโมง
+                durationSelect.onchange = function () {
+                    startTimeInput.value = '';
+                    stopTimeInput.value = '';
+                    startTimeInput.disabled = false; // Enable start_time
+                };
+            }
+            // ฟังก์ชันจัดการ animation เมื่อแสดงหรือซ่อน
+            function toggleGroupDisplay(group, show) {
+                if (show) {
+                    group.style.display = 'flex';
+                    group.style.opacity = '0';
+                    group.style.transition = 'opacity 0.3s ease-in-out';
+                    setTimeout(() => {
+                        group.style.opacity = '1';
+                    }, 10);
+                } else {
+                    group.style.opacity = '0';
+                    group.style.transition = 'opacity 0.3s ease-in-out';
+                    setTimeout(() => {
+                        group.style.display = 'none';
+                        // รีเซ็ตค่าใน time_group เมื่อซ่อน
+                        if (group === timeGroup) {
+                            startTimeInput.value = '';
+                            stopTimeInput.value = '';
+                            durationSelect.value = '';
+                            startTimeInput.disabled = false; // Enable start_time
+                        }
+                    }, 300);
+                }
+            }
+            // เมื่อกดปุ่ม "ทั้งวัน"
+            leaveFullBtn.addEventListener('click', function () {
+                resetButtonStyles();
+                leaveFullBtn.classList.add('active');
+                toggleGroupDisplay(dateGroup, true); // แสดง date_group
+                toggleGroupDisplay(timeGroup, false); // ซ่อน time_group
+                daysInput.disabled = false; // ENABLE ลาจำนวน
+            });
+            // เมื่อกดปุ่ม "ครึ่งวัน"
+            leaveHalfBtn.addEventListener('click', function () {
+                resetButtonStyles();
+                leaveHalfBtn.classList.add('active');
+                toggleGroupDisplay(dateGroup, true); // แสดง date_group
+                toggleGroupDisplay(timeGroup, true); // แสดง time_group
+                setHalfDayOptions(); // เปลี่ยนตัวเลือกเป็นครึ่งวันเช้า/บ่าย
+                daysInput.disabled = true; // DISABLE ลาจำนวน
+            });
+            // เมื่อกดปุ่ม "รายชั่วโมง"
+            leaveHoursBtn.addEventListener('click', function () {
+                resetButtonStyles();
+                leaveHoursBtn.classList.add('active');
+                toggleGroupDisplay(dateGroup, true); // แสดง date_group
+                toggleGroupDisplay(timeGroup, true); // แสดง time_group
+                setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
+                daysInput.disabled = true; // DISABLE ลาจำนวน
+            });
+            // เริ่มต้นด้วยการเลือก "ทั้งวัน" เป็นค่าเริ่มต้น
+            leaveFullBtn.click();
+        });
+
+        // การจัดการอัปโหลดและลบไฟล์
+        document.addEventListener('DOMContentLoaded', function () {
+            const fileInput = document.getElementById('fileInput');
+            const selectFileBtn = document.getElementById('selectFileBtn');
+            const uploadForm = document.getElementById('uploadForm');
+            const fileListContainer = document.getElementById('fileListContainer');
+
+            // ตรวจสอบว่า element โหลดครบ
+            if (!fileInput || !selectFileBtn || !uploadForm || !fileListContainer) {
+                console.error('ไม่พบ element ที่จำเป็น: ', { fileInput, selectFileBtn, uploadForm, fileListContainer });
+                showAlert('เกิดข้อผิดพลาด: ไม่พบองค์ประกอบที่จำเป็นสำหรับการอัปโหลดไฟล์');
+                return;
+            }
+
+            // คลิกปุ่มเลือกไฟล์
+            selectFileBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('คลิกปุ่มเลือกไฟล์');
+                fileInput.click();
+            });
+
+            // การจัดการ drag-and-drop
+            uploadForm.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Drag enter dropzone');
+                uploadForm.classList.add('dragover');
+            });
+
+            uploadForm.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Drag over dropzone');
+                uploadForm.classList.add('dragover');
+            });
+
+            uploadForm.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Drag leave dropzone');
+                uploadForm.classList.remove('dragover');
+            });
+
+            uploadForm.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('ไฟล์ถูกวางใน dropzone', e.dataTransfer.files);
+                uploadForm.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
+
+            // การจัดการเมื่อเลือกไฟล์ผ่าน input
+            fileInput.addEventListener('change', () => {
+                console.log('เลือกไฟล์ผ่าน input', fileInput.files);
+                handleFiles(fileInput.files);
+                fileInput.value = '';
+            });
+
+            // ฟังก์ชันจัดการไฟล์
+            function handleFiles(files) {
+                if (!files || files.length === 0) {
+                    console.warn('ไม่มีไฟล์ถูกเลือกหรือวาง');
+                    showAlert('ไม่มีไฟล์ถูกเลือกหรือวาง');
+                    return;
+                }
+
+                for (let file of files) {
+                    const fileType = file.name.split('.').pop().toLowerCase();
+                    const allowedTypes = ['pdf', 'jpg', 'png', 'xls', 'xlsx'];
+                    if (!allowedTypes.includes(fileType)) {
+                        console.warn(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}`);
+                        showAlert(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}. กรุณาอัปโหลดไฟล์ .pdf, .jpg, .png, .xls, หรือ .xlsx`);
+                        continue;
+                    }
+
+                    console.log(`เพิ่มไฟล์: ${file.name}`);
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'list-group-item d-flex align-items-center file-item added';
+                    fileItem.innerHTML = `
+                                    <i class="fas fa-file-${fileType === 'pdf' ? 'pdf text-danger' : 'image text-primary'} mr-2"></i>
+                                    <a href="#" class="file-link kanit-regular flex-grow-1">${file.name}</a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="${file.name}" title="ลบไฟล์">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                `;
+                    fileListContainer.appendChild(fileItem);
+
+                    // เริ่ม fade-in
+                    setTimeout(() => {
+                        fileItem.classList.add('show');
+                    }, 10);
+
+                    // ลบ class added หลัง 1 วินาทีเพื่อลบ highlight
+                    setTimeout(() => {
+                        fileItem.classList.remove('added');
+                    }, 1000);
+                }
+            }
+            // การจัดการลบไฟล์
+            fileListContainer.addEventListener('click', (e) => {
+                e.preventDefault(); // ป้องกันการ submit ฟอร์ม
+                const btn = e.target.closest('.delete-btn');
+                if (btn) {
+                    const fileItem = btn.closest('.file-item');
+                    const fileName = btn.dataset.file;
+                    console.log(`ลบไฟล์: ${fileName}`);
+                    fileItem.classList.add('removing');
+                    setTimeout(() => {
+                        fileItem.remove();
+                    }, 300);
+                }
+            });
+
+            // ฟังก์ชันแสดง alert
+            function showAlert(message) {
+                const modalAlert = document.getElementById('modal_alert');
+                const alertContent = document.getElementById('alert_content');
+                if (modalAlert && alertContent) {
+                    alertContent.innerHTML = `<p class="kanit-regular">${message}</p>`;
+                    $(modalAlert).modal('show');
+                } else {
+                    console.error('ไม่พบ modal_alert หรือ alert_content');
+                    alert(message);
+                }
+            }
+        });
+
     </script>
 }

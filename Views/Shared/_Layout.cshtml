@@ -6,6 +6,7 @@
 @{ 
     INotification Notification = new NotificationService();
     List<NotificationModel> notifications = Notification.GetNotificationsByEMPID(Model.emp_id);
+    notifications = notifications.Where(w => w.notification_date > DateTime.Now.AddDays(-30)).ToList();
 }
 <!DOCTYPE html>
 <html>
@@ -246,16 +247,30 @@
     </div>
     <partial name="Scripts" />
     @RenderSection("Scripts", required: false)
-    <script>
-        $(document).on('click', '.bell-circle', function (e) {
+<script>
+        $(document).on('click', '.bell-circle', async function (e) {
             e.preventDefault();
             $('.badge-notif').fadeOut(300, function () {
                 $(this).remove();
             });
 
-            
+            let emp_id = '@Html.Raw(Model.emp_id)';
+            await $.ajax({
+                type: "PATCH",
+                url: '@Url.Action("ClearNotification", "Leave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { emp_id },
+                success: async function (response) {
+                    if (response === "Success") {                     
+                    }
+                    else {
+                        alert(response);
+                    }
+                }
+            });
+
         });
-    </script>
+</script>
 </body>
 
 </html >
