@@ -542,8 +542,6 @@
                         <div class="col-xl-6 col-md-6 col-sm-12 ">
                             <label for="request_id">ประเภทการลา</label>
                             <select id="select_leave_type" class="form-control">
-                                <option value="">ลาพักร้อน</option>
-                                <option value="">ลาป่วย</option>
                             </select>
                         </div>
                         <div class="col-xl-6 col-md-6 col-sm-12">
@@ -2009,17 +2007,21 @@
         });
 
 
+    </script>
+
+    <script>
+
         // Leave
 
-        $('#leave').on('click', function () {
+        $('#leave').on('click', async function () {
             $('#modal_leave').modal();
             $('#modal_task').modal('hide');
+
+            await GetLeaveType();
         });
 
-    </script>
-    <script>
         document.addEventListener('DOMContentLoaded', function () {
-  
+
             const leaveFullBtn = document.getElementById('leave_full');
             const leaveHalfBtn = document.getElementById('leave_half');
             const leaveHoursBtn = document.getElementById('leave_hours');
@@ -2254,6 +2256,27 @@
                 }
             }
         });
+
+        async function GetLeaveType() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetLeaves", "Leave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    
+                },
+                success: function (response) {
+                    let leaves = response;
+                    GenerateLeaveOption(leaves);
+                }
+            });
+        }
+        function GenerateLeaveOption(leaves) {
+            $('#select_leave_type').empty();
+            for (let i = 0; i < leaves.length; i++) {
+                $('#select_leave_type').append(`<option value="${leaves[i].leave_type_id}">${leaves[i].leave_name_th}</option>`);
+            }
+        }
 
     </script>
 }

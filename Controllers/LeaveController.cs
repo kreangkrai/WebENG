@@ -9,6 +9,7 @@ using WebENG.CTLModels;
 using WebENG.CTLServices;
 using WebENG.Interface;
 using WebENG.LeaveInterfaces;
+using WebENG.LeaveModels;
 using WebENG.LeaveServices;
 using WebENG.Models;
 using WebENG.Service;
@@ -20,11 +21,13 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly IHierarchy Hierarchy;
         readonly INotification Notification;
+        readonly ILeaveType LeaveType;
         public LeaveController()
         {
             Accessory = new AccessoryService();
             Hierarchy = new HierarchyService();
             Notification = new NotificationService();
+            LeaveType = new LeaveTypeService();
         }
         public IActionResult Index()
         {
@@ -61,6 +64,13 @@ namespace WebENG.Controllers
         {            
             string message = Notification.UpdateStatus(emp_id,"Read");
             return Json(message);
+        }
+
+        [HttpGet]
+        public IActionResult GetLeaves()
+        {
+            List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
+            return Json(leaves);
         }
     }
 }
