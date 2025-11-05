@@ -465,6 +465,9 @@
                 </form>
             </div>
             <div class="modal-footer d-flex">
+                <button type="button" id="btn_delete" class="btn btn-danger elevation-1">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
                     <i class="fas fa-times"></i> Close
                 </button>
@@ -560,7 +563,7 @@
                             <label class="kanit-bold">สิทธิ์การลา</label>
                         </div>
                         <div div class="col-4 d-flex justify-content-end">
-                            <span class="kanit-light">5 วัน</span>
+                            <span id="leave_balance" class="kanit-light"></span>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -588,15 +591,10 @@
                                 <div class="card-body">
                                     <div class="row" style="row-gap:1px">
                                         <div class="col-12">
-                                            <div id="div_entitlement_manager">
-                                            </div>
                                             <div class="row">
                                                 <div class="col-12">
-                                                    <span class="kanit-light">
-                                                        หลักการ: ลูกจ้างมีสิทธิลาเพื่อกิจธุระอันจำเป็นได้ปีละไม่น้อยกว่า 3 วันทำงาน โดยนายจ้างต้องจ่ายค่าจ้างตามปกติ
-                                                        การขอลา: ต้องยื่นใบลาต่อผู้บังคับบัญชา และต้องได้รับอนุญาตก่อนจึงจะหยุดได้
-                                                        ข้อยกเว้น: หากมีเหตุจำเป็นที่ไม่สามารถรอการอนุญาตได้ทัน สามารถลาไปก่อนได้ แต่ต้องชี้แจงเหตุผลให้ผู้บังคับบัญชาทราบโดยเร็ว
-                                                        ข้อสังเกต: จำนวนวันที่ลาติดต่อกันขึ้นอยู่กับดุลยพินิจของนายจ้างและความเหมาะสมของแต่ละกรณี
+                                                    <span id="leave_description" class="kanit-light">
+                                                        
                                                     </span>
                                                 </div>
                                             </div>
@@ -606,51 +604,55 @@
                             </div>
                         </div>
                     </div>
-                    <div id="date_group" class="form-group row">
+                    <div id="leave_date_group" class="form-group row">
                         <div class="col-xl-4 col-md-6 col-sm-6">
-                            <label for="start_date">ลาตั้งแต่วันที่</label>
-                            <input id="start_date" type="date" class="form-control" />
+                            <label for="leave_start_date">ลาตั้งแต่วันที่</label>
+                            <input id="leave_start_date" type="date" class="form-control" />
                         </div>
                         <div class="col-xl-4 col-md-4 col-sm-12">
                             <label for="amount_leave">ลาจำนวน</label>
                             <div class="input-group">
-                                <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" />
+                                <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="100"/>
                                 <div class="input-group-append">
                                     <span class="input-group-text">วัน</span>
                                 </div>
                             </div>
                         </div>
                         <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
-                            <label for="start_date">ถึงวันที่</label>
-                            <input id="stop_date" type="text" class="form-control" />
+                            <label for="leave_stop_date">ถึงวันที่</label>
+                            <input id="leave_stop_date" type="date" class="form-control"/>
                         </fieldset>
                     </div>
-                    <div id="time_group" class="form-group row">
+                    <div id="leave_time_group" class="form-group row">
                         <div class="col-xl-4 col-md-4 col-sm-12">
-                            <label for="stop_date">ระยะเวลา</label>
+                            <label>ระยะเวลา</label>
                             <div class="input-group">
-                                <select id="" class="form-control">
-                                    <option value="">Select...</option>
-                                    <option value="">2 ชั่วโมง</option>
-                                    <option value="">4 ชั่วโมง</option>
-                                    <option value="">6 ชั่วโมง</option>
+                                <select id="select_leave_hours_duration" class="form-control">
                                 </select>
                             </div>
                         </div>
                         <div class="col-xl-4 col-md-4 col-sm-6">
-                            <label for="start_time">ตั้งแต่เวลา</label>
-                            <input id="start_time" type="time" class="form-control" />
+                            <label for="leave_start_time">ตั้งแต่เวลา</label>
+                            @*<input id="leave_start_time" type="time" class="form-control" />*@
+                            <div class="d-flex gap-2">
+                                <select id="leave_start_hour" class="form-control" style="width: auto;"></select>
+                                <span class="align-self-center">:</span>
+                                <select id="leave_start_minute" class="form-control" style="width: 80px;">
+                                    <option value="00">00</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </div>
                         </div>
                         <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
-                            <label for="stop_time">ถึงเวลา</label>
-                            <input id="stop_time" type="time" class="form-control" />
+                            <label for="leave_stop_time">ถึงเวลา</label>
+                            <input id="leave_stop_time" type="time" class="form-control" />                          
                         </fieldset>
                     </div>
                     <div class="form-group row">
                         <div class="col-12">
                             <div class="form-group">
-                                <label for="note">รายละเอียด</label>
-                                <textarea id="note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
+                                <label for="leave_note">รายละเอียด</label>
+                                <textarea id="leave_note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
                             </div>
                         </div>
                     </div>
@@ -658,14 +660,14 @@
                     <hr />
 
                     <!-- ส่วนอัปโหลดไฟล์ -->
-                    <div id="date_group" class="form-group row">
+                    <div id="leave_date_group" class="form-group row">
                         <div class="col-12">
                             <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
                             <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
                                 <div class="text-center">
                                     <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
                                     <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
-                                    <input type="file" id="fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
+                                    <input type="file" id="leave_fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
                                     <button type="button" id="selectFileBtn"
                                             class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
                                             style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
@@ -677,13 +679,13 @@
                     </div>
 
                     <!-- ส่วนแสดงรายการไฟล์ -->
-                    <div id="fileList" class="form-group row">
+                    <div id="leave_fileList" class="form-group row">
                         <div class="col-12">
                             <label class="kanit-medium">เอกสารที่แนบ</label>
                             <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                <div class="list-group" id="fileListContainer">
+                                <div class="list-group" id="leave_fileListContainer">
                                     <!-- ตัวอย่างไฟล์ -->
-                                    <div class="list-group-item d-flex align-items-center file-item">
+                                    @*<div class="list-group-item d-flex align-items-center file-item">
                                         <i class="fas fa-file-image text-primary mr-2"></i>
                                         <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
                                         <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_001.png" title="ลบไฟล์">
@@ -696,7 +698,7 @@
                                         <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_002.pdf" title="ลบไฟล์">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
-                                    </div>
+                                    </div>*@
                                 </div>
                             </div>
                         </div>
@@ -705,7 +707,7 @@
                     <hr />
                     <div class="form-group row">
                         <div class="col-12">
-                            <label for="approvers" class="kanit-medium">ผู้อนุมัติ</label>
+                            <label for="leave_approvers" class="kanit-medium">ผู้อนุมัติ</label>
                             <div class="card" style="border-radius: 10px; overflow: hidden;">
                                 <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
                                 <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
@@ -749,9 +751,6 @@
                 </form>
             </div>
             <div class="modal-footer d-flex">
-                <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                    <i class="fas fa-trash-alt"></i> ลบ
-                </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
                     <i class="fas fa-times"></i> ยกเลิก
                 </button>
@@ -2011,13 +2010,47 @@
 
     <script>
 
+        let leaves = [];
+        let balance_entitlement;
+        let path_file = [];
+
+        const hourSelect = document.getElementById('leave_start_hour');
+
+        // 08-17
+        for (let h = 8; h <= 17; h++) {
+            const option = document.createElement('option');
+            option.value = String(h).padStart(2, '0');
+            option.textContent = String(h).padStart(2, '0');
+            hourSelect.appendChild(option);
+        }
+        hourSelect.value = '08';
         // Leave
 
         $('#leave').on('click', async function () {
             $('#modal_leave').modal();
             $('#modal_task').modal('hide');
-
+            $('#leave_start_date').val($('#working_date').val());
+            $('#leave_stop_date').val($('#working_date').val());
             await GetLeaveType();
+        });
+
+        $('#select_leave_type').on('change', function () {
+            let leave_type_id = $('#select_leave_type').val();
+            let description = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m.description)[0];
+            let entitlement = balance_entitlement.entitlements.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+            $('#leave_description').text(description);
+            $('#leave_balance').text(entitlement.balance + '/' + entitlement.amount + ' วัน');
+        });
+
+        $('#amount_leave').on('change', function () {
+            let start = new Date($('#leave_start_date').val());
+            let amount = parseInt($('#amount_leave').val());
+
+            start.setDate(start.getDate() + amount - 1);
+            const day = String(start.getDate()).padStart(2, '0');
+            const month = String(start.getMonth() + 1).padStart(2, '0');
+            const year = start.getFullYear();
+            $('#leave_stop_date').val(`${year}-${month}-${day}`);
         });
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -2025,11 +2058,14 @@
             const leaveFullBtn = document.getElementById('leave_full');
             const leaveHalfBtn = document.getElementById('leave_half');
             const leaveHoursBtn = document.getElementById('leave_hours');
-            const dateGroup = document.getElementById('date_group');
-            const timeGroup = document.getElementById('time_group');
+            const dateGroup = document.getElementById('leave_date_group');
+            const timeGroup = document.getElementById('leave_time_group');
             const durationSelect = timeGroup.querySelector('select');
-            const startTimeInput = document.getElementById('start_time');
-            const stopTimeInput = document.getElementById('stop_time');
+            const startHourTimeInput = document.getElementById('leave_start_hour');
+            const startMinuteTimeInput = document.getElementById('leave_start_minute');
+            const startDateInput = document.getElementById('leave_start_date');
+            const stopTimeInput = document.getElementById('leave_stop_time');
+            const stopDateInput = document.getElementById('leave_stop_date');
             const daysInput = dateGroup.querySelector('input[type="number"]'); // ช่องลาจำนวน
             // ฟังก์ชันรีเซ็ตการเลือกปุ่ม (ลบ active class)
             function resetButtonStyles() {
@@ -2037,43 +2073,73 @@
                 leaveHalfBtn.classList.remove('active');
                 leaveHoursBtn.classList.remove('active');
             }
+
             // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_half
             function setHalfDayOptions() {
                 durationSelect.innerHTML = `
-                        <option value="">Select...</option>
+                        <option value=""selected disabled>Select</option>
                         <option value="morning">ครึ่งวันเช้า</option>
                         <option value="afternoon">ครึ่งวันบ่าย</option>
                     `;
+                startHourTimeInput.value = '08';
+                startMinuteTimeInput.value = '00';
+                stopTimeInput.value = '';
+                startHourTimeInput.disabled = false;
+                startMinuteTimeInput.disabled = false;
+                daysInput.value = 0;
+                stopDateInput.value = startDateInput.value;
                 // เพิ่ม event listener สำหรับการเปลี่ยนแปลงใน select
                 durationSelect.onchange = function () {
                     if (this.value === 'morning') {
-                        startTimeInput.value = '08:30';
+                        startHourTimeInput.value = '08';
+                        startMinuteTimeInput.value = '30';
                         stopTimeInput.value = '12:00';
-                        startTimeInput.disabled = true; // Disable start_time
+                        startHourTimeInput.disabled = true;
+                        startMinuteTimeInput.disabled = true;
                     } else if (this.value === 'afternoon') {
-                        startTimeInput.value = '13:00';
+                        startHourTimeInput.value = '13';
+                        startMinuteTimeInput.value = '00';
                         stopTimeInput.value = '17:30';
-                        startTimeInput.disabled = true; // Disable start_time
+                        startHourTimeInput.disabled = true;
+                        startMinuteTimeInput.disabled = true;
                     } else {
-                        startTimeInput.value = '';
+                        startHourTimeInput.value = '08';
+                        startMinuteTimeInput.value = '30';
                         stopTimeInput.value = '';
-                        startTimeInput.disabled = false; // Enable start_time
+                        startHourTimeInput.disabled = false;
+                        startMinuteTimeInput.disabled = false;
                     }
                 };
             }
             // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_hours
             function setHourlyOptions() {
                 durationSelect.innerHTML = `
-                        <option value="">Select...</option>
+                        <option value="" selected disabled>Select</option>
                         <option value="2">2 ชั่วโมง</option>
                         <option value="4">4 ชั่วโมง</option>
                         <option value="6">6 ชั่วโมง</option>
                     `;
+                startHourTimeInput.value = '08';
+                startMinuteTimeInput.value = '30';
+                stopTimeInput.value = '';
+                startHourTimeInput.disabled = false;
+                startMinuteTimeInput.disabled = false;
+                daysInput.value = 0;
+                stopDateInput.value = startDateInput.value;
                 // รีเซ็ตค่าเวลาและ enable start_time เมื่อเปลี่ยนเป็นรายชั่วโมง
                 durationSelect.onchange = function () {
-                    startTimeInput.value = '';
-                    stopTimeInput.value = '';
-                    startTimeInput.disabled = false; // Enable start_time
+                    
+                    calculateTime();
+                    startHourTimeInput.disabled = false; 
+                    startMinuteTimeInput.disabled = false;
+                };
+
+                startHourTimeInput.onchange = function () {
+                    calculateTime();
+                };
+
+                startMinuteTimeInput.onchange = function () {
+                    calculateTime();
                 };
             }
             // ฟังก์ชันจัดการ animation เมื่อแสดงหรือซ่อน
@@ -2092,10 +2158,12 @@
                         group.style.display = 'none';
                         // รีเซ็ตค่าใน time_group เมื่อซ่อน
                         if (group === timeGroup) {
-                            startTimeInput.value = '';
+                            startHourTimeInput.value = '';
+                            startMinuteTimeInput.value = '';
                             stopTimeInput.value = '';
                             durationSelect.value = '';
-                            startTimeInput.disabled = false; // Enable start_time
+                            startHourTimeInput.disabled = false; // Enable start_time
+                            startMinuteTimeInput.disabled = false; // Enable start_time
                         }
                     }, 300);
                 }
@@ -2104,9 +2172,11 @@
             leaveFullBtn.addEventListener('click', function () {
                 resetButtonStyles();
                 leaveFullBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true); // แสดง date_group
-                toggleGroupDisplay(timeGroup, false); // ซ่อน time_group
-                daysInput.disabled = false; // ENABLE ลาจำนวน
+                toggleGroupDisplay(dateGroup, true);
+                toggleGroupDisplay(timeGroup, false);
+                daysInput.disabled = false;
+                daysInput.value = 1;
+                stopDateInput.value = startDateInput.value;
             });
             // เมื่อกดปุ่ม "ครึ่งวัน"
             leaveHalfBtn.addEventListener('click', function () {
@@ -2126,124 +2196,166 @@
                 setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
                 daysInput.disabled = true; // DISABLE ลาจำนวน
             });
+
             // เริ่มต้นด้วยการเลือก "ทั้งวัน" เป็นค่าเริ่มต้น
+            function timeToMinutes(timeStr) {
+                const [hours, minutes] = timeStr.split(':').map(Number);
+                return hours * 60 + minutes;
+            }
+
+            function calculateTime() {
+                let first = timeToMinutes("08:30");
+                let last = timeToMinutes("17:30");
+                let duration = parseInt(durationSelect.value);
+                let start = startHourTimeInput.value + ':' + startMinuteTimeInput.value;
+                if (timeToMinutes(start) >= first && timeToMinutes(start) <= last) {
+                    let [hours, minutes] = start.split(':').map(Number);
+                    let date = new Date(startDateInput.value);
+                    date.setHours(hours);
+                    date.setMinutes(minutes);
+                    date.setSeconds(0);
+
+                    date.setHours(date.getHours() + duration);
+                    if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
+                        let stopHours = String(date.getHours()).padStart(2, '0');
+                        let stopMinutes = String(date.getMinutes()).padStart(2, '0');
+                        let stopTime = `${stopHours}:${stopMinutes}`;
+                        stopTimeInput.value = stopTime;
+                    } else {
+                        alert('ใส่เวลาผิด');
+                        startHourTimeInput.value = '08';
+                        startMinuteTimeInput.value = '30';
+                        stopTimeInput.value = '';
+                    }
+                } else {
+                    alert('ใส่เวลาผิด');
+                    startHourTimeInput.value = '08';
+                    startMinuteTimeInput.value = '30';
+                    stopTimeInput.value = '';
+                }
+            }
             leaveFullBtn.click();
         });
 
-        // การจัดการอัปโหลดและลบไฟล์
         document.addEventListener('DOMContentLoaded', function () {
-            const fileInput = document.getElementById('fileInput');
+
+            const fileInput = document.getElementById('leave_fileInput');
             const selectFileBtn = document.getElementById('selectFileBtn');
             const uploadForm = document.getElementById('uploadForm');
-            const fileListContainer = document.getElementById('fileListContainer');
-
-            // ตรวจสอบว่า element โหลดครบ
+            const fileListContainer = document.getElementById('leave_fileListContainer');
+       
             if (!fileInput || !selectFileBtn || !uploadForm || !fileListContainer) {
-                console.error('ไม่พบ element ที่จำเป็น: ', { fileInput, selectFileBtn, uploadForm, fileListContainer });
-                showAlert('เกิดข้อผิดพลาด: ไม่พบองค์ประกอบที่จำเป็นสำหรับการอัปโหลดไฟล์');
+                console.error('ไม่พบ element');
                 return;
             }
 
-            // คลิกปุ่มเลือกไฟล์
             selectFileBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log('คลิกปุ่มเลือกไฟล์');
                 fileInput.click();
             });
 
-            // การจัดการ drag-and-drop
-            uploadForm.addEventListener('dragenter', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Drag enter dropzone');
-                uploadForm.classList.add('dragover');
+            //Drag & Drop
+            ['dragenter', 'dragover'].forEach(event => {
+                uploadForm.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadForm.classList.add('dragover');
+                });
             });
 
-            uploadForm.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Drag over dropzone');
-                uploadForm.classList.add('dragover');
+            ['dragleave', 'drop'].forEach(event => {
+                uploadForm.addEventListener(event, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    uploadForm.classList.remove('dragover');
+                    if (event === 'drop') handleFiles(e.dataTransfer.files);
+                });
             });
 
-            uploadForm.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Drag leave dropzone');
-                uploadForm.classList.remove('dragover');
-            });
-
-            uploadForm.addEventListener('drop', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('ไฟล์ถูกวางใน dropzone', e.dataTransfer.files);
-                uploadForm.classList.remove('dragover');
-                handleFiles(e.dataTransfer.files);
-            });
-
-            // การจัดการเมื่อเลือกไฟล์ผ่าน input
             fileInput.addEventListener('change', () => {
-                console.log('เลือกไฟล์ผ่าน input', fileInput.files);
                 handleFiles(fileInput.files);
                 fileInput.value = '';
             });
 
-            // ฟังก์ชันจัดการไฟล์
+            //Delete File
+            fileListContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.delete-btn');
+                if (!btn) return;
+
+                const fileItem = btn.closest('.file-item');
+                const fileName = btn.dataset.file;
+
+                path_file = path_file.filter(name => name !== fileName);
+
+                fileItem.classList.add('removing');
+                setTimeout(() => fileItem.remove(), 300);
+
+                console.log('ลบไฟล์:', fileName, 'เหลือ:', path_file);
+            });
+
+            
             function handleFiles(files) {
-                if (!files || files.length === 0) {
-                    console.warn('ไม่มีไฟล์ถูกเลือกหรือวาง');
-                    showAlert('ไม่มีไฟล์ถูกเลือกหรือวาง');
-                    return;
-                }
+                if (!files || files.length === 0) return;
 
                 for (let file of files) {
                     const fileType = file.name.split('.').pop().toLowerCase();
                     const allowedTypes = ['pdf', 'jpg', 'png', 'xls', 'xlsx'];
+
                     if (!allowedTypes.includes(fileType)) {
-                        console.warn(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}`);
-                        showAlert(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}. กรุณาอัปโหลดไฟล์ .pdf, .jpg, .png, .xls, หรือ .xlsx`);
+                        showAlert(`ประเภทไฟล์ไม่ถูกต้อง: ${file.name}`);
                         continue;
                     }
 
-                    console.log(`เพิ่มไฟล์: ${file.name}`);
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'list-group-item d-flex align-items-center file-item added';
-                    fileItem.innerHTML = `
-                                    <i class="fas fa-file-${fileType === 'pdf' ? 'pdf text-danger' : 'image text-primary'} mr-2"></i>
-                                    <a href="#" class="file-link kanit-regular flex-grow-1">${file.name}</a>
-                                    <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="${file.name}" title="ลบไฟล์">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                `;
+                    if (path_file.includes(file.name)) {
+                        showAlert(`ไฟล์ "${file.name}" มีอยู่แล้ว`);
+                        continue;
+                    }
+
+                    path_file.push(file.name);
+
+                    const fileItem = createFileItem(file.name, fileType);
                     fileListContainer.appendChild(fileItem);
 
-                    // เริ่ม fade-in
-                    setTimeout(() => {
-                        fileItem.classList.add('show');
-                    }, 10);
-
-                    // ลบ class added หลัง 1 วินาทีเพื่อลบ highlight
-                    setTimeout(() => {
-                        fileItem.classList.remove('added');
-                    }, 1000);
+                    setTimeout(() => fileItem.classList.add('show'), 10);
+                    setTimeout(() => fileItem.classList.remove('added'), 1000);
                 }
             }
-            // การจัดการลบไฟล์
-            fileListContainer.addEventListener('click', (e) => {
-                e.preventDefault(); // ป้องกันการ submit ฟอร์ม
-                const btn = e.target.closest('.delete-btn');
-                if (btn) {
-                    const fileItem = btn.closest('.file-item');
-                    const fileName = btn.dataset.file;
-                    console.log(`ลบไฟล์: ${fileName}`);
-                    fileItem.classList.add('removing');
-                    setTimeout(() => {
-                        fileItem.remove();
-                    }, 300);
-                }
-            });
 
-            // ฟังก์ชันแสดง alert
+            //UI File
+            function createFileItem(fileName, fileType) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'list-group-item d-flex align-items-center file-item added';
+                fileItem.innerHTML = `
+            <i class="fas fa-file-${fileType === 'pdf' ? 'pdf text-danger' : 'image text-primary'} mr-2"></i>
+            <a href="#" class="file-link kanit-regular flex-grow-1">${fileName}</a>
+            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="${fileName}" title="ลบไฟล์">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        `;
+                return fileItem;
+            }
+
+            //Load old FIle
+            window.loadExistingFiles = function (existingFileNames) {
+                fileListContainer.innerHTML = '';
+                path_file = [];
+
+                if (!Array.isArray(existingFileNames)) return;
+
+                existingFileNames.forEach(fileName => {
+                    const fileType = fileName.split('.').pop().toLowerCase();
+                    const allowedTypes = ['pdf', 'jpg', 'png', 'xls', 'xlsx'];
+
+                    if (allowedTypes.includes(fileType)) {
+                        path_file.push(fileName);
+                        const fileItem = createFileItem(fileName, fileType);
+                        fileItem.classList.add('show');
+                        fileListContainer.appendChild(fileItem);
+                    }
+                });
+            };
+
+            //Alert
             function showAlert(message) {
                 const modalAlert = document.getElementById('modal_alert');
                 const alertContent = document.getElementById('alert_content');
@@ -2251,28 +2363,34 @@
                     alertContent.innerHTML = `<p class="kanit-regular">${message}</p>`;
                     $(modalAlert).modal('show');
                 } else {
-                    console.error('ไม่พบ modal_alert หรือ alert_content');
                     alert(message);
                 }
             }
         });
 
         async function GetLeaveType() {
+            let emp_id = '@Html.Raw(Model.emp_id)';
+            let now = new Date();
+            let year = now.getFullYear();
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetLeaves", "Leave")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    
+                    emp_id,year
                 },
                 success: function (response) {
-                    let leaves = response;
+                    leaves = response.leaves;
+                    balance_entitlement = response.balance_entitlement
                     GenerateLeaveOption(leaves);
+
+                    loadExistingFiles(['test.xlsx']);
                 }
             });
         }
         function GenerateLeaveOption(leaves) {
             $('#select_leave_type').empty();
+            $('#select_leave_type').append(`<option value="" selected disabled>Select</option>`);
             for (let i = 0; i < leaves.length; i++) {
                 $('#select_leave_type').append(`<option value="${leaves[i].leave_type_id}">${leaves[i].leave_name_th}</option>`);
             }

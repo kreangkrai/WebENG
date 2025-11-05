@@ -10,6 +10,9 @@ namespace WebENG.LeaveModels
         public string request_id { get; set; }
         public string emp_id { get; set; }
         public string leave_type_id { get; set; }
+        public string leave_type_code { get; set; }
+        public string leave_name_th { get; set; }
+        public string leave_name_en { get; set; }
         public bool is_full_day { get; set; }
         public DateTime start_request_date { get; set; }
         public DateTime end_request_date { get; set; }

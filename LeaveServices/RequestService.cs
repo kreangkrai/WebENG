@@ -30,7 +30,8 @@ namespace WebENG.LeaveServices
                 }
                 string strCmd = string.Format($@"SELECT [request_id]
                                                           ,[emp_id]
-                                                          ,[leave_type_id]
+                                                          ,[request].[leave_type_id]
+														  ,Leave_type.leave_type_code
                                                           ,[is_full_day]
                                                           ,[start_request_date]
                                                           ,[end_request_date]
@@ -48,7 +49,11 @@ namespace WebENG.LeaveServices
                                                           ,[admin_approve_date]
                                                           ,[decsription]
                                                           ,[status_request]
-                                                      FROM [dbo].[request] WHERE [request_id] IS NOT NULL");
+														  ,Leave_type.leave_name_th
+														  ,Leave_type.leave_name_en
+                                                      FROM [dbo].[request] 
+													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
+                                                      WHERE [request_id] IS NOT NULL");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -60,6 +65,9 @@ namespace WebENG.LeaveServices
                             request_id = dr["request_id"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
                             leave_type_id = dr["leave_type_id"].ToString(),
+                            leave_type_code = dr["leave_type_code"].ToString(),
+                            leave_name_th = dr["leave_name_th"].ToString(),
+                            leave_name_en = dr["leave_name_en"].ToString(),
                             is_full_day = dr["is_full_day"] != DBNull.Value ? Convert.ToBoolean(dr["is_full_day"].ToString()) : false,
                             start_request_date = dr["start_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_request_date"].ToString()) : DateTime.MinValue,
                             end_request_date = dr["end_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_request_date"].ToString()) : DateTime.MinValue,
@@ -103,7 +111,8 @@ namespace WebENG.LeaveServices
                 }
                 string strCmd = string.Format($@"SELECT [request_id]
                                                           ,[emp_id]
-                                                          ,[leave_type_id]
+                                                          ,[request].[leave_type_id]
+														  ,Leave_type.leave_type_code
                                                           ,[is_full_day]
                                                           ,[start_request_date]
                                                           ,[end_request_date]
@@ -121,7 +130,11 @@ namespace WebENG.LeaveServices
                                                           ,[admin_approve_date]
                                                           ,[decsription]
                                                           ,[status_request]
-                                                      FROM [dbo].[request] WHERE [request_id] = @request_id");
+														  ,Leave_type.leave_name_th
+														  ,Leave_type.leave_name_en
+                                                      FROM [dbo].[request] 
+													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
+                                                      WHERE [request_id] = @request_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@request_id", request_id);
                 SqlDataReader dr = command.ExecuteReader();
@@ -134,6 +147,9 @@ namespace WebENG.LeaveServices
                             request_id = dr["request_id"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
                             leave_type_id = dr["leave_type_id"].ToString(),
+                            leave_type_code = dr["leave_type_code"].ToString(),
+                            leave_name_th = dr["leave_name_th"].ToString(),
+                            leave_name_en = dr["leave_name_en"].ToString(),
                             is_full_day = dr["is_full_day"] != DBNull.Value ? Convert.ToBoolean(dr["is_full_day"].ToString()) : false,
                             start_request_date = dr["start_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_request_date"].ToString()) : DateTime.MinValue,
                             end_request_date = dr["end_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_request_date"].ToString()) : DateTime.MinValue,
@@ -306,6 +322,89 @@ namespace WebENG.LeaveServices
                 }
             }
             return "Success";
+        }
+
+        public List<RequestModel> GetRequestByEmpID(string emp_id)
+        {
+            List<RequestModel> requests = new List<RequestModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"SELECT [request_id]
+                                                          ,[emp_id]
+                                                          ,[request].[leave_type_id]
+														  ,Leave_type.leave_type_code
+                                                          ,[is_full_day]
+                                                          ,[start_request_date]
+                                                          ,[end_request_date]
+                                                          ,[amount_leave_day]
+                                                          ,[start_request_time]
+                                                          ,[end_request_time]
+                                                          ,[amount_leave_hour]
+                                                          ,[path_file]
+                                                          ,[request_date]
+                                                          ,[manager_approver_status]
+                                                          ,[manager_approver]
+                                                          ,[manager_approve_date]
+                                                          ,[admin_approver_status]
+                                                          ,[admin_approver]
+                                                          ,[admin_approve_date]
+                                                          ,[decsription]
+                                                          ,[status_request]
+														  ,Leave_type.leave_name_th
+														  ,Leave_type.leave_name_en
+                                                      FROM [dbo].[request] 
+													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
+                                                      WHERE [emp_id] = @emp_id");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                command.Parameters.AddWithValue("@emp_id", emp_id);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        RequestModel request = new RequestModel()
+                        {
+                            request_id = dr["request_id"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
+                            leave_type_id = dr["leave_type_id"].ToString(),
+                            leave_type_code = dr["leave_type_code"].ToString(),
+                            leave_name_th = dr["leave_name_th"].ToString(),
+                            leave_name_en = dr["leave_name_en"].ToString(),
+                            is_full_day = dr["is_full_day"] != DBNull.Value ? Convert.ToBoolean(dr["is_full_day"].ToString()) : false,
+                            start_request_date = dr["start_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_request_date"].ToString()) : DateTime.MinValue,
+                            end_request_date = dr["end_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_request_date"].ToString()) : DateTime.MinValue,
+                            amount_leave_day = dr["amount_leave_day"] != DBNull.Value ? Convert.ToInt32(dr["amount_leave_day"].ToString()) : 0,
+                            start_request_time = dr["start_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["start_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            end_request_time = dr["end_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["end_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
+                            path_file = dr["path_file"].ToString(),
+                            request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
+                            manager_approver = dr["manager_approver"].ToString(),
+                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
+                            manager_approver_status = dr["manager_approver_status"].ToString(),
+                            admin_approver = dr["admin_approver"].ToString(),
+                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
+                            admin_approver_status = dr["admin_approver_status"].ToString(),
+                            decsription = dr["decsription"].ToString(),
+                            status_request = dr["status_request"].ToString()
+                        };
+                        requests.Add(request);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return requests;
         }
     }
 }

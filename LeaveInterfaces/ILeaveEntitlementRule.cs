@@ -12,5 +12,6 @@ namespace WebENG.LeaveInterfaces
         List<LeaveEntitlementRuleModel> GetLeaveEntitlementRulesByLeaveID(string leave_type_id);
         string Insert(List<LeaveEntitlementRuleModel> leaves);
         string Delete(string leave_id);
+        LeaveBalanceModel GetLeaveBalances(string emp_id, int year);
     }
 }

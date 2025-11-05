@@ -22,12 +22,14 @@ namespace WebENG.Controllers
         readonly IHierarchy Hierarchy;
         readonly INotification Notification;
         readonly ILeaveType LeaveType;
+        readonly ILeaveEntitlementRule EntitlementRule;
         public LeaveController()
         {
             Accessory = new AccessoryService();
             Hierarchy = new HierarchyService();
             Notification = new NotificationService();
             LeaveType = new LeaveTypeService();
+            EntitlementRule = new LeaveEntitlementRuleService();
         }
         public IActionResult Index()
         {
@@ -51,6 +53,8 @@ namespace WebENG.Controllers
                 List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
                 List<HierarchyDepartmentModel> hierarchies_depaartmenr = Hierarchy.GetDepartmentHierarchies();
 
+               
+
                 return View(u);
             }
             else
@@ -67,10 +71,12 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetLeaves()
+        public IActionResult GetLeaves(string emp_id,int year)
         {
+            LeaveBalanceModel balance_entitlement = EntitlementRule.GetLeaveBalances(emp_id, year);
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            return Json(leaves);
+            var data = new { leaves = leaves, balance_entitlement = balance_entitlement };
+            return Json(data);
         }
     }
 }
