@@ -40,7 +40,7 @@ namespace WebENG.CTLServices
             hierarchies_operation = operations.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
-                name = operations.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(),
+                name = operations.Where(w => w.emp_id == s.Key).Select(c => c.name_en).FirstOrDefault(),
                 gender = operations.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = operations.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = operations.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
@@ -52,7 +52,7 @@ namespace WebENG.CTLServices
             hierarchies_manager = managers.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
-                name = managers.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(),
+                name = managers.Where(w => w.emp_id == s.Key).Select(c => c.name_en).FirstOrDefault(),
                 gender = managers.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = managers.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = managers.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
@@ -64,7 +64,7 @@ namespace WebENG.CTLServices
             hierarchies_director = directors.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
-                name = directors.Where(w => w.emp_id == s.Key).Select(c => c.name).FirstOrDefault(),
+                name = directors.Where(w => w.emp_id == s.Key).Select(c => c.name_en).FirstOrDefault(),
                 gender = directors.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = directors.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = directors.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),

@@ -33,7 +33,7 @@ namespace WebENG.Service
                                                     user_id,
                                                     emp.emp_id
                                                     FROM [MES].dbo.Authen
-                                                    LEFT JOIN [CTL].dbo.[Employees] emp ON [MES].dbo.Authen.name = emp.name
+                                                    LEFT JOIN [CTL].dbo.[Employees] emp ON [MES].dbo.Authen.name = emp.name_en
                                                     ORDER BY [MES].dbo.Authen.name", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)

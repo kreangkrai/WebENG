@@ -30,18 +30,21 @@ namespace WebENG.LeaveServices
                 }
                 string strCmd = string.Format($@"SELECT 
                                                 emp1.emp_id,
-                                                emp2.name,
+                                                emp2.name_en,
+                                                emp2.name_th,
                                                 emp2.department,
                                                 emp2.location,
                                                 emp2.position,
                                                 emp2.gender,
                                                 emp2.email,
                                                 emp2.phone,
+                                                emp2.telephone,
                                                 emp2.start_date,
+                                                emp2.promote_manager_date,
                                                 emp2.active,
                                                 emp1.role
                                                 FROM ELEAVE.dbo.Employees emp1
-                                                LEFT JOIN CTL.dbo.Employees  emp2 ON  emp1.emp_id = emp2.emp_id");
+                                                LEFT JOIN CTL.dbo.Employees emp2 ON  emp1.emp_id = emp2.emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -51,14 +54,17 @@ namespace WebENG.LeaveServices
                         EmployeeModel employee = new EmployeeModel()
                         {
                             emp_id = dr["emp_id"].ToString(),
-                            name = dr["name"].ToString(),
+                            name_en = dr["name_en"].ToString(),
+                            name_th = dr["name_th"].ToString(),
                             department = dr["department"].ToString(),
                             location = dr["location"].ToString(),
                             position = dr["position"].ToString(),
                             email = dr["email"].ToString(),
                             phone = dr["phone"].ToString(),
+                            telephone = dr["telephone"].ToString(),
                             gender = dr["gender"].ToString(),
                             start_date = dr["start_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_date"].ToString()) : DateTime.MinValue,
+                            promote_manager_date = dr["promote_manager_date"] != DBNull.Value ? Convert.ToDateTime(dr["promote_manager_date"].ToString()) : DateTime.MinValue,
                             active = dr["active"] != DBNull.Value ? Convert.ToBoolean(dr["active"].ToString()) : false,
                             role = dr["role"].ToString()
                         };

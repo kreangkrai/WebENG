@@ -89,8 +89,8 @@ namespace WebENG.LeaveServices
                             double x_all = x_day + (x_hours / 24);
                             EntitlementBalanceModel entitle_b = new EntitlementBalanceModel()
                             {
-                                amount = entitles[j].days_per_year + (entitles[i].hours_per_year / 24),
-                                balance = (decimal)(entitles[j].days_per_year + (entitles[i].hours_per_year / 24) - x_all),
+                                amount = entitles[j].days_per_year + (entitles[j].hours_per_year / 24),
+                                balance = (decimal)(entitles[j].days_per_year + (entitles[j].hours_per_year / 24) - x_all),
                                 leave_code = entitles[j].leave_type_code,
                                 leave_type_id = entitles[j].leave_type_id,
                                 leave_name_th = entitles[j].leave_name_th,
@@ -143,8 +143,8 @@ namespace WebENG.LeaveServices
                             leave_name_en = dr["leave_name_en"].ToString(),
                             start_age = Convert.ToDecimal(dr["start_age"].ToString()),
                             before_age = Convert.ToDecimal(dr["before_age"].ToString()),
-                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 1,
-                            hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 1
+                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 0,
+                            hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 0
                         };
                         leaves.Add(leave);
                     }

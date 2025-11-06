@@ -66,7 +66,7 @@ namespace WebENG.Controllers
         {
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
-            string admin = employees.Where(w => w.name.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
+            string admin = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             DateTime date = DateTime.Now;
             string leave_id = Guid.NewGuid().ToString("N").Substring(0, 10);
             string message = LeaveType.Insert(new LeaveTypeModel()
@@ -101,8 +101,8 @@ namespace WebENG.Controllers
             LeaveTypeModel m_leave = LeaveType.GetLeaveTypeByID(leave_.leave_type_id);
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
-            string admin = employees.Where(w => w.name.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
-            string create_by = employees.Where(w => w.name.ToLower() == m_leave.created_by.ToLower()).Select(s => s.emp_id).FirstOrDefault();
+            string admin = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
+            string create_by = employees.Where(w => w.name_en.ToLower() == m_leave.created_by.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             DateTime date = DateTime.Now;
             leave_.created_at = m_leave.created_at;
             leave_.created_by = create_by;
