@@ -332,12 +332,44 @@
                             <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ข้อมูลพนักงาน</h5>
                         </div>
                         <div class="card-body p-3">
+                            <!-- Dropdown กรองแผนก -->
+                            <div class="form-group mb-3">
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
+                                <select id="DepartmentSelect" class="form-control form-control-sm kanit-regular" style="font-size: 15px;">
+                                    <option value="ALL">ทั้งหมด</option>
+                                    <option value="CES">CES</option>
+                                    <option value="ARD">ARD</option>
+                                </select>
+                            </div>
+                            <!-- Dropdown เลือกชื่อหรือรหัสพนักงาน -->
+                            <div class="form-group mb-3">
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
+                                <select id="DepartmentSelect" class="form-control form-control-sm kanit-regular" style="font-size: 15px;">
+                                    <option value="ALL">ทั้งหมด</option>
+                                    <option value="CES">CES</option>
+                                    <option value="ARD">ARD</option>
+                                </select>
+                            </div>
                             <!-- Dropdown เลือกพนักงาน -->
                             <div class="form-group mb-3">
                                 <label class="kanit-regular text-muted" style="font-size: 18px;">เลือกพนักงาน</label>
                                 <select id="employeeSelect" class="form-control form-control-sm kanit-regular" style="font-size: 15px;">
                                     <option value="">-- เลือกพนักงาน --</option>
                                 </select>
+                            </div>
+
+                            <!-- Dropdown + Search -->
+                            <div class="form-group mb-3">
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">เลือกพนักงาน</label>
+                                <div class="dropdown-search">
+                                    <input type="text" id="employeeSearch" class="form-control form-control-sm kanit-regular"
+                                           placeholder="ค้นหา รหัสหรือชื่อ..." style="font-size: 15px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+                                    <select id="employeeSelect" class="form-control form-control-sm kanit-regular" size="5"
+                                            style="font-size: 15px; height: auto; max-height: 200px; border-top-left-radius: 0; border-top-right-radius: 0; display: none;">
+                                        <!-- JS จะเติม -->
+                                    </select>
+                                    <div id="searchResults" class="list-group position-absolute w-100" style="max-height: 200px; overflow-y: auto; z-index: 1000; display: none; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
+                                </div>
                             </div>
 
                             <!-- แสดงข้อมูลพนักงาน -->
@@ -386,14 +418,14 @@
                         <div class="card shadow-sm modern-card" style="border-radius:10px; padding:10px">
                         <div class="card-body" overflow-y:auto">
                             <div class="form-group row">
-                                <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาคงเหลือ</label>
+                                <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาคงเหลือ (วัน)</label>
                                 <div class="col-12" style="font-size:18px; ">
                                     <div class="row">
                                         <div class="col-8" style="text-align:start">
                                             <label class="kanit-light">ลาพักร้อน</label>
                                         </div>
                                         <div class="col-4" style="text-align:end">
-                                            <label class="kanit-regular">4 / 4 วัน</label>
+                                            <label class="kanit-regular">4 / 4</label>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -401,7 +433,7 @@
                                             <label class="kanit-light">ลาป่วย</label>
                                         </div>
                                         <div class="col-4" style="text-align:end">
-                                            <label class="kanit-regular">29 / 30 วัน</label>
+                                            <label class="kanit-regular">29 / 30</label>
                                         </div>
                                     </div>
                                     <div id="div_leaves_balance"></div>
@@ -436,10 +468,10 @@
                     <select id="yearFilter"
                             class="form-control form-control-sm kanit-medium "
                             style="width: 90px; color:#555; font-size: 18px; border-radius: 8px; height: 36px; padding: 0 8px; flex-shrink: 0;">
-                            <option>2568</option>
-                            <option>2567</option>
-                            <option>2566</option>
-                            <option>2565</option>
+                            <option>2025</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                            <option>2022</option>
                         <!-- JS จะเติมที่นี่ -->
                     </select>
                 </h4>
@@ -873,6 +905,99 @@
             // ตั้งค่าเริ่มต้น
             $info.hide();
             $noEmp.show();
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            const employees = [
+                { id: "EM010101", name: "นาย A DC" },
+                { id: "EM020202", name: "นาย B EE" },
+                { id: "EM030303", name: "นางสาว C FF" },
+                { id: "EM040404", name: "นาย D GG" },
+                { id: "EM010002", name: "นางสาว P PC" },
+                { id: "EM010004", name: "นาย W WW" }
+                // เพิ่มตามจริง
+            ];
+
+            const $search = $('#employeeSearch');
+            const $select = $('#employeeSelect');
+            const $results = $('#searchResults');
+
+            // สร้าง option ทั้งหมด
+            employees.forEach(emp => {
+                const opt = `<option value="${emp.id}">${emp.id} : ${emp.name}</option>`;
+                $select.append(opt);
+            });
+
+            // ฟังก์ชันกรอง
+            function filterEmployees(query) {
+                query = query.trim().toLowerCase();
+                if (!query) {
+                    $results.hide().empty();
+                    return;
+                }
+
+                const filtered = employees.filter(emp =>
+                    emp.id.toLowerCase().includes(query) ||
+                    emp.name.toLowerCase().includes(query)
+                );
+
+                $results.empty();
+                if (filtered.length === 0) {
+                    $results.append('<div class="list-group-item text-muted text-center">ไม่พบข้อมูล</div>').show();
+                    return;
+                }
+
+                filtered.forEach((emp, idx) => {
+                    const item = $(`
+                                <div class="list-group-item" data-id="${emp.id}">
+                                    <strong>${emp.id}</strong> : ${emp.name}
+                                </div>
+                            `);
+                    if (idx === 0) item.addClass('active');
+                    $results.append(item);
+                });
+                $results.show();
+            }
+
+            // พิมพ์ค้นหา
+            let timeout;
+            $search.on('input', function () {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => filterEmployees($(this).val()), 200);
+            });
+
+            // คลิกผลลัพธ์
+            $results.on('click', '.list-group-item', function () {
+                if ($(this).hasClass('text-muted')) return;
+                const id = $(this).data('id');
+                $select.val(id).trigger('change');
+                $search.val($select.find('option:selected').text());
+                $results.hide();
+            });
+
+            // กด Enter
+            $search.on('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    const $active = $results.find('.active');
+                    if ($active.length) $active.click();
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    let $next = $results.find('.active').removeClass('active').next('.list-group-item');
+                    if (!$next.length) $next = $results.find('.list-group-item').first();
+                    $next.addClass('active');
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    let $prev = $results.find('.active').removeClass('active').prev('.list-group-item');
+                    if (!$prev.length) $prev = $results.find('.list-group-item').last();
+                    $prev.addClass('active');
+                }
+            });
+
+            // เริ่มต้น
+            $search.val('-- เลือกพนักงาน --');
+            $results.hide();
         });
     </script>
 }

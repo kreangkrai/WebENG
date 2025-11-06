@@ -223,6 +223,7 @@
                 background-color: white;
                 border-radius: 50%;
                 transition: 0.3s;
+
             }
 
         .modern-switch input:checked + .slider {
@@ -416,6 +417,7 @@
                                                         </select>
                                                     </div>
                                                 </div>
+                                                <!-- ต้องแนบไฟล์ -->
                                                 <div class="row condition-row">
                                                     <div class="col-8">
                                                         <span class="kanit-light">ต้องแนบไฟล์</span>
@@ -430,7 +432,6 @@
                                                                 <span class="slider"></span>
                                                             </label>
                                                         </div>
-
                                                     </div>
                                                 </div>
                                                 <div id="div_leave_attachment_threshold_days" class="row condition-row" hidden>
@@ -440,6 +441,62 @@
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <div class="input-group">
                                                             <input id="update_leave_attachment_threshold_days" type="number" class="form-control kanit-light" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- กำหนดลาต่อเนื่อง -->
+                                                <div class="row condition-row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">กำหนดลาต่อเนื่อง</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="custom-control custom-switch">
+                                                            <label class="modern-switch">
+                                                                <input type="checkbox" id="update_leave_continuous">
+                                                                <span class="slider"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="div_leave_continuous_threshold_days" class="row condition-row" hidden>
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">ลาติดต่อกันได้ไม่เกิน</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="input-group">
+                                                            <input id="update_leave_continuous_threshold_days" type="number" class="form-control kanit-light" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- กำหนดการอนุมัติ 2 ชั้น -->
+                                                <div class="row condition-row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">ต้องมีการอนุมัติ 2 ชั้น</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="custom-control custom-switch">
+                                                            <label class="modern-switch">
+                                                                <input type="checkbox" id="enable_two_steps_approve">
+                                                                <span class="slider"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="div_two_steps_approve_threshold_days" class="row condition-row" hidden>
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เมื่อลาติดต่อกันเกิน</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="input-group">
+                                                            <input id="update_two_steps_approve_threshold_days" type="number" class="form-control kanit-light" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text kanit-light">วัน</span>
                                                             </div>
@@ -545,7 +602,7 @@
                                                 <div class="card-header" style=" background: #EEE;">
                                                     <div class="row">
                                                         <div class="col-xl-4 col-md-4 col-sm-12">
-                                                            <span class="kanit-medium" style="color:#555; font-size:20px; letter-spacing:2px">ผู้จัดการขึ้นไป</span>
+                                                            <span class="kanit-medium" style="color:#555; font-size:20px; letter-spacing:2px">ผู้ช่วยผู้จัดการขึ้นไป</span>
                                                         </div>
                                                         <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
                                                             <div class="row">
@@ -987,7 +1044,29 @@
                 $('#update_leave_attachment_threshold_days').val(0);
             }
         });
+        
+        $('#update_leave_continuous').on('change', function () {
+            let chk = $('#update_leave_continuous').prop('checked');
+            if (chk === true) {
+                $('#div_leave_continuous_threshold_days').attr('hidden', false);
+                $('#update_leave_continuous_threshold_days').val(3);
+            } else {
+                $('#div_leave_continuous_threshold_days').attr('hidden', true);
+                $('#update_leave_continuous_threshold_days').val(0);
+            }
+        });
 
+        $('#enable_two_steps_approve').on('change', function () {
+            let chk = $('#enable_two_steps_approve').prop('checked');
+            if (chk === true) {
+                $('#div_two_steps_approve_threshold_days').attr('hidden', false);
+                $('#update_two_steps_approve_threshold_days').val(3);
+            } else {
+                $('#div_two_steps_approve_threshold_days').attr('hidden', true);
+                $('#update_two_steps_approve_threshold_days').val(0);
+            }
+        });
+        
         /*
          =============== Entitlement Manager ================
         */
