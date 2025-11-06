@@ -71,7 +71,7 @@ namespace WebENG.Service
                         EngUserModel user = new EngUserModel()
                         {
                             user_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
-                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString().ToLower() : "",
+                            user_name = dr["name_en"] != DBNull.Value ? dr["name_en"].ToString().ToLower() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             allow_edit = false,
                             group = dr["group"] != DBNull.Value ? dr["group"].ToString().ToLower() : "",
