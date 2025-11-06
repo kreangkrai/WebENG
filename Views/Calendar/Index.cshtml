@@ -539,7 +539,7 @@
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="overflow-y:auto;height:600px; color:#555555">
+            <div class="modal-body" id="div_main_leave" style="height:100px;color:#555555">
                 <form>
                     <div class="form-group row">
                         <div class="col-xl-6 col-md-6 col-sm-12 ">
@@ -558,190 +558,192 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div div class="col-8">
-                            <label class="kanit-bold">สิทธิ์การลา</label>
+                    <div id="div_leave" hidden>
+                        <div class="row">
+                            <div div class="col-8">
+                                <label class="kanit-bold">สิทธิ์การลา</label>
+                            </div>
+                            <div div class="col-4 d-flex justify-content-end">
+                                <span id="leave_balance" class="kanit-light"></span>
+                            </div>
                         </div>
-                        <div div class="col-4 d-flex justify-content-end">
-                            <span id="leave_balance" class="kanit-light"></span>
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-xl-12 col-md-12 col-sm-12">
-                            <div class="card collapsed-card">
-                                <div class="card-header" style=" background: #EEE;cursor:pointer" data-card-widget="collapse">
-                                    <div class="row">
-                                        <div class="col-11 d-flex justify-content-end">
-                                            <span class="kanit-bold" style="color:#555;">เงื่อนไขการลา</span>
+                        <div class="form-group row">
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card collapsed-card">
+                                    <div class="card-header" style=" background: #EEE;cursor:pointer" data-card-widget="collapse">
+                                        <div class="row">
+                                            <div class="col-11 d-flex justify-content-end">
+                                                <span class="kanit-bold" style="color:#555;">เงื่อนไขการลา</span>
+                                            </div>
+                                            <div class="col-1 d-flex justify-content-end">
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="card-tools">
+                                                            <button type="button" class="btn btn-tool" style="color:#555 ; font-size:20px">
+                                                                <i class="fas fa-chevron-down"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
                                         </div>
-                                        <div class="col-1 d-flex justify-content-end">
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <div class="card-tools">
-                                                        <button type="button" class="btn btn-tool" style="color:#555 ; font-size:20px">
-                                                            <i class="fas fa-chevron-down"></i>
-                                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row" style="row-gap:1px">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <span id="leave_description" class="kanit-light">
+
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card-body">
-                                    <div class="row" style="row-gap:1px">
-                                        <div class="col-12">
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <span id="leave_description" class="kanit-light">
-                                                        
-                                                    </span>
-                                                </div>
+                            </div>
+                        </div>
+                        <div id="leave_date_group" class="form-group row">
+                            <div class="col-xl-4 col-md-6 col-sm-6">
+                                <label for="leave_start_date">ลาตั้งแต่วันที่</label>
+                                <input id="leave_start_date" type="date" class="form-control" />
+                            </div>
+                            <div class="col-xl-4 col-md-4 col-sm-12">
+                                <label for="amount_leave">ลาจำนวน</label>
+                                <div class="input-group">
+                                    <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="100" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">วัน</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
+                                <label for="leave_stop_date">ถึงวันที่</label>
+                                <input id="leave_stop_date" type="date" class="form-control" />
+                            </fieldset>
+                        </div>
+                        <div id="leave_time_group" class="form-group row">
+                            <div class="col-xl-4 col-md-4 col-sm-12">
+                                <label>ระยะเวลา</label>
+                                <div class="input-group">
+                                    <select id="select_leave_hours_duration" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xl-4 col-md-4 col-sm-6">
+                                <label for="leave_start_time">ตั้งแต่เวลา</label>
+                                @*<input id="leave_start_time" type="time" class="form-control" />*@
+                                <div class="d-flex gap-2">
+                                    <select id="leave_start_hour" class="form-control" style="width: auto;"></select>
+                                    <span class="align-self-center">:</span>
+                                    <select id="leave_start_minute" class="form-control" style="width: 80px;">
+                                        <option value="00">00</option>
+                                        <option value="30">30</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
+                                <label for="leave_stop_time">ถึงเวลา</label>
+                                <input id="leave_stop_time" type="time" class="form-control" />
+                            </fieldset>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="leave_note">รายละเอียด</label>
+                                    <textarea id="leave_note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <!-- ส่วนอัปโหลดไฟล์ -->
+                        <div id="leave_date_group" class="form-group row">
+                            <div class="col-12">
+                                <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
+                                <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
+                                    <div class="text-center">
+                                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                        <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
+                                        <input type="file" id="leave_fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
+                                        <button type="button" id="selectFileBtn"
+                                                class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
+                                                style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
+                                            เลือกไฟล์
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ส่วนแสดงรายการไฟล์ -->
+                        <div id="leave_fileList" class="form-group row">
+                            <div class="col-12">
+                                <label class="kanit-medium">เอกสารที่แนบ</label>
+                                <div class="card" style="border-radius: 10px; overflow: hidden;">
+                                    <div class="list-group" id="leave_fileListContainer">
+                                        <!-- ตัวอย่างไฟล์ -->
+                                        @*<div class="list-group-item d-flex align-items-center file-item">
+                            <i class="fas fa-file-image text-primary mr-2"></i>
+                            <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_001.png" title="ลบไฟล์">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <div class="list-group-item d-flex align-items-center file-item">
+                            <i class="fas fa-file-pdf text-danger mr-2"></i>
+                            <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
+                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_002.pdf" title="ลบไฟล์">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-------------------------------------------------------------------------------------------------------------------------------->
+                        <hr />
+                        <div class="form-group row">
+                            <div class="col-12">
+                                <label for="leave_approvers" class="kanit-medium">ผู้อนุมัติ</label>
+                                <div class="card" style="border-radius: 10px; overflow: hidden;">
+                                    <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
+                                    <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
+                                        <i class="fas fa-info-circle mr-2"></i>เลือกอนุมัติโดย 1 ใน 2 ผู้จัดการด้านล่าง
+                                    </div>
+                                    <div class="list-group" id="approverList">
+                                        <!-- ผู้อนุมัติคนที่ 1 -->
+                                        <div class="list-group-item d-flex align-items-center approver-item">
+                                            <div class="col-6">
+                                                <i class="fas fa-user-check mr-2 text-primary"></i>
+                                                <span class="kanit-regular">Chakrit R.</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="kanit-regular text-muted">Manager</span>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="leave_date_group" class="form-group row">
-                        <div class="col-xl-4 col-md-6 col-sm-6">
-                            <label for="leave_start_date">ลาตั้งแต่วันที่</label>
-                            <input id="leave_start_date" type="date" class="form-control" />
-                        </div>
-                        <div class="col-xl-4 col-md-4 col-sm-12">
-                            <label for="amount_leave">ลาจำนวน</label>
-                            <div class="input-group">
-                                <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="100"/>
-                                <div class="input-group-append">
-                                    <span class="input-group-text">วัน</span>
-                                </div>
-                            </div>
-                        </div>
-                        <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
-                            <label for="leave_stop_date">ถึงวันที่</label>
-                            <input id="leave_stop_date" type="date" class="form-control"/>
-                        </fieldset>
-                    </div>
-                    <div id="leave_time_group" class="form-group row">
-                        <div class="col-xl-4 col-md-4 col-sm-12">
-                            <label>ระยะเวลา</label>
-                            <div class="input-group">
-                                <select id="select_leave_hours_duration" class="form-control">
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-4 col-sm-6">
-                            <label for="leave_start_time">ตั้งแต่เวลา</label>
-                            @*<input id="leave_start_time" type="time" class="form-control" />*@
-                            <div class="d-flex gap-2">
-                                <select id="leave_start_hour" class="form-control" style="width: auto;"></select>
-                                <span class="align-self-center">:</span>
-                                <select id="leave_start_minute" class="form-control" style="width: 80px;">
-                                    <option value="00">00</option>
-                                    <option value="30">30</option>
-                                </select>
-                            </div>
-                        </div>
-                        <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
-                            <label for="leave_stop_time">ถึงเวลา</label>
-                            <input id="leave_stop_time" type="time" class="form-control" />                          
-                        </fieldset>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col-12">
-                            <div class="form-group">
-                                <label for="leave_note">รายละเอียด</label>
-                                <textarea id="leave_note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr />
-
-                    <!-- ส่วนอัปโหลดไฟล์ -->
-                    <div id="leave_date_group" class="form-group row">
-                        <div class="col-12">
-                            <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
-                            <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
-                                <div class="text-center">
-                                    <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-                                    <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
-                                    <input type="file" id="leave_fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
-                                    <button type="button" id="selectFileBtn"
-                                            class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
-                                            style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
-                                        เลือกไฟล์
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ส่วนแสดงรายการไฟล์ -->
-                    <div id="leave_fileList" class="form-group row">
-                        <div class="col-12">
-                            <label class="kanit-medium">เอกสารที่แนบ</label>
-                            <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                <div class="list-group" id="leave_fileListContainer">
-                                    <!-- ตัวอย่างไฟล์ -->
-                                    @*<div class="list-group-item d-flex align-items-center file-item">
-                                        <i class="fas fa-file-image text-primary mr-2"></i>
-                                        <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
-                                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_001.png" title="ลบไฟล์">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>
-                                    <div class="list-group-item d-flex align-items-center file-item">
-                                        <i class="fas fa-file-pdf text-danger mr-2"></i>
-                                        <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
-                                        <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_002.pdf" title="ลบไฟล์">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </div>*@
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-------------------------------------------------------------------------------------------------------------------------------->
-                    <hr />
-                    <div class="form-group row">
-                        <div class="col-12">
-                            <label for="leave_approvers" class="kanit-medium">ผู้อนุมัติ</label>
-                            <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
-                                <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
-                                    <i class="fas fa-info-circle mr-2"></i>เลือกอนุมัติโดย 1 ใน 2 ผู้จัดการด้านล่าง
-                                </div>
-                                <div class="list-group" id="approverList">
-                                    <!-- ผู้อนุมัติคนที่ 1 -->
-                                    <div class="list-group-item d-flex align-items-center approver-item">
-                                        <div class="col-6">
-                                            <i class="fas fa-user-check mr-2 text-primary"></i>
-                                            <span class="kanit-regular">Chakrit R.</span>
+                                        <!-- ผู้อนุมัติคนที่ 2 (ถ้ามี) -->
+                                        <div class="list-group-item d-flex align-items-center approver-item">
+                                            <div class="col-6">
+                                                <i class="fas fa-user-check mr-2 text-primary"></i>
+                                                <span class="kanit-regular">Kriangkrai R.</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="kanit-regular text-muted">Manager</span>
+                                            </div>
                                         </div>
-                                        <div class="col-6">
-                                            <span class="kanit-regular text-muted">Manager</span>
-                                        </div>
-                                    </div>
-                                    <!-- ผู้อนุมัติคนที่ 2 (ถ้ามี) -->
-                                    <div class="list-group-item d-flex align-items-center approver-item">
-                                        <div class="col-6">
-                                            <i class="fas fa-user-check mr-2 text-primary"></i>
-                                            <span class="kanit-regular">Kriangkrai R.</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <span class="kanit-regular text-muted">Manager</span>
-                                        </div>
-                                    </div>
-                                    <!-- ผู้อนุมัติคนที่ 3 -->
-                                    <div class="list-group-item d-flex align-items-center approver-item">
-                                        <div class="col-6">
-                                            <i class="fas fa-user-check mr-2 text-primary"></i>
-                                            <span class="kanit-regular">Siriporn S.</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <span class="kanit-regular text-muted">Admin</span>
+                                        <!-- ผู้อนุมัติคนที่ 3 -->
+                                        <div class="list-group-item d-flex align-items-center approver-item">
+                                            <div class="col-6">
+                                                <i class="fas fa-user-check mr-2 text-primary"></i>
+                                                <span class="kanit-regular">Siriporn S.</span>
+                                            </div>
+                                            <div class="col-6">
+                                                <span class="kanit-regular text-muted">Admin</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -754,7 +756,7 @@
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
                     <i class="fas fa-times"></i> ยกเลิก
                 </button>
-                <button id="btn_accept" type="button" class="btn btn-primary elevation-1">
+                <button id="btn_leave_send" type="button" class="btn btn-primary elevation-1" disabled>
                     <i class="fas fa-check"></i> ส่งเอกสาร
                 </button>
             </div>
@@ -2015,9 +2017,12 @@
         let path_file = [];
 
         const hourSelect = document.getElementById('leave_start_hour');
+        $(document).ready(function () {
+            
+        });
 
-        // 08-17
-        for (let h = 8; h <= 17; h++) {
+        // 08-15
+        for (let h = 8; h <= 15; h++) {
             const option = document.createElement('option');
             option.value = String(h).padStart(2, '0');
             option.textContent = String(h).padStart(2, '0');
@@ -2031,6 +2036,10 @@
             $('#modal_task').modal('hide');
             $('#leave_start_date').val($('#working_date').val());
             $('#leave_stop_date').val($('#working_date').val());
+            $('#div_leave').prop('hidden', true);
+            $('#div_main_leave').css('height', '100px');
+            $('#div_main_leave').css('overflow-y', 'hidden');
+            $('#btn_leave_send').prop('disabled', true);
             await GetLeaveType();
         });
 
@@ -2040,6 +2049,10 @@
             let entitlement = balance_entitlement.entitlements.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             $('#leave_description').text(description);
             $('#leave_balance').text(entitlement.balance + '/' + entitlement.amount + ' วัน');
+            $('#div_leave').prop('hidden', false);
+            $('#div_main_leave').css('height', '600px');
+            $('#div_main_leave').css('overflow-y', 'auto');
+            $('#btn_leave_send').prop('disabled', false);
         });
 
         $('#amount_leave').on('change', function () {
@@ -2073,7 +2086,6 @@
                 leaveHalfBtn.classList.remove('active');
                 leaveHoursBtn.classList.remove('active');
             }
-
             // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_half
             function setHalfDayOptions() {
                 durationSelect.innerHTML = `
