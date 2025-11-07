@@ -15,6 +15,8 @@ namespace WebENG.LeaveModels
         public decimal start_age { get; set; }
         public decimal before_age { get; set; }
         public int days { get; set; }
-        public int hours { get; set; }
+        public bool is_prorated { get; set; }
+        public int prorated_amount_per_year { get; set; }
+        public bool is_calculate_by_year { get; set; }
     }
 }

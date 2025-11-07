@@ -14,8 +14,10 @@ namespace WebENG.LeaveModels
         public string description { get; set; }
         public decimal min_request_hours { get; set; }
         public string request_timing { get; set; }
-        public bool max_consecutive { get; set; }
+        public bool is_consecutive { get; set; }
         public decimal max_consecutive_days { get; set; }
+        public bool is_two_step_approve { get; set; }
+        public decimal over_consecutive_days_for_two_step { get; set; }
         public string gender_restriction { get; set; }
         public bool attachment_required { get; set; }
         public decimal attachment_threshold_days { get; set; }

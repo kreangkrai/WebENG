@@ -608,7 +608,11 @@
                         <div id="leave_date_group" class="form-group row">
                             <div class="col-xl-4 col-md-6 col-sm-6">
                                 <label for="leave_start_date">ลาตั้งแต่วันที่</label>
-                                <input id="leave_start_date" type="date" class="form-control" />
+                                <input id="leave_start_date" type="date" class="form-control" disabled/>
+                            </div>
+                            <div class="col-xl-4 col-md-6 col-sm-6">
+                                <label for="leave_stop_date">ถึงวันที่</label>
+                                <input id="leave_stop_date" type="date" class="form-control" />
                             </div>
                             <div class="col-xl-4 col-md-4 col-sm-12">
                                 <label for="amount_leave">ลาจำนวน</label>
@@ -619,10 +623,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
-                                <label for="leave_stop_date">ถึงวันที่</label>
-                                <input id="leave_stop_date" type="date" class="form-control" />
-                            </fieldset>
                         </div>
                         <div id="leave_time_group" class="form-group row">
                             <div class="col-xl-4 col-md-4 col-sm-12">
@@ -2056,14 +2056,14 @@
         });
 
         $('#amount_leave').on('change', function () {
-            let start = new Date($('#leave_start_date').val());
-            let amount = parseInt($('#amount_leave').val());
+            //let start = new Date($('#leave_start_date').val());
+            //let amount = parseInt($('#amount_leave').val());
 
-            start.setDate(start.getDate() + amount - 1);
-            const day = String(start.getDate()).padStart(2, '0');
-            const month = String(start.getMonth() + 1).padStart(2, '0');
-            const year = start.getFullYear();
-            $('#leave_stop_date').val(`${year}-${month}-${day}`);
+            //start.setDate(start.getDate() + amount - 1);
+            //const day = String(start.getDate()).padStart(2, '0');
+            //const month = String(start.getMonth() + 1).padStart(2, '0');
+            //const year = start.getFullYear();
+            //$('#leave_stop_date').val(`${year}-${month}-${day}`);
         });
 
         document.addEventListener('DOMContentLoaded', function () {

@@ -456,19 +456,19 @@
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <div class="custom-control custom-switch">
                                                             <label class="modern-switch">
-                                                                <input type="checkbox" id="update_leave_continuous">
+                                                                <input type="checkbox" id="update_leave_consecutive">
                                                                 <span class="slider"></span>
                                                             </label>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div id="div_leave_continuous_threshold_days" class="row condition-row" hidden>
+                                                <div id="div_leave_max_consecutive_days" class="row condition-row" hidden>
                                                     <div class="col-8">
                                                         <span class="kanit-light">ลาติดต่อกันได้ไม่เกิน</span>
                                                     </div>
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <div class="input-group">
-                                                            <input id="update_leave_continuous_threshold_days" type="number" class="form-control kanit-light" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
+                                                            <input id="update_leave_max_consecutive_days" type="number" class="form-control kanit-light" placeholder="#" value="3" step="1" min="1" max="5" style="text-align:end" />
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text kanit-light">วัน</span>
                                                             </div>
@@ -594,7 +594,7 @@
 
                         <!-- สิทธิ์การลา -->
                         <div class="tab-pane fade" id="Entitlement">
-                            <div class="container d-flex justify-content-center" >
+                            <div class="container-fluid d-flex justify-content-center" >
                                 <div class="col-xl-12 col-md-12 col-sm-12">
                                     <div class="row">
                                         <div class="col-xl-12 col-md-12 col-sm-12">
@@ -623,6 +623,7 @@
                                                         <div class="col-12">
                                                             <div id="div_entitlement_manager">
                                                             </div>
+                                                           
                                                             <div class="row">
                                                                 <div class="col-xl-1 col-md-1 col-sm-6">
                                                                     <input type="button" class="kanit-light btn modern-btn btn-add" onclick="EntitlementManagerClicked()" value="+ เพิ่ม" />
@@ -684,7 +685,7 @@
             <div class="card-footer" style="background-color:white;">
                 <div class="row justify-content-center" style="row-gap: 10px;">
                     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-5">
-                        <button class="btn modern-btn btn-cancel kanit-medium"  type="button">ยกเลิก</button>
+                        <button class="btn modern-btn btn-cancel kanit-medium" onclick="CancelClick()" type="button">ยกเลิก</button>
                     </div>
                     <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-5">
                         <button class="btn modern-btn btn-save kanit-medium" onclick="UpdateSave()" type="button">บันทึก</button>
@@ -886,6 +887,10 @@
             let gender_restriction = $('#update_leave_gender').val();
             let attachment_required = $('#update_leave_require_attachment').prop('checked');
             let attachment_threshold_days = $('#update_leave_attachment_threshold_days').val();
+            let is_consecutive = $('#update_leave_consecutive').prop('checked');
+            let max_consecutive_days = $('#update_leave_max_consecutive_days').val();
+            let is_two_step_approve = $('#enable_two_steps_approve').prop('checked');
+            let over_consecutive_days_for_two_step = $('#update_two_steps_approve_threshold_days').val();
             let is_unpaid = $('#update_leave_is_unpaid').prop('checked');
             let count_holidays_as_leave = $('#update_leave_count_holidays_as_leave').prop('checked');
             let updated_by = $('#update_leave_edit_by').text();
@@ -906,6 +911,10 @@
                     "gender_restriction": gender_restriction,
                     "attachment_required": attachment_required,
                     "attachment_threshold_days": attachment_threshold_days,
+                    "is_consecutive": is_consecutive,
+                    "max_consecutive_days": max_consecutive_days,
+                    "is_two_step_approve": is_two_step_approve,
+                    "over_consecutive_days_for_two_step": over_consecutive_days_for_two_step,
                     "is_unpaid": is_unpaid,
                     "count_holidays_as_leave": count_holidays_as_leave,
                     "updated_by": updated_by,
@@ -989,23 +998,25 @@
                     "start_age": datas_entitlement_manager[i].start_age,
                     "before_age": datas_entitlement_manager[i].before_age,
                     "days": datas_entitlement_manager[i].days_per_year,
-                    "hours": datas_entitlement_manager[i].hours_per_year
+                    "is_prorated": datas_entitlement_manager[i].is_prorated,
+                    "prorated_amount_per_year": datas_entitlement_manager[i].prorated_amount_per_year,
+                    "is_calculate_by_year": datas_entitlement_manager[i].is_calculate_by_year
                 });
                 entitlement_manager++;
             }
-
+            
             for (let i = 0; i < datas_entitlement_operation.length; i++) {
                 data_entitlement_operation.push({
                     "id": entitlement_operation,
                     "start_age": datas_entitlement_operation[i].start_age,
                     "before_age": datas_entitlement_operation[i].before_age,
                     "days": datas_entitlement_operation[i].days_per_year,
-                    "hours": datas_entitlement_operation[i].hours_per_year
+                    "is_prorated": datas_entitlement_operation[i].is_prorated,
+                    "prorated_amount_per_year": datas_entitlement_operation[i].prorated_amount_per_year,
+                    "is_calculate_by_year": datas_entitlement_operation[i].is_calculate_by_year
                 });
                 entitlement_operation++;
             }
-
-            console.log(entitlements);
 
             let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             $('#update_type_leave_th').val(leave.leave_name_th);
@@ -1014,20 +1025,43 @@
             $('#update_leave_description').val(leave.description);
             $('#update_leave_request_timing').val(leave.request_timing);
             $('#update_leave_gender').val(leave.gender_restriction);
-            leave.attachment_required === true ? $('#update_leave_require_attachment').attr('checked', true) : $('#update_leave_require_attachment').attr('checked', false);
 
+             // Attachment Required
+            leave.attachment_required === true ? $('#update_leave_require_attachment').attr('checked', true) : $('#update_leave_require_attachment').attr('checked', false);
             let chk = $('#update_leave_require_attachment').prop('checked');
             if (chk === true) {
                 $('#div_leave_attachment_threshold_days').attr('hidden', false);
             } else {
                 $('#div_leave_attachment_threshold_days').attr('hidden', true);
-                
+
             }
             $('#update_leave_attachment_threshold_days').val(leave.attachment_threshold_days);
+
+             // Consecutive
+            leave.is_consecutive === true ? $('#update_leave_consecutive').attr('checked', true) : $('#update_leave_consecutive').attr('checked', false);
+            let chk_consecutive = $('#update_leave_consecutive').prop('checked');
+            if (chk_consecutive === true) {
+                $('#div_leave_max_consecutive_days').attr('hidden', false);
+            } else {
+                $('#div_leave_max_consecutive_days').attr('hidden', true);
+            }
+            $('#update_leave_max_consecutive_days').val(leave.max_consecutive_days);
+
+            // Two Step Approve
+            leave.is_two_step_approve === true ? $('#enable_two_steps_approve').attr('checked', true) : $('#enable_two_steps_approve').attr('checked', false);
+            if (leave.is_two_step_approve === true) {
+                $('#div_two_steps_approve_threshold_days').attr('hidden', false);
+            } else {
+                $('#div_two_steps_approve_threshold_days').attr('hidden', true);
+            }
+            $('#update_two_steps_approve_threshold_days').val(leave.over_consecutive_days_for_two_step);
+
+            //Leave Check Unpaid
             leave.is_unpaid === true ? $('#update_leave_is_unpaid').attr('checked', true) : $('#update_leave_is_unpaid').attr('checked', false);
             leave.count_holidays_as_leave === true ? $('#update_leave_count_holidays_as_leave').attr('checked', true) : $('#update_leave_count_holidays_as_leave').attr('checked', false);
             $('#update_leave_edit_by').text(leave.updated_by);
             $('#update_leave_edit_at').text(leave.updated_at.replace('T', ' '));
+
             leave.is_active === true ? $('#update_leave_is_active').attr('checked', true) : $('#update_leave_is_active').attr('checked', false);
 
             CreateEntitlementManager();
@@ -1044,15 +1078,15 @@
                 $('#update_leave_attachment_threshold_days').val(0);
             }
         });
-        
-        $('#update_leave_continuous').on('change', function () {
-            let chk = $('#update_leave_continuous').prop('checked');
+
+        $('#update_leave_consecutive').on('change', function () {
+            let chk = $('#update_leave_consecutive').prop('checked');
             if (chk === true) {
-                $('#div_leave_continuous_threshold_days').attr('hidden', false);
-                $('#update_leave_continuous_threshold_days').val(3);
+                $('#div_leave_max_consecutive_days').attr('hidden', false);
+                $('#update_leave_max_consecutive_days').val(3);
             } else {
-                $('#div_leave_continuous_threshold_days').attr('hidden', true);
-                $('#update_leave_continuous_threshold_days').val(0);
+                $('#div_leave_max_consecutive_days').attr('hidden', true);
+                $('#update_leave_max_consecutive_days').val(0);
             }
         });
 
@@ -1066,13 +1100,16 @@
                 $('#update_two_steps_approve_threshold_days').val(0);
             }
         });
-        
+
+        function CancelClick() {
+            window.location.reload();
+        }
         /*
          =============== Entitlement Manager ================
         */
         function EntitlementManagerClicked() {
 
-            data_entitlement_manager.push({ "id": entitlement_manager, "start_age": 1, "before_age": 1, "days": 1, "hours": 0 });
+            data_entitlement_manager.push({ "id": entitlement_manager, "start_age": 1, "before_age": 1, "days": 1, "is_prorated": false, "prorated_amount_per_year": 0,"is_calculate_by_year":false });
             CreateEntitlementManager();
             entitlement_manager++;
 
@@ -1080,70 +1117,87 @@
         function CreateEntitlementManager() {
             $('#div_entitlement_manager').empty();
             for (let i = 0; i < data_entitlement_manager.length; i++) {
-
-                let html = `<div class="row">
-                                                                            <div class="col-xl-3 col-md-3 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">อายุงานตั้งแต่</label>
-                                                                                        <div class="input-group">
-                                                                                                <input id="entitlement_manager_start_age_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerStartAgeAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="1" value="${data_entitlement_manager[i].start_age}" step="1" min="1" max="12" style="text-align:end" />
-                                                                                            <div class="input-group-append">
-                                                                                                    <select id = "entitlement_manager_start_age_select${data_entitlement_manager[i].id}" onChange="EntitlementManagerStartAgeSelectChanged(${data_entitlement_manager[i].id})" class="kanit-light form-control">
-                                                                                                    <option value="month">เดือน</option>
-                                                                                                    <option value="year" selected>ปี</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-xl-3 col-md-3 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">แต่ไม่ถึง</label>
-                                                                                        <div class="input-group">
-                                                                                            <input id="entitlement_manager_before_age_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerBeforeAgeAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="#" value="${data_entitlement_manager[i].before_age}" step="1" min="1" max="30" style="text-align:end" />
-                                                                                            <div class="input-group-append">
-                                                                                                <select id = "entitlement_manager_before_age_select${data_entitlement_manager[i].id}" onChange="EntitlementManagerBeforeAgeSelectChanged(${data_entitlement_manager[i].id})" class="kanit-light form-control" disabled>
-                                                                                                    <option value="month">เดือน</option>
-                                                                                                    <option value="year" selected>ปี</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-xl-3 col-md-3 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
-                                                                                        <div class="input-group">
-                                                                                            <input id="entitlement_manager_day_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerDayAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="#" value="${data_entitlement_manager[i].days}" step="1" min="1" max="16" style="text-align:end" />
-                                                                                            <div class="input-group-append">
-                                                                                                <span class="input-group-text kanit-light">วัน</span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                <div class="col-xl-2 col-md-2 col-sm-5">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนชั่วโมง</label>
-                                                                                        <div class="input-group">
-                                                                                            <input id="entitlement_manager_hour_amount${data_entitlement_manager[i].id}" type="number" onChange="EntitlementManagerHourAmountChanged(${data_entitlement_manager[i].id})" class="form-control" placeholder="1" value="${data_entitlement_manager[i].hours}" step="1" min="1" max="24" style="text-align:end" />
-                                                                                        <div class="input-group-append">
-                                                                                            <span class="input-group-text kanit-light">ชั่วโมง</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                        </div>
-                                                                                </div>
-                                                                                <div class="col-1">
-                                                                                    <div class="form-group">
-                                                                                                <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">ยกเลิก</label>
-                                                                                        <div class="input-group d-flex justify-content-center">
-                                                                                                                 <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%; transform:scale(1.1);" onClick="EntitlementManagerDelete(${data_entitlement_manager[i].id})">
-                                                                                                    <i class="fas fa-trash-alt"></i>
-                                                                                                </button>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>`
+                const proratedChecked = data_entitlement_manager[i].is_prorated ? 'checked' : '';
+                const calcByYearChecked = data_entitlement_manager[i].is_calculate_by_year ? 'checked' : '';
+                const start_age = data_entitlement_manager[i].start_age;
+                const before_age = data_entitlement_manager[i].before_age;
+                const days = data_entitlement_manager[i].days;
+                const prorated_day_per_year = data_entitlement_manager[i].prorated_amount_per_year;
+                const hidden_prorated_day_per_year = data_entitlement_manager[i].is_prorated ? '' : 'hidden';
+                const hidden_calculate_per_year = data_entitlement_manager[i].is_prorated ? 'hidden' : '';
+                let html = `
+                            <div class="row">
+                                                                <div class="col-xl-2 col-md-2 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">อายุงานตั้งแต่</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_manager_start_age_amount${data_entitlement_manager[i].id}" onChange="EntitlementManagerStartAgeAmountChanged(${data_entitlement_manager[i].id})" type="number" class="form-control" placeholder="1" value="${start_age}" step="1" min="1" max="12" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">ปี</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xl-2 col-md-2 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">แต่ไม่ถึง</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_manager_before_age_amount${data_entitlement_manager[i].id}" onChange="EntitlementManagerBeforeAgeAmountChanged(${data_entitlement_manager[i].id})" type="number" class="form-control" placeholder="#" value="${before_age}" step="1" min="1" max="30" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">ปี</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_entitlement_manager_day_amount${data_entitlement_manager[i].id}"class="col-xl-2 col-md-2 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_manager_day_amount${data_entitlement_manager[i].id}" onChange="EntitlementManagerDayAmountChanged(${data_entitlement_manager[i].id})" type="number" class="form-control" placeholder="#" value="${days}" step="1" min="1" max="16" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xl-1 col-md-1 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">คิดโปรเรต</label>
+                                                                        <div class="form-check d-flex justify-content-center pt-2">
+                                                                            <input type="checkbox" class="form-check-input" id="entitlement_manager_prorated${data_entitlement_manager[i].id}" onChange="EntitlementManagerProratedChanged(${data_entitlement_manager[i].id})" style="transform:scale(1.5)" ${proratedChecked}>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_entitlement_manager_prorated_amount${data_entitlement_manager[i].id}"class="col-xl-2 col-md-2 col-sm-6" ${hidden_prorated_day_per_year}>
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_manager_prorated_amount${data_entitlement_manager[i].id}" onChange="EntitlementManagerProratedAmountChanged(${data_entitlement_manager[i].id})" type="number" class="form-control" placeholder="#" value="${prorated_day_per_year}" step="1" min="1" max="16" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_entitlement_manager_calculate_year${data_entitlement_manager[i].id}" class="col-xl-1 col-md-1 col-sm-6" ${hidden_calculate_per_year}>
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">คำนวณตามปี</label>
+                                                                        <div class="form-check d-flex justify-content-center pt-2">
+                                                                            <input type="checkbox" class="form-check-input" id="entitlement_manager_calculate_year${data_entitlement_manager[i].id}" onChange="EntitlementManagerCalculateByYearChanged(${data_entitlement_manager[i].id})" style="transform:scale(1.5)" ${calcByYearChecked}>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xl-1 col-md-1 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">ยกเลิก</label>
+                                                                        <div class="input-group d-flex justify-content-center">
+                                                                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%; transform:scale(1.1);" onClick="EntitlementManagerDelete(${data_entitlement_manager[i].id})">
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>`;
 
 
                 $('#div_entitlement_manager').append(html);
@@ -1160,71 +1214,16 @@
 
         function EntitlementManagerStartAgeAmountChanged(id) {
             let tag = "#entitlement_manager_start_age_amount" + id;
-            let tag_year = "#entitlement_manager_start_age_select" + id;
-            let type = $(tag_year).val();
             let amount = parseInt($(tag).val());
-
-            if (type === "month"){
-                amount = (amount / 12.0).toFixed(1);
-            }
             const index = data_entitlement_manager.findIndex(item => item.id === id);
             data_entitlement_manager[index].start_age = amount;
-
-            console.log(data_entitlement_manager);
-        }
-
-        function EntitlementManagerStartAgeSelectChanged(id){
-            let tag = "#entitlement_manager_before_age_amount" + id;
-            let before_age_year = "#entitlement_manager_before_age_select" + id;
-            let start_age_year = "#entitlement_manager_start_age_select" + id;
-            let type_start_age = $(start_age_year).val();
-            let type_before_age = $(before_age_year).val();
-            let amount = parseInt($(tag).val());
-
-            if (type_start_age === "month") {
-                if (type_before_age === "month") {
-                    amount = (amount / 12.0).toFixed(1);
-                }
-                $(before_age_year).attr('disabled', false);
-            }
-            if (type_start_age === "year") {
-                $(before_age_year).attr('disabled', true);
-                $(before_age_year).val(type_start_age);
-            }
-
-            const index = data_entitlement_manager.findIndex(item => item.id === id);
-            data_entitlement_manager[index].start_age = amount;
-            console.log(data_entitlement_manager);
         }
 
         function EntitlementManagerBeforeAgeAmountChanged(id) {
             let tag = "#entitlement_manager_before_age_amount" + id;
-            let tag_year = "#entitlement_manager_before_age_select" + id;
-            let type = $(tag_year).val();
             let amount = parseInt($(tag).val());
-
-            if (type === "month") {
-                amount = (amount / 12.0).toFixed(1);
-            }
             const index = data_entitlement_manager.findIndex(item => item.id === id);
             data_entitlement_manager[index].before_age = amount;
-
-            console.log(data_entitlement_manager);
-        }
-
-        function EntitlementManagerBeforeAgeSelectChanged(id) {
-            let tag = "#entitlement_manager_before_age_amount" + id;
-            let before_age_year = "#entitlement_manager_before_age_select" + id;
-            let type_before_age = $(before_age_year).val();
-            let amount = parseInt($(tag).val());
-
-            if (type_before_age === "month") {
-                amount = (amount / 12.0).toFixed(1);
-            }
-
-            const index = data_entitlement_manager.findIndex(item => item.id === id);
-            data_entitlement_manager[index].before_age = amount;
-            console.log(data_entitlement_manager);
         }
 
         function EntitlementManagerDayAmountChanged(id) {
@@ -1232,94 +1231,149 @@
             let amount = parseInt($(tag).val());
             const index = data_entitlement_manager.findIndex(item => item.id === id);
             data_entitlement_manager[index].days = amount;
-            console.log(data_entitlement_manager);
-        }
-        function EntitlementManagerHourAmountChanged(id) {
-            let tag = "#entitlement_manager_hour_amount" + id;
-            let amount = parseInt($(tag).val());
-            const index = data_entitlement_manager.findIndex(item => item.id === id);
-            data_entitlement_manager[index].hours = amount;
-            console.log(data_entitlement_manager);
         }
 
+        function EntitlementManagerProratedAmountChanged(id) {
+            let tag = "#entitlement_manager_prorated_amount" + id;
+            let amount = parseInt($(tag).val());
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+            data_entitlement_manager[index].prorated_amount_per_year = amount;
+        }
+
+        function EntitlementManagerProratedChanged(id) {
+            let entitlement_manager_prorated = $('#entitlement_manager_prorated' + id).prop('checked');
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+
+            if (entitlement_manager_prorated === true) {
+                $('#entitlement_manager_day_amount' + id).attr('disabled', true);
+                $('#entitlement_manager_day_amount' + id).val(0);
+                $('#div_entitlement_manager_prorated_amount' + id).prop('hidden', false);
+                $('#entitlement_manager_prorated_amount' + id).val(10);
+                $('#div_entitlement_manager_calculate_year' + id).prop('hidden', true);
+                $('#entitlement_manager_calculate_year' + id).prop('checked', false);
+
+                data_entitlement_manager[index].is_prorated = true;
+                data_entitlement_manager[index].days = 0;
+                data_entitlement_manager[index].is_calculate_by_year = false;
+                data_entitlement_manager[index].prorated_amount_per_year = 10;
+            } else {
+                $('#entitlement_manager_day_amount' + id).attr('disabled', false);
+                $('#entitlement_manager_day_amount' + id).val(1);
+                $('#div_entitlement_manager_prorated_amount' + id).prop('hidden', true);
+                $('#entitlement_manager_prorated_amount' + id).val(0);
+                $('#div_entitlement_manager_calculate_year' + id).prop('hidden', false);
+                $('#entitlement_manager_calculate_year' + id).prop('checked', false);
+
+                data_entitlement_manager[index].is_prorated = false;
+                data_entitlement_manager[index].days = 1;
+                data_entitlement_manager[index].is_calculate_by_year = false;
+                data_entitlement_manager[index].prorated_amount_per_year = 0;
+            }
+        }
+        function EntitlementManagerCalculateByYearChanged(id) {
+            let entitlement_manager_calculate_year = $('#entitlement_manager_calculate_year' + id).prop('checked');
+            const index = data_entitlement_manager.findIndex(item => item.id === id);
+
+            if (entitlement_manager_calculate_year === true) {
+                data_entitlement_manager[index].is_calculate_by_year = true;
+            } else {
+                data_entitlement_manager[index].is_calculate_by_year = false;
+            }   
+        }
         /*
          =============== Entitlement Operation ================
         */
         function EntitlementOperationClicked() {
 
-            data_entitlement_operation.push({ "id": entitlement_operation, "start_age": 1, "before_age": 1, "days": 1, "hours": 0 });
+            data_entitlement_operation.push({ "id": entitlement_operation, "start_age": 1, "before_age": 1, "days": 1, "is_prorated": false, "prorated_amount_per_year": 0, "is_calculate_by_year": false });
             CreateEntitlementOperation();
             entitlement_operation++;
-
         }
 
         function CreateEntitlementOperation() {
             $('#div_entitlement_operation').empty();
             for (let i = 0; i < data_entitlement_operation.length; i++) {
-
-                let html = `<div class="row">
-                                                                            <div class="col-xl-3 col-md-3 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">อายุงานตั้งแต่</label>
-                                                                                        <div class="input-group">
-                                                                                                <input id="entitlement_operation_start_age_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationStartAgeAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="1" value="${data_entitlement_operation[i].start_age}" step="1" min="1" max="12" style="text-align:end" />
-                                                                                            <div class="input-group-append">
-                                                                                                    <select id = "entitlement_operation_start_age_select${data_entitlement_operation[i].id}" onChange="EntitlementOperationStartAgeSelectChanged(${data_entitlement_operation[i].id})" class="kanit-light form-control">
-                                                                                                    <option value="month">เดือน</option>
-                                                                                                    <option value="year" selected>ปี</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-xl-3 col-md-3 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">แต่ไม่ถึง</label>
-                                                                                        <div class="input-group">
-                                                                                            <input id="entitlement_operation_before_age_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationBeforeAgeAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="#" value="${data_entitlement_operation[i].before_age}" step="1" min="1" max="30" style="text-align:end" />
-                                                                                            <div class="input-group-append">
-                                                                                                <select id = "entitlement_operation_before_age_select${data_entitlement_operation[i].id}" onChange="EntitlementOperationBeforeAgeSelectChanged(${data_entitlement_operation[i].id})" class="kanit-light form-control" disabled>
-                                                                                                    <option value="month">เดือน</option>
-                                                                                                    <option value="year" selected>ปี</option>
-                                                                                                </select>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="col-xl-3 col-md-3 col-sm-6">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
-                                                                                        <div class="input-group">
-                                                                                            <input id="entitlement_operation_day_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationDayAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="#" value="${data_entitlement_operation[i].days}" step="1" min="1" max="16" style="text-align:end" />
-                                                                                            <div class="input-group-append">
-                                                                                                <span class="input-group-text kanit-light">วัน</span>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                <div class="col-xl-2 col-md-2 col-sm-5">
-                                                                                    <div class="form-group">
-                                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนชั่วโมง</label>
-                                                                                        <div class="input-group">
-                                                                                            <input id="entitlement_operation_hour_amount${data_entitlement_operation[i].id}" type="number" onChange="EntitlementOperationHourAmountChanged(${data_entitlement_operation[i].id})" class="form-control" placeholder="1" value="${data_entitlement_operation[i].hours}" step="1" min="1" max="24" style="text-align:end" />
-                                                                                        <div class="input-group-append">
-                                                                                            <span class="input-group-text kanit-light">ชั่วโมง</span>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                        </div>
-                                                                                </div>
-                                                                                <div class="col-1">
-                                                                                    <div class="form-group">
-                                                                                                <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">ยกเลิก</label>
-                                                                                        <div class="input-group d-flex justify-content-center">
-                                                                                             <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%; transform:scale(1.1);" onClick="EntitlementOperationDelete(${data_entitlement_operation[i].id})">
-                                                                                                 <i class="fas fa-trash-alt"></i>
-                                                                                             </button>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>`
+                const proratedChecked = data_entitlement_operation[i].is_prorated ? 'checked' : '';
+                const calcByYearChecked = data_entitlement_operation[i].is_calculate_by_year ? 'checked' : '';
+                const start_age = data_entitlement_operation[i].start_age;
+                const before_age = data_entitlement_operation[i].before_age;
+                const days = data_entitlement_operation[i].days;
+                const prorated_day_per_year = data_entitlement_operation[i].prorated_amount_per_year;
+                const hidden_prorated_day_per_year = data_entitlement_operation[i].is_prorated ? '' : 'hidden';
+                const hidden_calculate_per_year = data_entitlement_manager[i].is_prorated ? 'hidden' : '';
+                let html = `
+                            <div class="row">
+                                                                <div class="col-xl-2 col-md-2 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">อายุงานตั้งแต่</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_operation_start_age_amount${data_entitlement_operation[i].id}" onChange="EntitlementOperationStartAgeAmountChanged(${data_entitlement_operation[i].id})" type="number" class="form-control" placeholder="1" value="${start_age}" step="1" min="1" max="12" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">ปี</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xl-2 col-md-2 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">แต่ไม่ถึง</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_operation_before_age_amount${data_entitlement_operation[i].id}" onChange="EntitlementOperationBeforeAgeAmountChanged(${data_entitlement_operation[i].id})" type="number" class="form-control" placeholder="#" value="${before_age}" step="1" min="1" max="30" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">ปี</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_entitlement_operation_day_amount${data_entitlement_operation[i].id}"class="col-xl-2 col-md-2 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_operation_day_amount${data_entitlement_operation[i].id}" onChange="EntitlementOperationDayAmountChanged(${data_entitlement_operation[i].id})" type="number" class="form-control" placeholder="#" value="${days}" step="1" min="1" max="16" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xl-1 col-md-1 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">คิดโปรเรต</label>
+                                                                        <div class="form-check d-flex justify-content-center pt-2">
+                                                                            <input type="checkbox" class="form-check-input" id="entitlement_operation_prorated${data_entitlement_operation[i].id}" onChange="EntitlementOperationProratedChanged(${data_entitlement_operation[i].id})" style="transform:scale(1.5)" ${proratedChecked}>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_entitlement_operation_prorated_amount${data_entitlement_operation[i].id}"class="col-xl-2 col-md-2 col-sm-6" ${hidden_prorated_day_per_year}>
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light" style="color:dimgrey">จำนวนวัน</label>
+                                                                        <div class="input-group">
+                                                                            <input id="entitlement_operation_prorated_amount${data_entitlement_operation[i].id}" onChange="EntitlementOperationProratedAmountChanged(${data_entitlement_operation[i].id})" type="number" class="form-control" placeholder="#" value="${prorated_day_per_year}" step="1" min="1" max="16" style="text-align:end" />
+                                                                            <div class="input-group-append">
+                                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div id="div_entitlement_operation_calculate_year${data_entitlement_operation[i].id}" class="col-xl-1 col-md-1 col-sm-6" ${hidden_calculate_per_year}>
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">คำนวณตามปี</label>
+                                                                        <div class="form-check d-flex justify-content-center pt-2">
+                                                                            <input type="checkbox" class="form-check-input" id="entitlement_operation_calculate_year${data_entitlement_operation[i].id}" onChange="EntitlementOperationCalculateByYearChanged(${data_entitlement_operation[i].id})" style="transform:scale(1.5)" ${calcByYearChecked}>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xl-1 col-md-1 col-sm-6">
+                                                                    <div class="form-group">
+                                                                        <label class="kanit-light d-flex justify-content-center" style="color:dimgrey">ยกเลิก</label>
+                                                                        <div class="input-group d-flex justify-content-center">
+                                                                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%; transform:scale(1.1);" onClick="EntitlementOperationDelete(${data_entitlement_operation[i].id})">
+                                                                                <i class="fas fa-trash-alt"></i>
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>`;
 
 
                 $('#div_entitlement_operation').append(html);
@@ -1336,86 +1390,69 @@
 
         function EntitlementOperationStartAgeAmountChanged(id) {
             let tag = "#entitlement_operation_start_age_amount" + id;
-            let tag_year = "#entitlement_operation_start_age_select" + id;
-            let type = $(tag_year).val();
             let amount = parseInt($(tag).val());
-
-            if (type === "month") {
-                amount = (amount / 12.0).toFixed(1);
-            }
             const index = data_entitlement_operation.findIndex(item => item.id === id);
             data_entitlement_operation[index].start_age = amount;
-
-            console.log(data_entitlement_operation);
-        }
-
-        function EntitlementOperationStartAgeSelectChanged(id) {
-            let tag = "#entitlement_operation_before_age_amount" + id;
-            let before_age_year = "#entitlement_operation_before_age_select" + id;
-            let start_age_year = "#entitlement_operation_start_age_select" + id;
-            let type_start_age = $(start_age_year).val();
-            let type_before_age = $(before_age_year).val();
-            let amount = parseInt($(tag).val());
-
-            if (type_start_age === "month") {
-                if (type_before_age === "month") {
-                    amount = (amount / 12.0).toFixed(1);
-                }
-                $(before_age_year).attr('disabled', false);
-            }
-            if (type_start_age === "year") {
-                $(before_age_year).attr('disabled', true);
-                $(before_age_year).val(type_start_age);
-            }
-
-            const index = data_entitlement_operation.findIndex(item => item.id === id);
-            data_entitlement_operation[index].start_age = amount;
-            console.log(data_entitlement_operation);
         }
 
         function EntitlementOperationBeforeAgeAmountChanged(id) {
             let tag = "#entitlement_operation_before_age_amount" + id;
-            let tag_year = "#entitlement_operation_before_age_select" + id;
-            let type = $(tag_year).val();
             let amount = parseInt($(tag).val());
-
-            if (type === "month") {
-                amount = (amount / 12.0).toFixed(1);
-            }
             const index = data_entitlement_operation.findIndex(item => item.id === id);
             data_entitlement_operation[index].before_age = amount;
-
-            console.log(data_entitlement_operation);
         }
-
-        function EntitlementOperationBeforeAgeSelectChanged(id) {
-            let tag = "#entitlement_operation_before_age_amount" + id;
-            let before_age_year = "#entitlement_operation_before_age_select" + id;
-            let type_before_age = $(before_age_year).val();
-            let amount = parseInt($(tag).val());
-
-            if (type_before_age === "month") {
-                amount = (amount / 12.0).toFixed(1);
-            }
-
-            const index = data_entitlement_operation.findIndex(item => item.id === id);
-            data_entitlement_operation[index].before_age = amount;
-            console.log(data_entitlement_operation);
-        }
-
         function EntitlementOperationDayAmountChanged(id) {
             let tag = "#entitlement_operation_day_amount" + id;
             let amount = parseInt($(tag).val());
             const index = data_entitlement_operation.findIndex(item => item.id === id);
             data_entitlement_operation[index].days = amount;
-            console.log(data_entitlement_operation);
         }
-        function EntitlementOperationHourAmountChanged(id) {
-            let tag = "#entitlement_operation_hour_amount" + id;
+        function EntitlementOperationProratedAmountChanged(id) {
+            let tag = "#entitlement_operation_prorated_amount" + id;
             let amount = parseInt($(tag).val());
             const index = data_entitlement_operation.findIndex(item => item.id === id);
-            data_entitlement_operation[index].hours = amount;
-            console.log(data_entitlement_operation);
+            data_entitlement_operation[index].prorated_amount_per_year = amount;
+        }
+
+        function EntitlementOperationProratedChanged(id) {
+            let entitlement_operation_prorated = $('#entitlement_operation_prorated' + id).prop('checked');
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+
+            if (entitlement_operation_prorated === true) {
+                $('#entitlement_operation_day_amount' + id).attr('disabled', true);
+                $('#entitlement_operation_day_amount' + id).val(0);
+                $('#div_entitlement_operation_prorated_amount' + id).prop('hidden', false);
+                $('#entitlement_operation_prorated_amount' + id).val(10);
+                $('#div_entitlement_operation_calculate_year' + id).prop('hidden', true);
+                $('#entitlement_operation_calculate_year' + id).prop('checked', false);
+
+                data_entitlement_operation[index].is_prorated = true;
+                data_entitlement_operation[index].days = 0;
+                data_entitlement_operation[index].is_calculate_by_year = false;
+                data_entitlement_operation[index].prorated_amount_per_year = 10;
+            } else {
+                $('#entitlement_operation_day_amount' + id).attr('disabled', false);
+                $('#entitlement_operation_day_amount' + id).val(1);
+                $('#div_entitlement_operation_prorated_amount' + id).prop('hidden', true);
+                $('#entitlement_operation_prorated_amount' + id).val(0);
+                $('#div_entitlement_operation_calculate_year' + id).prop('hidden', false);
+                $('#entitlement_operation_calculate_year' + id).prop('checked', false);
+
+                data_entitlement_operation[index].is_prorated = false;
+                data_entitlement_operation[index].days = 1;
+                data_entitlement_operation[index].is_calculate_by_year = false;
+                data_entitlement_operation[index].prorated_amount_per_year = 0;
+            }
+        }
+        function EntitlementOperationCalculateByYearChanged(id) {
+            let entitlement_operation_calculate_year = $('#entitlement_operation_calculate_year' + id).prop('checked');
+            const index = data_entitlement_operation.findIndex(item => item.id === id);
+
+            if (entitlement_operation_calculate_year === true) {
+                data_entitlement_operation[index].is_calculate_by_year = true;
+            } else {
+                data_entitlement_operation[index].is_calculate_by_year = false;
+            }
         }
     </script>
 }

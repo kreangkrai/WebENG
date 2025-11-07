@@ -89,8 +89,8 @@ namespace WebENG.LeaveServices
                             double x_all = x_day + (x_hours / 24);
                             EntitlementBalanceModel entitle_b = new EntitlementBalanceModel()
                             {
-                                amount = entitles[j].days_per_year + (entitles[j].hours_per_year / 24),
-                                balance = (decimal)(entitles[j].days_per_year + (entitles[j].hours_per_year / 24) - x_all),
+                                amount = entitles[j].days_per_year,
+                                balance = (decimal)(entitles[j].days_per_year - x_all),
                                 leave_code = entitles[j].leave_type_code,
                                 leave_type_id = entitles[j].leave_type_id,
                                 leave_name_th = entitles[j].leave_name_th,
@@ -122,7 +122,9 @@ namespace WebENG.LeaveServices
                                                           ,[start_age]
                                                           ,[before_age]
                                                           ,[days_per_year]
-                                                          ,[hours_per_year]
+														  ,[is_prorated]
+														  ,[prorated_amount_per_year]
+														  ,[is_calculate_by_year]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                       FROM [dbo].[leave_entitlement_rule]
@@ -144,7 +146,10 @@ namespace WebENG.LeaveServices
                             start_age = Convert.ToDecimal(dr["start_age"].ToString()),
                             before_age = Convert.ToDecimal(dr["before_age"].ToString()),
                             days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 0,
-                            hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 0
+                            //hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 0,
+                            is_prorated = dr["is_prorated"] != DBNull.Value ? Convert.ToBoolean(dr["is_prorated"].ToString()) : false,
+                            prorated_amount_per_year = dr["prorated_amount_per_year"] != DBNull.Value ? Convert.ToInt32(dr["prorated_amount_per_year"].ToString()) : 0,
+                            is_calculate_by_year = dr["is_calculate_by_year"] != DBNull.Value ? Convert.ToBoolean(dr["is_calculate_by_year"].ToString()) : false
                         };
                         leaves.Add(leave);
                     }
@@ -177,7 +182,9 @@ namespace WebENG.LeaveServices
                                                           ,[start_age]
                                                           ,[before_age]
                                                           ,[days_per_year]
-                                                          ,[hours_per_year]
+                                                          ,[is_prorated]
+														  ,[prorated_amount_per_year]
+														  ,[is_calculate_by_year]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                       FROM [dbo].[leave_entitlement_rule]
@@ -200,8 +207,11 @@ namespace WebENG.LeaveServices
                             leave_name_en = dr["leave_name_en"].ToString(),
                             start_age = Convert.ToDecimal(dr["start_age"].ToString()),
                             before_age = Convert.ToDecimal(dr["before_age"].ToString()),
-                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 1,
-                            hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 1
+                            days_per_year = dr["days_per_year"] != DBNull.Value ? Convert.ToInt32(dr["days_per_year"].ToString()) : 0,
+                            //hours_per_year = dr["hours_per_year"] != DBNull.Value ? Convert.ToInt32(dr["hours_per_year"].ToString()) : 0,
+                            is_prorated = dr["is_prorated"] != DBNull.Value ? Convert.ToBoolean(dr["is_prorated"].ToString()) : false,
+                            prorated_amount_per_year = dr["prorated_amount_per_year"] != DBNull.Value ? Convert.ToInt32(dr["prorated_amount_per_year"].ToString()) : 0,
+                            is_calculate_by_year = dr["is_calculate_by_year"] != DBNull.Value ? Convert.ToBoolean(dr["is_calculate_by_year"].ToString()) : false
                         };
                         leaves.Add(leave);
                     }
@@ -233,7 +243,9 @@ namespace WebENG.LeaveServices
                                                    ,[start_age]
                                                    ,[before_age]
                                                    ,[days_per_year]
-                                                   ,[hours_per_year])
+                                                   ,[is_prorated]
+                                                   ,[prorated_amount_per_year]
+                                                   ,[is_calculate_by_year])
                                              VALUES
                                                    (@entitlement_rule_id
                                                    ,@position
@@ -241,7 +253,9 @@ namespace WebENG.LeaveServices
                                                    ,@start_age
                                                    ,@before_age
                                                    ,@days_per_year
-                                                   ,@hours_per_year)");
+                                                   ,@is_prorated
+                                                   ,@prorated_amount_per_year
+                                                   ,@is_calculate_by_year)");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.Add("@entitlement_rule_id",SqlDbType.Text);
                 command.Parameters.Add("@position", SqlDbType.Text);
@@ -249,8 +263,10 @@ namespace WebENG.LeaveServices
                 command.Parameters.Add("@start_age", SqlDbType.Decimal);
                 command.Parameters.Add("@before_age", SqlDbType.Decimal);
                 command.Parameters.Add("@days_per_year", SqlDbType.Int);
-                command.Parameters.Add("@hours_per_year", SqlDbType.Int);
-                for(int i = 0; i < leaves.Count; i++)
+                command.Parameters.Add("@is_prorated", SqlDbType.Bit);
+                command.Parameters.Add("@prorated_amount_per_year", SqlDbType.Int);
+                command.Parameters.Add("@is_calculate_by_year", SqlDbType.Bit);
+                for (int i = 0; i < leaves.Count; i++)
                 {
                     command.Parameters[0].Value = leaves[i].entitlement_rule_id;
                     command.Parameters[1].Value = leaves[i].position;
@@ -258,7 +274,9 @@ namespace WebENG.LeaveServices
                     command.Parameters[3].Value = leaves[i].start_age;
                     command.Parameters[4].Value = leaves[i].before_age;
                     command.Parameters[5].Value = leaves[i].days_per_year;
-                    command.Parameters[6].Value = leaves[i].hours_per_year;
+                    command.Parameters[6].Value = leaves[i].is_prorated;
+                    command.Parameters[7].Value = leaves[i].prorated_amount_per_year;
+                    command.Parameters[8].Value = leaves[i].is_calculate_by_year;
                     command.ExecuteNonQuery();
                 }
                 

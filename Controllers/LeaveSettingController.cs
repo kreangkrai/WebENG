@@ -87,9 +87,11 @@ namespace WebENG.Controllers
                 max_consecutive_days = 3,
                 count_holidays_as_leave = false,
                 gender_restriction = "Both",
-                max_consecutive = false,
+                is_consecutive = false,
                 min_request_hours = 2,
-                request_timing = "Both"
+                request_timing = "Both",
+                is_two_step_approve = false,
+                over_consecutive_days_for_two_step = 0
             });
             return Json(message);
         }
@@ -126,7 +128,9 @@ namespace WebENG.Controllers
                     start_age = manager.entitlement[i].start_age,
                     before_age = manager.entitlement[i].before_age,
                     days_per_year= manager.entitlement[i].days,
-                    hours_per_year = manager.entitlement[i].hours
+                    is_prorated = manager.entitlement[i].is_prorated,
+                    prorated_amount_per_year = manager.entitlement[i].prorated_amount_per_year,
+                    is_calculate_by_year = manager.entitlement[i].is_calculate_by_year
                 };
                 leaves_manager.Add(m);
             }
@@ -143,7 +147,9 @@ namespace WebENG.Controllers
                     start_age = oeration.entitlement[i].start_age,
                     before_age = oeration.entitlement[i].before_age,
                     days_per_year = oeration.entitlement[i].days,
-                    hours_per_year = oeration.entitlement[i].hours
+                    is_prorated = oeration.entitlement[i].is_prorated,
+                    prorated_amount_per_year = oeration.entitlement[i].prorated_amount_per_year,
+                    is_calculate_by_year = oeration.entitlement[i].is_calculate_by_year
                 };
                 leaves_operation.Add(m);
             }
@@ -167,6 +173,7 @@ namespace WebENG.Controllers
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             leaves = leaves.OrderBy(o => o.leave_type_code).ToList();
             List<LeaveEntitlementRuleModel> entitlements = LeaveEntitlement.GetLeaveEntitlementRules();
+            entitlements = entitlements.OrderBy(o => o.start_age).ThenBy(t => t.before_age).ToList();
             var data = new { leaves = leaves, entitlements = entitlements };
             return Json(data);
         }
