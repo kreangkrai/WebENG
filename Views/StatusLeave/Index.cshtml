@@ -269,8 +269,7 @@
             border-left: none !important;
             border-right: none !important;
         }
-
-        
+             
         /* Badge โค้งมน */
         #table_leave .badge {
             border-radius: 20px;
@@ -290,7 +289,6 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
         }
 
-
         /* Card พนักงาน */
     .modern-card {
         transition: all 0.3s ease;
@@ -302,13 +300,39 @@
         box-shadow: 0 8px 20px rgba(28, 70, 152, 0.15) !important;
     }
 
-    /* Dropdown */
-    #employeeSelect {
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-        padding: 6px 10px;
+    /* ป้องกัน dropdown ถูกตัด */
+    .dropdown-search {
+        position: relative;
+        z-index: 1050;
     }
 
+    /* sticky styles */
+    .freeze-pane {
+        overflow: auto;
+        height: 600px;
+        position: relative;
+        display: block;
+    }
+
+    .freeze-head {
+        position: sticky;
+        top: 0;
+        background: #2178BE;
+        z-index: 10;
+        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+    }
+
+    .freeze-left {
+        position: sticky;
+        left: 0;
+        background: #2178BE;
+        z-index: 5;
+        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+    }
+
+    .freeze-corner {
+        z-index: 15 !important;
+    }
 </style>
 
 
@@ -335,16 +359,7 @@
                             <!-- Dropdown กรองแผนก -->
                             <div class="form-group mb-3">
                                 <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
-                                <select id="DepartmentSelect" class="form-control form-control-sm kanit-regular" style="font-size: 15px;">
-                                    <option value="ALL">ทั้งหมด</option>
-                                    <option value="CES">CES</option>
-                                    <option value="ARD">ARD</option>
-                                </select>
-                            </div>
-                            <!-- Dropdown เลือกชื่อหรือรหัสพนักงาน -->
-                            <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
-                                <select id="DepartmentSelect" class="form-control form-control-sm kanit-regular" style="font-size: 15px;">
+                                <select id="DepartmentSelect" class="form-control form-control-sm kanit-regular" style="font-size: 16px;">
                                     <option value="ALL">ทั้งหมด</option>
                                     <option value="CES">CES</option>
                                     <option value="ARD">ARD</option>
@@ -352,18 +367,20 @@
                             </div>
                             <!-- Dropdown เลือกพนักงาน -->
                             <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">เลือกพนักงาน</label>
-                                <select id="employeeSelect" class="form-control form-control-sm kanit-regular" style="font-size: 15px;">
-                                    <option value="">-- เลือกพนักงาน --</option>
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">พนักงาน</label>
+                                <select id="employeeSelect" class="form-control form-control-sm kanit-regular" style="font-size: 16px;">
+                                    <option value="All">ทุกคน</option>
                                 </select>
                             </div>
 
+                            <hr />
+
                             <!-- Dropdown + Search -->
                             <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">เลือกพนักงาน</label>
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">ค้นหาโดยตรง</label>
                                 <div class="dropdown-search">
                                     <input type="text" id="employeeSearch" class="form-control form-control-sm kanit-regular"
-                                           placeholder="ค้นหา รหัสหรือชื่อ..." style="font-size: 15px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+                                           placeholder="ค้นหา รหัส/ชื่อพนักงาน" style="font-size: 15px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
                                     <select id="employeeSelect" class="form-control form-control-sm kanit-regular" size="5"
                                             style="font-size: 15px; height: auto; max-height: 200px; border-top-left-radius: 0; border-top-right-radius: 0; display: none;">
                                         <!-- JS จะเติม -->
@@ -372,6 +389,7 @@
                                 </div>
                             </div>
 
+                            <hr />
                             <!-- แสดงข้อมูลพนักงาน -->
                             <div id="employeeInfo" class="text-left" style="font-size: 16px; display: none;">
                                 <div class="row mb-2">
@@ -458,59 +476,104 @@
                     + ยื่นลางาน
                 </button>
                 </h4>*@
-            <div class="card-header p-3"
+            <div class="card-header p-3 d-flex justify-content-between align-items-center"
                  style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
-            border-radius: 20px 20px 0 0;
-            min-height: 60px;">
+            border-radius: 20px 20px 0 0; min-height: 60px;">
+
+                <!-- ซ้าย: หัวข้อ + ปี + เดือน -->
                 <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
                     style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
-                    ประวัติการลา - ปี
-                    <select id="yearFilter"
-                            class="form-control form-control-sm kanit-medium "
+                    ประวัติการลา -
+                    <select id="yearFilter" class="form-control form-control-sm kanit-medium"
                             style="width: 90px; color:#555; font-size: 18px; border-radius: 8px; height: 36px; padding: 0 8px; flex-shrink: 0;">
-                            <option>2025</option>
-                            <option>2024</option>
-                            <option>2023</option>
-                            <option>2022</option>
-                        <!-- JS จะเติมที่นี่ -->
+                        <option>2025</option>
+                        <option>2024</option>
+                        <option>2023</option>
+                        <option>2022</option>
+                    </select>
+                    /
+                    <select id="monthFilter" class="form-control form-control-sm kanit-medium"
+                            style="width: 130px; color:#555; font-size: 18px; border-radius: 8px; height: 36px; padding: 0 8px; flex-shrink: 0;">
+                        <option>ทุกเดือน</option>
+                        <option value="01">มกราคม</option>
+                        <option value="02">กุมภาพันธ์</option>
+                        <option value="03">มีนาคม</option>
+                        <option value="04">เมษายน</option>
+                        <option value="05">พฤษภาคม</option>
+                        <option value="06">มิถุนายน</option>
+                        <option value="07">กรกฎาคม</option>
+                        <option value="08">สิงหาคม</option>
+                        <option value="09">กันยายน</option>
+                        <option value="10">ตุลาคม</option>
+                        <option value="11">พฤศจิกายน</option>
+                        <option value="12">ธันวาคม</option>
                     </select>
                 </h4>
+
+                <!-- ขวา: ปุ่ม Export ชิดขวา -->
+                <button class="btn btn-success ml-auto kanit-regular" data-toggle="modal" data-target="#sendModal"
+                        style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
+                    <i class="fas fa-file-excel"></i> Export to Excel
+                </button>
             </div>
 
             <div class="card-body " style="height:700px; overflow-y:auto; ">
+                @* <div class="freeze-pane">
+                    <table id="table_leave" class="table table-sm compact table-bordered table-hover text-center w-100">
+                        <thead class="kanit-light" style="background-color:lightgrey">
+                            <tr id="headerRow">
+                                <th rowspan="2" class="kanit-bold freeze-head freeze-left freeze-corner" style="vertical-align:middle;background-color:lightgrey">รายชื่อ</th>
+                            </tr>
+                            <tr id="dateRow">
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div> *@
                @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
-                    <div class="table-responsive">
+                @* <div class="freeze-pane">
                     <table id="table_leave" class="table table-sm table-hover text-center mb-0">
                             <thead class="kanit-light" style="background-color:#2178BE; color:white; font-size:18px; letter-spacing:1px">
+                                <tr class="kanit-light">
+                                    <th class="freeze-head freeze-left freeze-corner">ลำดับ</th>
+                                    <th class="freeze-head">รหัสพนักงาน</th>
+                                    <th class="freeze-head">ชื่อ-สกุล</th>
+                                    <th class="freeze-head">วันที่ยื่นลา</th>
+                                    <th class="freeze-head">วันที่ลา</th>
+                                    <th class="freeze-head">เวลาที่ลา</th>
+                                    <th class="freeze-head">ระยะเวลาที่ลา</th>
+                                    <th class="freeze-head">ประเภทการลา</th>
+                                    <th class="freeze-head">หมายเหตุ</th>
+                                    <th class="freeze-head">สถานะ</th>
+                </tr> *@
+                <div class="freeze-pane">
+                    <table id="table_leave" class="table table-sm table-hover text-center mb-0">
+                        <thead style="background-color:#2178BE; color:white; font-size:18px;">
                             <tr class="kanit-light">
-                                <th class="align-middle">ลำดับ</th>
-                                <th class="align-middle">วันที่ยื่นลา</th>
-                                <th class="align-middle">วันที่ลา</th>
-                                <th class="align-middle">เวลาที่ลา</th>
-                                <th class="align-middle">ระยะเวลาที่ลา</th>
-                                <th class="align-middle">ประเภทการลา</th>
-                                <th class="align-middle">หมายเหตุ</th>
-                                <th class="align-middle">สถานะ</th>
-                                </tr>
+                                <th class="freeze-head freeze-left freeze-corner">ลำดับ</th>
+                                <th class="freeze-head">รหัสพนักงาน</th>
+                                <th class="freeze-head">ชื่อ-สกุล</th>
+                                <th class="freeze-head">วันที่ยื่นลา</th>
+                                <th class="freeze-head">วันที่ลา</th>
+                                <th class="freeze-head">เวลาที่ลา</th>
+                                <th class="freeze-head">ระยะเวลาที่ลา</th>
+                                <th class="freeze-head">ประเภทการลา</th>
+                                <th class="freeze-head">หมายเหตุ</th>
+                                <th class="freeze-head">สถานะ</th>
+                            </tr>
+
+
                             </thead>
-                            <tbody>
+
+                        <tbody>
                                 <tr class="clickable-row kanit-regular"
-                                    style="color:#555"
-                                    data-toggle="modal"
-                                    data-target="#modal_leave"
-                                    data-id="1"
-                                    data-request-date="03/11/25 08:33"
-                                    data-leave-date="31/10/25"
-                                    data-time="08:30 - 17:30"
-                                    data-duration="1 วัน"
-                                    data-type="ลาป่วย"
-                                    data-note="ท้องเสีย"
-                                    data-status="อนุมัติ"
-                                    data-files='["File_001.png"]'
-                                    data-approvers='["Chakrit R. (Manager)", "Siriporn S. (Admin)"]'>
+                                    style="color:#555">
                                     <td>1</td>
-                                    <td>03/11/25 08:33</td>
-                                    <td>31/10/25</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 03/11/25 08:33</td>
+                                    <td>ศ. 31/10/25</td>
                                     <td>08:30 - 17:30</td>
                                     <td>1 วัน</td>
                                     <td>ลาป่วย</td>
@@ -521,29 +584,148 @@
                                 <tr class="clickable-row align-content-center text-center kanit-regular"
                                     style="color:#555">
                                     <td>2</td>
-                                    <td>03/11/25 08:46</td>
-                                    <td>06/11/25 - 07/11/25</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 03/11/25 08:46</td>
+                                    <td>ศ. 07/11/25 - จ. 10/11/25</td>
                                     <td>08:30 - 17:30</td>
                                     <td>2 วัน</td>
                                     <td>ลาพักร้อน</td>
                                     <td>-</td>
                                 <td><span class="badge badge-warning p-2 kanit-regular" style="font-size:16px; border-radius:20px;">รออนุมัติ</span></td>
                                 </tr>
-
+                                
                                 <tr class="clickable-row align-content-center text-center kanit-regular"
                                     style="color:#555">
                                     <td>3</td>
-                                    <td>03/11/25 09:00</td>
-                                    <td>04/11/25</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 03/11/25 09:00</td>
+                                    <td>อ. 04/11/25</td>
                                     <td>08:30 - 12:00</td>
-                                    <td>ครึ่งวัน (เช้า)</td>
+                                    <td>0.5 วัน</td>
                                     <td>ลาพักร้อนไม่รับค่าจ้าง</td>
                                     <td>-</td>
                                     <td><span class="badge badge-danger p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ไม่อนุมัติ</span></td>
                                 </tr>
-                            </tbody>
-                        </table>
-                    </div>
+
+                                <tr class="clickable-row align-content-center text-center kanit-regular"
+                                    style="color:#555">
+                                    <td>4</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 10/11/25 09:50</td>
+                                    <td>พ. 05/11/25</td>
+                                    <td>13:30 - 15:30</td>
+                                    <td>0.25 วัน</td>
+                                    <td>ลากิจ(ราชการ)</td>
+                                    <td>ทำบัตรประชาชน</td>
+                                    <td><span class="badge badge-danger p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ยกเลิก</span></td>
+                                </tr>
+                                
+                                <tr class="clickable-row align-content-center text-center kanit-regular"
+                                    style="color:#555">
+                                    <td>5</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 10/11/25 09:50</td>
+                                    <td>พ. 05/11/25</td>
+                                    <td>13:00 - 17:30</td>
+                                    <td>0.5 วัน</td>
+                                    <td>ลากิจ(ราชการ)</td>
+                                    <td>ทำบัตรประชาชน</td>
+                                    <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                                </tr>
+
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td>5</td>
+                                <td>EM010101</td>
+                                <td>นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 10/11/25 09:50</td>
+                                <td>พ. 05/11/25</td>
+                                <td>13:00 - 17:30</td>
+                                <td>0.5 วัน</td>
+                                <td>ลากิจ(ราชการ)</td>
+                                <td>ทำบัตรประชาชน</td>
+                                <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                            </tr>
+
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td>5</td>
+                                <td>EM010101</td>
+                                <td>นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 10/11/25 09:50</td>
+                                <td>พ. 05/11/25</td>
+                                <td>13:00 - 17:30</td>
+                                <td>0.5 วัน</td>
+                                <td>ลากิจ(ราชการ)</td>
+                                <td>ทำบัตรประชาชน</td>
+                                <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                            </tr>
+
+
+
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td>5</td>
+                                <td>EM010101</td>
+                                <td>นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 10/11/25 09:50</td>
+                                <td>พ. 05/11/25</td>
+                                <td>13:00 - 17:30</td>
+                                <td>0.5 วัน</td>
+                                <td>ลากิจ(ราชการ)</td>
+                                <td>ทำบัตรประชาชน</td>
+                                <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                            </tr>
+
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td>5</td>
+                                <td>EM010101</td>
+                                <td>นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 10/11/25 09:50</td>
+                                <td>พ. 05/11/25</td>
+                                <td>13:00 - 17:30</td>
+                                <td>0.5 วัน</td>
+                                <td>ลากิจ(ราชการ)</td>
+                                <td>ทำบัตรประชาชน</td>
+                                <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                            </tr>
+
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td>5</td>
+                                <td>EM010101</td>
+                                <td>นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 10/11/25 09:50</td>
+                                <td>พ. 05/11/25</td>
+                                <td>13:00 - 17:30</td>
+                                <td>0.5 วัน</td>
+                                <td>ลากิจ(ราชการ)</td>
+                                <td>ทำบัตรประชาชน</td>
+                                <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                            </tr>
+
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td>5</td>
+                                <td>EM010101</td>
+                                <td>นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 10/11/25 09:50</td>
+                                <td>พ. 05/11/25</td>
+                                <td>13:00 - 17:30</td>
+                                <td>0.5 วัน</td>
+                                <td>ลากิจ(ราชการ)</td>
+                                <td>ทำบัตรประชาชน</td>
+                                <td><span class="badge badge-primary p-2 kanit-regular" style="font-size:16px; border-radius:20px;">ตรวจสอบสำเร็จ</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -838,7 +1020,7 @@
 
 
 
-    <script>
+    @* <script>
         // ข้อมูลพนักงาน (สามารถดึงจาก API ได้)
         const employees = [
             {
@@ -906,19 +1088,110 @@
             $info.hide();
             $noEmp.show();
         });
-    </script>
+    </script> *@
 
     <script>
         $(document).ready(function () {
+            
+        // ข้อมูลพนักงาน 5 คน (สำหรับทดสอบ 3 คนแรก = ARD, ที่เหลือ = ENG)
             const employees = [
-                { id: "EM010101", name: "นาย A DC" },
-                { id: "EM020202", name: "นาย B EE" },
-                { id: "EM030303", name: "นางสาว C FF" },
-                { id: "EM040404", name: "นาย D GG" },
-                { id: "EM010002", name: "นางสาว P PC" },
-                { id: "EM010004", name: "นาย W WW" }
-                // เพิ่มตามจริง
+                {
+                    id: "EM010101",
+                    name: "นาย ชัยวัฒน์ สุขสม",
+                    department: "ARD",
+                    position: "Senior Developer",
+                    phone: "081-111-1111",
+                    startDate: "01/01/2023",
+                    probationEnd: "30/06/2023"
+                },
+                {
+                    id: "EM010102",
+                    name: "นางสาว พิมพ์มาดา รัตนวงศ์",
+                    department: "ARD",
+                    position: "UI/UX Designer",
+                    phone: "082-222-2222",
+                    startDate: "15/03/2023",
+                    probationEnd: "14/09/2023"
+                },
+                {
+                    id: "EM020201",
+                    name: "นาย วิชัย ธนโชติ",
+                    department: "ARD",
+                    position: "Project Manager",
+                    phone: "083-333-3333",
+                    startDate: "01/06/2022",
+                    probationEnd: "30/11/2022"
+                },
+                {
+                    id: "EM030301",
+                    name: "นาง ศิริพร แซ่ตั้ง",
+                    department: "ENG",
+                    position: "HR Officer",
+                    phone: "084-444-4444",
+                    startDate: "10/09/2024",
+                    probationEnd: "09/03/2025"
+                },
+                {
+                    id: "EM040401",
+                    name: "นาย กรกฤช วงศ์ใหญ่",
+                    department: "ENG",
+                    position: "System Admin",
+                    phone: "085-555-5555",
+                    startDate: "20/07/2021",
+                    probationEnd: "19/01/2022"
+                }
             ];
+
+        // ข้อมูลประวัติการลา (หลากหลายสถานะ, วัน, เวลา, ประเภท)
+            const leaveHistory = [
+                // พนักงาน 1 (ARD)
+                { empId: "EM010101", seq: 1, requestDate: "03/11/25 08:33", leaveDate: "31/10/25", time: "08:30 - 17:30", duration: "1 วัน", type: "ลาป่วย", note: "ท้องเสีย", status: "อนุมัติ", badge: "success" },
+                { empId: "EM010101", seq: 2, requestDate: "05/11/25 14:20", leaveDate: "10/11/25 - 11/11/25", time: "08:30 - 17:30", duration: "2 วัน", type: "ลาพักร้อน", note: "ไปเที่ยวภูเก็ต", status: "รออนุมัติ", badge: "warning" },
+                { empId: "EM010101", seq: 3, requestDate: "06/11/25 10:15", leaveDate: "07/11/25", time: "13:00 - 17:30", duration: "0.5 วัน", type: "ลากิจ", note: "ไปโรงพยาบาล", status: "ไม่อนุมัติ", badge: "danger" },
+
+                // พนักงาน 2 (ARD)
+                { empId: "EM010102", seq: 1, requestDate: "01/11/25 09:00", leaveDate: "04/11/25", time: "08:30 - 12:00", duration: "0.5 วัน", type: "ลาพักร้อน", note: "-", status: "อนุมัติ", badge: "success" },
+                { empId: "EM010102", seq: 2, requestDate: "02/11/25 11:30", leaveDate: "06/11/25", time: "09:00 - 15:00", duration: "6 ชม.", type: "ลากิจ (ราชการ)", note: "ไปอบรม", status: "ตรวจสอบสำเร็จ", badge: "primary" },
+
+                // พนักงาน 3 (ARD)
+                { empId: "EM020201", seq: 1, requestDate: "28/10/25 16:45", leaveDate: "30/10/25", time: "08:30 - 17:30", duration: "1 วัน", type: "ลาคลอด", note: "คลอดบุตร", status: "อนุมัติ", badge: "success" },
+                { empId: "EM020201", seq: 2, requestDate: "04/11/25 13:00", leaveDate: "08/11/25 - 09/11/25", time: "08:30 - 17:30", duration: "2 วัน", type: "ลาพักร้อน", note: "พักผ่อน", status: "ยกเลิก", badge: "danger" },
+
+                // พนักงาน 4 (ENG)
+                { empId: "EM030301", seq: 1, requestDate: "07/11/25 08:00", leaveDate: "07/11/25", time: "08:30 - 10:30", duration: "2 ชม.", type: "ลากิจ", note: "ไปธนาคาร", status: "รออนุมัติ", badge: "warning" },
+
+                // พนักงาน 5 (ENG)
+                { empId: "EM040401", seq: 1, requestDate: "06/11/25 17:30", leaveDate: "12/11/25", time: "08:30 - 17:30", duration: "1 วัน", type: "ลาพักร้อนไม่รับค่าจ้าง", note: "ไปต่างประเทศ", status: "อนุมัติ", badge: "success" }
+            ];
+
+           
+                // const $tbody = $('#table_leave tbody');
+                // $tbody.empty();
+
+                // leaveHistory.forEach((row, index) => {
+                //     const emp = employees.find(e => e.id === row.empId) || { name: "-" };
+                //     const tr = `
+                //     <tr class="clickable-row kanit-regular" style="color:#555"
+                //         data-toggle="modal" data-target="#modal_leave"
+                //         data-id="${row.seq}" data-emp-id="${row.empId}"
+                //         data-request-date="${row.requestDate}" data-leave-date="${row.leaveDate}"
+                //         data-time="${row.time}" data-duration="${row.duration}"
+                //         data-type="${row.type}" data-note="${row.note}" data-status="${row.status}">
+                //         <td>${index + 1}</td>
+                //         <td>${row.empId}</td>
+                //         <td>${emp.name}</td>
+                //         <td>${row.requestDate}</td>
+                //         <td>${row.leaveDate}</td>
+                //         <td>${row.time}</td>
+                //         <td>${row.duration}</td>
+                //         <td>${row.type}</td>
+                //         <td>${row.note}</td>
+                //         <td><span class="badge badge-${row.badge} p-2 kanit-regular" style="font-size:16px; border-radius:20px;">${row.status}</span></td>
+                //     </tr>`;
+                //     $tbody.append(tr);
+                // });
+
+
 
             const $search = $('#employeeSearch');
             const $select = $('#employeeSelect');
@@ -996,7 +1269,7 @@
             });
 
             // เริ่มต้น
-            $search.val('-- เลือกพนักงาน --');
+            $search.val();
             $results.hide();
         });
     </script>
