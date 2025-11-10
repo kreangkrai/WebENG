@@ -123,6 +123,7 @@
         font-weight: 900;
         font-style: italic;
     }
+
     /* สไตล์สำหรับ input */
     input[type="text"] {
         transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
@@ -135,6 +136,7 @@
         input[type="text"]:not(:disabled) {
             opacity: 1;
         }
+
     /* สไตล์สำหรับ input */
     input[type="number"] {
         transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
@@ -147,6 +149,14 @@
         input[type="number"]:not(:disabled) {
             opacity: 1;
         }
+
+    #table_leave th,
+    #table_leave td {
+        border-left: none !important;
+        border-right: none !important;
+        padding: 8px 10px !important; /* ทำให้เซลล์สูงขึ้น */
+        vertical-align: middle !important; /* สำรองถ้า Bootstrap ไม่ทำงาน */
+    }
 
     table.dataTable tbody td {
         border-left: none !important;
@@ -174,15 +184,18 @@
     .freeze-head {
         position: sticky;
         top: 0;
-        background: lightgrey;
+        background: #EEE;
         z-index: 10;
+        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
 
     }
 
     .freeze-left {
         position: sticky;
         left: 0;
+        width: 200px;
         background: white;
+        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
         z-index: 5;
     }
 
@@ -214,7 +227,7 @@
         overflow: hidden;
     }
         .half-right::before {
-            content: '';
+            content: '';ช
             position: absolute;
             left: 50%;
             top: 0;
@@ -233,27 +246,85 @@
         background-color: #d1ecf1 !important;
         border-left: 4px solid #17a2b8 !important;
     }
+
+
+    .color-grid-container {
+        width: 50px;
+        height: 50px;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+        .color-grid-container > div {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transition: transform 0.3s ease;
+        }
+
+            .color-grid-container > div:hover {
+                transform: scale(1.1);
+                z-index: 10;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+
+    .color-top-left {
+        top: 0;
+        left: 0;
+        background: yellow;
+    }
+
+    .color-top-right {
+        top: 0;
+        right: 0;
+        background: blue;
+    }
+
+    .color-bottom-left {
+        bottom: 0;
+        left: 0;
+        background: red;
+    }
+
+    .color-bottom-right {
+        bottom: 0;
+        right: 0;
+        background: lightgrey;
+    }
 </style>
+
 <div class="row" style="row-gap:1px">
     <div class="col-12">
         <span class="kanit-bold" style="font-size:24px;color:dimgrey">สถานะการลาพนักงาน</span>
         <hr style="border:solid;color:gray;border-width:1px" />
+
+        <div class="color-grid-container" style="border-radius:50%;">
+            <div class="color-top-left"></div>
+            <div class="color-top-right"></div>
+            <div class="color-bottom-left"></div>
+            <div class="color-bottom-right"></div>
+        </div>
     </div>
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark">
             <div class="card-body" style="height:700px; overflow-y:auto">
                 <form>
                     <div class="form-group">
+                        <!-- Filter Monthly-->
                         <div class="mb-3 d-flex justify-content-center">
                             <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
                             <input type="month" id="monthPicker" class="form-control kanit-regular" style="width:200px; display:inline-block;">
                             <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
                         </div>
+
+                        <!-- Status Data Employees -->
                         <div class="freeze-pane">
                             <table id="table_leave" class="table table-sm compact table-bordered table-hover text-center w-100">
-                                <thead class="kanit-light" style="background-color:lightgrey">
+                                <thead class="kanit-light" style="background-color:#E8E8E8">
                                     <tr id="headerRow">
-                                        <th rowspan="2" class="kanit-bold freeze-head freeze-left freeze-corner" style="vertical-align:middle;background-color:lightgrey">รายชื่อ</th>
+                                        <th rowspan="2" class="kanit-bold freeze-head freeze-left freeze-corner" style="vertical-align:middle;background-color:#E8E8E8;">รายชื่อ</th>
                                     </tr>
                                     <tr id="dateRow">
                                     </tr>
@@ -370,17 +441,16 @@
                                             imgSrc = 'data:image/jpeg;base64,' + row.img;
                                         }
                                         return `
-                                            <div class="row">
-                                                <div class="col-2 d-flex justify-content-start">
+                                           <div class="row align-items-center" style="width:300px">
+                                             <div class="col-2 d-flex justify-content-center">
                                                     <img src="${imgSrc}"
                                                         class="rounded-circle me-2"
                                                         style="width: 32px; height: 32px; object-fit: cover;"
                                                         alt="${row.name}" />
-
-                                                 </div>
-                                                 <div class="col-10 d-flex justify-content-start">
-                                                    <div>
-                                                        <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
+                                             </div>
+                                                <div class="col-10 d-flex justify-content-start">
+                                                    <div style="color:#444">
+                                                        <span class="kanit-regular d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
                                                         <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
                                                     </div>
                                                 </div>
