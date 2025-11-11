@@ -23,6 +23,7 @@ namespace WebENG.Controllers
         readonly INotification Notification;
         readonly ILeaveType LeaveType;
         readonly ILeaveEntitlementRule EntitlementRule;
+        readonly ILeave Leave;
         public LeaveController()
         {
             Accessory = new AccessoryService();
@@ -30,6 +31,7 @@ namespace WebENG.Controllers
             Notification = new NotificationService();
             LeaveType = new LeaveTypeService();
             EntitlementRule = new LeaveEntitlementRuleService();
+            Leave = new LeaveService();
         }
         public IActionResult Index()
         {
@@ -53,8 +55,14 @@ namespace WebENG.Controllers
                 List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
                 List<HierarchyDepartmentModel> hierarchies_depaartmenr = Hierarchy.GetDepartmentHierarchies();
 
-               
+                CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel()
+                {
+                    start_date = new DateTime (2025,6,15),
+                    promote_manager_date = new DateTime (2025,6,15),
+                    position = "Manager"
+                };
 
+                double leave = Leave.CalculateLeaveDays(emp, 2025, 6, 10, 10, 12); 
                 return View(u);
             }
             else
