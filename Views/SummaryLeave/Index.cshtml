@@ -248,7 +248,7 @@
     }
 
 
-    .color-grid-container {
+    /* .color-grid-container {
         width: 50px;
         height: 50px;
         position: relative;
@@ -292,7 +292,7 @@
         bottom: 0;
         right: 0;
         background: lightgrey;
-    }
+    } */
 
     .modern-card {
         transition: all 0.3s ease;
@@ -307,34 +307,48 @@
 </style>
 
 <div class="row" style="row-gap:1px">
-    <div class="col-12">
+    <!-- HEADER -->
+    <div class="col-12" style="padding:20px">
+        <span class="kanit-bold d-flex justify-content-center " style="font-size:30px; color:#1C4698; text-align:center;">
+            สถิติการลารายวัน
+        </span>
+        @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
+    </div>
+
+    @*<div class="col-12">
         <span class="kanit-bold" style="font-size:24px;color:dimgrey">สถานะการลาพนักงาน</span>
         <hr style="border:solid;color:gray;border-width:1px" />
 
-        <div class="color-grid-container" style="border-radius:50%;">
+         <div class="color-grid-container" style="border-radius:50%;">
             <div class="color-top-left"></div>
             <div class="color-top-right"></div>
             <div class="color-bottom-left"></div>
             <div class="color-bottom-right"></div>
         </div>
-    </div>
+        </div>*@
 
     <form>
         <div class="col-12">
-            <div class="card shadow-sm modern-card" style="border-radius:10px; padding:10px">
-                <div class="card-body" overflow-y:auto">
+            <div class="card shadow-sm modern-card col-12" style="border-radius:10px; ">
+                <div class="card-body" style="overflow-y:auto">
                     <div class="form-group row">
-                        <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาคงเหลือ (วัน)</label>
-                        <div class="col-12" style="font-size:18px; ">
-                            <div class="row">
-                                <div class="col-8" style="text-align:start">
-                                    <label class="kanit-light">ลาพักร้อน</label>
-                                </div>
-                                <div class="col-4" style="text-align:end">
-                                    <label class="kanit-regular">4 / 4</label>
-                                </div>
+                        <div class="col-12" style="font-size:18px;">
+
+                            <!-- ตัวเลข 4 ตรงกลาง -->
+                            <div style="text-align:center; ">
+                                <label class="kanit-regular" style="font-size:32px">4</label>
                             </div>
-                            
+
+                            <!-- จุดวงกลม + ข้อความ (เรียงแนวนอน) -->
+                            <div class="d-flex align-items-center justify-content-center">
+                                <!-- จุดวงกลมสีแดง -->
+                                <div class="rounded-circle"
+                                     style="width:10px; height:10px; background-color:red; margin-right:10px"></div>
+
+                                <!-- ข้อความ -->
+                                <label class="kanit-light">ลาพักร้อน</label>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -346,12 +360,32 @@
         <div class="card card-dark">
             <div class="card-body" style="height:700px; overflow-y:auto">
                 <form>
+                    
                     <div class="form-group">
-                        <!-- Filter Monthly-->
-                        <div class="mb-3 d-flex justify-content-center">
-                            <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
-                            <input type="month" id="monthPicker" class="form-control kanit-regular" style="width:200px; display:inline-block;">
-                            <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <!-- Search Filter (ชิดซ้าย) -->
+                            <div class="input-group col-3 p-0">
+                                <!-- ปรับ col-4 ตามความกว้างที่ต้องการ -->
+                                <input type="text"
+                                       id="employeeSearch"
+                                       class="form-control form-control-sm kanit-regular"
+                                       placeholder="ค้นหา รหัส/ชื่อพนักงาน"
+                                       style="font-size: 16px; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+                                <div class="input-group-append">
+                                    <button id="clearSearch"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            type="button"
+                                            style="display:none; border-top-right-radius: 5px; border-bottom-right-radius: 5px;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Filter Monthly-->
+                            <div class="d-flex align-items-center">
+                                <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
+                                <input type="month" id="monthPicker" class="form-control kanit-regular" style="width:200px; display:inline-block;">
+                                <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
+                            </div>
                         </div>
 
                         <!-- Status Data Employees -->
