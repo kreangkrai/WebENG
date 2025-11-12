@@ -506,7 +506,7 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group condition-group">
-                                                <label class="kanit-medium" style="font-size:20px; color: #555555; letter-spacing:1px">เงื่อนไข</label>
+                                                <label class="kanit-medium" style="font-size:20px; color: #555555; letter-spacing:1px">เงื่อนไขการลา</label>
                                                 <!-- แถวที่ 1 -->
                                                 <div class="row condition-row">
                                                     <div class="col-8">
@@ -537,7 +537,57 @@
                                     </div>
 
                                     <hr /> <!------------------------------------------------------------------------------------------------------->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group condition-group">
+                                                <label class="kanit-medium" style="font-size:20px; color: #555555; letter-spacing:1px">เงื่อนไขการคำนวณสิทธิ์</label>
+                                                <div class="row condition-row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">เมื่ออายุงานตั้งแต่</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="input-group">
+                                                            <input id="update_length_start_date" type="number" class="form-control kanit-light" placeholder="#" value="0" step="1" min="0" max="2000" style="text-align:end" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row condition-row">
+                                                    <div class="col-8">
+                                                        <div class="form-row">
+                                                            <span class="kanit-light">คำนวณวันลาอัตโนมัติ</span>
+                                                            <button type="button" class="d-flex justify-content-center" style="width:20px;height:20px;border-radius:10px;background-color:black;" data-toggle="tooltip" data-placement="top" title="คำนวณเข้างานปีแรกแบบคิดตามสัดส่วนและปีต่อไปคิดตามสิทธิ์ที่ได้">
+                                                                <i class="fas fa-question" style="color:white;"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <label class="modern-switch">
+                                                            <input type="checkbox" id="update_leave_calculate_auto">
+                                                            <span class="slider"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div id="div_calculate_auto" class="row condition-row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">จำนวนวันสิทธิ์การลา</span>
+                                                    </div>
+                                                    <div class="col-4 d-flex justify-content-end">
+                                                        <div class="input-group">
+                                                            <input id="update_amount_entitlement" type="number" class="form-control kanit-light" placeholder="#" value="0" step="1" min="1" max="200" style="text-align:end" />
+                                                            <div class="input-group-append">
+                                                                <span class="input-group-text kanit-light">วัน</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <hr /> <!------------------------------------------------------------------------------------------------------->
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group condition-group">
@@ -559,6 +609,18 @@
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <label id="update_leave_edit_at" class="kanit-light">
                                                         </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row condition-row">
+                                                    <div class="col-8">
+                                                        <span class="kanit-light">สีของวันลา</span>
+                                                    </div>
+                                                    <div class="col-4 kanit-light d-flex justify-content-end">
+                                                        <select id="update_leave_code_color" class="form-control">
+                                                            <option value="red">แดง</option>
+                                                            <option value="green">เขียว</option>
+                                                            <option value="yellow">เหลือง</option>
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="row condition-row">
@@ -693,11 +755,17 @@
 @section Scripts
 {
     <script type="text/javascript">
+
+       
         let leaves = [];
         let last_leave_id = "";
         $(document).ready(async function () {
             await GetLeaveGroup();
         });
+
+        //$(function () {
+        //    $('[data-toggle="tooltip"]').tooltip();
+        //});
 
         $('#addLeave').on('click', function () {
             $('#modal_leave').modal();
@@ -757,11 +825,13 @@
             let updated_by = $('#update_leave_edit_by').text();
             let updated_at = $('#update_leave_edit_at').text();
             let is_active = $('#update_leave_is_active').prop('checked');
+            let color_code = $('#update_leave_code_color').val();
+            let calculate_auto = $('#update_leave_calculate_auto').prop('checked');
+            let amount_entitlement = $('#update_amount_entitlement').val();
+            let length_start_date = $('#update_length_start_date').val();
             if (leave_name_th.trim() !== "" &&
                 leave_name_en.trim() !== "" &&
-                leave_type_code.trim() !== "" &&
-                data_entitlement_manager.length > 0 &&
-                data_entitlement_operation.length > 0) {
+                leave_type_code.trim() !== "") {
                 var leave = JSON.stringify({
                     "leave_type_id": leave_type_id,
                     "leave_name_th": leave_name_th,
@@ -780,19 +850,17 @@
                     "count_holidays_as_leave": count_holidays_as_leave,
                     "updated_by": updated_by,
                     "updated_at": updated_at,
-                    "is_active": is_active
-                });
-                var entitlement_manager = JSON.stringify({
-                    "entitlement": data_entitlement_manager
-                });
-                var entitlement_operation = JSON.stringify({
-                    "entitlement": data_entitlement_operation
+                    "is_active": is_active,
+                    "color_code": color_code,
+                    "calculate_auto": calculate_auto,
+                    "amount_entitlement": amount_entitlement,
+                    "length_start_date": length_start_date
                 });
                 await $.ajax({
                     type: "PUT",
                     url: '@Url.Action("UpdateLeaveGroup", "LeaveSetting")',
                     contentType: 'application/x-www-form-urlencoded',
-                    data: { leave, entitlement_manager, entitlement_operation },
+                    data: { leave },
                     success: function (response) {
                         let message = response;
                         if (message === "Success") {
@@ -891,6 +959,16 @@
 
             leave.is_active === true ? $('#update_leave_is_active').attr('checked', true) : $('#update_leave_is_active').attr('checked', false);
 
+            $('#update_leave_code_color').val(leave.color_code);
+            leave.calculate_auto === true ? $('#update_leave_calculate_auto').attr('checked', true) : $('#update_leave_calculate_auto').attr('checked', false);
+            if (leave.calculate_auto === true) {
+                $('#div_calculate_auto').attr('hidden', true);
+            } else {
+                $('#div_calculate_auto').attr('hidden', false);
+            }
+            $('#update_amount_entitlement').val(leave.amount_entitlement);
+            $('#update_length_start_date').val(leave.length_start_date);
+
         }
 
         $('#update_leave_require_attachment').on('change', function () {
@@ -923,6 +1001,16 @@
             } else {
                 $('#div_two_steps_approve_threshold_days').attr('hidden', true);
                 $('#update_two_steps_approve_threshold_days').val(0);
+            }
+        });
+
+        $('#update_leave_calculate_auto').on('change', function () {
+            let chk = $('#update_leave_calculate_auto').prop('checked');
+            if (chk === true) {
+                $('#div_calculate_auto').attr('hidden', true);
+                $('#update_amount_entitlement').val(0);
+            } else {
+                $('#div_calculate_auto').attr('hidden', false);
             }
         });
 

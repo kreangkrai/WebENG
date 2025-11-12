@@ -21,7 +21,7 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly IHierarchy Hierarchy;
         private ILeaveType LeaveType;
-        private ILeaveEntitlementRule LeaveEntitlement;
+        //private ILeaveEntitlementRule LeaveEntitlement;
         private CTLInterfaces.IEmployee Employee;
         public LeaveSettingController()
         {
@@ -29,7 +29,7 @@ namespace WebENG.Controllers
             Hierarchy = new HierarchyService();
             LeaveType = new LeaveTypeService();
             Employee = new CTLServices.EmployeeService();
-            LeaveEntitlement = new LeaveEntitlementRuleService();
+            //LeaveEntitlement = new LeaveEntitlementRuleService();
         }
         public IActionResult Index()
         {
@@ -97,7 +97,7 @@ namespace WebENG.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateLeaveGroup(string leave , string entitlement_manager, string entitlement_operation)
+        public IActionResult UpdateLeaveGroup(string leave)
         {
             LeaveTypeModel leave_ = JsonConvert.DeserializeObject<LeaveTypeModel>(leave);
             LeaveTypeModel m_leave = LeaveType.GetLeaveTypeByID(leave_.leave_type_id);
@@ -112,58 +112,6 @@ namespace WebENG.Controllers
             leave_.updated_by = admin;
 
             string message = LeaveType.Update(leave_);
-
-            EntitlementModel manager = JsonConvert.DeserializeObject<EntitlementModel>(entitlement_manager);
-            EntitlementModel oeration = JsonConvert.DeserializeObject<EntitlementModel>(entitlement_operation);
-
-            List<LeaveEntitlementRuleModel> leaves_manager = new List<LeaveEntitlementRuleModel>();
-            for(int i = 0; i < manager.entitlement.Count; i++)
-            {
-                string entitlement_rule_id = Guid.NewGuid().ToString("N").Substring(0, 10);
-                LeaveEntitlementRuleModel m = new LeaveEntitlementRuleModel()
-                {
-                    entitlement_rule_id = entitlement_rule_id,
-                    position = "Manager",
-                    leave_type_id = leave_.leave_type_id,
-                    start_age = manager.entitlement[i].start_age,
-                    before_age = manager.entitlement[i].before_age,
-                    days_per_year= manager.entitlement[i].days,
-                    is_prorated = manager.entitlement[i].is_prorated,
-                    prorated_amount_per_year = manager.entitlement[i].prorated_amount_per_year,
-                    is_calculate_by_year = manager.entitlement[i].is_calculate_by_year
-                };
-                leaves_manager.Add(m);
-            }
-
-            List<LeaveEntitlementRuleModel> leaves_operation = new List<LeaveEntitlementRuleModel>();
-            for (int i = 0; i < oeration.entitlement.Count; i++)
-            {
-                string entitlement_rule_id = Guid.NewGuid().ToString("N").Substring(0, 10);
-                LeaveEntitlementRuleModel m = new LeaveEntitlementRuleModel()
-                {
-                    entitlement_rule_id = entitlement_rule_id,
-                    position = "Operation",
-                    leave_type_id = leave_.leave_type_id,
-                    start_age = oeration.entitlement[i].start_age,
-                    before_age = oeration.entitlement[i].before_age,
-                    days_per_year = oeration.entitlement[i].days,
-                    is_prorated = oeration.entitlement[i].is_prorated,
-                    prorated_amount_per_year = oeration.entitlement[i].prorated_amount_per_year,
-                    is_calculate_by_year = oeration.entitlement[i].is_calculate_by_year
-                };
-                leaves_operation.Add(m);
-            }
-
-            message = LeaveEntitlement.Delete(leave_.leave_type_id);
-
-            if (message == "Success")
-            {
-                message = LeaveEntitlement.Insert(leaves_manager);
-                if (message == "Success")
-                {
-                    message = LeaveEntitlement.Insert(leaves_operation);
-                }
-            }
             return Json(message);
         }
 
@@ -172,9 +120,9 @@ namespace WebENG.Controllers
         {
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             leaves = leaves.OrderBy(o => o.leave_type_code).ToList();
-            List<LeaveEntitlementRuleModel> entitlements = LeaveEntitlement.GetLeaveEntitlementRules();
-            entitlements = entitlements.OrderBy(o => o.start_age).ThenBy(t => t.before_age).ToList();
-            var data = new { leaves = leaves, entitlements = entitlements };
+            //List<LeaveEntitlementRuleModel> entitlements = LeaveEntitlement.GetLeaveEntitlementRules();
+            //entitlements = entitlements.OrderBy(o => o.start_age).ThenBy(t => t.before_age).ToList();
+            var data = new { leaves = leaves};
             return Json(data);
         }
     }
