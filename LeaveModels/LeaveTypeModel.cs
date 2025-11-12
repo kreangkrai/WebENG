@@ -28,5 +28,9 @@ namespace WebENG.LeaveModels
         public string created_by { get; set; }
         public DateTime updated_at { get; set; }
         public string updated_by { get; set; }
+        public string color_code { get; set; }
+        public bool calculate_auto { get; set; }
+        public decimal amount_entitlement { get; set; }
+        public decimal length_start_date { get; set; }
     }
 }
