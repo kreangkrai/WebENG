@@ -204,7 +204,7 @@
     }
 
     .half-left {
-        background: linear-gradient(90deg, transparent 50%, lightgrey 50%);
+        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%);
         border: none;
         position: relative;
         overflow: hidden;
@@ -310,7 +310,7 @@
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
-        height: 100%;
+        /* height: 100%; */
         display: flex;
         flex-direction: column;
         text-align: center;
@@ -344,7 +344,7 @@
         font-size: 1.1rem;
         font-weight: 600;
         color: #212529;
-        margin-bottom: 8px;
+        margin-bottom: 3px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -366,6 +366,19 @@
         line-height: 1.4;
     }
     
+    .color-type1  {  background-color: #9CCC65;    }     /* เขียวมะนาว */
+    .color-type2  {  background-color: #4FC3F7;    }     /*  */
+    .color-type3  {  background-color: #FFD54F;    }     /*  */
+    .color-type4  {  background-color: #43A047;    }     /*  */
+    .color-type5  {  background-color: #1976D2;    }     /*  */
+    .color-type6  {  background-color: #E53935;    }     /*  */
+    .color-type7  {  background-color: #D32F2F;    }     /*  */
+    .color-type8  {  background-color: #90A4AE;    }     /*  */
+    .color-type9  {  background-color: #FF8A65;    }     /*  */
+    .color-type10 {  background-color: #8E24AA;    }     /*  */
+    .color-type11 {  background-color: #9CCC65;    }     /*  */
+    .color-type12 {  background-color: #F06292;    }     /*  */
+    .color-type13 {  background-color: #6D4C41;    }     /*  */
 </style>
 
 <div class="row" style="row-gap:1px">
@@ -420,64 +433,191 @@
 
         <div class="row">
             <!-- Card 1 -->
-            <div class="col-md-3 mb-3">
-                <div class="card kanit-regular">
-                    <div class="badge-circle">1</div>
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px">
+                    @* <div class="badge-circle">1 คน</div> *@
+                    <h1 class="card-title" style="font-size:28px"> 1 คน </h1>
+                    @* <span class="dot" style="background-color: #6f42c1;"></span> รอชำระเงิน *@
                     <h5 class="card-title">
                         <span class="dot"></span> รอดำเนินการ
+                        
                     </h5>
                 </div>
             </div>
 
             <!-- Card 2 -->
-            <div class="col-md-3 mb-3">
-                <div class="card kanit-regular">
-                    <div class="badge-circle">2</div>
-                    <h5 class="card-title">
-                        <span class="dot" style="background-color: #ffc107;"></span> ดำเนินการแล้ว
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    @* <div class="badge-circle">1 คน</div> *@
+                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 12 คน </h1>
+                    <h5 class="card-title" >
+                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        ลาป่วย
                     </h5>
                 </div>
             </div>
 
             <!-- Card 3 -->
-            <div class="col-md-3 mb-3">
-                <div class="card kanit-regular">
-                    <div class="badge-circle">3</div>
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 3 คน </h1>
                     <h5 class="card-title">
-                        <span class="dot" style="background-color: #28a745;"></span> เสร็จสิ้น
+                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        ลากิจ
                     </h5>
                 </div>
             </div>
 
             <!-- Card 4 -->
-            <div class="col-md-3 mb-3">
-                <div class="card kanit-regular">
-                    <div class="badge-circle">4</div>
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 4 คน </h1>
                     <h5 class="card-title">
-                        <span class="dot"></span> ยกเลิกแล้ว
+                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        ลาพักร้อน
                     </h5>
                 </div>
             </div>
 
             <!-- Card 5 -->
-            <div class="col-md-3 mb-3">
-                <div class="card kanit-regular">
-                    <div class="badge-circle">5</div>
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 5 คน </h1>
                     <h5 class="card-title">
-                        <span class="dot" style="background-color: #6f42c1;"></span> รอชำระเงิน
+                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        ลากิจ
                     </h5>
                 </div>
             </div>
 
             <!-- Card 6 -->
-            <div class="col-md-3 mb-3">
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 6 คน </h1>
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        ลากิจ
+                    </h5>
+                </div>
+            </div>
+            
+            <!-- Card 7 TEST-->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <div style="background:white; padding:10px; align-items: center;">
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type1"
+                           style="width:30px;height:30px;border-radius:15px; "/>
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type2"
+                           style="width:30px;height:30px;border-radius:15px; "/>
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type3"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left      color-type4"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                </div>
+            </div>
+
+            <!-- Card 8 TEST-->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <div style="background:white; padding:10px; align-items: center;">
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type5"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type6"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type7"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left      color-type8"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                </div>
+            </div>
+
+            <!-- Card 9 TEST-->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <div style="background:white; padding:10px; align-items: center;">
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type9"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type10"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left mr-2 color-type11"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn half-left      color-type12"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                </div>
+            </div>
+
+            <!-- Card 7 TEST-->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <div style="background:white; padding:10px; align-items: center;">
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type1"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type2"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type3"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn      color-type4"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                </div>
+            </div>
+
+            <!-- Card 8 TEST-->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <div style="background:white; padding:10px; align-items: center;">
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type5"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type6"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type7"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn      color-type8"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                </div>
+            </div>
+
+            <!-- Card 9 TEST-->
+            <div class="col-md-2 col-sm-6 mb-2">
+                <div style="background:white; padding:10px; align-items: center;">
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type9"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type10"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn mr-2 color-type11"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                    <input type="button"
+                           class="kanit-light btn      color-type12"
+                           style="width:30px;height:30px;border-radius:15px; " />
+                </div>
+            </div>
+
+            @* <div class="col-md-3 mb-3">
                 <div class="card kanit-regular">
                     <div class="badge-circle">6</div>
                     <h5 class="card-title">
                         <span class="dot" style="background-color: #17a2b8;"></span> กำลังจัดส่ง
                     </h5>
                 </div>
-            </div>
+            </div> *@
+           
         </div>
     </div>
 
@@ -533,6 +673,7 @@
         </div>
     </div>
 </div>
+
 <partial name="ModalSpin" />
 @section Scripts
 {
@@ -658,8 +799,8 @@
                                     render: function (data, type, row) {
                                         return `
                                             <input type="button"
-                                                           class="kanit-light btn btn-${colors[0]} ${classes[0]}"
-                                                           style="width:30px;height:30px;border-radius:15px; background-color:red"/>
+                                                   class="kanit-light btn btn-${colors[0]} ${classes[0]}"
+                                                   style="width:30px;height:30px;border-radius:15px; background-color:#B0D483"/>
                                         `;
                                     }
                                 });
