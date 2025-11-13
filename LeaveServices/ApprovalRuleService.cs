@@ -109,6 +109,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@created_by", approval.created_by);
                 command.Parameters.AddWithValue("@updated_at", approval.updated_at);
                 command.Parameters.AddWithValue("@updated_by", approval.updated_by);
+                command.ExecuteNonQuery();
             }
             finally
             {
@@ -148,6 +149,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@created_by", approval.created_by);
                 command.Parameters.AddWithValue("@updated_at", approval.updated_at);
                 command.Parameters.AddWithValue("@updated_by", approval.updated_by);
+                command.ExecuteNonQuery();
             }
             finally
             {

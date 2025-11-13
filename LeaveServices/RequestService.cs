@@ -281,6 +281,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
                 command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
+                command.ExecuteNonQuery();
             }
             finally
             {
@@ -349,6 +350,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
                 command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
+                command.ExecuteNonQuery();
             }
             finally
             {

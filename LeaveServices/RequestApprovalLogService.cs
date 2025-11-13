@@ -102,7 +102,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@action_type", request.action_type);
                 command.Parameters.AddWithValue("@action_level", request.action_level);
                 command.Parameters.AddWithValue("@comment", request.comment);
-
+                command.ExecuteNonQuery();
             }
             finally
             {

@@ -73,6 +73,7 @@ namespace WebENG.LeaveServices
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@department_id", department.department_id);
                 command.Parameters.AddWithValue("@department_name", department.department_name);
+                command.ExecuteNonQuery();
             }
             finally
             {
@@ -98,6 +99,7 @@ namespace WebENG.LeaveServices
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@department_id", department.department_id);
                 command.Parameters.AddWithValue("@department_name", department.department_name);
+                command.ExecuteNonQuery();
             }
             finally
             {
