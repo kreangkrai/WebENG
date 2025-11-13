@@ -25,11 +25,15 @@ namespace WebENG.LeaveModels
         public string manager_approver_status { get; set; }
         public string manager_approver { get; set; }
         public DateTime manager_approve_date { get; set; }
+        public string director_approver_status { get; set; }
+        public string director_approver { get; set; }
+        public DateTime director_approve_date { get; set; }
         public string admin_approver_status { get; set; }
         public string admin_approver { get; set; }
         public DateTime admin_approve_date { get; set; }
         public string decsription { get; set; }
         public string status_request { get; set; }
+        public bool is_two_step_approve { get; set; }
 
     }
 }

@@ -94,6 +94,7 @@ namespace WebENG.LeaveServices
                         leaves.Add(leave);
                     }
                     dr.Close();
+
                 }
             }
             finally
@@ -179,7 +180,7 @@ namespace WebENG.LeaveServices
                             length_start_date = dr["length_start_date"] != DBNull.Value ? Convert.ToDecimal(dr["length_start_date"].ToString()) : 0,
                         };
                     }
-                    dr.Close();
+                    dr.Close();                    
                 }
             }
             finally

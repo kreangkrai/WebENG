@@ -37,7 +37,47 @@
                 </span>
             </div>
             <div class="card-body">
-                <table id="table_admin" class="table table-sm table-hover table-striped text-center w-100">
+                <table id="table_super_admin" class="table table-sm table-hover table-striped text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>User ID</th>
+                            <th>Department</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow">
+            <div class="card-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <span class="card-title">
+                    <i class="fas fa-user-shield"></i> Admin Operation
+                </span>
+            </div>
+            <div class="card-body">
+                <table id="table_admin_operation" class="table table-sm table-hover table-striped text-center w-100">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>User ID</th>
+                            <th>Department</th>
+                            <th>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card shadow">
+            <div class="card-header" style="background-color:#0F4C75;color:#FFFFFF">
+                <span class="card-title">
+                    <i class="fas fa-user-shield"></i> Admin Leave
+                </span>
+            </div>
+            <div class="card-body">
+                <table id="table_admin_leave" class="table table-sm table-hover table-striped text-center w-100">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -173,21 +213,29 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button id="btnToAdmin" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
-                    <i class="fas fa-user-shield"></i> To Admin
-                </button>
-                <button id="btnToSale" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
-                    <i class="fas fa-user-injured"></i> To Sale
-                </button>
-                <button id="btnToManager" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
-                    <i class="fas fa-user-tie"></i> To Manager
-                </button>
-                <button id="btnToUser" type="button" class="btn elevation-1" style="background-color:#0F4C75;color:#FFFFFF">
-                    <i class="fas fa-user"></i> To User
-                </button>
-                <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Close
-                </button>
+                <div class="col-12">
+                    <button id="btnToSuperAdmin" type="button" class="btn btn-primary p-1" style="color:#FFFFFF">
+                        <i class="fas fa-user-shield"></i> To Super Admin
+                    </button>
+                    <button id="btnToAdminOperation" type="button" class="btn btn-primary p-1" style="color:#FFFFFF">
+                        <i class="fas fa-user-shield"></i> To Admin Operation
+                    </button>
+                    <button id="btnToAdminLeave" type="button" class="btn  btn-primary p-1" style="color:#FFFFFF">
+                        <i class="fas fa-user-shield"></i> To Admin Leave
+                    </button>
+                    <button id="btnToSale" type="button" class="btn btn-warning p-1" style="color:#FFFFFF">
+                        <i class="fas fa-user-injured"></i> To Sale
+                    </button>
+                    <button id="btnToManager" type="button" class="btn btn-success p-1" style="color:#FFFFFF">
+                        <i class="fas fa-user-tie"></i> To Manager
+                    </button>
+                    <button id="btnToUser" type="button" class="btn p-1" style="background-color:#0F4C75;color:#FFFFFF">
+                        <i class="fas fa-user"></i> To User
+                    </button>
+                    <button type="button" class="btn btn-secondary p-1" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -197,20 +245,26 @@
 {
     <script type="text/javascript">
         var table_user;
-        var table_admin;
+        var table_super_admin;
+        var table_admin_operation;
+        var table_admin_leave;
         var table_sale;
         var table_manager;
         var users = [];
         var engineers = [];
 
         var toUser = false;
-        var toAdmin = false;
+        var toSuperAdmin = false;
         var toSale = false;
         var toManager = false;
+        var toAdminOperation = false;
+        var toAdminLeave = false;
 
         $(document).ready(async function () {
             await GetAuthenUsers();
-            await GetAuthenAdmin();
+            await GetAuthenSuperAdmin();
+            await GetAuthenAdminOperation();
+            await GetAuthenAdminLeave();
             await GetAuthenSale();
             await GetAuthenManager();
         });
@@ -264,7 +318,7 @@
                 "levels":level
             });
             CreateAuthen(user_string);
-            
+
         });
 
         async function CreateAuthen(user_string) {
@@ -322,25 +376,25 @@
             });
         }
 
-        async function GetAuthenAdmin() {
+        async function GetAuthenSuperAdmin() {
             var _admin = [];
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetAuthenAdmin", "Authen")',
+                url: '@Url.Action("GetAuthenSuperAdmin", "Authen")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: { },
                 success: function (response) {
                     _admin = response;
-                    GenerateTableAdmin(_admin);
+                    GenerateTableSuperAdmin(_admin);
                 }
             });
         }
 
-        function GenerateTableAdmin(admins) {
+        function GenerateTableSuperAdmin(admins) {
             var datas = [];
 
-            if (table_admin !== undefined)
-                table_admin.DataTable().destroy();
+            if (table_super_admin !== undefined)
+                table_super_admin.DataTable().destroy();
 
             for (var i = 0; i < admins.length; i++) {
                 datas.push([
@@ -351,7 +405,47 @@
                 ]);
             }
 
-            table_admin = $('#table_admin').DataTable({
+            table_super_admin = $('#table_super_admin').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
+        async function GetAuthenAdminOperation() {
+            var _admin = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAuthenAdminOperation", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    _admin = response;
+                    GenerateTableAdminOperation(_admin);
+                }
+            });
+        }
+
+        function GenerateTableAdminOperation(admins) {
+            var datas = [];
+
+            if (table_admin_operation !== undefined)
+                table_admin_operation.DataTable().destroy();
+
+            for (var i = 0; i < admins.length; i++) {
+                datas.push([
+                    admins[i].name,
+                    admins[i].user_id,
+                    admins[i].department,
+                    admins[i].levels,
+                ]);
+            }
+
+            table_admin_operation = $('#table_admin_operation').DataTable({
                 lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
                 data: datas,
                 columnDefs: [
@@ -363,6 +457,46 @@
             });
         }
 
+        async function GetAuthenAdminLeave() {
+            var _admin = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetAuthenAdminLeave", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { },
+                success: function (response) {
+                    _admin = response;
+                    GenerateTableAdminLeave(_admin);
+                }
+            });
+        }
+
+        function GenerateTableAdminLeave(admins) {
+            var datas = [];
+
+            if (table_admin_leave !== undefined)
+                table_admin_leave.DataTable().destroy();
+
+            for (var i = 0; i < admins.length; i++) {
+                datas.push([
+                    admins[i].name,
+                    admins[i].user_id,
+                    admins[i].department,
+                    admins[i].levels,
+                ]);
+            }
+
+            table_admin_leave = $('#table_admin_leave').DataTable({
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                data: datas,
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2],
+                        className: "border-left"
+                    }
+                ],
+            });
+        }
         async function GetAuthenSale() {
             var _sale = [];
             await $.ajax({
@@ -384,7 +518,7 @@
                 table_sale.DataTable().destroy();
 
             for (var i = 0; i < sales.length; i++) {
-                datas.push([ 
+                datas.push([
                     sales[i].name,
                     sales[i].user_id,
                     sales[i].department,
@@ -448,26 +582,50 @@
         function ShowModal(data) {
             if (toUser === false) {
                 $('#btnToUser').hide();
-                $('#btnToAdmin').show();
+                $('#btnToSuperAdmin').show();
+                $('#btnToAdminOperation').show();
+                $('#btnToAdminLeave').show();
                 $('#btnToSale').show();
                 $('#btnToManager').show();
             }
-            if (toAdmin === false) {
+            if (toSuperAdmin === false) {
                 $('#btnToUser').show();
-                $('#btnToAdmin').hide();
+                $('#btnToSuperAdmin').hide();
+                $('#btnToAdminOperation').show();
+                $('#btnToAdminLeave').show();
+                $('#btnToSale').show();
+                $('#btnToManager').show();
+            }
+            if (toAdminOperation === false) {
+                $('#btnToUser').show();
+                $('#btnToSuperAdmin').show();
+                $('#btnToAdminOperation').hide();
+                $('#btnToAdminLeave').show();
+                $('#btnToSale').show();
+                $('#btnToManager').show();
+            }
+            if (toAdminLeave === false) {
+                $('#btnToUser').show();
+                $('#btnToSuperAdmin').show();
+                $('#btnToAdminOperation').show();
+                $('#btnToAdminLeave').hide();
                 $('#btnToSale').show();
                 $('#btnToManager').show();
             }
             if (toSale === false) {
                 $('#btnToUser').show();
-                $('#btnToAdmin').show();
+                $('#btnToSuperAdmin').show();
+                $('#btnToAdminOperation').show();
+                $('#btnToAdminLeave').show();
                 $('#btnToSale').hide();
                 $('#btnToManager').show();
             }
 
             if (toManager === false) {
                 $('#btnToUser').show();
-                $('#btnToAdmin').show();
+                $('#btnToSuperAdmin').show();
+                $('#btnToAdminOperation').show();
+                $('#btnToAdminLeave').show();
                 $('#btnToSale').show();
                 $('#btnToManager').hide();
             }
@@ -480,25 +638,54 @@
 
         $('#table_user tbody').on('click', 'tr', function () {
             toUser = false;
-            toAdmin = true;
+            toSuperAdmin = true;
+            toAdminOperation = true;
+            toAdminLeave = true;
             toSale = true;
             toManager = true;
 
             let data = table_user.row(this).data();
             ShowModal(data);
         });
-         $('#table_admin tbody').on('click', 'tr', function () {
+        $('#table_super_admin tbody').on('click', 'tr', function () {
             toUser = true;
-            toAdmin = false;
+             toSuperAdmin = false;
+             toAdminOperation = true;
+             toAdminLeave = true;
             toSale = true;
             toManager = true;
 
-            let data = table_admin.row(this).data();
+            let data = table_super_admin.row(this).data();
+            ShowModal(data);
+        });
+        $('#table_admin_operation tbody').on('click', 'tr', function () {
+            toUser = true;
+            toSuperAdmin = true;
+            toAdminOperation = false;
+            toAdminLeave = true;
+            toSale = true;
+            toManager = true;
+
+            let data = table_admin_operation.row(this).data();
+            ShowModal(data);
+        });
+
+        $('#table_admin_leave tbody').on('click', 'tr', function () {
+            toUser = true;
+            toSuperAdmin = true;
+            toAdminOperation = true;
+            toAdminLeave = false;
+            toSale = true;
+            toManager = true;
+
+            let data = table_admin_leave.row(this).data();
             ShowModal(data);
         });
          $('#table_sale tbody').on('click', 'tr', function () {
             toUser = true;
-            toAdmin = true;
+             toSuperAdmin = true;
+             toAdminOperation = true;
+             toAdminLeave = true;
             toSale = false;
             toManager = true;
 
@@ -507,7 +694,9 @@
         });
         $('#table_manager tbody').on('click', 'tr', function () {
             toUser = true;
-            toAdmin = true;
+            toSuperAdmin = true;
+            toAdminOperation = true;
+            toAdminLeave = true;
             toSale = true;
             toManager = false;
 
@@ -567,7 +756,7 @@
             });
         });
 
-        $('#btnToAdmin').on('click',async function(){
+        $('#btnToSuperAdmin').on('click',async function(){
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
@@ -577,6 +766,56 @@
                 "name": name,
                 "department": department,
                 "role" : "Admin",
+                "levels":level
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateRole", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        });
+        $('#btnToAdminOperation').on('click',async function(){
+            var user_id = document.getElementById("UserID").value;
+            var name = document.getElementById("UserName").value;
+            var department = document.getElementById("Department").value;
+            var level = document.getElementById("Level").value;
+            var user_string = JSON.stringify({
+                "user_id":user_id,
+                "name": name,
+                "department": department,
+                "role" : "Admin_Operation",
+                "levels":level
+            });
+            await $.ajax({
+                type: "PUT",
+                url: '@Url.Action("UpdateRole", "Authen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { user_string },
+                success: function (response) {
+                    if (response === "Success")
+                        location.reload();
+                    else
+                        alert(response);
+                }
+            });
+        });
+        $('#btnToAdminLeave').on('click',async function(){
+            var user_id = document.getElementById("UserID").value;
+            var name = document.getElementById("UserName").value;
+            var department = document.getElementById("Department").value;
+            var level = document.getElementById("Level").value;
+            var user_string = JSON.stringify({
+                "user_id":user_id,
+                "name": name,
+                "department": department,
+                "role" : "Admin_Leave",
                 "levels":level
             });
             await $.ajax({

@@ -617,7 +617,7 @@
                             <div class="col-xl-4 col-md-4 col-sm-12">
                                 <label for="amount_leave">ลาจำนวน</label>
                                 <div class="input-group">
-                                    <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="100" />
+                                    <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="200" />
                                     <div class="input-group-append">
                                         <span class="input-group-text">วัน</span>
                                     </div>
@@ -657,55 +657,41 @@
                                 </div>
                             </div>
                         </div>
-
-                        <hr />
-
                         <!-- ส่วนอัปโหลดไฟล์ -->
-                        <div id="leave_date_group" class="form-group row">
-                            <div class="col-12">
-                                <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
-                                <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
-                                    <div class="text-center">
-                                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
-                                        <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
-                                        <input type="file" id="leave_fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
-                                        <button type="button" id="selectFileBtn"
-                                                class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
-                                                style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
-                                            เลือกไฟล์
-                                        </button>
+                        <div id="leave_attach_file_group" hidden>
+                            <hr />
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label for="uploadForm" class="kanit-medium">แนบไฟล์</label>
+                                    <div id="uploadForm" class="card p-3 mb-3 dropzone" style="border: 2px dashed #ccc; border-radius: 10px; background: #f8f9fa; min-height: 120px; position: relative;">
+                                        <div class="text-center">
+                                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                            <p class="kanit-regular text-muted">ลากไฟล์มาวางที่นี่ หรือคลิกเพื่อเลือกไฟล์ <br />(.pdf, .jpg, .png, .xls, .xlsx)</p>
+                                            <input type="file" id="leave_fileInput" name="files" accept=".pdf,.jpg,.png,.xls,.xlsx" multiple style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 1000;" />
+                                            <button type="button" id="selectFileBtn"
+                                                    class="btn btn-outline-primary btn-md kanit-medium select-file-btn"
+                                                    style="position: relative; z-index: 1001; cursor: pointer; border-radius:5px; ">
+                                                เลือกไฟล์
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- ส่วนแสดงรายการไฟล์ -->
-                        <div id="leave_fileList" class="form-group row">
-                            <div class="col-12">
-                                <label class="kanit-medium">เอกสารที่แนบ</label>
-                                <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                    <div class="list-group" id="leave_fileListContainer">
-                                        <!-- ตัวอย่างไฟล์ -->
-                                        @*<div class="list-group-item d-flex align-items-center file-item">
-                            <i class="fas fa-file-image text-primary mr-2"></i>
-                            <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
-                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_001.png" title="ลบไฟล์">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                        <div class="list-group-item d-flex align-items-center file-item">
-                            <i class="fas fa-file-pdf text-danger mr-2"></i>
-                            <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
-                            <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="File_002.pdf" title="ลบไฟล์">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>*@
+                            <!-- ส่วนแสดงรายการไฟล์ -->
+                            <div class="form-group row">
+                                <div class="col-12">
+                                    <label class="kanit-medium">เอกสารที่แนบ</label>
+                                    <div class="card" style="border-radius: 10px; overflow: hidden;">
+                                        <div class="list-group" id="leave_fileListContainer">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-------------------------------------------------------------------------------------------------------------------------------->
+                            <hr />
                         </div>
-                        <!-------------------------------------------------------------------------------------------------------------------------------->
-                        <hr />
                         <div class="form-group row">
                             <div class="col-12">
                                 <label for="leave_approvers" class="kanit-medium">ผู้อนุมัติ</label>
@@ -2013,12 +1999,10 @@
     <script>
 
         let leaves = [];
-        let balance_entitlement;
         let path_file = [];
-
+        let balance_leave = 0;
         const hourSelect = document.getElementById('leave_start_hour');
-        $(document).ready(function () {
-            
+        $(document).ready(async function () {
         });
 
         // 08-15
@@ -2030,7 +2014,6 @@
         }
         hourSelect.value = '08';
         // Leave
-
         $('#leave').on('click', async function () {
             $('#modal_leave').modal();
             $('#modal_task').modal('hide');
@@ -2043,12 +2026,28 @@
             await GetLeaveType();
         });
 
-        $('#select_leave_type').on('change', function () {
+        $('#select_leave_type').on('change', async function () {
             let leave_type_id = $('#select_leave_type').val();
-            let description = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m.description)[0];
-            let entitlement = balance_entitlement.entitlements.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+            let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+            let description = leave_.description;
+            let emp_id = '@Html.Raw(Model.emp_id)';
+            let leave;            
+            $('#leave_stop_date').val($('#working_date').val());
+            $('#amount_leave').val(1);
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetLeaveByID", "Leave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    leave_type_id,emp_id
+                },
+                success: function (response) {
+                    leave = response.leave;
+                    balance_leave = response.balance;
+                }
+            });
             $('#leave_description').text(description);
-            $('#leave_balance').text(entitlement.balance + '/' + entitlement.amount + ' วัน');
+            $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
             $('#div_leave').prop('hidden', false);
             $('#div_main_leave').css('height', '600px');
             $('#div_main_leave').css('overflow-y', 'auto');
@@ -2072,6 +2071,7 @@
             const leaveHalfBtn = document.getElementById('leave_half');
             const leaveHoursBtn = document.getElementById('leave_hours');
             const dateGroup = document.getElementById('leave_date_group');
+            const attachFileGroup = document.getElementById('leave_attach_file_group');            
             const timeGroup = document.getElementById('leave_time_group');
             const durationSelect = timeGroup.querySelector('select');
             const startHourTimeInput = document.getElementById('leave_start_hour');
@@ -2100,6 +2100,7 @@
                 startMinuteTimeInput.disabled = false;
                 daysInput.value = 0;
                 stopDateInput.value = startDateInput.value;
+                stopDateInput.disabled = true;
                 // เพิ่ม event listener สำหรับการเปลี่ยนแปลงใน select
                 durationSelect.onchange = function () {
                     if (this.value === 'morning') {
@@ -2138,11 +2139,12 @@
                 startMinuteTimeInput.disabled = false;
                 daysInput.value = 0;
                 stopDateInput.value = startDateInput.value;
+                stopDateInput.disabled = true;
                 // รีเซ็ตค่าเวลาและ enable start_time เมื่อเปลี่ยนเป็นรายชั่วโมง
                 durationSelect.onchange = function () {
-                    
+
                     calculateTime();
-                    startHourTimeInput.disabled = false; 
+                    startHourTimeInput.disabled = false;
                     startMinuteTimeInput.disabled = false;
                 };
 
@@ -2189,6 +2191,11 @@
                 daysInput.disabled = false;
                 daysInput.value = 1;
                 stopDateInput.value = startDateInput.value;
+                stopDateInput.disabled = false;
+
+                //Reload Attach File
+                path_file = [];
+                //window.loadExistingFiles();
             });
             // เมื่อกดปุ่ม "ครึ่งวัน"
             leaveHalfBtn.addEventListener('click', function () {
@@ -2198,6 +2205,10 @@
                 toggleGroupDisplay(timeGroup, true); // แสดง time_group
                 setHalfDayOptions(); // เปลี่ยนตัวเลือกเป็นครึ่งวันเช้า/บ่าย
                 daysInput.disabled = true; // DISABLE ลาจำนวน
+
+                //Reload Attach File
+                path_file = [];
+                //window.loadExistingFiles();
             });
             // เมื่อกดปุ่ม "รายชั่วโมง"
             leaveHoursBtn.addEventListener('click', function () {
@@ -2207,7 +2218,104 @@
                 toggleGroupDisplay(timeGroup, true); // แสดง time_group
                 setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
                 daysInput.disabled = true; // DISABLE ลาจำนวน
+
+                //Reload Attach File
+                path_file = [];
+                //window.loadExistingFiles();
             });
+
+            //Stop date Change
+            stopDateInput.addEventListener('change', function () {
+                let leave_type_id = $('#select_leave_type').val();
+                let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+                let start = new Date(startDateInput.value);
+                let stop = new Date(stopDateInput.value);
+                let diffInDays = 0;
+                if (stop >= start) {
+                    if (leave.count_holidays_as_leave === true) {
+                        diffInDays = getDaysBetween(start, stop, true);
+                    } else {
+                        diffInDays = getBusinessDays(start, stop, holidays);
+                    }
+                    if (balance_leave >= diffInDays) {
+                        if (leave.is_consecutive === true) {
+                            if (leave.max_consecutive_days >= diffInDays) {
+                                daysInput.value = diffInDays;
+                            } else {
+                                alert(`ไม่สามารถลาเกิน ${leave.max_consecutive_days} วัน`);
+                                daysInput.value = 1;
+                                stopDateInput.value = $('#working_date').val();
+                            }
+                        } else {
+                            daysInput.value = diffInDays;
+                        }
+                    } else {
+                        alert('วันลาไม่เพียงพอ');
+                        daysInput.value = 1;
+                        stopDateInput.value = $('#working_date').val();
+                    }
+                } else {
+                    alert('ใส่วันผิด');
+                    daysInput.value = 1;
+                    stopDateInput.value = $('#working_date').val();
+                }
+
+                //Check attachment_required
+                CheckAttachFileRequire(leave, diffInDays);
+
+                //Reload Attach File
+                window.loadExistingFiles();
+            });
+
+            function CheckAttachFileRequire(leave, diffInDays) {
+                //Check attachment_required
+                if (leave.attachment_required === true) {
+                    if (diffInDays >= Number(leave.attachment_threshold_days)) {
+                        attachFileGroup.hidden = false;
+
+                    } else {
+                        attachFileGroup.hidden = true;
+                        path_file = [];
+                    }
+                } else {
+                    attachFileGroup.hidden = true;
+                    path_file = [];
+                }
+            }
+            function getDaysBetween(startDate, endDate, absolute = true) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffInMs = end - start;
+                const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+                const days = Math.floor(diffInDays) + 1;
+                return absolute ? Math.abs(days) : days;
+            }
+            function getBusinessDays(startDate, endDate, holidays = []) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+
+                //if (start > end) [start, end] = [end, start];
+
+                let count = 0;
+                const current = new Date(start);
+
+                const holidaySet = new Set(
+                    holidays.map(date => {
+                        const d = new Date(date);
+                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    })
+                );
+
+                while (current <= end) {
+                    const dayOfWeek = current.getDay(); // 0 = Sun, 6 = Sat
+                    const dateStr = current.toISOString().split('T')[0]; // YYYY-MM-DD
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidaySet.has(dateStr)) {
+                        count++;
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+                return count;
+            }
 
             // เริ่มต้นด้วยการเลือก "ทั้งวัน" เป็นค่าเริ่มต้น
             function timeToMinutes(timeStr) {
@@ -2255,7 +2363,7 @@
             const selectFileBtn = document.getElementById('selectFileBtn');
             const uploadForm = document.getElementById('uploadForm');
             const fileListContainer = document.getElementById('leave_fileListContainer');
-       
+
             if (!fileInput || !selectFileBtn || !uploadForm || !fileListContainer) {
                 console.error('ไม่พบ element');
                 return;
@@ -2302,10 +2410,9 @@
                 fileItem.classList.add('removing');
                 setTimeout(() => fileItem.remove(), 300);
 
-                console.log('ลบไฟล์:', fileName, 'เหลือ:', path_file);
             });
 
-            
+
             function handleFiles(files) {
                 if (!files || files.length === 0) return;
 
@@ -2342,8 +2449,7 @@
             <a href="#" class="file-link kanit-regular flex-grow-1">${fileName}</a>
             <button type="button" class="btn btn-outline-danger btn-sm delete-btn" style="border-radius: 50%;" data-file="${fileName}" title="ลบไฟล์">
                 <i class="fas fa-trash-alt"></i>
-            </button>
-        `;
+            </button>`;
                 return fileItem;
             }
 
@@ -2393,7 +2499,6 @@
                 },
                 success: function (response) {
                     leaves = response.leaves;
-                    balance_entitlement = response.balance_entitlement
                     GenerateLeaveOption(leaves);
 
                     loadExistingFiles(['test.xlsx']);

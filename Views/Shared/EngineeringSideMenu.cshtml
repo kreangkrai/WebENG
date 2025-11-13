@@ -52,7 +52,7 @@
                                 <p class="text-bold">JOBS STATUS</p>
                             </a>
                         </li>
-                        @if (Model.role == "Admin" || Model.role != "User")
+                        @if (Model.role == "Admin_Operation" || Model.role == "Admin" || Model.role != "User")
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Job" asp-action="JobsSummary">
@@ -61,7 +61,7 @@
                                 </a>
                             </li>
                         }
-                        @if (Model.role == "Admin" || Model.role != "User")
+                        @if (Model.role == "Admin_Operation" || Model.role == "Admin" || Model.role != "User")
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="QuotationSummary" asp-action="Index">
@@ -108,7 +108,7 @@
                         </ul>
                     </li>
                 }
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -137,7 +137,7 @@
                         </ul>
                     </li>
                 }
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -161,7 +161,7 @@
                     </li>
                 }
 
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -236,7 +236,7 @@
                     </li>
                 }
 
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -260,7 +260,7 @@
                     </li>
                 }
 
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -278,7 +278,7 @@
                     </li>
                 }
 
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
@@ -332,12 +332,12 @@
                     </li>
                 }
 
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Opearation" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-cogs"></i>
-                            <p class="text-bold">ADMIN<i class="right fas fa-angle-left"></i></p>
+                            <p class="text-bold">ADMIN OPERATION<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -410,7 +410,7 @@
                     </li>
                 }
 
-                @if (Model.role == "Admin")
+                @if (Model.role == "Admin_Leave" || Model.role == "Admin")
                 {
                     <li class="nav-item">
                         <a href="#" class="nav-link">

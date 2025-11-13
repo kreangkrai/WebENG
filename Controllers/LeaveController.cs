@@ -22,16 +22,19 @@ namespace WebENG.Controllers
         readonly IHierarchy Hierarchy;
         readonly INotification Notification;
         readonly ILeaveType LeaveType;
-        readonly ILeaveEntitlementRule EntitlementRule;
         readonly ILeave Leave;
+        private CTLInterfaces.IEmployee Employee;
+        readonly IRequest Requests;
         public LeaveController()
         {
             Accessory = new AccessoryService();
             Hierarchy = new HierarchyService();
             Notification = new NotificationService();
             LeaveType = new LeaveTypeService();
-            EntitlementRule = new LeaveEntitlementRuleService();
             Leave = new LeaveService();
+            Employee = new CTLServices.EmployeeService();
+            Requests = new RequestService();
+
         }
         public IActionResult Index()
         {
@@ -79,11 +82,38 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetLeaves(string emp_id,int year)
+        public IActionResult GetLeaves()
         {
-            LeaveBalanceModel balance_entitlement = EntitlementRule.GetLeaveBalances(emp_id, year);
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            var data = new { leaves = leaves, balance_entitlement = balance_entitlement };
+            
+            var data = new { leaves = leaves };
+            return Json(data);
+        }
+        [HttpGet]
+        public IActionResult GetLeaveById(string leave_type_id, string emp_id)
+        {
+            LeaveTypeModel leave = LeaveType.GetLeaveTypeByID(leave_type_id);
+            int year = DateTime.Now.Year;
+            List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
+            List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
+            requests = requests.Where(w => w.leave_type_id == leave_type_id &&
+            w.start_request_date.Year == year &&
+            w.status_request == "Successed").ToList();
+            if (leave.calculate_auto == true)
+            {
+                var em = emps.Where(w => w.emp_id == emp_id).FirstOrDefault();
+                CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel()
+                {
+                    emp_id = emp_id,
+                    position = em.position,
+                    start_date = em.start_date,
+                    promote_manager_date = em.promote_manager_date,                   
+                };
+                double _leave = Leave.CalculateLeaveDays(emp, year, 6, 10, 10, 12);
+                leave.amount_entitlement = (decimal)_leave;
+            }
+            double balance = (double)leave.amount_entitlement - requests.Count;
+            var data = new { leave = leave ,balance = balance };
             return Json(data);
         }
     }

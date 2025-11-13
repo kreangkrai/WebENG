@@ -52,6 +52,7 @@ namespace WebENG.Controllers
         public JsonResult GetUsers()
         {
             List<EngUserModel> users = EngUserService.GetUsers().OrderBy(o => o.user_id).ToList();
+            users = users.OrderBy(o => o.user_name).ToList();
             return Json(users);
         }
 
@@ -71,9 +72,22 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAuthenAdmin()
+        public JsonResult GetAuthenSuperAdmin()
         {
             List<AuthenModel> users = Authen.GetAuthens().Where(w => w.role == "Admin").OrderBy(o => o.name).ToList();
+            return Json(users);
+        }
+        [HttpGet]
+        public JsonResult GetAuthenAdminOperation()
+        {
+            List<AuthenModel> users = Authen.GetAuthens().Where(w => w.role == "Admin_Operation").OrderBy(o => o.name).ToList();
+            return Json(users);
+        }
+
+        [HttpGet]
+        public JsonResult GetAuthenAdminLeave()
+        {
+            List<AuthenModel> users = Authen.GetAuthens().Where(w => w.role == "Admin_Leave").OrderBy(o => o.name).ToList();
             return Json(users);
         }
 
@@ -87,7 +101,7 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetAuthenManager()
         {
-            List<AuthenModel> users = Authen.GetAuthens().Where(w => w.role != "User" && w.role != "Admin" && w.role != "Sale").OrderBy(o => o.name).ToList();
+            List<AuthenModel> users = Authen.GetAuthens().Where(w => w.role != "User" && !w.role.Contains("Admin") && w.role != "Sale").OrderBy(o => o.name).ToList();
             return Json(users);
         }
 

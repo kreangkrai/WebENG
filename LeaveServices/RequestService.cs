@@ -44,6 +44,9 @@ namespace WebENG.LeaveServices
                                                           ,[manager_approver_status]
                                                           ,[manager_approver]
                                                           ,[manager_approve_date]
+                                                          ,[director_approver_status]
+                                                          ,[director_approver]
+                                                          ,[director_approve_date]
                                                           ,[admin_approver_status]
                                                           ,[admin_approver]
                                                           ,[admin_approve_date]
@@ -51,6 +54,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] IS NOT NULL");
@@ -80,11 +84,15 @@ namespace WebENG.LeaveServices
                             manager_approver = dr["manager_approver"].ToString(),
                             manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
                             manager_approver_status = dr["manager_approver_status"].ToString(),
+                            director_approver = dr["director_approver"].ToString(),
+                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
+                            director_approver_status = dr["director_approver_status"].ToString(),
                             admin_approver = dr["admin_approver"].ToString(),
                             admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
                             admin_approver_status = dr["admin_approver_status"].ToString(),
                             decsription = dr["decsription"].ToString(),
-                            status_request = dr["status_request"].ToString()
+                            status_request = dr["status_request"].ToString(),
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                         };
                         requests.Add(request);
                     }
@@ -125,6 +133,9 @@ namespace WebENG.LeaveServices
                                                           ,[manager_approver_status]
                                                           ,[manager_approver]
                                                           ,[manager_approve_date]
+                                                          ,[director_approver_status]
+                                                          ,[director_approver]
+                                                          ,[director_approve_date]
                                                           ,[admin_approver_status]
                                                           ,[admin_approver]
                                                           ,[admin_approve_date]
@@ -132,6 +143,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] = @request_id");
@@ -162,11 +174,15 @@ namespace WebENG.LeaveServices
                             manager_approver = dr["manager_approver"].ToString(),
                             manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
                             manager_approver_status = dr["manager_approver_status"].ToString(),
+                            director_approver = dr["director_approver"].ToString(),
+                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
+                            director_approver_status = dr["director_approver_status"].ToString(),
                             admin_approver = dr["admin_approver"].ToString(),
                             admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
                             admin_approver_status = dr["admin_approver_status"].ToString(),
                             decsription = dr["decsription"].ToString(),
-                            status_request = dr["status_request"].ToString()
+                            status_request = dr["status_request"].ToString(),
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false
                         };
                     }
                     dr.Close();
@@ -206,11 +222,15 @@ namespace WebENG.LeaveServices
                                                    ,[manager_approver_status]
                                                    ,[manager_approver]
                                                    ,[manager_approve_date]
+                                                   ,[director_approver_status]
+                                                   ,[director_approver]
+                                                   ,[director_approve_date]
                                                    ,[admin_approver_status]
                                                    ,[admin_approver]
                                                    ,[admin_approve_date]
                                                    ,[decsription]
-                                                   ,[status_request])
+                                                   ,[status_request]
+                                                   ,[is_two_step_approve])
                                              VALUES
                                                    (@request_id
                                                    ,@emp_id
@@ -227,11 +247,15 @@ namespace WebENG.LeaveServices
                                                    ,@manager_approver_status
                                                    ,@manager_approver
                                                    ,@manager_approve_date
+                                                   ,@director_approver_status
+                                                   ,@director_approver
+                                                   ,@director_approve_date
                                                    ,@admin_approver_status
                                                    ,@admin_approver
                                                    ,@admin_approve_date
                                                    ,@decsription
-                                                   ,@status_request)");
+                                                   ,@status_request
+                                                   ,@is_two_step_approve)");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@request_id", request.request_id);
                 command.Parameters.AddWithValue("@emp_id", request.emp_id);
@@ -248,11 +272,15 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@manager_approver", request.manager_approver);
                 command.Parameters.AddWithValue("@manager_approve_date", request.manager_approve_date);
                 command.Parameters.AddWithValue("@manager_approver_status", request.manager_approver_status);
+                command.Parameters.AddWithValue("@director_approver", request.director_approver);
+                command.Parameters.AddWithValue("@director_approve_date", request.director_approve_date);
+                command.Parameters.AddWithValue("@director_approver_status", request.director_approver_status);
                 command.Parameters.AddWithValue("@admin_approver", request.admin_approver);
                 command.Parameters.AddWithValue("@admin_approve_date", request.admin_approve_date);
                 command.Parameters.AddWithValue("@admin_approver_status", request.admin_approver_status);
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
+                command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
             }
             finally
             {
@@ -286,11 +314,15 @@ namespace WebENG.LeaveServices
                                                       ,[manager_approver_status] = @manager_approver_status
                                                       ,[manager_approver] = @manager_approver
                                                       ,[manager_approve_date] = @manager_approve_date
+                                                      ,[director_approver_status] = @director_approver_status
+                                                      ,[director_approver] = @director_approver
+                                                      ,[director_approve_date] = @director_approve_date
                                                       ,[admin_approver_status] = @admin_approver_status
                                                       ,[admin_approver] = @admin_approver
                                                       ,[admin_approve_date] = @admin_approve_date
                                                       ,[decsription] = @decsription
                                                       ,[status_request] = @status_request
+                                                      ,[is_two_step_approve] = @is_two_step_approve
                                                  WHERE [request_id] = @request_id AND  [emp_id] = @emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@request_id", request.request_id);
@@ -308,11 +340,15 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@manager_approver", request.manager_approver);
                 command.Parameters.AddWithValue("@manager_approve_date", request.manager_approve_date);
                 command.Parameters.AddWithValue("@manager_approver_status", request.manager_approver_status);
+                command.Parameters.AddWithValue("@director_approver", request.director_approver);
+                command.Parameters.AddWithValue("@director_approve_date", request.director_approve_date);
+                command.Parameters.AddWithValue("@director_approver_status", request.director_approver_status);
                 command.Parameters.AddWithValue("@admin_approver", request.admin_approver);
                 command.Parameters.AddWithValue("@admin_approve_date", request.admin_approve_date);
                 command.Parameters.AddWithValue("@admin_approver_status", request.admin_approver_status);
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
+                command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
             }
             finally
             {
@@ -349,6 +385,9 @@ namespace WebENG.LeaveServices
                                                           ,[manager_approver_status]
                                                           ,[manager_approver]
                                                           ,[manager_approve_date]
+                                                          ,[director_approver_status]
+                                                          ,[director_approver]
+                                                          ,[director_approve_date]
                                                           ,[admin_approver_status]
                                                           ,[admin_approver]
                                                           ,[admin_approve_date]
@@ -356,6 +395,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [emp_id] = @emp_id");
@@ -386,11 +426,15 @@ namespace WebENG.LeaveServices
                             manager_approver = dr["manager_approver"].ToString(),
                             manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
                             manager_approver_status = dr["manager_approver_status"].ToString(),
+                            director_approver = dr["director_approver"].ToString(),
+                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
+                            director_approver_status = dr["director_approver_status"].ToString(),
                             admin_approver = dr["admin_approver"].ToString(),
                             admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
                             admin_approver_status = dr["admin_approver_status"].ToString(),
                             decsription = dr["decsription"].ToString(),
-                            status_request = dr["status_request"].ToString()
+                            status_request = dr["status_request"].ToString(),
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                         };
                         requests.Add(request);
                     }

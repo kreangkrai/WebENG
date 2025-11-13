@@ -359,13 +359,13 @@
                                 <div class="col-xl-8 col-md-8 col-sm-12">
                                     <div class="row">
                                         <div class="col-xl-6 col-md-6 col-sm-12">
-                                            <div class="form-group ">
+                                            <div class="form-row">
                                                 <label class="kanit-light" style="color:dimgrey; font-size:18px">ชื่อประเภท (TH)</label>
                                                 <input id="update_type_leave_th" type="text" class="form-control kanit-light" style="text-align:start; font-size:18px" />
                                             </div>
                                         </div>
                                         <div class="col-xl-6 col-md-6 col-sm-12">
-                                            <div class="form-group ">
+                                            <div class="form-row">
                                                 <label class="kanit-light" style="color:dimgrey; font-size:18px">ชื่อประเภท (EN)</label>
                                                 <input id="update_type_leave_en" type="text" class="form-control kanit-light" style="text-align:start; font-size:18px" />
                                             </div>
@@ -373,15 +373,27 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-xl-4 col-md-4 col-sm-12">
-                                            <div class="form-group ">
-                                                <label class="kanit-light" style="color:dimgrey; font-size:18px">รหัสการลา</label>
-                                                <input id="update_type_leave_code" type="text" class="form-control" style="text-align:start; font-size:18px" />
+                                            <div class="row">
+                                                <div class="form-row col-12">
+                                                    <label class="kanit-light" style="color:dimgrey; font-size:18px">รหัสการลา</label>
+                                                    <input id="update_type_leave_code" type="text" class="form-control" style="text-align:start; font-size:18px" />
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-row col-12">
+                                                    <label class="kanit-light" style="color:dimgrey; font-size:18px">สีของการลา</label>
+                                                    <select id="update_leave_code_color" class="form-control">
+                                                        <option value="red" style="color: #dc3545;"class="fas fa-circle">แดง</option>
+                                                        <option value="green" style="color: #198754;">เขียว</option>
+                                                        <option value="yellow" style="color: #ffc107;">เหลือง</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-xl-8 col-md-8 col-sm-12">
-                                            <div class="form-group">
+                                            <div class="form-row">
                                                 <label class="kanit-light" style="color:dimgrey; font-size:18px">รายละเอียด</label>
-                                                <textarea id="update_leave_description" class="form-control kanit-light" style="text-align:start; font-size:18px" placeholder="รายละเอียดเพิ่มเติม" rows="1"></textarea>
+                                                <textarea id="update_leave_description" class="form-control kanit-light" style="text-align:start; font-size:18px" placeholder="รายละเอียดเพิ่มเติม" rows="4"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -609,18 +621,6 @@
                                                     <div class="col-4 d-flex justify-content-end">
                                                         <label id="update_leave_edit_at" class="kanit-light">
                                                         </label>
-                                                    </div>
-                                                </div>
-                                                <div class="row condition-row">
-                                                    <div class="col-8">
-                                                        <span class="kanit-light">สีของวันลา</span>
-                                                    </div>
-                                                    <div class="col-4 kanit-light d-flex justify-content-end">
-                                                        <select id="update_leave_code_color" class="form-control">
-                                                            <option value="red">แดง</option>
-                                                            <option value="green">เขียว</option>
-                                                            <option value="yellow">เหลือง</option>
-                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="row condition-row">
