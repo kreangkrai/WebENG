@@ -28,30 +28,46 @@ namespace WebENG.LeaveServices
                     else
                         return CalculateProratedManagerLeave(promoteDate, min_leave_manager);
                 }
-                else if (targetYear == promoteYear)
-                {
-                    // เลื่อนปีนี้ แต่ไม่ใช่ปีแรกที่เข้าทำงาน
-                    if (emp.start_date.Day <= 15 && emp.start_date.Month == 1)
-                        return min_leave_staft; // ปีแรกเข้าเต็ม (แต่เลื่อนปีนี้ → ยังเป็น Staff)
-                    else
-                    {
-                        int yearsAsStaff = promoteYear - hireYear;
-                        if (yearsAsStaff == 0)
-                            return CalculateProratedStaffLeave(emp.start_date, min_leave_staft);
-                        else
-                            return Math.Round((double)Math.Min(min_leave_staft + (yearsAsStaff - 1), max_leave_staft), 2);
-                    }
-                }
                 else
                 {
-                    // ปีถัดไปหลังเลื่อน → ใช้สูตร Manager ปกติ
-                    int yearsAsStaff = promoteYear - hireYear;
-                    int staffLeave = Math.Min(min_leave_staft + (yearsAsStaff - 1), max_leave_staft);
-                    bool reachedStaffMax = staffLeave >= max_leave_staft;
-                    int yearsAsManager = targetYear - promoteYear;
-                    int baseManagerLeave = reachedStaffMax ? (min_leave_manager + 1) : min_leave_manager;
-                    int total = baseManagerLeave + (yearsAsManager - 1);
-                    return Math.Round((double)Math.Min(total, max_leave_manager), 2);
+
+                    if (targetYear == promoteYear)
+                    {
+                        // เลื่อนปีนี้ แต่ไม่ใช่ปีแรกที่เข้าทำงาน
+                        if (emp.promote_manager_date.Day <= 15 && emp.promote_manager_date.Month == 1)
+                        {
+                            int yearsAsStaff = promoteYear - hireYear - 1;
+                            double leaveAsStaff = Math.Round((double)Math.Min(min_leave_staft + (yearsAsStaff), max_leave_staft), 2);
+                            if (leaveAsStaff >= max_leave_staft)
+                            {
+                                return min_leave_manager + 1;
+                            }
+                            return min_leave_manager; // ปีแรกเข้าเต็ม (แต่เลื่อนปีนี้ → ยังเป็น Staff)
+                        }
+                        else
+                        {
+                            int yearsAsStaff = promoteYear - hireYear;
+                            if (yearsAsStaff == 0)
+                                return CalculateProratedStaffLeave(emp.start_date, min_leave_staft);
+                            else
+                                return Math.Round((double)Math.Min(min_leave_staft + (yearsAsStaff), max_leave_staft), 2);
+                        }
+                    }
+                    else
+                    {
+                        // ปีถัดไปหลังเลื่อน → ใช้สูตร Manager ปกติ
+                        int yearsAsStaff = promoteYear - hireYear;
+                        int staffLeave = Math.Min(min_leave_staft + (yearsAsStaff), max_leave_staft);
+                        bool reachedStaffMax = staffLeave >= max_leave_staft;
+                        int yearsAsManager = targetYear - promoteYear;
+                        int baseManagerLeave = reachedStaffMax ? (min_leave_manager + 1) : min_leave_manager;
+                        int total = 0;
+                        if (emp.promote_manager_date.Day <= 15 && emp.promote_manager_date.Month == 1)
+                             total = baseManagerLeave + (yearsAsManager);
+                        else
+                             total = baseManagerLeave + (yearsAsManager - 1);
+                        return Math.Round((double)Math.Min(total, max_leave_manager), 2);
+                    }
                 }
             }
             else
@@ -60,13 +76,13 @@ namespace WebENG.LeaveServices
                 if (targetYear == hireYear)
                 {
                     if (emp.start_date.Day <= 15 && emp.start_date.Month == 1)
-                        return min_leave_staft; // เข้าก่อน 16 ม.ค. → ได้เต็ม
+                        return min_leave_staft;
                     else
                         return CalculateProratedStaffLeave(emp.start_date, min_leave_staft);
                 }
                 else
                 {
-                    return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear - 1), max_leave_staft), 2);
+                    return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear), max_leave_staft), 2);
                 }
             }
         }
@@ -94,7 +110,7 @@ namespace WebENG.LeaveServices
                     if (yearsAsStaff == 0)
                         return CalculateProratedStaffLeave(emp.start_date, min_leave_staft);
                     else
-                        return Math.Round((double)Math.Min(min_leave_staft + (yearsAsStaff - 1), max_leave_staft),2);
+                        return Math.Round((double)Math.Min(min_leave_staft + (yearsAsStaff - 1), max_leave_staft), 2);
                 }
                 else
                 {
@@ -106,7 +122,7 @@ namespace WebENG.LeaveServices
                     int yearsAsManager = targetYear - promoteYear;
                     int baseManagerLeave = reachedStaffMax ? (min_leave_manager + 1) : min_leave_manager;
                     int total = baseManagerLeave + (yearsAsManager - 1);
-                    return Math.Round((double)Math.Min(total, max_leave_manager),2);
+                    return Math.Round((double)Math.Min(total, max_leave_manager), 2);
                 }
             }
             else
@@ -115,7 +131,7 @@ namespace WebENG.LeaveServices
                 if (targetYear == hireYear)
                     return CalculateProratedStaffLeave(emp.start_date, min_leave_staft);
                 else
-                    return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear - 1), max_leave_staft),2);
+                    return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear - 1), max_leave_staft), 2);
             }
         }
 
@@ -135,7 +151,6 @@ namespace WebENG.LeaveServices
             return Math.Round(leave, 2);
         }
 
-        // นับเดือน (ก่อน 15 = เต็มเดือน)
         private int GetCountedMonths(DateTime startDate)
         {
             int startMonth = startDate.Month;
@@ -146,7 +161,7 @@ namespace WebENG.LeaveServices
                 count++;
 
             return count;
-        }
+        }      
     }
 }
 

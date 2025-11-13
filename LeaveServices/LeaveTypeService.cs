@@ -49,6 +49,10 @@ namespace WebENG.LeaveServices
                                                           ,emp1.name_en as created_by
                                                           ,[updated_at]
                                                           ,emp2.name_en as updated_by
+                                                          ,[color_code]
+                                                          ,[calculate_auto]
+                                                          ,[amount_entitlement]
+                                                          ,[length_start_date]
                                                       FROM [dbo].[leave_type]
 													  LEFT JOIN Employees emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
 													  LEFT JOIN Employees emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
@@ -81,7 +85,11 @@ namespace WebENG.LeaveServices
                             created_at = dr["created_at"] != DBNull.Value ? Convert.ToDateTime(dr["created_at"].ToString()) : DateTime.MinValue,
                             created_by = dr["created_by"].ToString(),
                             updated_at = dr["updated_at"] != DBNull.Value ? Convert.ToDateTime(dr["updated_at"].ToString()) : DateTime.MinValue,
-                            updated_by = dr["updated_by"].ToString()
+                            updated_by = dr["updated_by"].ToString(),
+                            color_code = dr["color_code"].ToString(),
+                            calculate_auto = dr["calculate_auto"] != DBNull.Value ? Convert.ToBoolean(dr["calculate_auto"].ToString()) : false,
+                            amount_entitlement = dr["amount_entitlement"] != DBNull.Value ? Convert.ToDecimal(dr["amount_entitlement"].ToString()) : 0,
+                            length_start_date = dr["length_start_date"] != DBNull.Value ? Convert.ToDecimal(dr["length_start_date"].ToString()) : 0,
                         };
                         leaves.Add(leave);
                     }
@@ -127,6 +135,10 @@ namespace WebENG.LeaveServices
                                                           ,emp1.name_en as created_by
                                                           ,[updated_at]
                                                           ,emp2.name_en as updated_by
+                                                          ,[color_code]
+                                                          ,[calculate_auto]
+                                                          ,[amount_entitlement]
+                                                          ,[length_start_date]
                                                       FROM [dbo].[leave_type]
 													  LEFT JOIN Employees emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
 													  LEFT JOIN Employees emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
@@ -160,7 +172,11 @@ namespace WebENG.LeaveServices
                             created_at = dr["created_at"] != DBNull.Value ? Convert.ToDateTime(dr["created_at"].ToString()) : DateTime.MinValue,
                             created_by = dr["created_by"].ToString(),
                             updated_at = dr["updated_at"] != DBNull.Value ? Convert.ToDateTime(dr["updated_at"].ToString()) : DateTime.MinValue,
-                            updated_by = dr["updated_by"].ToString()
+                            updated_by = dr["updated_by"].ToString(),
+                            color_code = dr["color_code"].ToString(),
+                            calculate_auto = dr["calculate_auto"] != DBNull.Value ? Convert.ToBoolean(dr["calculate_auto"].ToString()) : false,
+                            amount_entitlement = dr["amount_entitlement"] != DBNull.Value ? Convert.ToDecimal(dr["amount_entitlement"].ToString()) : 0,
+                            length_start_date = dr["length_start_date"] != DBNull.Value ? Convert.ToDecimal(dr["length_start_date"].ToString()) : 0,
                         };
                     }
                     dr.Close();
@@ -204,7 +220,11 @@ namespace WebENG.LeaveServices
                                                ,[created_at]
                                                ,[created_by]
                                                ,[updated_at]
-                                               ,[updated_by])
+                                               ,[updated_by]
+                                               ,[color_code]
+                                               ,[calculate_auto]
+                                               ,[amount_entitlement]
+                                               ,[length_start_date])
                                          VALUES
                                                (@leave_type_id
                                                ,@leave_type_code
@@ -226,7 +246,11 @@ namespace WebENG.LeaveServices
                                                ,@created_at
                                                ,@created_by
                                                ,@updated_at
-                                               ,@updated_by)");
+                                               ,@updated_by
+                                               ,@color_code
+                                               ,@calculate_auto
+                                               ,@amount_entitlement
+                                               ,@length_start_date)");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
                 command.Parameters.AddWithValue("@leave_type_code", leave.leave_type_code);
@@ -249,6 +273,10 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@created_by", leave.created_by);
                 command.Parameters.AddWithValue("@updated_at", leave.updated_at);
                 command.Parameters.AddWithValue("@updated_by", leave.updated_by);
+                command.Parameters.AddWithValue("@color_code", leave.color_code);
+                command.Parameters.AddWithValue("@calculate_auto", leave.calculate_auto);
+                command.Parameters.AddWithValue("@amount_entitlement", leave.amount_entitlement);
+                command.Parameters.AddWithValue("@length_start_date", leave.length_start_date);
                 command.ExecuteNonQuery();
             }
             finally
@@ -289,6 +317,10 @@ namespace WebENG.LeaveServices
                                                       ,[created_by] = @created_by
                                                       ,[updated_at] = @updated_at
                                                       ,[updated_by] = @updated_by
+                                                      ,[color_code] = @color_code
+                                                      ,[calculate_auto] = @calculate_auto
+                                                      ,[amount_entitlement] = @amount_entitlement
+                                                      ,[length_start_date] = @length_start_date
                                                  WHERE [leave_type_id] = @leave_type_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
@@ -312,6 +344,10 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@created_by", leave.created_by);
                 command.Parameters.AddWithValue("@updated_at", leave.updated_at);
                 command.Parameters.AddWithValue("@updated_by", leave.updated_by);
+                command.Parameters.AddWithValue("@color_code", leave.color_code);
+                command.Parameters.AddWithValue("@calculate_auto", leave.calculate_auto);
+                command.Parameters.AddWithValue("@amount_entitlement", leave.amount_entitlement);
+                command.Parameters.AddWithValue("@length_start_date", leave.length_start_date);
                 command.ExecuteNonQuery();
             }
             finally
