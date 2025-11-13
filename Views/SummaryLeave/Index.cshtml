@@ -304,6 +304,68 @@
             box-shadow: 0 8px 20px rgba(28, 70, 152, 0.15) !important;
         }
 
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        /*align-items: center;
+            padding: 10px 15px; */
+        background-color: #fff;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+    .badge-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+    }
+
+    .card-text {
+        font-size: 0.95rem;
+        color: #6c757d;
+        margin-top: 5px;
+        line-height: 1.4;
+    }
+    
 </style>
 
 <div class="row" style="row-gap:1px">
@@ -325,10 +387,8 @@
             <div class="color-bottom-left"></div>
             <div class="color-bottom-right"></div>
         </div>
-        </div>*@
-
-    <form>
-        <div class="col-12">
+        </div>
+        <div class="col-3">
             <div class="card shadow-sm modern-card col-12" style="border-radius:10px; ">
                 <div class="card-body" style="overflow-y:auto">
                     <div class="form-group row">
@@ -344,7 +404,6 @@
                                 <!-- จุดวงกลมสีแดง -->
                                 <div class="rounded-circle"
                                      style="width:10px; height:10px; background-color:red; margin-right:10px"></div>
-
                                 <!-- ข้อความ -->
                                 <label class="kanit-light">ลาพักร้อน</label>
                             </div>
@@ -354,7 +413,73 @@
                 </div>
             </div>
         </div>
-    </form>
+    *@
+
+    <div class="container">
+        <h4 class="text-center kanit-medium" style="color: #2c3e50;">สรุปการลาวันนี้</h4>
+
+        <div class="row">
+            <!-- Card 1 -->
+            <div class="col-md-3 mb-3">
+                <div class="card kanit-regular">
+                    <div class="badge-circle">1</div>
+                    <h5 class="card-title">
+                        <span class="dot"></span> รอดำเนินการ
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-md-3 mb-3">
+                <div class="card kanit-regular">
+                    <div class="badge-circle">2</div>
+                    <h5 class="card-title">
+                        <span class="dot" style="background-color: #ffc107;"></span> ดำเนินการแล้ว
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-md-3 mb-3">
+                <div class="card kanit-regular">
+                    <div class="badge-circle">3</div>
+                    <h5 class="card-title">
+                        <span class="dot" style="background-color: #28a745;"></span> เสร็จสิ้น
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="col-md-3 mb-3">
+                <div class="card kanit-regular">
+                    <div class="badge-circle">4</div>
+                    <h5 class="card-title">
+                        <span class="dot"></span> ยกเลิกแล้ว
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="col-md-3 mb-3">
+                <div class="card kanit-regular">
+                    <div class="badge-circle">5</div>
+                    <h5 class="card-title">
+                        <span class="dot" style="background-color: #6f42c1;"></span> รอชำระเงิน
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="col-md-3 mb-3">
+                <div class="card kanit-regular">
+                    <div class="badge-circle">6</div>
+                    <h5 class="card-title">
+                        <span class="dot" style="background-color: #17a2b8;"></span> กำลังจัดส่ง
+                    </h5>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark">
