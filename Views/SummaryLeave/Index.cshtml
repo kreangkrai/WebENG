@@ -366,19 +366,72 @@
         line-height: 1.4;
     }
     
-    .color-type1  {  background-color: #9CCC65;    }     /* เขียวมะนาว */
-    .color-type2  {  background-color: #4FC3F7;    }     /*  */
-    .color-type3  {  background-color: #FFD54F;    }     /*  */
-    .color-type4  {  background-color: #43A047;    }     /*  */
-    .color-type5  {  background-color: #1976D2;    }     /*  */
-    .color-type6  {  background-color: #E53935;    }     /*  */
-    .color-type7  {  background-color: #D32F2F;    }     /*  */
-    .color-type8  {  background-color: #90A4AE;    }     /*  */
-    .color-type9  {  background-color: #FF8A65;    }     /*  */
-    .color-type10 {  background-color: #8E24AA;    }     /*  */
-    .color-type11 {  background-color: #9CCC65;    }     /*  */
-    .color-type12 {  background-color: #F06292;    }     /*  */
-    .color-type13 {  background-color: #6D4C41;    }     /*  */
+    /* .color-type1  {  background-color: #9CCC65;    } */     /* เขียวมะนาว - Default*/
+    .color-type1  {  background-color: #6D4C41;    }     /* น้ำตาลช็อกเข้ม */
+    .color-type2  {  background-color: #4FC3F7;    }     /* ฟ้าคราม */
+    .color-type3  {  background-color: #FFD54F;    }     /* เหลืองทอง */
+    .color-type4  {  background-color: #43A047;    }     /* เขียวป่า */
+    .color-type5  {  background-color: #1976D2;    }     /* น้ำเงินกรม */
+    .color-type6  {  background-color: #E53935;    }     /* แดง */
+    .color-type7  {  background-color: #F06292;    }     /* ชมพู */
+    .color-type8  {  background-color: #90A4AE;    }     /* เทาเงิน */
+    .color-type9  {  background-color: #FF8A65;    }     /* ส้ม*/
+    .color-type10 {  background-color: #8E24AA;    }     /* ม่วง */
+
+    .text-color-type1  {  color: #6D4C41;    }     /* น้ำตาลช็อกเข้ม */
+    .text-color-type2  {  color: #4FC3F7;    }     /* ฟ้าคราม */
+    .text-color-type3  {  color: #FFD54F;    }     /* เหลืองทอง */
+    .text-color-type4  {  color: #43A047;    }     /* เขียวป่า */
+    .text-color-type5  {  color: #1976D2;    }     /* น้ำเงินกรม */
+    .text-color-type6  {  color: #E53935;    }     /* แดง */
+    .text-color-type7  {  color: #F06292;    }     /* ชมพู */
+    .text-color-type8  {  color: #90A4AE;    }     /* เทาเงิน */
+    .text-color-type9  {  color: #FF8A65;    }     /* ส้ม*/
+    .text-color-type10 {  color: #8E24AA;    }     /* ม่วง */
+
+    /* กลุ่มปุ่มที่มี tooltip */
+    .tooltip-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* ซ่อน tooltip เริ่มต้น */
+    .custom-tooltip {
+        position: absolute;
+        bottom: 100%; /* วางด้านบนปุ่ม */
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 8px; /* ระยะห่างจากปุ่ม */
+        background-color: #333;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+        /* ลูกศรชี้ลง (ด้านล่างของ tooltip) */
+        .custom-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; /* อยู่ด้านล่าง tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+    /* แสดง tooltip เมื่อ hover */
+    .tooltip-wrapper:hover .custom-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
 </style>
 
 <div class="row" style="row-gap:1px">
@@ -434,36 +487,37 @@
         <div class="row">
             <!-- Card 1 -->
             <div class="col-md-2 col-sm-6">
-                <div class="card kanit-regular" style="align-items: center; padding:10px">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; background-color:#2178BE;">
                     @* <div class="badge-circle">1 คน</div> *@
-                    <h1 class="card-title" style="font-size:28px"> 1 คน </h1>
+                    <h1 class="card-title" style="font-size:28px; color:white;"> 25 คน </h1>
                     @* <span class="dot" style="background-color: #6f42c1;"></span> รอชำระเงิน *@
-                    <h5 class="card-title">
-                        <span class="dot"></span> รอดำเนินการ
-                        
+                    <h5 class="card-title" style="color:white;">
+                        ลาทั้งหมด
                     </h5>
                 </div>
             </div>
 
             <!-- Card 2 -->
             <div class="col-md-2 col-sm-6">
-                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                <div class="card kanit-regular" style="align-items: center; padding:10px">
                     @* <div class="badge-circle">1 คน</div> *@
-                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 12 คน </h1>
-                    <h5 class="card-title" >
-                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                    <h1 class="card-title text-color-type1" style="font-size:28px;"> 6 คน </h1>
+                    @* <span class="dot" style="background-color: #6f42c1;"></span> รอชำระเงิน *@
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2 text-color-type1" style="font-size:10px;"></i>
                         ลาป่วย
                     </h5>
                 </div>
             </div>
-
+            
             <!-- Card 3 -->
             <div class="col-md-2 col-sm-6">
                 <div class="card kanit-regular" style="align-items: center; padding:10px; ">
-                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 3 คน </h1>
-                    <h5 class="card-title">
-                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
-                        ลากิจ
+                    @* <div class="badge-circle">1 คน</div> *@
+                    <h1 class="card-title text-color-type2" style="font-size:28px;"> 5 คน </h1>
+                    <h5 class="card-title" >
+                        <i class="fas fa-circle mr-2 text-color-type2" style="font-size:10px;"></i>
+                        ลาพักร้อน
                     </h5>
                 </div>
             </div>
@@ -471,10 +525,10 @@
             <!-- Card 4 -->
             <div class="col-md-2 col-sm-6">
                 <div class="card kanit-regular" style="align-items: center; padding:10px; ">
-                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 4 คน </h1>
+                    <h1 class="card-title text-color-type3" style="font-size:28px;"> 4 คน </h1>
                     <h5 class="card-title">
-                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
-                        ลาพักร้อน
+                        <i class="fas fa-circle mr-2 text-color-type3" style="font-size:10px;"></i>
+                        ลาบวช
                     </h5>
                 </div>
             </div>
@@ -482,9 +536,9 @@
             <!-- Card 5 -->
             <div class="col-md-2 col-sm-6">
                 <div class="card kanit-regular" style="align-items: center; padding:10px; ">
-                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 5 คน </h1>
+                    <h1 class="card-title text-color-type4" style="font-size:28px;"> 3 คน </h1>
                     <h5 class="card-title">
-                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        <i class="fas fa-circle mr-2 text-color-type4" style="font-size:10px;"></i>
                         ลากิจ
                     </h5>
                 </div>
@@ -493,119 +547,66 @@
             <!-- Card 6 -->
             <div class="col-md-2 col-sm-6">
                 <div class="card kanit-regular" style="align-items: center; padding:10px; ">
-                    <h1 class="card-title" style="font-size:28px; color:#014E86"> 6 คน </h1>
+                    <h1 class="card-title text-color-type5" style="font-size:28px;"> 2 คน </h1>
                     <h5 class="card-title">
-                        <i class="fas fa-circle mr-2" style="font-size:10px; color:#014E86"></i>
+                        <i class="fas fa-circle mr-2 text-color-type5" style="font-size:10px;"></i>
+                        ลาพักร้อนไม่รับค่าจ้าง
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 7 -->
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title text-color-type6" style="font-size:28px;"> 1 คน </h1>
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2 text-color-type6" style="font-size:10px;"></i>
+                        ลาคลอด
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 8 -->
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title text-color-type7" style="font-size:28px;"> 1 คน </h1>
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2 text-color-type7" style="font-size:10px;"></i>
+                        ลาฝึกวิชาทหาร
+                    </h5>
+                </div>
+            </div>
+
+            <!-- Card 9 -->
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title text-color-type8" style="font-size:28px;"> 1 คน </h1>
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2 text-color-type8" style="font-size:10px;"></i>
                         ลากิจ
                     </h5>
                 </div>
             </div>
-            
-            <!-- Card 7 TEST-->
-            <div class="col-md-2 col-sm-6 mb-2">
-                <div style="background:white; padding:10px; align-items: center;">
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type1"
-                           style="width:30px;height:30px;border-radius:15px; "/>
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type2"
-                           style="width:30px;height:30px;border-radius:15px; "/>
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type3"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left      color-type4"
-                           style="width:30px;height:30px;border-radius:15px; " />
+
+            <!-- Card 10 -->
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title text-color-type9" style="font-size:28px;"> 1 คน </h1>
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2 text-color-type9" style="font-size:10px;"></i>
+                        ลากิจ
+                    </h5>
                 </div>
             </div>
 
-            <!-- Card 8 TEST-->
-            <div class="col-md-2 col-sm-6 mb-2">
-                <div style="background:white; padding:10px; align-items: center;">
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type5"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type6"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type7"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left      color-type8"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                </div>
-            </div>
-
-            <!-- Card 9 TEST-->
-            <div class="col-md-2 col-sm-6 mb-2">
-                <div style="background:white; padding:10px; align-items: center;">
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type9"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type10"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left mr-2 color-type11"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn half-left      color-type12"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                </div>
-            </div>
-
-            <!-- Card 7 TEST-->
-            <div class="col-md-2 col-sm-6 mb-2">
-                <div style="background:white; padding:10px; align-items: center;">
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type1"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type2"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type3"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn      color-type4"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                </div>
-            </div>
-
-            <!-- Card 8 TEST-->
-            <div class="col-md-2 col-sm-6 mb-2">
-                <div style="background:white; padding:10px; align-items: center;">
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type5"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type6"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type7"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn      color-type8"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                </div>
-            </div>
-
-            <!-- Card 9 TEST-->
-            <div class="col-md-2 col-sm-6 mb-2">
-                <div style="background:white; padding:10px; align-items: center;">
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type9"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type10"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn mr-2 color-type11"
-                           style="width:30px;height:30px;border-radius:15px; " />
-                    <input type="button"
-                           class="kanit-light btn      color-type12"
-                           style="width:30px;height:30px;border-radius:15px; " />
+            <!-- Card 11 -->
+            <div class="col-md-2 col-sm-6">
+                <div class="card kanit-regular" style="align-items: center; padding:10px; ">
+                    <h1 class="card-title text-color-type10" style="font-size:28px;"> 1 คน </h1>
+                    <h5 class="card-title">
+                        <i class="fas fa-circle mr-2 text-color-type10" style="font-size:10px;"></i>
+                        ลากิจ
+                    </h5>
                 </div>
             </div>
 
@@ -798,9 +799,17 @@
                                     targets: i,
                                     render: function (data, type, row) {
                                         return `
-                                            <input type="button"
+                                            <div class="tooltip-wrapper">
+                                                <input type="button"
                                                    class="kanit-light btn btn-${colors[0]} ${classes[0]}"
                                                    style="width:30px;height:30px;border-radius:15px; background-color:#B0D483"/>
+
+                                                <!-- Tooltip แบบกำหนดเอง -->
+                                                <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
+                                                    <h5 style="font-size:18px; text-align:center">ลาพักร้อน</h5>
+                                                    <span style="font-size:16px; text-align:center">08:30 - 17:30</span>
+                                                </div>
+                                            </div>
                                         `;
                                     }
                                 });
@@ -835,5 +844,15 @@
             });
         }
     </script>
-}
 
+}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        // เปิดใช้งาน Tooltip ทั้งหมด
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
