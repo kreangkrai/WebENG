@@ -170,11 +170,15 @@
         <span class="kanit-bold" style="font-size:24px;color:dimgrey">สิทธิ์การจัดการวันลาพนักงาน</span>
         <hr style="border:solid;color:gray;border-width:1px" />
     </div>
-
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark">
             <div class="card-body" style="height:700px; overflow-y:auto">
                 <form>
+                    <div class="form-group row">
+                        <div class="col-2">
+                            <input type="button" id="addUser" class="btn btn-info form-control kanit-medium" style="border-radius:5px; height:40px; letter-spacing:1px" value="+ เพิ่มรายชื่อสิทธิ์" />
+                        </div>
+                    </div>
                     <div class="form-group">
                         <table id="table_authen" class="table table-sm table-bordered table-hover text-center w-100">
                             <thead class="kanit-light" style="background-color:lightgrey">
@@ -207,10 +211,10 @@
                 <form>
                     <div class="form-group row">
                         <div disabled class="col-xl-4 col-md-4 col-sm-6">
-                            <input id="emp_id" type="text" class="form-control" placeholder="EM010101" />
+                            <input id="emp_id" type="text" class="form-control" placeholder="" disabled />
                         </div>
                         <div disabled class="col-xl-8 col-md-8 col-sm-6">
-                            <input id="emp_name" type="text" class="form-control" placeholder="นายชัยวัฒน์ สุขสม" />
+                            <input id="emp_name" type="text" class="form-control" placeholder="" disabled />
                         </div>
                     </div>
                     <div class="row">
@@ -234,7 +238,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                   
+                    </div>
                     <div class="row">
                         <div class="col-12">
                             <div class="col-xl-4 col-md-4 col-sm-6">
@@ -268,7 +272,52 @@
         </div>
     </div>
 </div>
-
+<!-- Modal : เพิ่มรายชื่อสิทธิ์ -->
+<div class="modal fade" id="modal_user" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content" style="border-radius: 10px; overflow: hidden;">
+            <div class="modal-header" style="background: #34ba7c;
+                                            background: linear-gradient(90deg, rgba(52, 186, 124, 1) 0%, rgba(0, 138, 112, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title kanit-medium" style="color: white; font-size: 20px; letter-spacing: 1px;" id="modal_leave_title">เพิ่มรายชื่อสิทธิ์</h5>
+                <button type="button" class="close" style="color: white;" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mb-4" style="height:100px; color:#555555">
+                <form>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group ">
+                                <label class="kanit-light" style="color:dimgrey">รายชื่อ</label>
+                                <select class="form-control">
+                                    <option>Mee</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex">
+                <div class="container">
+                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-center">
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="btn modern-btn btn-cancel kanit-medium" style="background-color:red; color:white; border-radius:10px;width:80px" data-dismiss="modal">
+                                    ยกเลิก
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btn_add_user" class="btn modern-btn btn-save kanit-medium" style="background-color:#034694; color:white; border-radius:10px;width:80px">
+                                    เพิ่ม
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <partial name="ModalSpin" />
 
 @section Scripts
@@ -308,13 +357,14 @@
                 if (table_authen !== null)
                     $('#table_authen').DataTable().destroy();
                 for (let i = 0; i < positions.length; i++) {
-                    if (positions[i].level === "Manager") {
-                        list_department.push(positions[i].department);
-                    }
+
+                    list_department.push(positions[i].manager_departments);
+
                     datas.push([
                         positions[i].emp_name,
                         list_department,
-                        positions[i].department,
+                        positions[i].is_director,
+                        positions[i].is_auditor,
                     ]);
                 }
                 table_authen = $('#table_authen').DataTable({
@@ -345,14 +395,18 @@
                             </div>
                        </div>`;
                             }
-                        },                        
+                        },
                     ],
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
-                    }, info: false,
+                    }, rowCallback: function (row, data) {
+                        data[2] === true ? $('td:eq(2)', row).html('<span style = "color: green; font-weight: bold;" >✓</span >') : $('td:eq(2)', row).html("");
+                        data[3] === true ? $('td:eq(3)', row).html('<span style = "color: green; font-weight: bold;" >✓</span >') : $('td:eq(3)', row).html("");
+                    },
+                    info: false,
                     paging: false,
                     searching:false
-                    
+
                 });
             });
         }
@@ -365,7 +419,7 @@
                           <label class="kanit-light">${departments[i]}</label>
                        </div>`;
             }
-            
+
             $('#div_manager').empty();
             $('#div_manager').append(str);
         }
@@ -373,6 +427,10 @@
 
             let data = table_authen.row(this).data();
             $('#modal_authen').modal();
+        });
+
+        $('#addUser').on('click', function () {
+            $('#modal_user').modal();
         });
 
         function SelectDirector() {
@@ -399,7 +457,6 @@
             } else {
                 managers = managers.filter(item => item !== department);
             }
-            console.log(managers);
         }
     </script>
 }
