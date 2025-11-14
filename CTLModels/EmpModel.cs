@@ -7,6 +7,7 @@ namespace WebENG.CTLModels
 {
     public class EmpModel
     {
+        public string emp_id { get; set; }
         public string name { get; set; }
         public string img { get; set; }
     }

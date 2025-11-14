@@ -14,6 +14,13 @@ using WebENG.LeaveServices;
 using WebENG.Models;
 using WebENG.Service;
 
+/*
+
+ Pending , Resubmit => Operation, Manager
+Cancelled , Approved, Rejected ,Returned
+Successed
+ * 
+ */
 namespace WebENG.Controllers
 {
     public class LeaveController : Controller

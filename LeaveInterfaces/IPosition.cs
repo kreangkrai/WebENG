@@ -8,7 +8,7 @@ namespace WebENG.LeaveInterfaces
 {
     public interface IPosition
     {
-        List<PositionModel> GetPositions();
+        List<LeavePositionModel> GetPositions();
         string insert(List<PositionModel> positions);
         string delete(string emp_id);
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.DirectoryServices;
+using System.Linq;
 using System.Reflection.PortableExecutable;
 using WebENG.CTLInterfaces;
 using WebENG.CTLModels;
@@ -87,6 +88,7 @@ namespace WebENG.CTLServices
 
         public List<EmpModel> GetEmps()
         {
+            List<EmployeeModel> employees = GetEmployees();
             List<EmpModel> emps = new List<EmpModel>();
             try
             {              
@@ -115,6 +117,7 @@ namespace WebENG.CTLServices
 
                                 EmpModel emp = new EmpModel()
                                 {
+                                    emp_id = employees.Where(w=>w.name_en.ToLower() == name.ToLower()).Select(s=>s.emp_id).FirstOrDefault(),
                                     name = name,
                                     img = photo
                                 };

@@ -412,20 +412,28 @@
 
                 @if (Model.role == "Admin_Leave" || Model.role == "Admin")
                 {
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-cogs"></i>
+                    <p class="text-bold">ADMIN LEAVE<i class="right fas fa-angle-left"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cogs"></i>
-                            <p class="text-bold">ADMIN LEAVE<i class="right fas fa-angle-left"></i></p>
+                        <a class="nav-link" asp-controller="LeaveSetting" asp-action="Index">
+                            <i class="nav-icon fas fas fa-microchip"></i>
+                            <p>Setting</p>
                         </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="LeaveSetting" asp-action="Index">
-                                    <i class="nav-icon fas fas fa-microchip"></i>
-                                    <p>Setting</p>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
+                </ul>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="LeaveAuthen" asp-action="Index">
+                            <i class="nav-icon fas fas fa-microchip"></i>
+                            <p>Authen</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
                 }
 
                 <li class="nav-item pt-2">

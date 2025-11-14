@@ -1,0 +1,405 @@
+﻿@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Leave Authen";
+}
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+<style>
+
+    .custom-control-input:not(:checked) ~ .custom-control-label::before {
+        background-color: lightgray;
+        border-color: lightgray;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: green;
+        border-color: green;
+    }
+
+    .kanit-thin {
+        font-family: "Kanit", sans-serif !important;
+        font-weight: 100 !important;
+        font-style: normal !important;
+    }
+
+    .kanit-extralight {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: normal;
+    }
+
+    .kanit-light {
+        font-family: "Kanit", sans-serif !important;
+        font-weight: 300 !important;
+        font-style: normal !important;
+    }
+
+    .kanit-regular {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .kanit-medium {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: normal;
+    }
+
+    .kanit-semibold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: normal;
+    }
+
+    .kanit-bold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: normal;
+    }
+
+    .kanit-extrabold {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: normal;
+    }
+
+    .kanit-black {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: normal;
+    }
+
+    .kanit-thin-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 100;
+        font-style: italic;
+    }
+
+    .kanit-extralight-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 200;
+        font-style: italic;
+    }
+
+    .kanit-light-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .kanit-regular-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 400;
+        font-style: italic;
+    }
+
+    .kanit-medium-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 500;
+        font-style: italic;
+    }
+
+    .kanit-semibold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 600;
+        font-style: italic;
+    }
+
+    .kanit-bold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 700;
+        font-style: italic;
+    }
+
+    .kanit-extrabold-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 800;
+        font-style: italic;
+    }
+
+    .kanit-black-italic {
+        font-family: "Kanit", sans-serif;
+        font-weight: 900;
+        font-style: italic;
+    }
+    /* สไตล์สำหรับ input */
+    input[type="text"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="text"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="text"]:not(:disabled) {
+            opacity: 1;
+        }
+    /* สไตล์สำหรับ input */
+    input[type="number"] {
+        transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
+    }
+        /* input ตอน disable */
+        input[type="number"]:disabled {
+            cursor: not-allowed;
+        }
+        /* input ตอน enable */
+        input[type="number"]:not(:disabled) {
+            opacity: 1;
+        }
+
+    table.dataTable tbody td {
+        border-left: none !important;
+        border-right: none !important;
+        border-top: none !important; /* ถ้าต้องการลบเส้นแนวนอนด้วย ให้ uncomment */
+    }
+
+    /* สำหรับ header ถ้าต้องการลบแนวตั้ง */
+    table.dataTable thead th {
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    /* ลบเส้นล่างของ footer ถ้ามี */
+    table.dataTable tfoot th {
+        border-bottom: 1px solid #111; /* เก็บเส้นแนวนอนไว้ */
+    }
+</style>
+<div class="row" style="row-gap:1px">
+    <div class="col-12">
+        <span class="kanit-bold" style="font-size:24px;color:dimgrey">สิทธิ์การจัดการวันลาพนักงาน</span>
+        <hr style="border:solid;color:gray;border-width:1px" />
+    </div>
+
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <div class="card card-dark">
+            <div class="card-body" style="height:700px; overflow-y:auto">
+                <form>
+                    <div class="form-group">
+                        <table id="table_authen" class="table table-sm table-bordered table-hover text-center w-100">
+                            <thead class="kanit-light" style="background-color:lightgrey">
+                                <tr>
+                                    <th>รายชื่อ</th>
+                                    <th>ผู้จัดการแผนก</th>
+                                    <th>ผู้อำนวยการ</th>
+                                    <th>ผู้ตรวจสอบ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_authen" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title" id="modal_leave_title">จัดการสิทธิ์</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height:460px; color:#555555">
+                <form>
+                    <div class="form-group row">
+                        <div disabled class="col-xl-4 col-md-4 col-sm-6">
+                            <input id="emp_id" type="text" class="form-control" placeholder="EM010101" />
+                        </div>
+                        <div disabled class="col-xl-8 col-md-8 col-sm-6">
+                            <input id="emp_name" type="text" class="form-control" placeholder="นายชัยวัฒน์ สุขสม" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 kanit-light">
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <span>ผู้จัดการ</span>
+                                    <div class="card-tools">
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div id="div_manager" class="row">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                   
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="col-xl-4 col-md-4 col-sm-6">
+                                <input type="checkbox" id="check_director" style="width:20px;height:1em" onclick="SelectDirector()" />
+                                <label class="kanit-light">ผู้อำนวยการ</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="col-xl-4 col-md-4 col-sm-6">
+                                <input type="checkbox" id="check_auditor" style="width:20px;height:1em" onclick="SelectAuditor()" />
+                                <label class="kanit-light">ผู้ตรวจสอบ</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex">
+                <div class="container d-flex justify-content-end">
+                    <div class="col-xl-8 col-md-8 col-sm-12">
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="form-control kanit-light" style="background-color:red;color:white" data-dismiss="modal">ยกเลิก</button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btn_save" class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="ModalSpin" />
+
+@section Scripts
+{
+    <script type="text/javascript">
+        let managers = [];
+        let director = false;
+        let auditor = false;
+        var table_authen;
+        let departments = [];
+        let employees = [];
+        let positions = [];
+        $(document).ready(async function () {
+            GetData();
+        });
+
+        async function GetData() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetData", "LeaveAuthen")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    departments = response.departments;
+                    employees = response.employees;
+                    positions = response.positions;
+                    ShowDepartment(departments);
+                    init(positions);
+                }
+            });
+        }
+
+        function init(positions) {
+            $(document).ready(function () {
+                let datas = [];
+                let list_department = [];
+                if (table_authen !== null)
+                    $('#table_authen').DataTable().destroy();
+                for (let i = 0; i < positions.length; i++) {
+                    if (positions[i].level === "Manager") {
+                        list_department.push(positions[i].department);
+                    }
+                    datas.push([
+                        positions[i].emp_name,
+                        list_department,
+                        positions[i].department,
+                    ]);
+                }
+                table_authen = $('#table_authen').DataTable({
+                    data: datas,
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            render: function (data, type, row) {
+                                var imgSrc = '/images/default-avatar.png';
+                                let user = positions.filter(f => f.emp_name === data).map(m => m)[0];
+                                if (user !== null) {
+                                    imgSrc = 'data:image/jpeg;base64,' + user.img;
+                                }
+                                return `
+                        <div class="row">
+                            <div class="col-1 d-flex align-items-center justify-content-start">
+                                <img src="${imgSrc}"
+                                    class="rounded-circle me-2"
+                                    style="width: 32px; height: 32px; object-fit: cover;"
+                                    alt="${data}" />
+
+                             </div>
+                             <div class="col-11 d-flex align-items-center justify-content-start">
+                                <div>
+                                    <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${data}</span>
+                                    <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">${user.position}</span>
+                                </div>
+                            </div>
+                       </div>`;
+                            }
+                        },                        
+                    ],
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
+                    }, info: false,
+                    paging: false,
+                    searching:false
+                    
+                });
+            });
+        }
+        function ShowDepartment(departments) {
+            let str = ``;
+            for (let i = 0; i < departments.length; i++) {
+                str += `
+                       <div class="col-xl-4 col-md-4 col-sm-6">
+                          <input type="checkbox" id="check_department${departments[i]}" style="width:20px;height:1em" onclick="SelectDepartment('${departments[i]}')" />
+                          <label class="kanit-light">${departments[i]}</label>
+                       </div>`;
+            }
+            
+            $('#div_manager').empty();
+            $('#div_manager').append(str);
+        }
+        $('#table_authen tbody').on('click','tr', function () {
+
+            let data = table_authen.row(this).data();
+            $('#modal_authen').modal();
+        });
+
+        function SelectDirector() {
+            let chk = $('#check_director').prop('checked');
+            if (chk === true) {
+                director = true;
+            } else {
+                director = false;
+            }
+        }
+
+        function SelectAuditor() {
+            let chk = $('#check_auditor').prop('checked');
+            if (chk === true) {
+                auditor = true;
+            } else {
+                auditor = false;
+            }
+        }
+        function SelectDepartment(department) {
+            let chk = $('#check_department' + department).prop('checked');
+            if (chk === true) {
+                managers.push(department);
+            } else {
+                managers = managers.filter(item => item !== department);
+            }
+            console.log(managers);
+        }
+    </script>
+}
