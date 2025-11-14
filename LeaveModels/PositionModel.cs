@@ -13,6 +13,5 @@ namespace WebENG.LeaveModels
         public string level { get; set; }
         public string department { get; set; }
         public bool is_active { get; set; }
-    }
-    }
+    }    
 }
