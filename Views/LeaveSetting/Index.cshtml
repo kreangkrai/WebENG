@@ -312,6 +312,20 @@
             color: white;
             transform: translateY(-2px);
         }
+
+        /* .color-type1  {  background-color: #9CCC65;    } */     /* เขียวมะนาว - Default*/
+    .color-type1  {  background-color: #6D4C41;    }     /* น้ำตาลช็อกเข้ม */
+    .color-type2  {  background-color: #4FC3F7;    }     /* ฟ้าคราม */
+    .color-type3  {  background-color: #FFD54F;    }     /* เหลืองทอง */
+    .color-type4  {  background-color: #43A047;    }     /* เขียวป่า */
+    .color-type5  {  background-color: #1976D2;    }     /* น้ำเงินกรม */
+    .color-type6  {  background-color: #E53935;    }     /* แดง */
+    .color-type7  {  background-color: #F06292;    }     /* ชมพู */
+    .color-type8  {  background-color: #90A4AE;    }     /* เทาเงิน */
+    .color-type9  {  background-color: #FF8A65;    }     /* ส้ม*/
+    .color-type10 {  background-color: #8E24AA;    }     /* ม่วง */
+
+   
 </style>
 <!-------------------------------------------------------------------------------------------------------------------->
 
@@ -382,10 +396,17 @@
                                             <div class="row">
                                                 <div class="form-row col-12">
                                                     <label class="kanit-light" style="color:dimgrey; font-size:18px">สีของการลา</label>
-                                                    <select id="update_leave_code_color" class="form-control">
-                                                        <option value="red" style="color: #dc3545;"class="fas fa-circle">แดง</option>
-                                                        <option value="green" style="color: #198754;">เขียว</option>
-                                                        <option value="yellow" style="color: #ffc107;">เหลือง</option>
+                                                    <select id="update_leave_code_color" class="form-control kanit-regular form-control-no-hover">
+                                                        <option value="color-type1" class="form-control kanit-regular color-type1" style="color:white">น้ำตาลช็อกเข้ม</option>
+                                                        <option value="color-type2" class="form-control kanit-regular color-type2" style="color:white">ฟ้าคราม</option>
+                                                        <option value="color-type3" class="form-control kanit-regular color-type3" style="color:white">เหลืองทอง</option>
+                                                        <option value="color-type4" class="form-control kanit-regular color-type4" style="color:white">เขียวป่า</option>
+                                                        <option value="color-type5" class="form-control kanit-regular color-type5" style="color:white">น้ำเงินกรม</option>
+                                                        <option value="color-type6" class="form-control kanit-regular color-type6" style="color:white">แดง</option>
+                                                        <option value="color-type7" class="form-control kanit-regular color-type7" style="color:white">ชมพู</option>
+                                                        <option value="color-type8" class="form-control kanit-regular color-type8" style="color:white">เทาเงิน</option>
+                                                        <option value="color-type9" class="form-control kanit-regular color-type9" style="color:white">ส้ม</option>
+                                                        <option value="color-type10" class="form-control kanit-regular color-type10" style="color:white">ม่วง</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -569,9 +590,9 @@
                                                 <div class="row condition-row">
                                                     <div class="col-8">
                                                         <div class="form-row">
-                                                            <span class="kanit-light">คำนวณวันลาอัตโนมัติ</span>
-                                                            <button type="button" class="d-flex justify-content-center" style="width:20px;height:20px;border-radius:10px;background-color:black;" data-toggle="tooltip" data-placement="top" title="คำนวณเข้างานปีแรกแบบคิดตามสัดส่วนและปีต่อไปคิดตามสิทธิ์ที่ได้">
-                                                                <i class="fas fa-question" style="color:white;"></i>
+                                                            <span class="kanit-light ml-1 mr-2">คำนวณวันลาอัตโนมัติ</span>
+                                                            <button type="button" class=" d-flex justify-content-center" style="width:20px;height:20px;border-radius:10px;background-color:black;" data-toggle="tooltip" data-placement="top" title="คำนวณเข้างานปีแรกแบบคิดตามสัดส่วนและปีต่อไปคิดตามสิทธิ์ที่ได้">
+                                                                <i class="fas fa-question" style="color:white; "></i>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -1019,3 +1040,14 @@
         }       
     </script>
 }
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        // เปิดใช้งาน Tooltip ทั้งหมด
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
