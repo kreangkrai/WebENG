@@ -165,35 +165,38 @@
         border-bottom: 1px solid #111; /* เก็บเส้นแนวนอนไว้ */
     }
 </style>
+
 <div class="row" style="row-gap:1px">
     <div class="col-12">
         <span class="kanit-bold" style="font-size:24px;color:dimgrey">สิทธิ์การจัดการวันลาพนักงาน</span>
         <hr style="border:solid;color:gray;border-width:1px" />
     </div>
-    <div class="col-xl-12 col-md-12 col-sm-12">
-        <div class="card card-dark">
-            <div class="card-body" style="height:700px; overflow-y:auto">
-                <form>
-                    <div class="form-group row">
-                        <div class="col-2">
-                            <input type="button" id="addUser" class="btn btn-info form-control kanit-medium" style="border-radius:5px; height:40px; letter-spacing:1px" value="+ เพิ่มรายชื่อสิทธิ์" />
+    <div class="container">
+        <div class="col-xl-12 col-md-12 col-sm-12">
+            <div class="card card-dark">
+                <div class="card-body" style="height:700px; overflow-y:auto">
+                    <form>
+                        <div class="form-group row">
+                            <div class="col-xl-2 col-md-2 col-sm-6">
+                                <input type="button" id="addUser" class="btn btn-info form-control kanit-medium" style="border-radius:5px; height:40px; letter-spacing:1px" value="+ เพิ่มรายชื่อสิทธิ์" />
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <table id="table_authen" class="table table-sm table-bordered table-hover text-center w-100">
-                            <thead class="kanit-light" style="background-color:lightgrey">
-                                <tr>
-                                    <th>รายชื่อ</th>
-                                    <th>ผู้จัดการแผนก</th>
-                                    <th>ผู้อำนวยการ</th>
-                                    <th>ผู้ตรวจสอบ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
+                        <div class="form-group">
+                            <table id="table_authen" class="table table-sm table-bordered table-hover text-center w-100">
+                                <thead class="kanit-light" style="background-color:lightgrey">
+                                    <tr>
+                                        <th>รายชื่อ</th>
+                                        <th>ผู้จัดการแผนก</th>
+                                        <th>ผู้อำนวยการ</th>
+                                        <th>ผู้ตรวจสอบ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -283,14 +286,13 @@
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
             </div>
-            <div class="modal-body mb-4" style="height:100px; color:#555555">
+            <div class="modal-body mb-4" style="color:#555555">
                 <form>
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group ">
                                 <label class="kanit-light" style="color:dimgrey">รายชื่อ</label>
-                                <select class="form-control">
-                                    <option>Mee</option>
+                                <select id="select_user" class="form-control">
                                 </select>
                             </div>
                         </div>
@@ -323,7 +325,7 @@
 @section Scripts
 {
     <script type="text/javascript">
-        let managers = [];
+        let manager_departments = [];
         let director = false;
         let auditor = false;
         var table_authen;
@@ -344,7 +346,7 @@
                     departments = response.departments;
                     employees = response.employees;
                     positions = response.positions;
-                    ShowDepartment(departments);
+                    GenerateUserOption(employees);
                     init(positions);
                 }
             });
@@ -357,7 +359,7 @@
                 if (table_authen !== null)
                     $('#table_authen').DataTable().destroy();
                 for (let i = 0; i < positions.length; i++) {
-
+                    list_department = [];
                     list_department.push(positions[i].manager_departments);
 
                     datas.push([
@@ -410,14 +412,23 @@
                 });
             });
         }
-        function ShowDepartment(departments) {
+        function ShowDepartment(departments, manager_departments) {
             let str = ``;
             for (let i = 0; i < departments.length; i++) {
-                str += `
+                let chk = manager_departments.includes(departments[i]);
+                if (chk === true) {
+                    str += `
+                       <div class="col-xl-4 col-md-4 col-sm-6">
+                          <input type="checkbox" id="check_department${departments[i]}" style="width:20px;height:1em" onclick="SelectDepartment('${departments[i]}')" checked />
+                          <label class="kanit-light">${departments[i]}</label>
+                       </div>`;
+                } else {
+                    str += `
                        <div class="col-xl-4 col-md-4 col-sm-6">
                           <input type="checkbox" id="check_department${departments[i]}" style="width:20px;height:1em" onclick="SelectDepartment('${departments[i]}')" />
                           <label class="kanit-light">${departments[i]}</label>
                        </div>`;
+                }
             }
 
             $('#div_manager').empty();
@@ -426,6 +437,14 @@
         $('#table_authen tbody').on('click','tr', function () {
 
             let data = table_authen.row(this).data();
+            let emp = employees.filter(f => f.name_en.toLowerCase() === data[0].toLowerCase()).map(m => m)[0];
+
+            //Show Select Department
+            manager_departments = data[1][0];
+            ShowDepartment(departments, manager_departments);
+
+            $('#emp_id').val(emp.emp_id);
+            $('#emp_name').val(emp.name_en);
             $('#modal_authen').modal();
         });
 
@@ -433,6 +452,51 @@
             $('#modal_user').modal();
         });
 
+        $('#btn_save').on('click', async function () {
+            let emp_id = $('#emp_id').val();
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("UpdateUser", "LeaveAuthen")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { emp_id, manager_departments, director, auditor },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#btn_add_user').on('click', async function () {
+            let emp_id = $('#select_user').val();
+            if (emp_id !== null) {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CreateUser", "LeaveAuthen")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { emp_id },
+                    success: function (response) {
+                        if (response === "Success") {
+                            location.reload();
+                        } else {
+                            alert(response);
+                        }
+                    }
+                });
+            } else {
+                alert("Error");
+            }
+        });
+
+        function GenerateUserOption(employees) {
+            $('#select_user').empty();
+            $('#select_user').append(`<option value="" selected disabled>Please Select</option>`);
+            for (let i = 0; i < employees.length; i++) {
+                $('#select_user').append(`<option value="${employees[i].emp_id}">${employees[i].name_en}</option>`);
+            }
+        }
         function SelectDirector() {
             let chk = $('#check_director').prop('checked');
             if (chk === true) {
@@ -453,9 +517,9 @@
         function SelectDepartment(department) {
             let chk = $('#check_department' + department).prop('checked');
             if (chk === true) {
-                managers.push(department);
+                manager_departments.push(department);
             } else {
-                managers = managers.filter(item => item !== department);
+                manager_departments = manager_departments.filter(item => item !== department);
             }
         }
     </script>

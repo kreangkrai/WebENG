@@ -219,15 +219,6 @@ namespace WebENG.LeaveServices
                                                    ,[amount_leave_hour]
                                                    ,[path_file]
                                                    ,[request_date]
-                                                   ,[manager_approver_status]
-                                                   ,[manager_approver]
-                                                   ,[manager_approve_date]
-                                                   ,[director_approver_status]
-                                                   ,[director_approver]
-                                                   ,[director_approve_date]
-                                                   ,[admin_approver_status]
-                                                   ,[admin_approver]
-                                                   ,[admin_approve_date]
                                                    ,[decsription]
                                                    ,[status_request]
                                                    ,[is_two_step_approve])
@@ -244,15 +235,6 @@ namespace WebENG.LeaveServices
                                                    ,@amount_leave_hour
                                                    ,@path_file
                                                    ,@request_date
-                                                   ,@manager_approver_status
-                                                   ,@manager_approver
-                                                   ,@manager_approve_date
-                                                   ,@director_approver_status
-                                                   ,@director_approver
-                                                   ,@director_approve_date
-                                                   ,@admin_approver_status
-                                                   ,@admin_approver
-                                                   ,@admin_approve_date
                                                    ,@decsription
                                                    ,@status_request
                                                    ,@is_two_step_approve)");
@@ -269,15 +251,6 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
                 command.Parameters.AddWithValue("@path_file", request.path_file);
                 command.Parameters.AddWithValue("@request_date", request.request_date);
-                command.Parameters.AddWithValue("@manager_approver", request.manager_approver);
-                command.Parameters.AddWithValue("@manager_approve_date", request.manager_approve_date);
-                command.Parameters.AddWithValue("@manager_approver_status", request.manager_approver_status);
-                command.Parameters.AddWithValue("@director_approver", request.director_approver);
-                command.Parameters.AddWithValue("@director_approve_date", request.director_approve_date);
-                command.Parameters.AddWithValue("@director_approver_status", request.director_approver_status);
-                command.Parameters.AddWithValue("@admin_approver", request.admin_approver);
-                command.Parameters.AddWithValue("@admin_approve_date", request.admin_approve_date);
-                command.Parameters.AddWithValue("@admin_approver_status", request.admin_approver_status);
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
                 command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);

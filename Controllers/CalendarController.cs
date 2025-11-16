@@ -35,6 +35,7 @@ namespace WebENG.Controllers
             if (HttpContext.Session.GetString("Login_ENG") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
+                
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
                 UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { 
@@ -136,7 +137,7 @@ namespace WebENG.Controllers
                 return Json(exception.Message);
             }
         }
-
+   
         [HttpPost]
         public JsonResult AddWorkingHoursDays(string[] wh_strings)
         {

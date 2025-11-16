@@ -45,6 +45,162 @@ namespace WebENG.LeaveServices
             return "Success";
         }
 
+        public List<PositionModel> GetAuditorPositions()
+        {
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            List<PositionModel> positions = new List<PositionModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"
+                                                SELECT [position_id]
+                                                      ,[position].[emp_id]
+	                                                  ,employees.name_en as emp_name
+                                                      ,[level]
+                                                      ,[position].[department]
+                                                      ,[is_active]
+                                                  FROM [dbo].[position]
+                                                  LEFT JOIN [CTL].dbo.[Employees] employees ON position.emp_id = employees.emp_id
+                                                  WHERE [level] = 'Auditor'");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        PositionModel position = new PositionModel()
+                        {
+                            position_id = Int32.Parse(dr["position_id"].ToString()),
+                            emp_name = dr["emp_name"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
+                            level = dr["level"].ToString(),
+                            department = dr["department"].ToString(),
+                            is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false,
+                            img = "",
+                            position = employees.Where(w => w.emp_id == dr["emp_id"].ToString()).Select(x => x.position).FirstOrDefault(),
+                        };
+                        positions.Add(position);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return positions;
+        }
+
+        public List<PositionModel> GetDirectorPositions()
+        {
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            List<PositionModel> positions = new List<PositionModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"
+                                                SELECT [position_id]
+                                                      ,[position].[emp_id]
+	                                                  ,employees.name_en as emp_name
+                                                      ,[level]
+                                                      ,[position].[department]
+                                                      ,[is_active]
+                                                  FROM [dbo].[position]
+                                                  LEFT JOIN [CTL].dbo.[Employees] employees ON position.emp_id = employees.emp_id
+                                                  WHERE [level] = 'Director'");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        PositionModel position = new PositionModel()
+                        {
+                            position_id = Int32.Parse(dr["position_id"].ToString()),
+                            emp_name = dr["emp_name"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
+                            level = dr["level"].ToString(),
+                            department = dr["department"].ToString(),
+                            is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false,
+                            img = "",
+                            position = employees.Where(w => w.emp_id == dr["emp_id"].ToString()).Select(x => x.position).FirstOrDefault(),
+                        };
+                        positions.Add(position);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return positions;
+        }
+
+        public List<PositionModel> GetManagerPositions()
+        {
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            List<PositionModel> positions = new List<PositionModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"
+                                                SELECT [position_id]
+                                                      ,[position].[emp_id]
+	                                                  ,employees.name_en as emp_name
+                                                      ,[level]
+                                                      ,[position].[department]
+                                                      ,[is_active]
+                                                  FROM [dbo].[position]
+                                                  LEFT JOIN [CTL].dbo.[Employees] employees ON position.emp_id = employees.emp_id
+                                                  WHERE [level] = 'Manager'");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        PositionModel position = new PositionModel()
+                        {
+                            position_id = Int32.Parse(dr["position_id"].ToString()),
+                            emp_name = dr["emp_name"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
+                            level = dr["level"].ToString(),
+                            department = dr["department"].ToString(),
+                            is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false,
+                            img = "",
+                            position = employees.Where(w => w.emp_id == dr["emp_id"].ToString()).Select(x => x.position).FirstOrDefault(),
+                        };
+                        positions.Add(position);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return positions;
+        }
+
         public List<LeavePositionModel> GetPositions()
         {
             List<CTLModels.EmpModel> emps = Employee.GetEmps();
@@ -62,10 +218,10 @@ namespace WebENG.LeaveServices
                                                       ,[position].[emp_id]
 	                                                  ,employees.name_en as emp_name
                                                       ,[level]
-                                                      ,[department]
+                                                      ,[position].[department]
                                                       ,[is_active]
                                                   FROM [dbo].[position]
-                                                  LEFT JOIN employees ON position.emp_id = employees.emp_id");
+                                                  LEFT JOIN [CTL].dbo.[Employees] employees ON position.emp_id = employees.emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -119,15 +275,15 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"INSERT INTO [dbo].[position]
-                                                       ([emp_id]
-                                                       ,[level]
-                                                       ,[department]
-                                                       ,[is_active])
-                                                 VALUES
-                                                       (@emp_id
-                                                       ,@level
-                                                       ,@department
-                                                       ,@is_active)");
+                                                           ([emp_id]
+                                                           ,[level]
+                                                           ,[department]
+                                                           ,[is_active])
+                                                        VALUES
+                                                           (@emp_id
+                                                           ,@level
+                                                           ,@department
+                                                           ,@is_active)");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.Add("@emp_id", SqlDbType.Text);
                 command.Parameters.Add("@level", SqlDbType.Text);

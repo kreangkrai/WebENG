@@ -6,16 +6,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebENG.CTLInterfaces;
 using WebENG.CTLModels;
+using WebENG.LeaveInterfaces;
+using WebENG.LeaveServices;
 using WebENG.Service;
 
 namespace WebENG.CTLServices
 {
     public class HierarchyService : IHierarchy
     {
-        readonly IEmployee Employees;
+        readonly CTLInterfaces.IEmployee Employees;
+        readonly IPosition Position;
         public HierarchyService()
         {
             Employees = new EmployeeService();
+            Position = new PositionService();
         }
 
         public List<HierarchyPersonalModel> GetPersonalHierarchies()
@@ -27,50 +31,81 @@ namespace WebENG.CTLServices
             List<EmployeeModel> employees = new List<EmployeeModel>();
             employees = Employees.GetEmployees();
             employees = employees.Where(w => w.active).ToList();
-            List<string> managements = new List<string>()
-            {
-                "Manager",
-                "Director",
-                "Manager/Director",
-            };
-            List<EmployeeModel> operations = employees.Where(w => !managements.Contains(w.position)).ToList();
-            List<EmployeeModel> managers = employees.Where(w => w.position.Contains("Manager")).ToList();
-            List<EmployeeModel> directors = employees.Where(w => w.position.Contains("Director")).ToList();
+
+            List<LeaveModels.PositionModel> managements = Position.GetManagerPositions();
+            List<LeaveModels.PositionModel> directors = Position.GetDirectorPositions();
+            List<LeaveModels.PositionModel> auditors = Position.GetAuditorPositions();
+
+            List<EmployeeModel> operations = employees.Where(w => w.position == "Operation").ToList();
 
             hierarchies_operation = operations.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
                 name = operations.Where(w => w.emp_id == s.Key).Select(c => c.name_en).FirstOrDefault(),
-                gender = operations.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
                 department = operations.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = operations.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
-                location = operations.Where(w => w.emp_id == s.Key).Select(c => c.location).FirstOrDefault(),
-                managers = managers.Where(w => w.department == operations.Where(t => t.emp_id == s.Key).Select(c => c.department).FirstOrDefault()).ToList(),
-                directors = directors
+                managers = managements.Where(w => w.department == operations.Where(t => t.emp_id == s.Key).Select(c => c.department).FirstOrDefault()).
+                Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList(),
+                directors = directors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList(),
+                auditors = auditors.Select(x=> new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList()
             }).ToList();
 
-            hierarchies_manager = managers.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
+            hierarchies_manager = managements.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
-                name = managers.Where(w => w.emp_id == s.Key).Select(c => c.name_en).FirstOrDefault(),
-                gender = managers.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
-                department = managers.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
-                position = managers.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
-                location = managers.Where(w => w.emp_id == s.Key).Select(c => c.location).FirstOrDefault(),
+                name = managements.Where(w => w.emp_id == s.Key).Select(c => c.emp_name).FirstOrDefault(),
+                department = managements.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
+                position = managements.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
                 managers = new List<EmployeeModel>(),
-                directors = directors
+                directors = directors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList(),
+                auditors = auditors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList()
             }).ToList();
 
             hierarchies_director = directors.GroupBy(g => g.emp_id).Select(s => new HierarchyPersonalModel()
             {
                 emp_id = s.Key,
-                name = directors.Where(w => w.emp_id == s.Key).Select(c => c.name_en).FirstOrDefault(),
-                gender = directors.Where(w => w.emp_id == s.Key).Select(c => c.gender).FirstOrDefault(),
+                name = directors.Where(w => w.emp_id == s.Key).Select(c => c.emp_name).FirstOrDefault(),
                 department = directors.Where(w => w.emp_id == s.Key).Select(c => c.department).FirstOrDefault(),
                 position = directors.Where(w => w.emp_id == s.Key).Select(c => c.position).FirstOrDefault(),
-                location = directors.Where(w => w.emp_id == s.Key).Select(c => c.location).FirstOrDefault(),
                 managers = new List<EmployeeModel>(),
                 directors = new List<EmployeeModel>(),
+                auditors = auditors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList()
             }).ToList();
 
             hierarchies.AddRange(hierarchies_operation);
@@ -87,32 +122,60 @@ namespace WebENG.CTLServices
             List<EmployeeModel> employees = new List<EmployeeModel>();
             employees = Employees.GetEmployees();
             employees = employees.Where(w => w.active).ToList();
-            List<string> managements = new List<string>()
-            {
-                "Manager",
-                "Director",
-                "Manager/Director",
-            };
-            List<EmployeeModel> operations = employees.Where(w => !managements.Contains(w.position)).ToList();
-            List<EmployeeModel> managers = employees.Where(w => w.position.Contains("Manager")).ToList();
-            List<EmployeeModel> directors = employees.Where(w => w.position.Contains("Director")).ToList();
+          
+            List<EmployeeModel> operations = employees.Where(w => w.position == "Operation").ToList();
+            List<LeaveModels.PositionModel> managements = Position.GetManagerPositions();
+            List<LeaveModels.PositionModel> directors = Position.GetDirectorPositions();
+            List<LeaveModels.PositionModel> auditors = Position.GetAuditorPositions();
 
-            hierarchies_manager = managers.GroupBy(g => g.department).Select(s => new HierarchyDepartmentModel()
+            hierarchies_manager = managements.GroupBy(g => g.department).Select(s => new HierarchyDepartmentModel()
             {
                 department = s.Key,
-                location = managers.Where(w=>w.department == s.Key).Select(x=>x.location).FirstOrDefault(),
-                operations = operations.Where(x=>x.department == s.Key).ToList(),
-                managers = managers.Where(w => w.department == s.Key).ToList(),
-                directors = directors
+                //location = managements.Where(w=>w.department == s.Key).Select(x=>x.location).FirstOrDefault(),
+                operations = operations.Where(x => x.department == s.Key).ToList(),
+                managers = managements.Where(w => w.department == s.Key).Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList(),
+                directors = directors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList(),
+                auditors = auditors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList()
             }).ToList();
 
-            hierarchies_director = directors.Where(w=>w.department == "CEO").GroupBy(g => g.department).Select(s => new HierarchyDepartmentModel()
+            hierarchies_director = directors.GroupBy(g => g.department).Select(s => new HierarchyDepartmentModel()
             {
                 department = s.Key,
-                location = directors.Where(w => w.department == s.Key).Select(x => x.location).FirstOrDefault(),
+                //location = directors.Where(w => w.department == s.Key).Select(x => x.location).FirstOrDefault(),
                 operations = operations,
-                managers = managers,
-                directors = new List<EmployeeModel> ()
+                managers = managements.Where(w => w.department == s.Key).Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList(),
+                directors = new List<EmployeeModel> (),
+                auditors = auditors.Select(x => new EmployeeModel()
+                {
+                    emp_id = x.emp_id,
+                    name_en = x.emp_name,
+                    department = x.department,
+                    active = x.is_active
+                }).ToList()
             }).ToList();
 
             hierarchies.AddRange(hierarchies_manager);

@@ -47,64 +47,64 @@ namespace WebENG.LeaveServices
             return "Success";
         }
 
-        public LeaveBalanceModel GetLeaveBalances(string emp_id, int year)
-        {
-            LeaveBalanceModel employees = new LeaveBalanceModel();
-            employees.emp_id = emp_id;
-            employees.year = year;
+        //public LeaveBalanceModel GetLeaveBalances(string emp_id, int year)
+        //{
+        //    LeaveBalanceModel employees = new LeaveBalanceModel();
+        //    employees.emp_id = emp_id;
+        //    employees.year = year;
 
-            EmployeeModel employee = Employee.GetEmployees().Where(w => w.emp_id == emp_id).FirstOrDefault();
-            DateTime start_date = employee.start_date;
-            string position = employee.position;
+        //    EmployeeModel employee = Employee.GetEmployees().Where(w => w.emp_id == emp_id).FirstOrDefault();
+        //    DateTime start_date = employee.start_date;
+        //    string position = employee.position;
 
-            //Get Request Leave
-            List<RequestModel> requests = Request.GetRequestByEmpID(emp_id);
-            requests = requests.Where(w => w.status_request == "Approved").ToList();
+        //    //Get Request Leave
+        //    List<RequestModel> requests = Request.GetRequestByEmpID(emp_id);
+        //    requests = requests.Where(w => w.status_request == "Approved").ToList();
 
-            List<LeaveEntitlementRuleModel> entitlements = GetLeaveEntitlementRules();
-            if (position.Contains("Manager") || position.Contains("Director"))
-            {
-                entitlements = entitlements.Where(w=>w.position == "Manager").OrderBy(o => o.leave_type_id).ThenBy(t => t.start_age).ToList();
-            }
-            if (position.Contains("Operation"))
-            {
-                entitlements = entitlements.Where(w => w.position == "Operation").OrderBy(o => o.leave_type_id).ThenBy(t => t.start_age).ToList();
-            }
+        //    List<LeaveEntitlementRuleModel> entitlements = GetLeaveEntitlementRules();
+        //    if (position.Contains("Manager") || position.Contains("Director"))
+        //    {
+        //        entitlements = entitlements.Where(w=>w.position == "Manager").OrderBy(o => o.leave_type_id).ThenBy(t => t.start_age).ToList();
+        //    }
+        //    if (position.Contains("Operation"))
+        //    {
+        //        entitlements = entitlements.Where(w => w.position == "Operation").OrderBy(o => o.leave_type_id).ThenBy(t => t.start_age).ToList();
+        //    }
 
-            double Duration = (DateTime.Now - start_date).TotalDays;
-            List<EntitlementBalanceModel> entitlements_balance = new List<EntitlementBalanceModel>();
-            if (entitlements.Count > 0)
-            {
-                List<string> leaves_type_id = entitlements.GroupBy(g => g.leave_type_id).Select(s => s.FirstOrDefault().leave_type_id).ToList();
-                for(int i = 0; i < leaves_type_id.Count; i++)
-                {
+        //    double Duration = (DateTime.Now - start_date).TotalDays;
+        //    List<EntitlementBalanceModel> entitlements_balance = new List<EntitlementBalanceModel>();
+        //    if (entitlements.Count > 0)
+        //    {
+        //        List<string> leaves_type_id = entitlements.GroupBy(g => g.leave_type_id).Select(s => s.FirstOrDefault().leave_type_id).ToList();
+        //        for(int i = 0; i < leaves_type_id.Count; i++)
+        //        {
                     
-                    List<LeaveEntitlementRuleModel> entitles = entitlements.Where(w => w.leave_type_id == leaves_type_id[i]).ToList();
-                    for(int j = 0; j < entitles.Count; j++)
-                    {
-                        if (Duration >= (double)(entitles[j].start_age * 365) && Duration <= (double)(entitles[j].before_age * 365))
-                        {
-                            double x_day = (double)requests.Where(w => w.leave_type_code == entitles[j].leave_type_code).Sum(x => x.amount_leave_day);
-                            double x_hours = (double)requests.Where(w => w.leave_type_code == entitles[j].leave_type_code).Sum(x => x.amount_leave_hour);
-                            double x_all = x_day + (x_hours / 24);
-                            EntitlementBalanceModel entitle_b = new EntitlementBalanceModel()
-                            {
-                                amount = entitles[j].days_per_year,
-                                balance = (decimal)(entitles[j].days_per_year - x_all),
-                                leave_code = entitles[j].leave_type_code,
-                                leave_type_id = entitles[j].leave_type_id,
-                                leave_name_th = entitles[j].leave_name_th,
-                                leave_name_en = entitles[j].leave_name_en
-                            };
-                            entitlements_balance.Add(entitle_b);
-                            continue;
-                        }
-                    }
-                }
-            }
-            employees.entitlements = entitlements_balance;
-            return employees;
-        }
+        //            List<LeaveEntitlementRuleModel> entitles = entitlements.Where(w => w.leave_type_id == leaves_type_id[i]).ToList();
+        //            for(int j = 0; j < entitles.Count; j++)
+        //            {
+        //                if (Duration >= (double)(entitles[j].start_age * 365) && Duration <= (double)(entitles[j].before_age * 365))
+        //                {
+        //                    double x_day = (double)requests.Where(w => w.leave_type_code == entitles[j].leave_type_code).Sum(x => x.amount_leave_day);
+        //                    double x_hours = (double)requests.Where(w => w.leave_type_code == entitles[j].leave_type_code).Sum(x => x.amount_leave_hour);
+        //                    double x_all = x_day + (x_hours / 24);
+        //                    EntitlementBalanceModel entitle_b = new EntitlementBalanceModel()
+        //                    {
+        //                        amount = entitles[j].days_per_year,
+        //                        balance = (decimal)(entitles[j].days_per_year - x_all),
+        //                        leave_code = entitles[j].leave_type_code,
+        //                        leave_type_id = entitles[j].leave_type_id,
+        //                        leave_name_th = entitles[j].leave_name_th,
+        //                        leave_name_en = entitles[j].leave_name_en
+        //                    };
+        //                    entitlements_balance.Add(entitle_b);
+        //                    continue;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    employees.entitlements = entitlements_balance;
+        //    return employees;
+        //}
 
         public List<LeaveEntitlementRuleModel> GetLeaveEntitlementRules()
         {

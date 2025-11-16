@@ -8,8 +8,8 @@ namespace WebENG.LeaveInterfaces
 {
     public interface IEmployee
     {
-        List<EmployeeModel> GetEmployees();
-        string Insert(EmployeeModel employee);
-        string Update(EmployeeModel employee);
+        //List<EmployeeModel> GetEmployees();
+        //string Insert(EmployeeModel employee);
+        //string Update(EmployeeModel employee);
     }
 }
