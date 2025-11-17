@@ -123,6 +123,17 @@
         font-weight: 900;
         font-style: italic;
     }
+
+    input[type="checkbox"] {
+        transition: all 0.3s ease; /* ทำให้เปลี่ยนสี/ขนาดนุ่มนวล */
+        transform: scale(1.5);
+    }
+
+        input[type="checkbox"]:checked {
+            transform: scale(1.75); /* ขยายนิดนึงตอนกด */
+            background-color: #32a852;
+        }
+
     /* สไตล์สำหรับ input */
     input[type="text"] {
         transition: opacity 0.3s ease, background-color 0.3s ease; /* แอนิเมชันนุ่มนวล */
@@ -148,29 +159,436 @@
             opacity: 1;
         }
 
-    table.dataTable tbody td {
-        border-left: none !important;
-        border-right: none !important;
-        border-top: none !important; /* ถ้าต้องการลบเส้นแนวนอนด้วย ให้ uncomment */
+
+    /* สไตล์สำหรับรายการไฟล์ */
+    .file-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #dee2e6;
+        transition: opacity 0.3s ease; /* ใช้ transition แทน keyframes */
     }
 
-    /* สำหรับ header ถ้าต้องการลบแนวตั้ง */
-    table.dataTable thead th {
-        border-left: none !important;
-        border-right: none !important;
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: #f8f9fa;
+        }
+
+    .file-link {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
     }
 
-    /* ลบเส้นล่างของ footer ถ้ามี */
-    table.dataTable tfoot th {
-        border-bottom: 1px solid #111; /* เก็บเส้นแนวนอนไว้ */
+        .file-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+    /* Responsive design */
+    .responsive-file-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .responsive-select-file-btn {
+        width: 100%;
+    }
+
+    /* สไตล์สำหรับส่วนผู้อนุมัติ */
+    .approver-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #dee2e6;
+        transition: all 0.3s ease; /* เหมือน dropzone */
+    }
+
+        .approver-item:last-child {
+            border-bottom: none;
+        }
+
+        .approver-item:hover {
+            background: #f8f9fa; /* Highlight เหมือน file-item */
+            transform: translateY(-2px); /* ยกขึ้นเล็กน้อย */
+        }
+
+        .approver-item i {
+            font-size: 16px;
+        }
+
+    #approver-note {
+        font-size: 14px;
+        background: #e9ecef;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .badge {
+        font-size: 14px;
+        padding: 8px 12px;
+        border-radius: 12px; /* ขอบโค้งทันสมัย */
+    }
+
+    .badge-warning {
+        background-color: #ffc107; /* รออนุมัติ = เหลือง */
+    }
+
+    .badge-success {
+        background-color: #28a745; /* อนุมัติ = เขียว */
+    }
+
+    .badge-danger {
+        background-color: #dc3545; /* ไม่อนุมัติ = แดง */
+    }
+
+    /* ตารางมีมุมโค้งมน */
+    #table_leave {
+        border-collapse: separate !important;
+        border-spacing: 0;
+        table-layout: fixed !important; /* สำคัญที่สุด! */
+        width: auto; /* บังคับให้เต็ม container */
+        /* border-radius: 12px !important; */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+        /* เส้นขอบแนวนอนใน tbody */
+        #table_leave tbody td {
+            border-top: 1px solid #dee2e6 !important;
+            border-bottom: none !important;
+        }
+
+        /* ลบเส้นแนวตั้งทั้งหมด (ถ้าต้องการ) */
+        #table_leave th,
+        #table_leave td {
+            border-left: none !important;
+            border-right: none !important;
+            padding: 8px 10px !important; /* ทำให้เซลล์สูงขึ้น */
+            vertical-align: middle !important; /* สำรองถ้า Bootstrap ไม่ทำงาน */
+        }
+
+        /* Badge โค้งมน */
+        #table_leave .badge {
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+    .clickable-row {
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+
+        .clickable-row:hover {
+            background-color: #f2faff !important;
+            transform: translateY(-1px) !important; /* เพิ่มยกขึ้นเล็กน้อย */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        }
+
+    /* Card พนักงาน */
+    .modern-card {
+        transition: all 0.3s ease;
+        border: none !important;
+    }
+
+        .modern-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(28, 70, 152, 0.15) !important;
+        }
+
+    /* ป้องกัน dropdown ถูกตัด */
+    .dropdown-search {
+        position: relative;
+        z-index: 1050;
+    }
+
+    /* 1. header sticky เท่านั้นที่เป็นสีเทา */
+    .freeze-head.freeze-left-1,
+    .freeze-head.freeze-left-2,
+    .freeze-head.freeze-left-3 {
+        background: #E8E8E8 !important;
+        z-index: 15 !important;
+    }
+
+    /* 2. body sticky (td) เป็นสีขาว */
+    #table_leave tbody td.freeze-left-1,
+    #table_leave tbody td.freeze-left-2,
+    #table_leave tbody td.freeze-left-3 {
+        background: white !important;
+        z-index: 10;
+    }
+
+    /* 3. ป้องกันทับกันตอนเลื่อน */
+    .freeze-head {
+        background: #EEE !important;
+        z-index: 10;
+    }
+
+    /* sticky styles */
+    .freeze-pane {
+        overflow: auto;
+        height: auto;
+        max-height: 500px;
+        width: 100%;
+        position: relative;
+        display: block;
+    }
+
+    .freeze-head {
+        position: sticky;
+        top: 0;
+        background: #EEE;
+        z-index: 10;
+        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+    }
+
+    /* คอลัมน์ 1: ติดซ้ายสุด */
+    .freeze-left-1 {
+        position: sticky;
+        left: 0;
+        background: #E8E8E8;
+        z-index: 10;
+    }
+
+    /* คอลัมน์ 2: ติดถัดจากคอลัมน์ 1 */
+    .freeze-left-2 {
+        position: sticky;
+        left: 60px; /* ปรับตามความกว้างจริงของคอลัมน์ 1 */
+        background: #E8E8E8;
+        z-index: 9;
+    }
+
+    /* คอลัมน์ 3: ติดถัดจากคอลัมน์ 2 */
+    .freeze-left-3 {
+        position: sticky;
+        left: 160px; /* 60 + 100 = 160px (ปรับตามจริง) */
+        background: #E8E8E8;
+        z-index: 8;
+        box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3);
+    }
+
+    .freeze-corner {
+        z-index: 15 !important;
     }
 </style>
+
 <div class="row" style="row-gap:1px">
-    <div class="col-12">
-        <span class="kanit-bold" style="font-size:24px;color:dimgrey">อนุมัติ & ตรวจสอบการลาพนักงาน</span>
-        <hr style="border:solid;color:gray;border-width:1px" />
+    
+    <!-- HEADER -->
+    <div class="col-12" style="padding:20px">
+        <span class="kanit-bold d-flex justify-content-center " style="font-size:30px; color:#1C4698; text-align:center;">
+            อนุมัติ & ตรวจสอบการลาพนักงาน
+        </span>
+        @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
     </div>
 
+    <!-- Table Leave Approve -->
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
+           
+            <div class="card-header  d-flex justify-content-between align-items-center"
+                 style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
+                 border-radius: 20px 20px 0 0;">
+
+                <!-- หัวข้อ รายการรออนุมัติ พร้อม Badge แจ้งเตือน -->
+                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center"
+                    style="letter-spacing: 2px; font-size: 22px; gap: 12px;">
+                    รายการรออนุมัติ
+                    <span class="badge badge-pill badge-danger position-relative d-inline-flex align-items-center justify-content-center"
+                          style="min-width: 28px; height: 28px; font-size: 14px; top: -2px;">
+                        2
+                        <!-- Optional: ใส่ ripple effect เล็กๆ ให้ดูมีชีวิตชีวา -->
+                        <span class="position-absolute rounded-circle bg-danger opacity-25 animate-pulse"
+                              style="width: 36px; height: 36px; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulse 2s infinite;"></span>
+                    </span>
+                </h4>
+            </div>
+
+               @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
+               
+                <div class="freeze-pane">
+                    <table class="table table-sm table-hover text-center mb-0">
+                        <thead style="font-size:18px; color:#555">
+                            <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner">
+                                <th class="freeze-left-1" style="width:60px;"> ลำดับ</th>
+                                <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
+                                <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                                <th >วันที่ยื่นลา</th>
+                                <th >วันที่ลา</th>
+                                <th >เวลาที่ลา</th>
+                                <th >ระยะเวลา (วัน)</th>
+                                <th >ประเภทการลา</th>
+                                <th >หมายเหตุ</th>
+                                <th >แนบไฟล์</th>
+                                <th >
+                                    <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
+                                        <input class="form-check-input" type="checkbox" id="SelectApproveAll">
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                                <tr class="clickable-row kanit-regular"
+                                    style="color:#555;">
+                                    <td>1</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 03/11/25 08:33</td>
+                                    <td>ศ. 31/10/25</td>
+                                    <td>08:30 - 17:30</td>
+                                    <td>1</td>
+                                    <td>ลาป่วย</td>
+                                    <td>ท้องเสีย</td>
+                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                                    <td>
+                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
+                                            <input class="form-check-input" type="checkbox">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr class="clickable-row align-content-center text-center kanit-regular"
+                                    style="color:#555">
+                                    <td>2</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 03/11/25 08:46</td>
+                                    <td>ศ. 07/11/25 - จ. 10/11/25</td>
+                                    <td>08:30 - 17:30</td>
+                                    <td>2</td>
+                                    <td>ลาพักร้อน</td>
+                                    <td>-</td>
+                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                                    <td>
+                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
+                                            <input class="form-check-input" type="checkbox">
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="clickable-row align-content-center text-center kanit-regular"
+                                    style="color:#555">
+                                    <td>3</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 03/11/25 09:00</td>
+                                    <td>อ. 04/11/25</td>
+                                    <td>08:30 - 12:00</td>
+                                    <td>0.5</td>
+                                    <td>ลาพักร้อนไม่รับค่าจ้าง</td>
+                                    <td>-</td>
+                                    <td></td>
+                                    <td>
+                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
+                                            <input class="form-check-input" type="checkbox">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr class="clickable-row align-content-center text-center kanit-regular"
+                                    style="color:#555">
+                                    <td>4</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 10/11/25 09:50</td>
+                                    <td>พ. 05/11/25</td>
+                                    <td>13:30 - 15:30</td>
+                                    <td>0.25</td>
+                                    <td>ลากิจ(ราชการ)</td>
+                                    <td>ทำบัตรประชาชน</td>
+                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                                    <td>
+                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
+                                            <input class="form-check-input" type="checkbox">
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <tr class="clickable-row align-content-center text-center kanit-regular"
+                                    style="color:#555">
+                                    <td>5</td>
+                                    <td>EM010101</td>
+                                    <td>นายชัยวัฒน์ สุขสม</td>
+                                    <td>จ. 10/11/25 09:50</td>
+                                    <td>พ. 05/11/25</td>
+                                    <td>13:00 - 17:30</td>
+                                    <td>0.5</td>
+                                    <td>ลากิจ(ราชการ)</td>
+                                    <td>ทำบัตรประชาชน</td>
+                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                                    <td>
+                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
+                                            <input class="form-check-input" type="checkbox">
+                                        </div>
+                                    </td>
+                                </tr>
+
+                        </tbody>
+                    </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <div class="card card-dark">
+            <div class="card-body" style="height:auto; overflow-y:auto">
+                <form>
+                    <div class="freeze-pane">
+                    <table  class="table table-sm table-hover text-center mb-0">
+                        <thead style="font-size:18px; color:#555">
+                            <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner">
+                                <th class="freeze-left-1" style="width:60px;"> ลำดับ</th>
+                                <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
+                                <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                                <th>วันที่ยื่นลา</th>
+                                <th>วันที่ลา</th>
+                                <th>เวลาที่ลา</th>
+                                <th>ระยะเวลา (วัน)</th>
+                                <th>ประเภทการลา</th>
+                                <th>หมายเหตุ</th>
+                                <th>สถานะ</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+                            <!-- Row 1 -->
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td class="freeze-left-1">1</td>
+                                <td class="freeze-left-2">EM010101</td>
+                                <td class="freeze-left-3">นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 03/11/25 08:33</td>
+                                <td>ศ. 31/10/25</td>
+                                <td>08:30 - 17:30</td>
+                                <td>1</td>
+                                <td>ลาป่วย</td>
+                                <td>ท้องเสีย</td>
+                                <td><span class="badge badge-warning p-2 kanit-regular" style="font-size:16px; border-radius:20px;">รออนุมัติ</span></td>
+                            </tr>
+
+                            <!-- Row 2 -->
+                            <tr class="clickable-row align-content-center text-center kanit-regular"
+                                style="color:#555">
+                                <td class="freeze-left-1">2</td>
+                                <td class="freeze-left-2">EM010101</td>
+                                <td class="freeze-left-3">นายชัยวัฒน์ สุขสม</td>
+                                <td>จ. 03/11/25 08:46</td>
+                                <td>ศ. 07/11/25 - จ. 10/11/25</td>
+                                <td>08:30 - 17:30</td>
+                                <td>2</td>
+                                <td>ลาพักร้อน</td>
+                                <td>-</td>
+                                <td><span class="badge badge-warning p-2 kanit-regular" style="font-size:16px; border-radius:20px;">รออนุมัติ</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark">
             <div class="card-body" style="height:700px; overflow-y:auto">
