@@ -133,9 +133,10 @@ namespace WebENG.Controllers
                 "Successed"
             };
             LeaveTypeModel leave = LeaveType.GetLeaveTypeByID(leave_type_id);
+            string leave_type_code = leave.leave_type_code;
             List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
-            requests = requests.Where(w => w.leave_type_id == leave_type_id &&
+            requests = requests.Where(w => w.leave_type_code == leave_type_code &&
             w.start_request_date.Year == year &&
             status_pending.Contains(w.status_request)).ToList();
 

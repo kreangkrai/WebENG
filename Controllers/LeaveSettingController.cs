@@ -91,7 +91,11 @@ namespace WebENG.Controllers
                 min_request_hours = 2,
                 request_timing = "Both",
                 is_two_step_approve = false,
-                over_consecutive_days_for_two_step = 0
+                over_consecutive_days_for_two_step = 0,
+                color_code = "",
+                calculate_auto = false,
+                amount_entitlement = 0,
+                length_start_date = 0
             });
             return Json(message);
         }

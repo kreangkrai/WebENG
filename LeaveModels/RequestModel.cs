@@ -36,4 +36,14 @@ namespace WebENG.LeaveModels
         public bool is_two_step_approve { get; set; }
 
     }
+    public class GroupRequestAmountModel
+    {
+        public string leave_type_code { get; set; }
+        public string leave_name_th { get; set; }
+        public string leave_name_en { get; set; }
+        public decimal amount_day { get; set; }
+        public string color_code { get; set; }
+        public int amount_emp { get; set; }
+        public DateTime start_request_date { get; set; }
+    }
 }

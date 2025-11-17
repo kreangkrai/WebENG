@@ -11,6 +11,8 @@ namespace WebENG.LeaveInterfaces
         List<RequestModel> GetRequests();
         RequestModel GetRequestByID(string request_id);
         List<RequestModel> GetRequestByEmpID(string emp_id);
+        List<RequestModel> GetRequestByDate(string date);
+        List<RequestModel> GetRequestByMonth(string month);
         string Insert(RequestModel request);
         string Update(RequestModel request);
     }
