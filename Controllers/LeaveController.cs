@@ -168,7 +168,7 @@ namespace WebENG.Controllers
                 }
             }
             double balance = (double)leave.amount_entitlement - used_leave;
-            var data = new { leave = leave ,balance = balance , gender = em.gender };
+            var data = new { leave = leave, balance = balance, gender = em.gender, hire_date = em.start_date };
             return Json(data);
         }
 

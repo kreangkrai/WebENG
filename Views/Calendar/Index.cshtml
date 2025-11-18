@@ -2107,6 +2107,7 @@
             let emp_id = '@Html.Raw(Model.emp_id)';
             let leave;
             let year = new Date(request_date).getFullYear();
+            let hire_date = new Date();
             $('#leave_stop_date').val(request_date);
             $('#amount_leave').val(1);
             await $.ajax({
@@ -2120,43 +2121,54 @@
                     leave = response.leave;
                     balance_leave = response.balance;
                     gender = response.gender;
+                    hire_date = response.hire_date;
                 }
             });
 
             //Check Request Timing
             let chk_request_timing = CheckRequestTiming(request_date);
-            if (chk_request_timing) {
-                //Check Gender Restriction                
-                let chk_gender_restriction = CheckGenderRestriction(gender);
-                if (chk_gender_restriction) {
+            let amount_diff_day = diffDays(new Date(), hire_date);
+            if (amount_diff_day > leave.length_start_date) {
+                if (chk_request_timing) {
+                    //Check Gender Restriction                
+                    let chk_gender_restriction = CheckGenderRestriction(gender);
+                    if (chk_gender_restriction) {
 
-                    $('#leave_description').text(description);
-                    $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
-                    $('#div_leave').prop('hidden', false);
-                    $('#div_main_leave').css('height', '500px');
-                    $('#div_main_leave').css('overflow-y', 'auto');
-                    $('#btn_leave_send').prop('disabled', false);
+                        $('#leave_description').text(description);
+                        $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
+                        $('#div_leave').prop('hidden', false);
+                        $('#div_main_leave').css('height', '500px');
+                        $('#div_main_leave').css('overflow-y', 'auto');
+                        $('#btn_leave_send').prop('disabled', false);
 
-                    //Reset Full day Click
-                    resetButtonStyles();
-                    leaveFullBtn.classList.add('active');
-                    toggleGroupDisplay(dateGroup, true);
-                    toggleGroupDisplay(timeGroup, false);
-                    daysInput.disabled = false;
-                    daysInput.value = 1;
-                    stopDateInput.value = startDateInput.value;
-                    stopDateInput.disabled = false;
+                        //Reset Full day Click
+                        resetButtonStyles();
+                        leaveFullBtn.classList.add('active');
+                        toggleGroupDisplay(dateGroup, true);
+                        toggleGroupDisplay(timeGroup, false);
+                        daysInput.disabled = false;
+                        daysInput.value = 1;
+                        stopDateInput.value = startDateInput.value;
+                        stopDateInput.disabled = false;
 
-                    //Check attachment_required
-                    type_duration = "Day";
-                    CheckAttachFileRequire(type_duration);
+                        //Check attachment_required
+                        type_duration = "Day";
+                        CheckAttachFileRequire(type_duration);
 
-                    $('#leave_full').attr('disabled', false);
-                    $('#leave_half').attr('disabled', false);
-                    $('#leave_hours').attr('disabled', false);
-                    $('#leave_stop_date').attr('disabled', false);
+                        $('#leave_full').attr('disabled', false);
+                        $('#leave_half').attr('disabled', false);
+                        $('#leave_hours').attr('disabled', false);
+                        $('#leave_stop_date').attr('disabled', false);
+                    } else {
+                        alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
+                        $('#btn_leave_send').prop('disabled', true);
+                        $('#leave_full').attr('disabled', true);
+                        $('#leave_half').attr('disabled', true);
+                        $('#leave_hours').attr('disabled', true);
+                        $('#leave_stop_date').attr('disabled', true);
+                    }
                 } else {
-                    alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
+                    alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
                     $('#btn_leave_send').prop('disabled', true);
                     $('#leave_full').attr('disabled', true);
                     $('#leave_half').attr('disabled', true);
@@ -2164,7 +2176,7 @@
                     $('#leave_stop_date').attr('disabled', true);
                 }
             } else {
-                alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
+                alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
                 $('#btn_leave_send').prop('disabled', true);
                 $('#leave_full').attr('disabled', true);
                 $('#leave_half').attr('disabled', true);
@@ -2174,13 +2186,25 @@
             is_full_day = true;
         });
 
-            // ฟังก์ชันรีเซ็ตการเลือกปุ่ม (ลบ active class)
+        function diffDays(date1, date2) {
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+
+            d1.setHours(0, 0, 0, 0);
+            d2.setHours(0, 0, 0, 0);
+
+            const diffTime = Math.abs(d2 - d1);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays;
+        }
+            
             function resetButtonStyles() {
                 leaveFullBtn.classList.remove('active');
                 leaveHalfBtn.classList.remove('active');
                 leaveHoursBtn.classList.remove('active');
             }
-            // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_half
+
             function setHalfDayOptions() {
                 durationSelect.innerHTML = `
                         <option value=""selected disabled>Select</option>
