@@ -196,7 +196,7 @@
                         //byte[] image = new byte[128];
                         if (userId == null)
                         {
-                            //Context.Response.Redirect("/Account");
+                            Context.Response.Redirect("/Account");
                         } }
                     <div class="navbar-custom-menu">
                         <ul class="nav navbar-nav">
@@ -205,21 +205,21 @@
                                 <!-- Menu Toggle Button -->
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <!-- The user image in the navbar-->
-                                    @{ //var base64 = Convert.ToBase64String(image);
-                                        //var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
-                                        //if (@imgSrc != null)
-                                        //{
-                                           // <img src="~/images/user.png" class="user-image" alt="User Image">
-                                            //<img src="@imgSrc" class="user-image" alt="User Image"> } <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                                    @{ var base64 = Convert.ToBase64String(image);
+                                        var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                                        if (@imgSrc != null)
+                                        {
+                                            //<img src="~/images/user.png" class="user-image" alt="User Image">
+                                            <img src="@imgSrc" class="user-image" alt="User Image"> } <!-- hidden-xs hides the username on small devices so only the image appears. -->
                                         @if (@userId != null)
                                         {
                                             <span class="hidden-xs" style="color:white">@userId</span>} }
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li class="user-header" style="background-color:#034694;color:white">
-                                        @*@{ if (imgSrc != null)
+                                        @{ if (imgSrc != null)
                                             {
-                                                <img src="@imgSrc" class="img-circle" alt="User Image"> } }*@
+                                                <img src="@imgSrc" class="img-circle" alt="User Image"> } }
 
                                         <p>
                                             @userId
