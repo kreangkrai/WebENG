@@ -238,6 +238,112 @@
             transform: translateX(-50%);
         }
 
+    .quarter {
+        position: relative;
+        overflow: hidden;
+        border: none;
+    }
+
+        /* เส้นกางเขนกั้นกลาง (แนวตั้ง + แนวนอน) */
+        .quarter::before,
+        .quarter::after {
+            content: '';
+            position: absolute;
+            background: lightgrey;
+            z-index: 1;
+        }
+
+        /* เส้นแนวตั้งกั้นซ้าย-ขวา */
+        .quarter::before {
+            left: 50%;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+
+        /* เส้นแนวนอนกั้นบน-ล่าง */
+        .quarter::after {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            transform: translateY(-50%);
+        }
+
+    /* 4 ช่องแต่ละมุม */
+    .half-top-left {
+        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
+    }
+
+    .half-bottom-left {
+        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
+    }
+
+    .half-top-right {
+        background: linear-gradient(90deg, #E0E0E0 50%, green 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
+    }
+
+    .half-bottom-right {
+        background: linear-gradient(90deg, #E0E0E0 50%, green 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
+    }
+
+
+    .three-quarter {
+        position: relative;
+        overflow: hidden;
+        border: none;
+    }
+
+        /* เส้นกางเขนกลาง (แนวตั้ง + แนวนอน) */
+        .three-quarter::before,
+        .three-quarter::after {
+            content: '';
+            position: absolute;
+            background: lightgrey;
+            z-index: 1;
+        }
+
+        .three-quarter::before { /* แนวตั้ง */
+            left: 50%;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+
+        .three-quarter::after { /* แนวนอน */
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            transform: translateY(-50%);
+        }
+
+    /* ------------------------------
+   4 แบบ three-quarter (เหลือช่องโปร่งใส 1 ช่อง)
+   ------------------------------ */
+
+    /* 1. เหลือแค่บนซ้ายโปร่งใส (เต็ม 3 ช่องที่เหลือด้วยเขียว) */
+    .tq-top-left-transparent {
+        background: linear-gradient(90deg, transparent 50%, green 50%), linear-gradient(0deg, transparent 50%, green 50%);
+    }
+
+    /* 2. เหลือแค่ล่างซ้ายโปร่งใส */
+    .tq-bottom-left-transparent {
+        background: linear-gradient(90deg, transparent 50%, green 50%), linear-gradient(180deg, transparent 50%, green 50%);
+    }
+
+    /* 3. เหลือแค่บนขวาโปร่งใส */
+    .tq-top-right-transparent {
+        background: linear-gradient(90deg, green 50%, transparent 50%), linear-gradient(0deg, transparent 50%, green 50%);
+    }
+
+    /* 4. เหลือแค่ล่างขวาโปร่งใส */
+    .tq-bottom-right-transparent {
+        background: linear-gradient(90deg, green 50%, transparent 50%), linear-gradient(180deg, transparent 50%, green 50%);
+    }
+
     .leave-warning {
         background-color: #f8d7da !important;
         border-left: 4px solid #dc3545 !important;
