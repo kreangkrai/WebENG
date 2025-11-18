@@ -202,6 +202,7 @@
         z-index: 15 !important;
     }
 
+    /* Start Half */
     .half-left {
         background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%);
         border: none;
@@ -221,7 +222,7 @@
         }
 
     .half-right {
-        background: linear-gradient(90deg, lightgrey 50%, green 50%);
+        background: linear-gradient(90deg, #E0E0E0 50%, transparent 50%);
         border: none;
         position: relative;
         overflow: hidden;
@@ -237,7 +238,8 @@
             background: lightgrey;
             transform: translateX(-50%);
         }
-
+    /* End Half */
+        /* Start Quarter */
     .quarter {
         position: relative;
         overflow: hidden;
@@ -272,77 +274,69 @@
         }
 
     /* 4 ช่องแต่ละมุม */
-    .half-top-left {
-        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
-    }
-
     .half-bottom-left {
-        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
-    }
-
-    .half-top-right {
-        background: linear-gradient(90deg, #E0E0E0 50%, green 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
-    }
-
-    .half-bottom-right {
-        background: linear-gradient(90deg, #E0E0E0 50%, green 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
-    }
-
-
-    .three-quarter {
-        position: relative;
-        overflow: hidden;
+        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
         border: none;
     }
 
-        /* เส้นกางเขนกลาง (แนวตั้ง + แนวนอน) */
-        .three-quarter::before,
-        .three-quarter::after {
+    .half-top-left {
+        background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
+        border: none;
+    }
+
+    .half-bottom-right {
+        background: linear-gradient(90deg, #E0E0E0 50%, transparent 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
+        border: none;
+    }
+
+    .half-top-right {
+        background: linear-gradient(90deg, #E0E0E0 50%, transparent 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
+        border: none;
+    }
+    /* End Quarter */
+
+    /*   Start  Three Quarter   */
+    .three-quarter-left {
+        background: linear-gradient(90deg, #E0E0E0 25%, /* ซ้าย 25% เทาอ่อน */
+        transparent 25% /* ขวา 75% โปร่งใส */
+        );
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .left-gray::before {
             content: '';
             position: absolute;
-            background: lightgrey;
-            z-index: 1;
-        }
-
-        .three-quarter::before { /* แนวตั้ง */
-            left: 50%;
+            left: 25%; /* เส้นกั้นอยู่ที่ 25% จากซ้าย */
             top: 0;
             width: 1px;
             height: 100%;
+            background: lightgrey;
             transform: translateX(-50%);
         }
 
-        .three-quarter::after { /* แนวนอน */
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            transform: translateY(-50%);
+    .three-quarter-right {
+        background: linear-gradient(90deg, transparent 75%, /* ซ้าย 75% โปร่งใส */
+        #E0E0E0 75% /* ขวา 25% เทาอ่อน */
+        );
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .right-gray::before {
+            content: '';
+            position: absolute;
+            left: 75%; /* เส้นกั้นอยู่ที่ 75% จากซ้าย */
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: lightgrey;
+            transform: translateX(-50%);
         }
 
-    /* ------------------------------
-   4 แบบ three-quarter (เหลือช่องโปร่งใส 1 ช่อง)
-   ------------------------------ */
-
-    /* 1. เหลือแค่บนซ้ายโปร่งใส (เต็ม 3 ช่องที่เหลือด้วยเขียว) */
-    .tq-top-left-transparent {
-        background: linear-gradient(90deg, transparent 50%, green 50%), linear-gradient(0deg, transparent 50%, green 50%);
-    }
-
-    /* 2. เหลือแค่ล่างซ้ายโปร่งใส */
-    .tq-bottom-left-transparent {
-        background: linear-gradient(90deg, transparent 50%, green 50%), linear-gradient(180deg, transparent 50%, green 50%);
-    }
-
-    /* 3. เหลือแค่บนขวาโปร่งใส */
-    .tq-top-right-transparent {
-        background: linear-gradient(90deg, green 50%, transparent 50%), linear-gradient(0deg, transparent 50%, green 50%);
-    }
-
-    /* 4. เหลือแค่ล่างขวาโปร่งใส */
-    .tq-bottom-right-transparent {
-        background: linear-gradient(90deg, green 50%, transparent 50%), linear-gradient(180deg, transparent 50%, green 50%);
-    }
+     /*    end Three Quarter   */
 
     .leave-warning {
         background-color: #f8d7da !important;
@@ -836,11 +830,9 @@
                                                 return '';
                                             }
                                             const duration = leave.duration;
-                                            console.log(leave.duration);
                                             let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
                                             if (duration !== "full") {
                                                 let classes = duration_classes.filter(f => f.duration === duration).map(m => m.class);
-                                                //console.log(leave.duration);
                                                 return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
@@ -858,7 +850,7 @@
                                                 return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
-                                                   class="kanit-light btn btn-success}"
+                                                   class="kanit-light btn btn-danger}"
                                                    style="width:30px;height:30px;border-radius:15px; background-color:${color}"/>
 
                                                 <!-- Tooltip แบบกำหนดเอง -->

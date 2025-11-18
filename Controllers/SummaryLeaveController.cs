@@ -126,7 +126,7 @@ namespace WebENG.Controllers
                                    }
                                    else if (durationSpan >= TimeSpan.FromHours(6))
                                    {
-                                       duration = "three-quarter";
+                                       duration = "three-quarter-left";
                                    }
 
                                    time = $"{req.start_request_time.ToString(@"hh\:mm")} - {req.end_request_time.ToString(@"hh\:mm")}";
