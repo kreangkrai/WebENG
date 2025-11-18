@@ -168,7 +168,7 @@
 
 <div class="row" style="row-gap:1px">
     <div class="col-12">
-        <span class="kanit-bold" style="font-size:24px;color:dimgrey">สิทธิ์การจัดการวันลาพนักงาน</span>
+        <span class="kanit-bold" style="font-size:24px;color:dimgrey">จัดการสิทธิ์ผู้อนุมัติ</span>
         <hr style="border:solid;color:gray;border-width:1px" />
     </div>
     <div class="container">
@@ -178,7 +178,7 @@
                     <form>
                         <div class="form-group row">
                             <div class="col-xl-2 col-md-2 col-sm-6">
-                                <input type="button" id="addUser" class="btn btn-info form-control kanit-medium" style="border-radius:5px; height:40px; letter-spacing:1px" value="+ เพิ่มรายชื่อสิทธิ์" />
+                                <input type="button" id="addUser" class="btn btn-info form-control kanit-medium" style="border-radius:5px; height:40px; letter-spacing:1px" value="+ เพิ่มสิทธิ์ผู้อนุมัติ" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -281,7 +281,7 @@
         <div class="modal-content" style="border-radius: 10px; overflow: hidden;">
             <div class="modal-header" style="background: #34ba7c;
                                             background: linear-gradient(90deg, rgba(52, 186, 124, 1) 0%, rgba(0, 138, 112, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title kanit-medium" style="color: white; font-size: 20px; letter-spacing: 1px;" id="modal_leave_title">เพิ่มรายชื่อสิทธิ์</h5>
+                <h5 class="modal-title kanit-medium" style="color: white; font-size: 20px; letter-spacing: 1px;" id="modal_leave_title">เพิ่มสิทธิ์ผู้อนุมัติ</h5>
                 <button type="button" class="close" style="color: white;" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
@@ -381,15 +381,15 @@
                                     imgSrc = 'data:image/jpeg;base64,' + user.img;
                                 }
                                 return `
-                        <div class="row">
-                            <div class="col-1 d-flex align-items-center justify-content-start">
+                        <div class="row align-items-center" style="width:300px">
+                            <div class="col-2 d-flex justify-content-center">
                                 <img src="${imgSrc}"
                                     class="rounded-circle me-2"
                                     style="width: 32px; height: 32px; object-fit: cover;"
                                     alt="${data}" />
 
                              </div>
-                             <div class="col-11 d-flex align-items-center justify-content-start">
+                             <div class="col-10 d-flex align-items-center justify-content-start">
                                 <div>
                                     <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${data}</span>
                                     <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">${user.position}</span>
@@ -442,6 +442,18 @@
             //Show Select Department
             manager_departments = data[1][0];
             ShowDepartment(departments, manager_departments);
+            let is_director = data[2];
+            let is_auditor = data[3];
+            if (is_director) {
+                $('#check_director').prop('checked', true);
+            } else {
+                $('#check_director').prop('checked', false);
+            }
+            if (is_auditor) {
+                $('#check_auditor').prop('checked', true);
+            } else {
+                $('#check_auditor').prop('checked', false);
+            }
 
             $('#emp_id').val(emp.emp_id);
             $('#emp_name').val(emp.name_en);

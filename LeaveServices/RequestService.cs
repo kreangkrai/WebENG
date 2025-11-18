@@ -54,6 +54,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
@@ -93,6 +94,7 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
+                            color_code = dr["color_code"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -143,6 +145,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
@@ -182,7 +185,8 @@ namespace WebENG.LeaveServices
                             admin_approver_status = dr["admin_approver_status"].ToString(),
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
-                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
+                            color_code = dr["color_code"].ToString()
                         };
                     }
                     dr.Close();
@@ -370,6 +374,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
@@ -410,6 +415,7 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
+                            color_code = dr["color_code"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -461,6 +467,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
@@ -501,6 +508,7 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
+                            color_code = dr["color_code"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -552,6 +560,7 @@ namespace WebENG.LeaveServices
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
+                                                          ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
@@ -591,6 +600,7 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
+                            color_code = dr["color_code"].ToString()
                         };
                         requests.Add(request);
                     }

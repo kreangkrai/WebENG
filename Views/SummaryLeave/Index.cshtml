@@ -470,9 +470,9 @@
                     <div class="form-group">
                         <div class="mb-3 d-flex justify-content-between align-items-center">
                             <!-- Search Filter (ชิดซ้าย) -->
-                            <div class="input-group col-3 p-0">
+                            <!--<div class="input-group col-3 p-0">-->
                                 <!-- ปรับ col-4 ตามความกว้างที่ต้องการ -->
-                                <input type="text"
+                                <!--<input type="text"
                                        id="employeeSearch"
                                        class="form-control form-control-sm kanit-regular"
                                        placeholder="ค้นหา รหัส/ชื่อพนักงาน"
@@ -485,9 +485,9 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
-                            </div>
+                            </div>-->
                             <!-- Filter Monthly-->
-                            <div class="d-flex align-items-center">
+                            <div class="col-12 d-flex align-items-center justify-content-center">
                                 <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
                                 <input type="month" id="monthPicker" class="form-control kanit-regular" style="width:200px; display:inline-block;">
                                 <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
@@ -526,7 +526,7 @@
         let day_of_month = 0;
         var table;
         $(document).ready(async function () {
-            refreshTable();
+
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth() + 1;
@@ -535,55 +535,85 @@
             const currentYearMonth = year + '-' + String(month).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
             day_of_month = new Date(year, month, 0).getDate();
-
+            const currentMonth = $('#monthPicker').val();
             GetDataLeave();
-            generateDateHeaders();
+            generateDateHeaders(currentMonth);
+
+            const months = String(now.getMonth() + 1).padStart(2, '0');
+            const month_ = `${year}-${months}`;
+            init(month_);
         });
-        function generateDateHeaders() {
-            $('#SpinModal').modal();
-            const monthPicker = $('#monthPicker');
-            //const headerRow = $('#headerRow');
+
+        function generateDateHeaders(forceYearMonth = null) {
             const dateRow = $('#dateRow');
-            const [year, month] = monthPicker.val().split('-');
-            const daysInMonth = new Date(year, month, 0).getDate();
+            if (dateRow.length === 0) {
+                return;
+            }
+
+            const val = forceYearMonth || $('#monthPicker').val();
+            if (!val || val === '') {
+                return;
+            }
+
+            const [y, m] = val.split('-');
+            const year = parseInt(y, 10);
+            const monthIndex = parseInt(m, 10) - 1; // 0-11
+
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
 
             dateRow.empty();
 
             for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, month - 1, day);
+                const date = new Date(year, monthIndex, day);
                 const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
-                dateRow.append(`<th class="kanit-bold freeze-head" style="min-width:40px;">${day}<br><small>${dayName}</small></th>`);
+                
+                dateRow.append(`
+            <th class="kanit-bold freeze-head" style="min-width:40px;">
+                ${day}<br><small>${dayName}</small>
+            </th>
+        `);
             }
-            $('#SpinModal').modal('hide');
         }
-        $('#monthPicker').on('change', function () {
-            if (is_this_month) {
-                is_this_month = false;
-            } else {
-                is_this_month = true;
-            }
-
-            generateDateHeaders();
-            refreshTable();
-        });
 
         $('#prevMonth').on('click', function () {
-            let monthPicker = new Date($('#monthPicker').val());
-            monthPicker.setMonth(monthPicker.getMonth() - 1);
-            const currentYearMonth = monthPicker.getFullYear() + '-' + String(monthPicker.getMonth() + 1).padStart(2, '0');
-            $('#monthPicker').val(currentYearMonth);
-            generateDateHeaders();
-            refreshTable();
+            changeMonth(-1);
         });
 
         $('#nextMonth').on('click', function () {
-            let monthPicker = new Date($('#monthPicker').val());
-            monthPicker.setMonth(monthPicker.getMonth() + 1);
-            const currentYearMonth = monthPicker.getFullYear() + '-' + String(monthPicker.getMonth() + 1).padStart(2, '0');
-            $('#monthPicker').val(currentYearMonth);
-            generateDateHeaders();
-            refreshTable();
+            changeMonth(1);
         });
+
+        $('#monthPicker').on('change', function () {
+            const newVal = this.value;
+            generateDateHeaders(newVal);
+            init(newVal);
+        });
+
+        function changeMonth(direction) {
+            const input = $('#monthPicker');
+            let current = input.val();
+
+            if (!current) {
+                const today = new Date();
+                current = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                input.val(current);
+            }
+
+            const [y, m] = current.split('-');
+            let year = parseInt(y, 10);
+            let month = parseInt(m, 10) + direction;
+
+            if (month > 12) { month = 1; year++; }
+            if (month < 1) { month = 12; year--; }
+
+            const newVal = `${year}-${String(month).padStart(2, '0')}`;
+            input.val(newVal);
+
+            init(newVal);
+            setTimeout(() => {
+                generateDateHeaders(newVal);
+            }, 100);
+        }
 
         async function GetDataLeave() {
             let now = new Date();
@@ -625,14 +655,7 @@
             $('#div_summary_leave').empty();
             $('#div_summary_leave').append(html);
         }
-        function refreshTable() {
-            let now = new Date();
-            const year = now.getFullYear();
-            const months = String(now.getMonth() + 1).padStart(2, '0');
-            const month = `${year}-${months}`;
-            init(month);
 
-        }
         function init(month) {
             $(document).ready(async function () {
                 if (table !== undefined) {
@@ -645,19 +668,31 @@
                         contentType: 'application/x-www-form-urlencoded',
                         data: { month },
                         dataSrc: '',
-                        //success: function (response) {
-                        //    let emps = response.emps;
-                        //    let requests = response.requests;
-                        //    console.log(emps);
-                        //}
                     },
-
+                    columns: Array(day_of_month + 1).fill({ data: null, defaultContent: "" }),
                     columnDefs: (() => {
                         const defs = [];
                         for (let i = 0; i <= day_of_month; i++) {
                             
-                            const colors = ['primary', 'success', 'danger'];
-                            const classes = ['half-left', 'half-right', ''];
+                            const colors = [{ "code": "color-brown", "color": "#6D4C41" },
+                            { "code": "color-sky", "color": "#4FC3F7" },
+                            { "code": "color-yellow", "color": "#FFD54F" },
+                            { "code": "color-green", "color": "#43A047" },
+                            { "code": "color-blue", "color": "#1976D2" },
+                            { "code": "color-red", "color": "#E53935" },
+                            { "code": "color-pink", "color": "#F06292" },
+                            { "code": "color-bluegrey ", "color": "#90A4AE" },
+                            { "code": "color-orange ", "color": "#FF8A65" },
+                            { "code": "color-purple ", "color": "#8E24AA" },
+                            ];
+                            const duration_classes = [{ "duration": "half-left", "class": "half-left" },
+                            { "duration": "half-right", "class": "half-right" },
+                            { "duration": "quarter-top-left", "class": "quarter-top-left" },
+                            { "duration": "quarter-bottom-left", "class": "quarter-bottom-left" },
+                            { "duration": "quarter-top-right", "class": "quarter-top-right" },
+                            { "duration": "quarter-bottom-right", "class": "quarter-bottom-right" },
+                            { "duration": "three-quarter", "class": "three-quarter" }
+                            ];
 
                             if (i == 0) {
                                 defs.push({
@@ -678,7 +713,7 @@
                                                 <div class="col-10 d-flex justify-content-start">
                                                     <div style="color:#444">
                                                         <span class="kanit-regular d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
-                                                        <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
+                                                        <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">${row.position}</span>
                                                     </div>
                                                 </div>
                                            </div>`;
@@ -689,18 +724,27 @@
                                 defs.push({
                                     targets: i,
                                     render: function (data, type, row) {
-                                        if (row.leaves[i] !== null) {
-                                            if (row.leaves[i].duration !== "full") {
+                                        if (row.leaves[i-1] !== null) {
+                                            let leave = row.leaves[i-1];
+                                            if (!leave) {
+                                                return '';
+                                            }
+                                            const duration = leave.duration;
+                                            console.log(leave.duration);
+                                            let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
+                                            if (duration !== "full") {
+                                                let classes = duration_classes.filter(f => f.duration === duration).map(m => m.class);
+                                                //console.log(leave.duration);
                                                 return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
-                                                   class="kanit-light btn btn-${colors[0]} ${classes[0]}"
-                                                   style="width:30px;height:30px;border-radius:15px; background-color:#B0D483"/>
+                                                   class="kanit-light btn ${classes}"
+                                                   style="width:30px;height:30px;border-radius:15px; background-color:${color}"/>
 
                                                 <!-- Tooltip แบบกำหนดเอง -->
                                                 <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
-                                                    <h5 style="font-size:18px; text-align:center">ลาพักร้อน</h5>
-                                                    <span style="font-size:16px; text-align:center">08:30 - 17:30</span>
+                                                    <h5 style="font-size:18px; text-align:center">${leave.type}</h5>
+                                                    <span style="font-size:16px; text-align:center">${leave.time}</span>
                                                 </div>
                                             </div>
                                         `;
@@ -708,13 +752,13 @@
                                                 return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
-                                                   class="kanit-light btn btn-${colors[0]}"
-                                                   style="width:30px;height:30px;border-radius:15px; background-color:#B0D483"/>
+                                                   class="kanit-light btn btn-success}"
+                                                   style="width:30px;height:30px;border-radius:15px; background-color:${color}"/>
 
                                                 <!-- Tooltip แบบกำหนดเอง -->
                                                 <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
-                                                    <h5 style="font-size:18px; text-align:center">ลาพักร้อน</h5>
-                                                    <span style="font-size:16px; text-align:center">08:30 - 17:30</span>
+                                                    <h5 style="font-size:18px; text-align:center">${leave.type}</h5>
+                                                    <span style="font-size:16px; text-align:center">${leave.time}</span>
                                                 </div>
                                             </div>
                                         `;
@@ -725,7 +769,7 @@
                             }
                         }
                         return defs;
-                    })(),
+                    })(),                   
                     rowCallback: function (row, data, index) {
                         if (is_this_month) {
                             $('td', row).each(function (colIndex) {
@@ -738,6 +782,8 @@
                     language: {
                         url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
                     },
+                    "bStateSave": false,
+                    "retrieve": true,
                     "info": false,
                     "paging": false,
                     "searching": false,
@@ -748,7 +794,7 @@
                     scrollX: false,
                     scrollCollapse: true,
                     fixedHeader: true,
-                    destroy: true,
+                    destroy: true,                  
                 });
             });
         }
