@@ -73,41 +73,43 @@
                     </ul>
                 </li>
 
-                @if (Model.role == "Admin")
-                {
+                
                     <li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-calendar"></i>
                             <p class="text-bold">LEAVE TASK<i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Leave" asp-action="Index">
-                                    <i class="nav-icon fas fa-user-graduate"></i>
-                                    <p>Leave</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="ManagementLeave" asp-action="Index">
-                                    <i class="nav-icon fas fa-file-invoice"></i>
-                                    <p>Management</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="StatusLeave" asp-action="Index">
-                                    <i class="nav-icon fas fa-file-invoice"></i>
-                                    <p>Status</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="SummaryLeave" asp-action="Index">
-                                    <i class="nav-icon fas fa-file-invoice"></i>
-                                    <p>Summary</p>
-                                </a>
-                            </li>
-                        </ul>
+                            @*<li class="nav-item">
+            <a class="nav-link" asp-controller="Leave" asp-action="Index">
+                <i class="nav-icon fas fa-user-graduate"></i>
+                <p>Leave</p>
+            </a>
+        </li>*@
+                            @if (Model.role == "Admin_Leave" || Model.role == "Admin")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="ManagementLeave" asp-action="Index">
+                                        <i class="nav-icon fas fa-file-invoice"></i>
+                                        <p>Management</p>
+                                    </a>
+                                </li>
+                            }
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="StatusLeave" asp-action="Index">
+                                        <i class="nav-icon fas fa-file-invoice"></i>
+                                        <p>Status</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="SummaryLeave" asp-action="Index">
+                                        <i class="nav-icon fas fa-file-invoice"></i>
+                                        <p>Summary</p>
+                                    </a>
+                                </li>
+                            </ul>
                     </li>
-                }
+                
                 @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
                     <li class="nav-item">

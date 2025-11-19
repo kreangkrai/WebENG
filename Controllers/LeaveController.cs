@@ -121,6 +121,7 @@ namespace WebENG.Controllers
             var data = new { leaves = leaves };
             return Json(data);
         }
+
         [HttpGet]
         public IActionResult GetLeaveById(string leave_type_id, string emp_id,int year)
         {

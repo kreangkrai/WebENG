@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using WebENG.CTLInterfaces;
 using WebENG.CTLServices;
 using WebENG.Interface;
+using WebENG.LeaveInterfaces;
+using WebENG.LeaveModels;
+using WebENG.LeaveServices;
 using WebENG.Models;
 using WebENG.Service;
 
@@ -16,12 +19,20 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly IHierarchy Hierarchy;
-        readonly IEmployee Employee;
+        readonly CTLInterfaces.IEmployee Employees;
+        private IPosition Position;
+        private ILeaveType LeaveType;
+        private IRequest Requests;
+        private ILeave Leave;
         public StatusLeaveController()
         {
             Accessory = new AccessoryService();
             Hierarchy = new HierarchyService();
-            Employee = new EmployeeService();
+            Employees = new CTLServices.EmployeeService();
+            Position = new PositionService();
+            LeaveType = new LeaveTypeService();
+            Requests = new RequestService();
+            Leave = new LeaveService();
         }
         public IActionResult Index()
         {
@@ -42,13 +53,114 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
 
-
+                List<int> years = new List<int>();
+                for(int y = DateTime.Now.AddYears(1).Year;y > DateTime.Now.AddYears(-5).Year; y--)
+                {
+                    years.Add(y);
+                }
+                ViewBag.listYears = years;
                 return View(u);
             }
             else
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+
+        [HttpGet]
+        public IActionResult GetEmployee()
+        {
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            employees = employees.OrderBy(o => o.name_en).ToList();
+            List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
+            var data = new { employees = employees, departments = departments };
+            return Json(data);
+        }
+
+        [HttpGet]
+        public IActionResult GetLeaveBalanceByEmpID(string emp_id, int year)
+        {
+            List<BalanceLeaveModel> balances = new List<BalanceLeaveModel>();
+            List<string> status_pending = new List<string>()
+            {
+                "Pending",
+                "Resubmit",
+                "Approved",
+                "Returned",
+                "Successed"
+            };
+            List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
+            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+            List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
+           
+            for (int i = 0; i < leaves.Count; i++)
+            {
+                requests = requests.Where(w => w.leave_type_code == leaves[i].leave_type_code &&
+                w.start_request_date.Year == year &&
+                status_pending.Contains(w.status_request)).ToList();
+
+                CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel();
+                var em = emps.Where(w => w.emp_id == emp_id).FirstOrDefault();
+                emp = new CTLModels.EmployeeModel()
+                {
+                    emp_id = emp_id,
+                    position = em.position,
+                    start_date = em.start_date,
+                    promote_manager_date = em.promote_manager_date,
+                    gender = em.gender
+                };
+                if (leaves[i].calculate_auto == true)
+                {
+                    double _leave = Leave.CalculateLeaveDays(emp, year, 6, 10, 10, 12);
+                    leaves[i].amount_entitlement = (decimal)_leave;
+                }
+                double used_leave = 0;
+                for (int j = 0; j < requests.Count; j++)
+                {
+                    if (requests[j].is_full_day)
+                    {
+                        used_leave += requests[j].amount_leave_day;
+                    }
+                    else
+                    {
+                        used_leave += Math.Round(((double)requests[j].amount_leave_hour) / 8.0, 2);
+                    }
+                }
+                decimal b = (decimal)((double)leaves[i].amount_entitlement - used_leave);
+
+                BalanceLeaveModel balance = new BalanceLeaveModel()
+                {
+                    leave_type_id = leaves[i].leave_type_id,
+                    leave_type_code = leaves[i].leave_type_code,
+                    leave_name_en = leaves[i].leave_name_en,
+                    leave_name_th =leaves[i].leave_name_th,
+                    amount_entitlement = leaves[i].amount_entitlement,
+                    balance = b
+                };
+                balances = balances.GroupBy(g => g.leave_type_code).Select(s => new BalanceLeaveModel()
+                {
+                    leave_type_code = s.Key,
+                    leave_type_id = s.FirstOrDefault().leave_type_id,
+                    leave_name_en = s.FirstOrDefault().leave_name_en,
+                    leave_name_th= s.FirstOrDefault().leave_name_th.Split(' ')[0],
+                    amount_entitlement = s.FirstOrDefault().amount_entitlement,
+                    balance = s.FirstOrDefault().balance
+
+                }).ToList();
+                balances.Add(balance);
+
+            }
+            
+            return Json(balances);
+        }
+
+        [HttpGet]
+        public IActionResult GetRequestHistory(string emp_id,int year,int month)
+        {
+            List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
+            requests = requests.Where(w => w.start_request_date.Year == year && w.start_request_date.Month == month).ToList();
+            return Json(requests);
         }
     }
 }
