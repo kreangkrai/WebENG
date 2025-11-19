@@ -124,15 +124,87 @@
         font-style: italic;
     }
 
-    input[type="checkbox"] {
-        transition: all 0.3s ease; /* ทำให้เปลี่ยนสี/ขนาดนุ่มนวล */
+    /* input[type="checkbox"] {
+        transition: all 0.3s ease; 
         transform: scale(1.5);
     }
 
         input[type="checkbox"]:checked {
-            transform: scale(1.75); /* ขยายนิดนึงตอนกด */
+            transform: scale(1.75); 
             background-color: #32a852;
+        } */
+    /* Checkbox สไตล์องค์กร - เล็ก เรียบ เท่ */
+    input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #adb5bd;
+        border-radius: 5px;
+        outline: none;
+        cursor: pointer;
+        background-color: #fff;
+        transition: all 0.25s ease;
+        transform: scale(1); /* ไม่ขยายพื้นฐาน */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+        input[type="checkbox"]:hover {
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0,123,255,0.25);
         }
+
+        /* เมื่อติ๊กถูก */
+        input[type="checkbox"]:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+            transform: scale(1.1);
+        }
+
+            /* ติ๊กขาว */
+            input[type="checkbox"]:checked::after {
+                content: '';
+                position: absolute;
+                top: 3px;
+                left: 6px;
+                width: 4px;
+                height: 8px;
+                border: solid white;
+                border-width: 0 2.5px 2.5px 0;
+                transform: rotate(45deg);
+            }
+
+        /* สถานะกึ่งเลือก (indeterminate) */
+        input[type="checkbox"]:indeterminate {
+            background-color: #007bff;
+            border-color: #007bff;
+            transform: scale(1.1);
+        }
+
+            input[type="checkbox"]:indeterminate::after {
+                content: '';
+                position: absolute;
+                top: 7px;
+                left: 3px;
+                width: 10px;
+                height: 2px;
+                background: white;
+                border-radius: 1px;
+            }
+
+    /* หัวตาราง Select All - ใหญ่กว่า checkbox ปกตินิดเดียว (ดูเด่นแต่ไม่ล้น) */
+    #selectAllApprove {
+        width: 20px !important;
+        height: 20px !important;
+        transform: scale(1.05);
+    }
+
+        #selectAllApprove:checked,
+        #selectAllApprove:indeterminate {
+            transform: scale(1.15) !important;
+        }
+        /*//////////////*/
+
 
     /* สไตล์สำหรับ input */
     input[type="text"] {
@@ -245,7 +317,8 @@
         border-collapse: separate !important;
         border-spacing: 0;
         table-layout: fixed !important; /* สำคัญที่สุด! */
-        width: auto; /* บังคับให้เต็ม container */
+        overflow-x: auto;
+        width: 100%; /* บังคับให้เต็ม container */
         /* border-radius: 12px !important; */
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
@@ -380,7 +453,7 @@
 
 </style>
 
-<div class="row" style="row-gap:1px">
+<div class="row" style="row-gap:15px">
     
     <!-- HEADER -->
     <div class="col-12" style="padding:20px">
@@ -412,150 +485,405 @@
                @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
                
             <div class="freeze-pane">
-                    <table id="table_approve" class="table table-sm table-hover text-center mb-0">
-                        <thead style="font-size:18px; color:#555">
-                            <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
-                                <th class="freeze-left-1" style="width:60px;"> ลำดับ</th>
-                                <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                                <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
-                                <th >วันที่ยื่นลา</th>
-                                <th >วันที่ลา</th>
-                                <th >เวลาที่ลา</th>
-                                <th >ระยะเวลา (วัน)</th>
-                                <th >ประเภทการลา</th>
-                                <th >รายละเอียด</th>
-                                <th >แนบไฟล์</th>
-                                <th >
-                                    <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
-                                        <input class="form-check-input" type="checkbox" id="SelectApproveAll">
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
+                <table id="table_approve" class="table table-sm table-hover text-center mb-0">
+                    <thead style="font-size:18px; color:#555">
+                        <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
+                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
+                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
+                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                            <th>วันที่ยื่นลา</th>
+                            <th>วันที่ลา</th>
+                            <th>เวลาที่ลา</th>
+                            <th>ระยะเวลา (วัน)</th>
+                            <th>ประเภทการลา</th>
+                            <th>รายละเอียด</th>
+                            <th style="width:70px;">แนบไฟล์</th>
+                            <th style="width:50px;">
+                                <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input" type="checkbox" id="selectAllApprove">
+                                    <label class="form-check-label" for="selectAllApprove"></label>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
 
-                        <tbody>
-                                <tr class="clickable-row kanit-regular"
-                                    style="color:#555;">
-                                    <td>1</td>
-                                    <td>EM010101</td>
-                                    <td>นายชัยวัฒน์ สุขสม</td>
-                                    <td>จ. 03/11/25 08:33</td>
-                                    <td>ศ. 31/10/25</td>
-                                    <td>08:30 - 17:30</td>
-                                    <td>1</td>
-                                    <td>ลาป่วย</td>
-                                    <td>ท้องเสีย</td>
-                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                                    <td>
-                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
-                                            <input class="form-check-input" type="checkbox">
-                                        </div>
-                                    </td>
-                                </tr>
+                    <tbody>
+                        <tr class="clickable-row kanit-regular"
+                            style="color:#555;">
+                            <td>1</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 03/11/25 08:33</td>
+                            <td>ศ. 31/10/25</td>
+                            <td>08:30 - 17:30</td>
+                            <td>1</td>
+                            <td>ลาป่วย</td>
+                            <td>ท้องเสีย</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td>
+                                <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input approve-checkbox" type="checkbox">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </td>
+                        </tr>
 
-                                <tr class="clickable-row align-content-center text-center kanit-regular"
-                                    style="color:#555">
-                                    <td>2</td>
-                                    <td>EM010101</td>
-                                    <td>นายชัยวัฒน์ สุขสม</td>
-                                    <td>จ. 03/11/25 08:46</td>
-                                    <td>ศ. 07/11/25 - จ. 10/11/25</td>
-                                    <td>08:30 - 17:30</td>
-                                    <td>2</td>
-                                    <td>ลาพักร้อน</td>
-                                    <td>-</td>
-                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                                    <td>
-                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
-                                            <input class="form-check-input" type="checkbox">
-                                        </div>
-                                    </td>
-                                </tr>
-                                
-                                <tr class="clickable-row align-content-center text-center kanit-regular"
-                                    style="color:#555">
-                                    <td>3</td>
-                                    <td>EM010101</td>
-                                    <td>นายชัยวัฒน์ สุขสม</td>
-                                    <td>จ. 03/11/25 09:00</td>
-                                    <td>อ. 04/11/25</td>
-                                    <td>08:30 - 12:00</td>
-                                    <td>0.5</td>
-                                    <td>ลาพักร้อนไม่รับค่าจ้าง</td>
-                                    <td>-</td>
-                                    <td></td>
-                                    <td>
-                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
-                                            <input class="form-check-input" type="checkbox">
-                                        </div>
-                                    </td>
-                                </tr>
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>2</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 03/11/25 08:46</td>
+                            <td>ศ. 07/11/25 - จ. 10/11/25</td>
+                            <td>08:30 - 17:30</td>
+                            <td>2</td>
+                            <td>ลาพักร้อน</td>
+                            <td>-</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td>
+                                <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input approve-checkbox" type="checkbox">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </td>
+                        </tr>
 
-                                <tr class="clickable-row align-content-center text-center kanit-regular"
-                                    style="color:#555">
-                                    <td>4</td>
-                                    <td>EM010101</td>
-                                    <td>นายชัยวัฒน์ สุขสม</td>
-                                    <td>จ. 10/11/25 09:50</td>
-                                    <td>พ. 05/11/25</td>
-                                    <td>13:30 - 15:30</td>
-                                    <td>0.25</td>
-                                    <td>ลากิจ(ราชการ)</td>
-                                    <td>ทำบัตรประชาชน</td>
-                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                                    <td>
-                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
-                                            <input class="form-check-input" type="checkbox">
-                                        </div>
-                                    </td>
-                                </tr>
-                                
-                                <tr class="clickable-row align-content-center text-center kanit-regular"
-                                    style="color:#555">
-                                    <td>5</td>
-                                    <td>EM010101</td>
-                                    <td>นายชัยวัฒน์ สุขสม</td>
-                                    <td>จ. 10/11/25 09:50</td>
-                                    <td>พ. 05/11/25</td>
-                                    <td>13:00 - 17:30</td>
-                                    <td>0.5</td>
-                                    <td>ลากิจ(ราชการ)</td>
-                                    <td>ทำบัตรประชาชน</td>
-                                    <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                                    <td>
-                                        <div class="form-check form-check-inline col-sm-6 col-md-3 mb-1">
-                                            <input class="form-check-input" type="checkbox">
-                                        </div>
-                                    </td>
-                                </tr>
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>3</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 03/11/25 09:00</td>
+                            <td>อ. 04/11/25</td>
+                            <td>08:30 - 12:00</td>
+                            <td>0.5</td>
+                            <td>ลาพักร้อนไม่รับค่าจ้าง</td>
+                            <td>-</td>
+                            <td></td>
+                            <td>
+                                <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input approve-checkbox" type="checkbox">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </td>
+                        </tr>
 
-                        </tbody>
-                    </table>
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>4</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 10/11/25 09:50</td>
+                            <td>พ. 05/11/25</td>
+                            <td>13:30 - 15:30</td>
+                            <td>0.25</td>
+                            <td>ลากิจ(ราชการ)</td>
+                            <td>ทำบัตรประชาชน</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td>
+                                <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input approve-checkbox" type="checkbox">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>5</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 10/11/25 09:50</td>
+                            <td>พ. 05/11/25</td>
+                            <td>13:00 - 17:30</td>
+                            <td>0.5</td>
+                            <td>ลากิจ(ราชการ)</td>
+                            <td>ทำบัตรประชาชน</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td>
+                                <div class="form-check form-check-inline mb-1">
+                                    <input class="form-check-input approve-checkbox" type="checkbox">
+                                    <label class="form-check-label"></label>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
             </div>
 
             <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
             <div class="modal-footer d-flex">
                 <div class="container d-flex justify-content-end">
-                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-center">
+                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                         <div class="row">
                             <div class="col-4">
-                                <button class="btn modern-btn btn-cancel kanit-medium" style="background-color:red; color:white; border-radius:8px; width:100px" data-dismiss="modal">
-                                    ยกเลิก
+                                <button id="btn_reject_leave" data-target="#modal_reject" class="btn modern-btn btn-outline-danger kanit-medium" style=" border-radius:8px; width:100px">
+                                    ปฏิเสธ
                                 </button>
                             </div>
                             <div class="col-4">
-                                <button id="btn_add_save" class="btn modern-btn btn-save kanit-medium" style="background-color:#034694; color:white; border-radius:8px; width:100px">
+                                <button id="btn_resubmit_leave" data-target="#modal_resubmit" class="btn modern-btn btn-outline-warning kanit-medium" style=" border-radius:8px; width:100px">
                                     ส่งกลับ
                                 </button>
                             </div>
                             <div class="col-4">
-                                <button id="btn_add_save" class="btn modern-btn btn-save kanit-medium" style="background-color:#034694; color:white; border-radius:8px; width:100px">
-                                    บันทึก
+                                <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-outline-success kanit-medium" style=" border-radius:8px; width:100px">
+                                    อนุมัติ
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            @* <!-- Modal : บันทึกการตั้งค่า-->
+            <div class="modal fade" id="modal_reject" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true" >
+                <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+                    <div class="modal-content kanit-regular" style="border-radius: 10px; overflow: hidden;">
+                        <div class="modal-header" style="background: linear-gradient(90deg, #034694 0%, #022f5b 100%); border-bottom: none; padding: 15px;">
+                            <h5 class="modal-title kanit-medium" style="color: white; font-size: 24px; letter-spacing: 1px;" id="modal_confirm_title">บันทึกการตั้งค่า</h5>
+                            <button type="button" class="close" style="color: white; font-size: 24px;" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding: 20px; text-align: center;">
+                            <div id="confirm_content">
+                                <i class="fas fa-save icon-shadow mb-3" style="font-size: 40px; color: #034694;"></i>
+                                <p class="kanit-light" style="font-size: 20px; color: #333; margin-bottom: 0;">คุณต้องการบันทึกหรือไม่?</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="border-top: none; padding: 15px 30px; background-color: #f8f9fa;">
+                            <div class="row justify-content-center" style=" width: 100%;">
+                                <div class="col-xl-4 col-md-4 col-sm-4">
+                                    <button type="button" class="btn modern-btn btn-cancel kanit-medium" data-dismiss="modal">ยกเลิก</button>
+                                </div>
+                                <div class="col-xl-4 col-md-4 col-sm-4">
+                                    <button type="button" class="btn modern-btn btn-save kanit-medium" id="confirm_ok">ยืนยัน</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> *@
+
+            <!-- ====================== Modal ปฏิเสธ ====================== -->
+            <div class="modal fade" id="modal_reject" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
+                        <div class="modal-header bg-danger text-white" style="border-radius: 12px 12px 0 0;">
+                            <h5 class="modal-title kanit-semibold">
+                                <i class="fas fa-times-circle mr-2"></i> ยืนยันการปฏิเสธคำขอ
+                            </h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+                            <p class="kanit-medium mb-0" style="font-size: 1.1rem;">
+                                คุณแน่ใจหรือไม่ว่าต้องการ <strong class="text-danger">ปฏิเสธ</strong> คำขอลานี้?
+                            </p>
+                            <br><small class="text-muted">เมื่อปฏิเสธแล้วจะไม่สามารถย้อนกลับได้</small>
+                            </p>
+                        </div>
+                        <div class="modal-footer justify-content-center border-0 pt-0">
+                            <button type="button" class="btn btn-secondary kanit-medium px-4" data-dismiss="modal" style="border-radius: 8px;">
+                                ยกเลิก
+                            </button>
+                            <button type="button" id="confirm_reject" class="btn btn-danger kanit-medium px-4" style="border-radius: 8px;">
+                                <i class="fas fa-check mr-1"></i> ยืนยันปฏิเสธ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================== Modal ส่งกลับ ====================== -->
+            <div class="modal fade" id="modal_resubmit" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
+                        <div class="modal-header bg-warning text-dark" style="border-radius: 12px 12px 0 0;">
+                            <h5 class="modal-title kanit-semibold">
+                                <i class="fas fa-undo-alt mr-2"></i> ส่งกลับเพื่อแก้ไข
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="fas fa-reply fa-4x text-warning mb-3"></i>
+                            <p class="kanit-medium mb-3" style="font-size: 1.1rem;">
+                                คุณต้องการ <strong class="text-warning">ส่งกลับ</strong> คำขอนี้ให้พนักงานแก้ไขหรือไม่?
+                            </p>
+                            <div class="form-group text-left">
+                                <label class="kanit-medium">เหตุผลที่ส่งกลับ <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="resubmit_reason" rows="3" placeholder="กรุณาระบุเหตุผล..." required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer justify-content-center border-0 pt-0">
+                            <button type="button" class="btn btn-secondary kanit-medium px-4" data-dismiss="modal" style="border-radius: 8px;">
+                                ยกเลิก
+                            </button>
+                            <button type="button" id="confirm_resubmit" class="btn btn-warning text-dark kanit-medium px-4" style="border-radius: 8px;">
+                                <i class="fas fa-paper-plane mr-1"></i> ส่งกลับ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================== Modal อนุมัติ ====================== -->
+            <div class="modal fade" id="modal_approve" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
+                        <div class="modal-header bg-success text-white" style="border-radius: 12px 12px 0 0;">
+                            <h5 class="modal-title kanit-semibold">
+                                <i class="fas fa-check-circle mr-2"></i> ยืนยันการอนุมัติ
+                            </h5>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center py-4">
+                            <i class="fas fa-check fa-4x text-success mb-3"></i>
+                            <p class="kanit-medium mb-0" style="font-size: 1.1rem;">
+                                คุณต้องการ <strong class="text-success">อนุมัติ</strong> คำขอลานี้หรือไม่?
+                                <br><small class="text-muted">เมื่ออนุมัติแล้ว ระบบจะแจ้งเตือนพนักงานทันที</small>
+                            </p>
+                        </div>
+                        <div class="modal-footer justify-content-center border-0 pt-0">
+                            <button type="button" class="btn btn-secondary kanit-medium px-4" data-dismiss="modal" style="border-radius: 8px;">
+                                ยกเลิก
+                            </button>
+                            <button type="button" id="confirm_approve" class="btn btn-success kanit-medium px-4" style="border-radius: 8px;">
+                                <i class="fas fa-check mr-1"></i> อนุมัติคำขอ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!------------------------------------------------------------------------------------------->
+
+    <!-- Table Leave Log -->
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
+
+            <div class="card-header  d-flex justify-content-between align-items-center"
+                 style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
+                 border-radius: 20px 20px 0 0;">
+
+                <!-- HEADER -->
+                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center"
+                    style="letter-spacing: 1px; font-size: 22px; gap: 12px;">
+                    ประวัติการอนุมัติ
+                </h4>
+            </div>
+
+            @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
+
+            <div class="freeze-pane">
+                <table id="table_approve" class="table table-sm table-hover text-center mb-0 overflow-auto">
+                    <thead style="font-size:18px; color:#555">
+                        @* <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
+                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
+                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
+                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th> *@
+                        <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
+                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
+                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
+                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                            <th>วันที่ยื่นลา</th>
+                            <th>วันที่ลา</th>
+                            <th>เวลาที่ลา</th>
+                            <th>ระยะเวลา (วัน)</th>
+                            <th>ประเภทการลา</th>
+                            <th>รายละเอียด</th>
+                            <th>แนบไฟล์</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr class="clickable-row kanit-regular"
+                            style="color:#555;">
+                            <td>1</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 03/11/25 08:33</td>
+                            <td>ศ. 31/10/25</td>
+                            <td>08:30 - 17:30</td>
+                            <td>1</td>
+                            <td>ลาป่วย</td>
+                            <td>ท้องเสีย</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                        </tr>
+
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>2</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 03/11/25 08:46</td>
+                            <td>ศ. 07/11/25 - จ. 10/11/25</td>
+                            <td>08:30 - 17:30</td>
+                            <td>2</td>
+                            <td>ลาพักร้อน</td>
+                            <td>-</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                        </tr>
+
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>3</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 03/11/25 09:00</td>
+                            <td>อ. 04/11/25</td>
+                            <td>08:30 - 12:00</td>
+                            <td>0.5</td>
+                            <td>ลาพักร้อนไม่รับค่าจ้าง</td>
+                            <td>-</td>
+                            <td></td>
+                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                        </tr>
+
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>4</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 10/11/25 09:50</td>
+                            <td>พ. 05/11/25</td>
+                            <td>13:30 - 15:30</td>
+                            <td>0.25</td>
+                            <td>ลากิจ(ราชการ)</td>
+                            <td>ทำบัตรประชาชน</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                        </tr>
+
+                        <tr class="clickable-row align-content-center text-center kanit-regular"
+                            style="color:#555">
+                            <td>5</td>
+                            <td>EM010101</td>
+                            <td>นายชัยวัฒน์ สุขสม</td>
+                            <td>จ. 10/11/25 09:50</td>
+                            <td>พ. 05/11/25</td>
+                            <td>13:00 - 17:30</td>
+                            <td>0.5</td>
+                            <td>ลากิจ(ราชการ)</td>
+                            <td>ทำบัตรประชาชน</td>
+                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
+                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                        </tr>
+
+                    </tbody>
+                </table>
             </div>
 
             <!-- Modal : บันทึกการตั้งค่า-->
@@ -590,6 +918,10 @@
         </div>
     </div>
 
+
+
+
+    <!------------------------------------------------------------>
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark">
             <div class="card-body" style="height:700px; overflow-y:auto">
@@ -637,6 +969,44 @@
         $(document).ready(async function () {
             //await GetData();
             init();
+
+                // ปุ่มปฏิเสธ
+                $('#btn_reject_leave').on('click', function () {
+                    $('#modal_reject').modal('show');
+                });
+
+                $('#confirm_reject').on('click', function () {
+                    // TODO: เรียก API หรือ submit form ปฏิเสธ
+                    alert('ปฏิเสธคำขอเรียบร้อยแล้ว');
+                    $('#modal_reject').modal('hide');
+                });
+
+                // ปุ่มส่งกลับ
+                $('#btn_resubmit_leave').on('click', function () {
+                    $('#modal_resubmit').modal('show');
+                });
+
+                $('#confirm_resubmit').on('click', function () {
+                    let reason = $('#resubmit_reason').val().trim();
+                    if (!reason) {
+                        alert('กรุณาระบุเหตุผลที่ส่งกลับ');
+                        return;
+                    }
+                    // TODO: ส่ง reason ไปยัง backend
+                    alert('ส่งกลับเรียบร้อยแล้ว\nเหตุผล: ' + reason);
+                    $('#modal_resubmit').modal('hide');
+                });
+
+                // ปุ่มอนุมัติ
+                $('#btn_approve_leave').on('click', function () {
+                    $('#modal_approve').modal('show');
+                });
+
+                $('#confirm_approve').on('click', function () {
+                    // TODO: เรียก API อนุมัติ
+                    alert('อนุมัติคำขอเรียบร้อยแล้ว');
+                    $('#modal_approve').modal('hide');
+                });
         });
 
         async function GetData() {
@@ -652,6 +1022,89 @@
             });
         }
 
+        $(document).ready(function () {
+    // ปุ่มปฏิเสธ
+    $('#btn_reject_leave').on('click', function () {
+        $('#modal_reject').modal('show');
+    });
+
+    $('#confirm_reject').on('click', function () {
+        // TODO: เรียก API หรือ submit form ปฏิเสธ
+        alert('ปฏิเสธคำขอเรียบร้อยแล้ว');
+        $('#modal_reject').modal('hide');
+    });
+
+    // ปุ่มส่งกลับ
+    $('#btn_resubmit_leave').on('click', function () {
+        $('#modal_resubmit').modal('show');
+    });
+
+    $('#confirm_resubmit').on('click', function () {
+        let reason = $('#resubmit_reason').val().trim();
+        if (!reason) {
+            alert('กรุณาระบุเหตุผลที่ส่งกลับ');
+            return;
+        }
+        // TODO: ส่ง reason ไปยัง backend
+        alert('ส่งกลับเรียบร้อยแล้ว\nเหตุผล: ' + reason);
+        $('#modal_resubmit').modal('hide');
+    });
+
+    // ปุ่มอนุมัติ
+    $('#btn_approve_leave').on('click', function () {
+        $('#modal_approve').modal('show');
+    });
+
+    $('#confirm_approve').on('click', function () {
+        // TODO: เรียก API อนุมัติ
+        alert('อนุมัติคำขอเรียบร้อยแล้ว');
+        $('#modal_approve').modal('hide');
+    });
+
+
+            // 1. เมื่อคลิก Select All
+            $('#selectAllApprove').on('change', function () {
+                var isChecked = $(this).is(':checked');
+                $('.approve-checkbox').prop('checked', isChecked);
+
+                // ปรับสถานะให้สวย (optional)
+                $(this).prop('indeterminate', false);
+            });
+
+            // 2. เมื่อมีการเปลี่ยนแปลง checkbox ในรายการ
+            $(document).on('change', '.approve-checkbox', function () {
+                var totalCheckboxes = $('.approve-checkbox').length;
+                var checkedCheckboxes = $('.approve-checkbox:checked').length;
+
+                if (checkedCheckboxes === 0) {
+                    $('#selectAllApprove').prop({
+                        checked: false,
+                        indeterminate: false
+                    });
+                } else if (checkedCheckboxes === totalCheckboxes) {
+                    $('#selectAllApprove').prop({
+                        checked: true,
+                        indeterminate: false
+                    });
+                } else {
+                    $('#selectAllApprove').prop({
+                        checked: false,
+                        indeterminate: true
+                    });
+                }
+            });
+
+            // 3. (เพิ่มเติม) ป้องกันการคลิกแถวแล้ว checkbox ไม่เปลี่ยน (ถ้ามี clickable-row)
+            $('.clickable-row').on('click', function (e) {
+                // ถ้าคลิกที่ checkbox เอง ไม่ต้องทำอะไร
+                if ($(e.target).closest('input[type="checkbox"]').length) {
+                    return;
+                }
+
+                var checkbox = $(this).find('.approve-checkbox');
+                checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
+            });
+});
         // function init() {
         //     $(document).ready(function () {
         //         $('#table_leave').DataTable({
