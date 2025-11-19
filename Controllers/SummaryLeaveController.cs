@@ -138,7 +138,8 @@ namespace WebENG.Controllers
                                    type = req.leave_name_th,
                                    duration = duration,
                                    time = time,
-                                   color_code = req.color_code
+                                   color_code = req.color_code,
+                                   status = req.status_request
                                };
                            }).ToArray()
             }).ToArray();
