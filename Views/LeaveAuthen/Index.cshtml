@@ -32,6 +32,7 @@
         font-family: "Kanit", sans-serif !important;
         font-weight: 300 !important;
         font-style: normal !important;
+        color: dimgrey;
     }
 
     .kanit-regular {
@@ -148,93 +149,333 @@
             opacity: 1;
         }
 
-    table.dataTable tbody td {
-        border-left: none !important;
-        border-right: none !important;
-        border-top: none !important; /* ถ้าต้องการลบเส้นแนวนอนด้วย ให้ uncomment */
+    /* สไตล์สำหรับปุ่ม leave_group */
+    .leave-group-btn {
+        transition: all 0.3s ease; /* เหมือน dropzone */
     }
 
-    /* สำหรับ header ถ้าต้องการลบแนวตั้ง */
-    table.dataTable thead th {
-        border-left: none !important;
-        border-right: none !important;
+        .leave-group-btn.active {
+            background-color: #0056b3 !important; /* น้ำเงินเข้มเมื่อเลือก */
+            color: white !important; /* ตัวอักษรขาว */
+            border-color: #0056b3 !important; /* ขอบน้ำเงินเข้ม */
+            box-shadow: 0 4px 8px rgba(0, 86, 179, 0.3); /* เงาเล็กน้อย */
+        }
+
+        .leave-group-btn:hover {
+            background-color: #007bff; /* สีน้ำเงินปกติเมื่อ hover */
+            color: white;
+            transform: translateY(-2px); /* ยกขึ้นเหมือน dropzone */
+        }
+
+    /****************************************************/
+
+    /* สไตล์สำหรับเงื่อนไข */
+    .condition-group {
+        padding: 5px 0; /* เพิ่ม padding รอบ ๆ เพื่อความโปร่ง */
     }
 
-    /* ลบเส้นล่างของ footer ถ้ามี */
-    table.dataTable tfoot th {
-        border-bottom: 1px solid #111; /* เก็บเส้นแนวนอนไว้ */
+    .condition-row {
+        margin-bottom: 0px; /* ช่องว่างระหว่างแถว */
+        padding: 5px 0; /* เพิ่ม padding ในแถว */
+        transition: all 0.3s ease; /* แอนิเมชันลื่นไหล */
+        display: flex; /* ทำให้เป็น Flexbox container */
+        align-items: center; /* จัดกึ่งกลางในแนวตั้ง */
     }
+
+        .condition-row:hover {
+            background: #f8f9fa; /* Highlight เหมือน dropzone */
+        }
+
+    /* สไตล์สำหรับสวิตช์ */
+    .modern-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+        margin-right: 10px;
+    }
+
+        .modern-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .modern-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            border-radius: 28px;
+            transition: 0.3s;
+        }
+
+            .modern-switch .slider:before {
+                position: absolute;
+                content: "";
+                height: 24px;
+                width: 24px;
+                left: 2px;
+                bottom: 2px;
+                background-color: white;
+                border-radius: 50%;
+                transition: 0.3s;
+            }
+
+        .modern-switch input:checked + .slider {
+            background-color: #007bff;
+        }
+
+            .modern-switch input:checked + .slider:before {
+                transform: translateX(22px);
+            }
+
+        .modern-switch:hover .slider {
+            background-color: #b3d7ff;
+        }
+
+    /*************************************************/
+
+    /* Modern Button Styles */
+    .modern-btn {
+        padding: 8px 0px;
+        border-radius: 8px;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border: none;
+        width: 100%; /* เต็มความกว้างของ column */
+        height: 100%;
+        text-align: center;
+    }
+
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            color: white !important; /* ตัวอักษรสีขาวตอน hover */
+        }
+
+        .modern-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+    /* Cancel Button */
+    .btn-cancel {
+        background-color: #dc3545; /* สีแดง Bootstrap */
+        color: white;
+    }
+
+        .btn-cancel:hover {
+            background-color: #c82333; /* แดงเข้มเมื่อ hover */
+        }
+
+    /* Save Button */
+    .btn-save {
+        background-color: #034694; /* สีน้ำเงินเดิม */
+        color: white;
+    }
+
+        .btn-save:hover {
+            background-color: #023670; /* น้ำเงินเข้มเมื่อ hover */
+        }
+
+    .icon-shadow {
+        display: inline-block;
+        padding: 15px;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Add Button */
+    .btn-add {
+        background-color: #53cc67;
+        color: white !important;
+    }
+
+        .btn-add:hover {
+            background-color: #42a052; /* ฟ้าเข้มเมื่อ hover */
+            color: white !important;
+        }
+
+    /* Delete Button */
+    .delete-btn {
+        transition: all 0.3s ease;
+    }
+
+        .delete-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .color-brown {
+        background-color: #6D4C41;
+    }
+    /* น้ำตาลช็อกเข้ม */
+    .color-sky {
+        background-color: #4FC3F7;
+    }
+    /* ฟ้าคราม */
+    .color-yellow {
+        background-color: #FFD54F;
+    }
+    /* เหลืองทอง */
+    .color-green {
+        background-color: #43A047;
+    }
+    /* เขียวป่า */
+    .color-blue {
+        background-color: #1976D2;
+    }
+    /* น้ำเงินกรม */
+    .color-red {
+        background-color: #E53935;
+    }
+    /* แดง */
+    .color-pink {
+        background-color: #F06292;
+    }
+    /* ชมพู */
+    .color-bluegrey {
+        background-color: #90A4AE;
+    }
+    /* เทาเงิน */
+    .color-orange {
+        background-color: #FF8A65;
+    }
+    /* ส้ม*/
+    .color-purple {
+        background-color: #8E24AA;
+    }
+    /* ม่วง */
+
 </style>
+<!-------------------------------------------------------------------------------------------------------------------->
 
-<div class="row" style="row-gap:1px">
-    <div class="col-12">
-        <span class="kanit-bold" style="font-size:24px;color:dimgrey">จัดการสิทธิ์ผู้อนุมัติ</span>
-        <hr style="border:solid;color:gray;border-width:1px" />
+<div class="row" style="row-gap:1px; padding:10px">
+    <div class="col-12 kanit-bold">
+        <h4 style="letter-spacing:2px; padding:10px; padding-left:15px; color:white; border-top-left-radius:20px; border-top-right-radius:20px; background: #2178BE;
+                    background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);">
+            แผนก
+        </h4>
     </div>
-    <div class="container">
-        <div class="col-xl-12 col-md-12 col-sm-12">
-            <div class="card card-dark">
-                <div class="card-body" style="height:700px; overflow-y:auto">
-                    <form>
-                        <div class="form-group row">
-                            <div class="col-xl-2 col-md-2 col-sm-6">
-                                <input type="button" id="addUser" class="btn btn-info form-control kanit-medium" style="border-radius:5px; height:40px; letter-spacing:1px" value="+ เพิ่มสิทธิ์ผู้อนุมัติ" />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <table id="table_authen" class="table table-sm table-bordered table-hover text-center w-100">
-                                <thead class="kanit-light" style="background-color:lightgrey">
-                                    <tr>
-                                        <th>รายชื่อ</th>
-                                        <th>ผู้จัดการแผนก</th>
-                                        <th>ผู้อำนวยการ</th>
-                                        <th>ผู้ตรวจสอบ</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
-                </div>
+
+    <div class="col-xl-2 col-md-3 col-sm-12">
+        <div class="card card-dark">
+            <div class="card-body" style="height:760px; overflow-y:auto">
+                <form>
+                    <div id="department_group">
+
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
-<div class="modal fade" id="modal_authen" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
-    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
-        <div class="modal-content kanit-regular">
-            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title" id="modal_leave_title">จัดการสิทธิ์</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="color: white;">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" style="height:460px; color:#555555">
-                <form>
-                    <div class="form-group row">
-                        <div disabled class="col-xl-4 col-md-4 col-sm-6">
-                            <input id="emp_id" type="text" class="form-control" placeholder="" disabled />
-                        </div>
-                        <div disabled class="col-xl-8 col-md-8 col-sm-6">
-                            <input id="emp_name" type="text" class="form-control" placeholder="" disabled />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 kanit-light">
-                            <div class="card card-primary">
-                                <div class="card-header">
-                                    <span>ผู้จัดการ</span>
-                                    <div class="card-tools">
-                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                            <i class="fas fa-minus"></i>
-                                        </button>
+    <div class="col-xl-10 col-md-9 col-sm-12">
+        <div class="card card-dark">
+            <form>
+                <div class="card-header-tabs mb-0" style="padding-left:10px">
+                    <ul class="nav nav-tabs sticky-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active kanit-medium" style="letter-spacing:2px; font-size:18px" href="#SettingDepartment" data-toggle="tab">ตั้งค่าสิทธิ์การอนุมัติ</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+            <div class="card-body" style="height:660px; overflow-y:auto;">
+                <form>                  
+                    <div class="tab-content" style="padding-top:20px">
+                        <div class="tab-pane fade show active" id="SettingDepartment">
+                            <div class="container d-flex justify-content-center">
+                                <div class="col-xl-12 col-md-12 col-sm-12">
+                                    <div class="row">                                      
+                                        <div class="col-xl-12 col-md-12 col-sm-12">                                         
+                                            <span id="div_department" class="kanit-bold mb-2" style="color:dimgrey;font-size:20px"> </span>
+                                            <div class="card">
+                                                <div class="card-header" style="background-color:powderblue">
+                                                    <div class="row">
+                                                        <div class="col-xl-4 col-md-4 col-sm-12">
+                                                            <span class="kanit-bold" style="color:dimgrey">ผู้จัดการแผนก (ผู้อนุมัติ 1)</span>
+                                                        </div>
+                                                        <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="card-tools">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
+                                                                            <i class="fas fa-chevron-down"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row" style="row-gap:1px">
+                                                        <div class="col-12">
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <div id="div_entitlement_manager">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xl-1 col-md-1 col-sm-6">
+                                                            <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementManagerClicked()" value="+ เพิ่ม" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="card-body">
                                     <div class="row">
-                                        <div class="col-12">
-                                            <div id="div_manager" class="row">
+                                        <div class="col-xl-12 col-md-12 col-sm-12">
+                                            <div class="card">
+                                                <div class="card-header" style="background-color:powderblue">
+                                                    <div class="row">
+                                                        <div class="col-xl-4 col-md-4 col-sm-12">
+                                                            <span class="kanit-bold" style="color:dimgrey">ผู้อนุมัติ 2</span>
+                                                        </div>
+                                                        <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="card-tools">
+                                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
+                                                                            <i class="fas fa-chevron-down"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row" style="row-gap:1px">
+                                                        <div class="col-12">
+                                                            <div class="form-group">
+                                                                <div class="row">
+                                                                    <div class="col-6">
+                                                                        <div id="div_entitlement_director">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-xl-1 col-md-1 col-sm-6">
+                                                            <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementDirectorClicked()" value="+ เพิ่ม" />
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -242,297 +483,249 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="col-xl-4 col-md-4 col-sm-6">
-                                <input type="checkbox" id="check_director" style="width:20px;height:1em" onclick="SelectDirector()" />
-                                <label class="kanit-light">ผู้อำนวยการ</label>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="col-xl-4 col-md-4 col-sm-6">
-                                <input type="checkbox" id="check_auditor" style="width:20px;height:1em" onclick="SelectAuditor()" />
-                                <label class="kanit-light">ผู้ตรวจสอบ</label>
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
-            <div class="modal-footer d-flex">
-                <div class="container d-flex justify-content-end">
-                    <div class="col-xl-8 col-md-8 col-sm-12">
-                        <div class="row">
-                            <div class="col-6">
-                                <button class="form-control kanit-light" style="background-color:red;color:white" data-dismiss="modal">ยกเลิก</button>
-                            </div>
-                            <div class="col-6">
-                                <button id="btn_save" class="form-control kanit-light" style="background-color:#034694;color:white">บันทึก</button>
-                            </div>
-                        </div>
+
+            <div class="card-footer" style="background-color:white;">
+                <div class="row justify-content-center" style="row-gap: 10px;">
+                    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-5">
+                        <button class="btn modern-btn btn-cancel kanit-medium" onclick="CancelClick()" type="button">ยกเลิก</button>
+                    </div>
+                    <div class="col-xl-2 col-lg-2 col-md-3 col-sm-4 col-5">
+                        <button class="btn modern-btn btn-save kanit-medium" onclick="UpdateSave()" type="button">บันทึก</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Modal : เพิ่มรายชื่อสิทธิ์ -->
-<div class="modal fade" id="modal_user" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
-    <div class="modal modal-dialog modal-dialog-centered modal-sm" role="document">
-        <div class="modal-content" style="border-radius: 10px; overflow: hidden;">
-            <div class="modal-header" style="background: #34ba7c;
-                                            background: linear-gradient(90deg, rgba(52, 186, 124, 1) 0%, rgba(0, 138, 112, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title kanit-medium" style="color: white; font-size: 20px; letter-spacing: 1px;" id="modal_leave_title">เพิ่มสิทธิ์ผู้อนุมัติ</h5>
-                <button type="button" class="close" style="color: white;" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="color: white;">&times;</span>
+
+<!-- Modal : บันทึกการตั้งค่า-->
+<div class="modal fade" id="modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content kanit-regular" style="border-radius: 10px; overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(90deg, #034694 0%, #022f5b 100%); border-bottom: none; padding: 15px;">
+                <h5 class="modal-title kanit-medium" style="color: white; font-size: 24px; letter-spacing: 1px;" id="modal_confirm_title">บันทึกการตั้งค่า</h5>
+                <button type="button" class="close" style="color: white; font-size: 24px;" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body mb-4" style="color:#555555">
-                <form>
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="form-group ">
-                                <label class="kanit-light" style="color:dimgrey">รายชื่อ</label>
-                                <select id="select_user" class="form-control">
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </form>
+            <div class="modal-body" style="padding: 20px; text-align: center;">
+                <div id="confirm_content">
+                    <i class="fas fa-save icon-shadow mb-3" style="font-size: 40px; color: #034694;"></i>
+                    <p class="kanit-light" style="font-size: 20px; color: #333; margin-bottom: 0;">คุณต้องการบันทึกหรือไม่?</p>
+                </div>
             </div>
-            <div class="modal-footer d-flex">
-                <div class="container">
-                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-center">
-                        <div class="row">
-                            <div class="col-6">
-                                <button class="btn modern-btn btn-cancel kanit-medium" style="background-color:red; color:white; border-radius:10px;width:80px" data-dismiss="modal">
-                                    ยกเลิก
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button id="btn_add_user" class="btn modern-btn btn-save kanit-medium" style="background-color:#034694; color:white; border-radius:10px;width:80px">
-                                    เพิ่ม
-                                </button>
-                            </div>
-                        </div>
+            <div class="modal-footer" style="border-top: none; padding: 15px 30px; background-color: #f8f9fa;">
+                <div class="row justify-content-center" style=" width: 100%;">
+                    <div class="col-xl-4 col-md-4 col-sm-4">
+                        <button type="button" class="btn modern-btn btn-cancel kanit-medium" data-dismiss="modal">ยกเลิก</button>
+                    </div>
+                    <div class="col-xl-4 col-md-4 col-sm-4">
+                        <button type="button" class="btn modern-btn btn-save kanit-medium" id="confirm_ok">ยืนยัน</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
 <partial name="ModalSpin" />
 
 @section Scripts
 {
     <script type="text/javascript">
-        let manager_departments = [];
-        let director = false;
-        let auditor = false;
-        var table_authen;
+
+
         let departments = [];
         let employees = [];
-        let positions = [];
+        let last_leave_id = "";
+        let approver_manager = [];
+        let approver_director = [];
+        let approver_admin = [];
+        let entitlement_manager = 0;
+        let entitlement_director = 0;
         $(document).ready(async function () {
-            GetData();
+            await GetDepartments();
         });
-
-        async function GetData() {
+        async function GetDepartments() {
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetData", "LeaveAuthen")',
-	            contentType: 'application/x-www-form-urlencoded',
-                data: {  },
+                url: '@Url.Action("GetDapartments", "LeaveAuthen")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {},
                 success: function (response) {
                     departments = response.departments;
                     employees = response.employees;
-                    positions = response.positions;
-                    GenerateUserOption(employees);
-                    init(positions);
+                    GenerateDepartments(departments);
                 }
             });
         }
 
-        function init(positions) {
-            $(document).ready(function () {
-                let datas = [];
-                let list_department = [];
-                if (table_authen !== null)
-                    $('#table_authen').DataTable().destroy();
-                for (let i = 0; i < positions.length; i++) {
-                    list_department = [];
-                    list_department.push(positions[i].manager_departments);
+        function GenerateDepartments(departments) {
+            var html = '';
+            for (var i = 0; i < departments.length; i++) {
+                html += `<div class="form-group row">
+                                       <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                       style="border-radius:7px; height:40px" onClick="DepartmentClicked('${departments[i]}', this)">
+                                    ${departments[i]}
+                               </button>
+                         </div>`;
+            }
 
-                    datas.push([
-                        positions[i].emp_name,
-                        list_department,
-                        positions[i].is_director,
-                        positions[i].is_auditor,
-                    ]);
-                }
-                table_authen = $('#table_authen').DataTable({
-                    data: datas,
-                    columnDefs: [
-                        {
-                            targets: 0,
-                            render: function (data, type, row) {
-                                var imgSrc = '/images/default-avatar.png';
-                                let user = positions.filter(f => f.emp_name === data).map(m => m)[0];
-                                if (user !== null) {
-                                    imgSrc = 'data:image/jpeg;base64,' + user.img;
-                                }
-                                return `
-                        <div class="row align-items-center" style="width:300px">
-                            <div class="col-2 d-flex justify-content-center">
-                                <img src="${imgSrc}"
-                                    class="rounded-circle me-2"
-                                    style="width: 32px; height: 32px; object-fit: cover;"
-                                    alt="${data}" />
-
-                             </div>
-                             <div class="col-10 d-flex align-items-center justify-content-start">
-                                <div>
-                                    <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${data}</span>
-                                    <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">${user.position}</span>
-                                </div>
-                            </div>
-                       </div>`;
-                            }
-                        },
-                    ],
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
-                    }, rowCallback: function (row, data) {
-                        data[2] === true ? $('td:eq(2)', row).html('<span style = "color: green; font-weight: bold;" >✓</span >') : $('td:eq(2)', row).html("");
-                        data[3] === true ? $('td:eq(3)', row).html('<span style = "color: green; font-weight: bold;" >✓</span >') : $('td:eq(3)', row).html("");
-                    },
-                    info: false,
-                    paging: false,
-                    searching:false
-
-                });
-            });
+            $('#department_group').empty();
+            $('#department_group').append(html);
         }
-        function ShowDepartment(departments, manager_departments) {
-            let str = ``;
-            for (let i = 0; i < departments.length; i++) {
-                let chk = manager_departments.includes(departments[i]);
-                if (chk === true) {
-                    str += `
-                       <div class="col-xl-4 col-md-4 col-sm-6">
-                          <input type="checkbox" id="check_department${departments[i]}" style="width:20px;height:1em" onclick="SelectDepartment('${departments[i]}')" checked />
-                          <label class="kanit-light">${departments[i]}</label>
-                       </div>`;
-                } else {
-                    str += `
-                       <div class="col-xl-4 col-md-4 col-sm-6">
-                          <input type="checkbox" id="check_department${departments[i]}" style="width:20px;height:1em" onclick="SelectDepartment('${departments[i]}')" />
-                          <label class="kanit-light">${departments[i]}</label>
-                       </div>`;
-                }
-            }
 
-            $('#div_manager').empty();
-            $('#div_manager').append(str);
+        function DepartmentClicked(department) {
+            $('#div_department').text("แผนก : " + department);
         }
-        $('#table_authen tbody').on('click','tr', function () {
 
-            let data = table_authen.row(this).data();
-            let emp = employees.filter(f => f.name_en.toLowerCase() === data[0].toLowerCase()).map(m => m)[0];
-
-            //Show Select Department
-            manager_departments = data[1][0];
-            ShowDepartment(departments, manager_departments);
-            let is_director = data[2];
-            let is_auditor = data[3];
-            if (is_director) {
-                $('#check_director').prop('checked', true);
-            } else {
-                $('#check_director').prop('checked', false);
-            }
-            if (is_auditor) {
-                $('#check_auditor').prop('checked', true);
-            } else {
-                $('#check_auditor').prop('checked', false);
-            }
-
-            $('#emp_id').val(emp.emp_id);
-            $('#emp_name').val(emp.name_en);
-            $('#modal_authen').modal();
-        });
-
-        $('#addUser').on('click', function () {
-            $('#modal_user').modal();
-        });
-
-        $('#btn_save').on('click', async function () {
-            let emp_id = $('#emp_id').val();
-            await $.ajax({
-                type: "POST",
-                url: '@Url.Action("UpdateUser", "LeaveAuthen")',
-                contentType: 'application/x-www-form-urlencoded',
-                data: { emp_id, manager_departments, director, auditor },
-                success: function (response) {
-                    if (response === "Success") {
-                        location.reload();
-                    } else {
-                        alert(response);
-                    }
-                }
-            });
-        });
-
-        $('#btn_add_user').on('click', async function () {
-            let emp_id = $('#select_user').val();
-            if (emp_id !== null) {
-                await $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("CreateUser", "LeaveAuthen")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: { emp_id },
-                    success: function (response) {
-                        if (response === "Success") {
-                            location.reload();
-                        } else {
-                            alert(response);
-                        }
-                    }
-                });
-            } else {
-                alert("Error");
-            }
-        });
-
-        function GenerateUserOption(employees) {
-            $('#select_user').empty();
-            $('#select_user').append(`<option value="" selected disabled>Please Select</option>`);
-            for (let i = 0; i < employees.length; i++) {
-                $('#select_user').append(`<option value="${employees[i].emp_id}">${employees[i].name_en}</option>`);
-            }
+         /* Manager */
+        function EntitlementManagerClicked() {
+            approver_manager.push({ "id": entitlement_manager, "emp_id" : "0" , "name": "" });
+            CreateEntitlementManager();
+            entitlement_manager++;
         }
-        function SelectDirector() {
-            let chk = $('#check_director').prop('checked');
-            if (chk === true) {
-                director = true;
-            } else {
-                director = false;
+
+        function CreateEntitlementManager() {
+            $('#div_entitlement_manager').empty();
+            for (let i = 0; i < approver_manager.length; i++) {
+                
+                let html = `
+                                                                     
+                                                                        <div class="row pt-2">
+                                                                            <div class="col-2">
+                                                                                <label class="kanit-light" style="color:dimgrey">คนที่ ${i+1}</label>
+                                                                            </div>
+                                                                            <div class="col-7">
+                                                                                <select id="EntitlementManager${approver_manager[i].id}" onchange = "ManagerChanged(${approver_manager[i].id})" class="kanit-light form-control">
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-1">
+                                                                                    <div class="form-group">
+                                                                                        <div class="input-group d-flex justify-content-start">
+                                                                                                <button type="button" class="btn btn-tool pt-3" style="color:red" onClick="EntitlementManagerDelete(${approver_manager[i].id})">
+                                                                                            <i class="fas fa-trash" style="transform:scale(1.2)"></i>
+                                                                                        </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                        </div>
+                                                                                `;
+
+                
+                $('#div_entitlement_manager').append(html);
+                GenerateManagerOption(approver_manager[i].id);
+                $('#EntitlementManager' + approver_manager[i].id).val(approver_manager[i].emp_id);
             }
         }
 
-        function SelectAuditor() {
-            let chk = $('#check_auditor').prop('checked');
-            if (chk === true) {
-                auditor = true;
-            } else {
-                auditor = false;
+        function GenerateManagerOption(id) {
+            let emps = employees.filter(f => f.position.includes("Manager"));
+            let select = $('#EntitlementManager' + id);
+            select.empty();
+            select.append(`<option value="" selected disabled>Please Select</option>`);
+            for (let i = 0; i < emps.length; i++) {
+
+                select.append(`<option value="${emps[i].emp_id}">${emps[i].name_en}</option>`);
             }
         }
-        function SelectDepartment(department) {
-            let chk = $('#check_department' + department).prop('checked');
-            if (chk === true) {
-                manager_departments.push(department);
-            } else {
-                manager_departments = manager_departments.filter(item => item !== department);
+
+        function ManagerChanged(id) {
+            let emp_id = $('#EntitlementManager' + id).val();
+            let emp_name = $('#EntitlementManager' + id + " :selected").text();
+            const index = approver_manager.findIndex(item => item.id === id);
+            if (index !== -1) {
+                approver_manager[index] = {
+                    id : id,
+                    name: emp_name,
+                    emp_id: emp_id                   
+                };
             }
+        }
+
+        function EntitlementManagerDelete(id) {
+            approver_manager = approver_manager.filter(item => item.id !== id);
+            const index = approver_manager.findIndex(item => item.id === id);
+            if (index !== -1) {
+                approver_manager.splice(index, 1);
+            }
+            console.log(approver_manager);
+            CreateEntitlementManager();
+        }
+
+        /* Director */
+        function EntitlementDirectorClicked() {
+            approver_director.push({ "id": entitlement_director, "emp_id": "0", "name": "" });
+            CreateEntitlementDirector();
+            entitlement_director++;
+        }
+        function CreateEntitlementDirector() {
+            $('#div_entitlement_director').empty();
+            for (let i = 0; i < approver_director.length; i++) {
+
+                let html = `
+                                                                     
+                                                                        <div class="row pt-2">
+                                                                            <div class="col-2">
+                                                                                <label class="kanit-light" style="color:dimgrey">คนที่ ${i + 1}</label>
+                                                                            </div>
+                                                                            <div class="col-7">
+                                                                                <select id="EntitlementDirector${approver_director[i].id}" onchange = "DirectorChanged(${approver_director[i].id})" class="kanit-light form-control">
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-1">
+                                                                                    <div class="form-group">
+                                                                                        <div class="input-group d-flex justify-content-start">
+                                                                                                <button type="button" class="btn btn-tool pt-3" style="color:red" onClick="EntitlementDirectorDelete(${approver_director[i].id})">
+                                                                                            <i class="fas fa-trash" style="transform:scale(1.2)"></i>
+                                                                                        </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                        </div>
+                                                                                `;
+
+
+                $('#div_entitlement_director').append(html);
+                GenerateDirectorOption(approver_director[i].id);
+                $('#EntitlementDirector' + approver_director[i].id).val(approver_director[i].emp_id);
+            }
+        }
+
+        function GenerateDirectorOption(id) {
+            let emps = employees.filter(f => f.position.includes("Director"));
+            let select = $('#EntitlementDirector' + id);
+            select.empty();
+            select.append(`<option value="" selected disabled>Please Select</option>`);
+            for (let i = 0; i < emps.length; i++) {
+
+                select.append(`<option value="${emps[i].emp_id}">${emps[i].name_en}</option>`);
+            }
+        }
+
+        function DirectorChanged(id) {
+            let emp_id = $('#EntitlementDirector' + id).val();
+            let emp_name = $('#EntitlementDirector' + id + " :selected").text();
+            const index = approver_director.findIndex(item => item.id === id);
+            if (index !== -1) {
+                approver_director[index] = {
+                    id: id,
+                    name: emp_name,
+                    emp_id: emp_id
+                };
+            }
+        }
+
+        function EntitlementDirectorDelete(id) {
+            approver_director = approver_director.filter(item => item.id !== id);
+            const index = approver_director.findIndex(item => item.id === id);
+            if (index !== -1) {
+                approver_director.splice(index, 1);
+            } 
+            CreateEntitlementDirector();
         }
     </script>
 }

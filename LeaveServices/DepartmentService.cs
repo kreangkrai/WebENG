@@ -28,10 +28,13 @@ namespace WebENG.LeaveServices
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"SELECT 
-                                                department_id,
-                                                department_name
-                                                FROM departments");
+                string strCmd = string.Format($@"SELECT [id]
+                                                  ,[department]
+                                                  ,[department_name]
+                                                  ,[approver_level]
+                                                  ,[manager_id]
+                                                  ,[is_active]
+                                              FROM [dbo].[departments]");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -40,8 +43,12 @@ namespace WebENG.LeaveServices
                     {
                         DepartmentModel department = new DepartmentModel()
                         {
-                            department_id = dr["department_id"].ToString(),
-                            department_name = dr["department_name"].ToString()
+                            id = Int32.Parse(dr["id"].ToString()),
+                            department = dr["department"].ToString(),
+                            department_name = dr["department_name"].ToString(),
+                            approver_level = dr["approver_level"] != DBNull.Value ? Convert.ToInt32(dr["approver_level"].ToString()) : 0,
+                            manager_id = dr["manager_id"].ToString(),
+                            is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()): false
                         };
                         departments.Add(department);
                     }
@@ -66,13 +73,24 @@ namespace WebENG.LeaveServices
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"INSERT INTO departments(department_id,
-                                                    department_name)
-                                                VALUES (@department_id,
-                                                    @department_name)");
+                string strCmd = string.Format($@"INSERT INTO [dbo].[departments]
+                                                   ([department]
+                                                   ,[department_name]
+                                                   ,[approver_level]
+                                                   ,[manager_id]
+                                                   ,[is_active])
+                                             VALUES
+                                                   (@department
+                                                   ,@department_name
+                                                   ,@approver_level
+                                                   ,@manager_id
+                                                   ,@is_active)");
                 SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@department_id", department.department_id);
+                command.Parameters.AddWithValue("@department", department.department);
                 command.Parameters.AddWithValue("@department_name", department.department_name);
+                command.Parameters.AddWithValue("@approver_level", department.approver_level);
+                command.Parameters.AddWithValue("@manager_id", department.manager_id);
+                command.Parameters.AddWithValue("@is_active", department.is_active);
                 command.ExecuteNonQuery();
             }
             finally
@@ -93,12 +111,18 @@ namespace WebENG.LeaveServices
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"UPDATE departments SET
-                                                    department_name = @department_name
-                                                WHERE department_id = @department_id");
+                string strCmd = string.Format($@"UPDATE [dbo].[departments]
+                                                   SET [department_name] = @department_name
+                                                      ,[approver_level] = @approver_level
+                                                      ,[manager_id] = @manager_id
+                                                      ,[is_active] = @is_active
+                                                 WHERE [department] = @department");
                 SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@department_id", department.department_id);
+                command.Parameters.AddWithValue("@department", department.department);
                 command.Parameters.AddWithValue("@department_name", department.department_name);
+                command.Parameters.AddWithValue("@approver_level", department.approver_level);
+                command.Parameters.AddWithValue("@manager_id", department.manager_id);
+                command.Parameters.AddWithValue("@is_active", department.is_active);
                 command.ExecuteNonQuery();
             }
             finally

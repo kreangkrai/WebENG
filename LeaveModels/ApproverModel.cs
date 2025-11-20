@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 
 namespace WebENG.LeaveModels
 {
-    public class DepartmentModel
+    public class ApproverModel
     {
         public int id { get; set; }
+        public string approver_id { get; set; }
         public string department { get; set; }
-        public string department_name { get; set; }
         public int approver_level { get; set; }
-        public string manager_id { get; set; }
         public bool is_active { get; set; }
     }
 }

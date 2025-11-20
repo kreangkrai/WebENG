@@ -52,6 +52,17 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
+        public IActionResult GetDapartments()
+        {
+            List<CTLModels.EmployeeModel> employees = CTLEmployees.GetEmployees();
+            employees = employees.OrderBy(o => o.name_en).ToList();
+            List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
+            var data = new { employees = employees, departments = departments };
+            return Json(data);
+        }
+
+
+        [HttpGet]
         public IActionResult GetData()
         {
             List<CTLModels.EmployeeModel> employees = CTLEmployees.GetEmployees();
