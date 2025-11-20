@@ -785,6 +785,17 @@
         let employees = [];
         let selectedEmployee = null;
         let requestHistory = [];
+
+        const request_status = [
+            { status_en: "Pending", status: { status_th: "รออนุมัติ", class: "warning" } },
+            { status_en: "Resubmit", status: { status_th: "ส่งใหม่", class: "secondary" } },
+            { status_en: "Cancelled", status: { status_th: "ยกเลิก", class: "dark" } },
+            { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
+            { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
+            { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
+            { status_en: "Success", status: { status_th: "สำเร็จ", class: "primary" } },
+        ];
+
         $(document).ready(async function () {
             await GetEmployee();
             initSearchEvents();
@@ -1017,11 +1028,12 @@
             const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
             return dayName;
         }
-        function timeToMinutes(timeStr) {       
-            const [h, m] = timeStr.split(':').map(Number);
+        function timeToMinutes(timeStr) {
+            const timePart = timeStr.split('.').pop();
+            const [h, m] = timePart.split(':').map(Number);
             return h * 60 + m;
         }
-
+        
         function renderLeaveHistory(emp_id) {
             const $tbody = $('#table_leave tbody').empty();
             requestHistory.forEach((row, index) => {
@@ -1036,12 +1048,16 @@
                     let start = timeToMinutes(row.start_request_time);
                     let end = timeToMinutes(row.end_request_time);
                     let diff = end - start;
-                    console.log(end, start);
-                    duration = (diff / 480 * 100).toFixed(2);
+                    duration = (diff / 480).toFixed(2);
+                    if (duration > 0.3 && duration < 0.6) {
+                        duration = 0.50;
+                    }
 
                     start_request_time = row.start_request_time.split('.')[1].substring(0,5);
                     end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
                 }
+
+                let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
                 const tr = $(`
                     <tr class="clickable-row kanit-regular" style="color:#555; font-size: 14px;"
                         data-toggle="modal" data-target="#modal_leave"
@@ -1058,7 +1074,7 @@
                         <td>${duration}</td>
                         <td>${row.leave_name_th}</td>
                         <td>${row.decsription}</td>
-                        <td><span class="badge badge-success p-2 kanit-light" style="font-size:16px; border-radius:20px;">${row.status_request}</span></td>
+                        <td><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
                     </tr>
                 `);
 

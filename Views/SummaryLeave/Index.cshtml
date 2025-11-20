@@ -274,22 +274,22 @@
         }
 
     /* 4 ช่องแต่ละมุม */
-    .half-bottom-left {
+    .quarter-bottom-left {
         background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
         border: none;
     }
 
-    .half-top-left {
+    .quarter-top-left {
         background: linear-gradient(90deg, transparent 50%, #E0E0E0 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
         border: none;
     }
 
-    .half-bottom-right {
+    .quarter-bottom-right {
         background: linear-gradient(90deg, #E0E0E0 50%, transparent 50%), linear-gradient(0deg, transparent 50%, #E0E0E0 50%);
         border: none;
     }
 
-    .half-top-right {
+    .quarter-top-right {
         background: linear-gradient(90deg, #E0E0E0 50%, transparent 50%), linear-gradient(180deg, transparent 50%, #E0E0E0 50%);
         border: none;
     }
@@ -757,7 +757,16 @@
                     columnDefs: (() => {
                         const defs = [];
                         for (let i = 0; i <= day_of_month; i++) {
-                            
+
+                            const request_status = [
+                                { status_en: "Pending", status_th: "รออนุมัติ" },
+                                { status_en: "Resubmit", status_th: "ส่งใหม่" },
+                                { status_en: "Cancelled", status_th: "ยกเลิก" },
+                                { status_en: "Approved", status_th: "อนุมัติ" },
+                                { status_en: "Rejected", status_th: "ไม่อนุมัติ" },
+                                { status_en: "Returned", status_th: "ตีกลับ" },
+                                { status_en: "Success", status_th: "สำเร็จ" },
+                            ];
                             const colors = [{ "code": "color-brown", "color": "#6D4C41" },
                             { "code": "color-sky", "color": "#4FC3F7" },
                             { "code": "color-yellow", "color": "#FFD54F" },
@@ -815,6 +824,7 @@
                                             }
                                             const duration = leave.duration;
                                             let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
+                                            let status = request_status.filter(f => f.status_en === leave.status).map(m => m.status_th);
                                             if (duration !== "full") {
                                                 let classes = duration_classes.filter(f => f.duration === duration).map(m => m.class);
                                                 return `
@@ -825,7 +835,7 @@
 
                                                 <!-- Tooltip แบบกำหนดเอง -->
                                                 <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
-                                                    <h5 style="font-size:18px; text-align:center">${leave.type} (${leave.status})</h5>
+                                                    <h5 style="font-size:18px; text-align:center">${leave.type} (${status})</h5>
                                                     <span style="font-size:16px; text-align:center">${leave.time}</span>
                                                 </div>
                                             </div>
@@ -839,7 +849,7 @@
 
                                                 <!-- Tooltip แบบกำหนดเอง -->
                                                 <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
-                                                    <h5 style="font-size:18px; text-align:center">${leave.type} (${leave.status})</h5>
+                                                    <h5 style="font-size:18px; text-align:center">${leave.type} (${status})</h5>
                                                     <span style="font-size:16px; text-align:center">${leave.time}</span>
                                                 </div>
                                             </div>
