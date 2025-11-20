@@ -9,7 +9,7 @@ namespace WebENG.LeaveInterfaces
     public interface IDepartment
     {
         List<DepartmentModel> GetDepartments();
-        string Insert(DepartmentModel department);
-        string Update(DepartmentModel department);
+        string Inserts(List<DepartmentModel> departments);
+        string Delete(string department);
     }
 }

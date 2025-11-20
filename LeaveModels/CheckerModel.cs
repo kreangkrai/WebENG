@@ -9,6 +9,7 @@ namespace WebENG.LeaveModels
     {
         public int id { get; set; }
         public string checker_id { get; set; }
+        public string checker_name { get; set; }
         public int checker_level { get; set; }
         public bool is_active { get; set; }
     }

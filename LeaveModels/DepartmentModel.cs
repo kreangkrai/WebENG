@@ -12,6 +12,7 @@ namespace WebENG.LeaveModels
         public string department_name { get; set; }
         public int approver_level { get; set; }
         public string manager_id { get; set; }
+        public string manager_name { get; set; }
         public bool is_active { get; set; }
     }
 }

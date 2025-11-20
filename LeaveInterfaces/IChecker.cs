@@ -8,8 +8,8 @@ namespace WebENG.LeaveInterfaces
 {
     public interface IChecker
     {
-        List<CheckerModel> GetDepartments();
-        string Insert(CheckerModel checker);
-        string Update(CheckerModel checker);
+        List<CheckerModel> GetCheckers();
+        string Inserts(List<CheckerModel >checkers);
+        string Delete();
     }
 }

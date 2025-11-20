@@ -386,7 +386,7 @@
                     </ul>
                 </div>
             </form>
-            <div class="card-body" style="height:660px; overflow-y:auto;">
+            <div class="card-body" style="height:650px; overflow-y:auto;">
                 <form>                  
                     <div class="tab-content" style="padding-top:20px">
                         <div class="tab-pane fade show active" id="SettingDepartment">
@@ -394,7 +394,7 @@
                                 <div class="col-xl-12 col-md-12 col-sm-12">
                                     <div class="row">                                      
                                         <div class="col-xl-12 col-md-12 col-sm-12">                                         
-                                            <span id="div_department" class="kanit-bold mb-2" style="color:dimgrey;font-size:20px"> </span>
+                                            <span id="div_department" class="kanit-bold mb-2" style="color:dimgrey;font-size:20px"></span>
                                             <div class="card">
                                                 <div class="card-header" style="background-color:powderblue">
                                                     <div class="row">
@@ -428,7 +428,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-xl-1 col-md-1 col-sm-6">
+                                                        <div class="col-xl-1 col-md-2 col-sm-6">
                                                             <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementManagerClicked()" value="+ เพิ่ม" />
                                                         </div>
                                                     </div>
@@ -471,7 +471,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="row">
-                                                        <div class="col-xl-1 col-md-1 col-sm-6">
+                                                        <div class="col-xl-1 col-md-2 col-sm-6">
                                                             <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementDirectorClicked()" value="+ เพิ่ม" />
                                                         </div>
                                                     </div>
@@ -578,13 +578,40 @@
             $('#department_group').append(html);
         }
 
-        function DepartmentClicked(department) {
+        async function DepartmentClicked(department) {
             $('#div_department').text("แผนก : " + department);
+
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetData", "LeaveAuthen")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { department},
+                success: function (response) {
+                    let managers = response.departments;
+                    let directors = response.approvers;
+                    let admins = response.checkers;
+                    entitlement_manager = 0;
+                    entitlement_director = 0;
+                    approver_manager = [];
+                    approver_director = [];
+                    for (let i = 0; i < managers.length; i++) {
+                        approver_manager.push({ "id": entitlement_manager, "manager_id": `${managers[i].manager_id}`, "manager_name": `${managers[i].manager_name}` });
+                        entitlement_manager++;
+                    }
+                    for (let i = 0; i < directors.length; i++) {
+                        approver_director.push({ "id": entitlement_director, "approver_id": `${directors[i].approver_id}`, "approver_name": `${directors[i].approver_name}` });
+                        entitlement_director++;
+                    }
+                    CreateEntitlementManager();
+                    CreateEntitlementDirector();
+
+                }
+            });
         }
 
          /* Manager */
         function EntitlementManagerClicked() {
-            approver_manager.push({ "id": entitlement_manager, "emp_id" : "0" , "name": "" });
+            approver_manager.push({ "id": entitlement_manager, "manager_id": "", "manager_name": "Please Select" });
             CreateEntitlementManager();
             entitlement_manager++;
         }
@@ -592,9 +619,9 @@
         function CreateEntitlementManager() {
             $('#div_entitlement_manager').empty();
             for (let i = 0; i < approver_manager.length; i++) {
-                
+
                 let html = `
-                                                                     
+
                                                                         <div class="row pt-2">
                                                                             <div class="col-2">
                                                                                 <label class="kanit-light" style="color:dimgrey">คนที่ ${i+1}</label>
@@ -615,10 +642,10 @@
                                                                         </div>
                                                                                 `;
 
-                
+
                 $('#div_entitlement_manager').append(html);
                 GenerateManagerOption(approver_manager[i].id);
-                $('#EntitlementManager' + approver_manager[i].id).val(approver_manager[i].emp_id);
+                $('#EntitlementManager' + approver_manager[i].id).val(approver_manager[i].manager_id);
             }
         }
 
@@ -636,13 +663,19 @@
         function ManagerChanged(id) {
             let emp_id = $('#EntitlementManager' + id).val();
             let emp_name = $('#EntitlementManager' + id + " :selected").text();
-            const index = approver_manager.findIndex(item => item.id === id);
-            if (index !== -1) {
-                approver_manager[index] = {
-                    id : id,
-                    name: emp_name,
-                    emp_id: emp_id                   
-                };
+            let check = approver_manager.filter(f => f.manager_id === emp_id);
+            if (check.length == 0) {
+                const index = approver_manager.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    approver_manager[index] = {
+                        id: id,
+                        manager_name: emp_name,
+                        manager_id: emp_id
+                    };
+                }
+            } else {
+                alert('มีชื่ออยู่แล้ว');
+                $('#EntitlementManager' + id).val("");
             }
         }
 
@@ -652,13 +685,12 @@
             if (index !== -1) {
                 approver_manager.splice(index, 1);
             }
-            console.log(approver_manager);
             CreateEntitlementManager();
         }
 
         /* Director */
         function EntitlementDirectorClicked() {
-            approver_director.push({ "id": entitlement_director, "emp_id": "0", "name": "" });
+            approver_director.push({ "id": entitlement_director, "approver_id": "", "approver_name": "Please Select" });
             CreateEntitlementDirector();
             entitlement_director++;
         }
@@ -667,7 +699,7 @@
             for (let i = 0; i < approver_director.length; i++) {
 
                 let html = `
-                                                                     
+
                                                                         <div class="row pt-2">
                                                                             <div class="col-2">
                                                                                 <label class="kanit-light" style="color:dimgrey">คนที่ ${i + 1}</label>
@@ -691,7 +723,7 @@
 
                 $('#div_entitlement_director').append(html);
                 GenerateDirectorOption(approver_director[i].id);
-                $('#EntitlementDirector' + approver_director[i].id).val(approver_director[i].emp_id);
+                $('#EntitlementDirector' + approver_director[i].id).val(approver_director[i].approver_id);
             }
         }
 
@@ -709,13 +741,19 @@
         function DirectorChanged(id) {
             let emp_id = $('#EntitlementDirector' + id).val();
             let emp_name = $('#EntitlementDirector' + id + " :selected").text();
-            const index = approver_director.findIndex(item => item.id === id);
-            if (index !== -1) {
-                approver_director[index] = {
-                    id: id,
-                    name: emp_name,
-                    emp_id: emp_id
-                };
+            let check = approver_director.filter(f => f.approver_id === emp_id);
+            if (check.length === 0) {
+                const index = approver_director.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    approver_director[index] = {
+                        id: id,
+                        approver_name: emp_name,
+                        approver_id: emp_id
+                    };
+                }
+            } else {
+                alert('มีชื่ออยู่แล้ว');
+                $('#EntitlementDirector' + id).val("");
             }
         }
 
@@ -724,8 +762,43 @@
             const index = approver_director.findIndex(item => item.id === id);
             if (index !== -1) {
                 approver_director.splice(index, 1);
-            } 
+            }
             CreateEntitlementDirector();
         }
+
+
+        function UpdateSave() {
+            let department = $('#div_department').text();
+            let chk_mamanger = approver_manager.filter(f => f.manager_id === "");
+            let chk_director = approver_director.filter(f => f.approver_id === "");
+            if (department !== "") {
+                if (chk_mamanger.length === 0 && chk_director.length === 0 && approver_manager.length > 0 && approver_director.length > 0) {
+                    $('#modal_confirm').modal();
+                } else {
+                    alert('กรุณาใส่ข้อมูลให้ถูกต้อง');
+                }
+            } else {
+                alert('กรุณาเลือกแผนก');
+            }
+        }
+
+        $('#confirm_ok').on('click', async function () {
+            $('#SpinModal').modal();
+            let department = $('#div_department').text().split(':')[1].trim();
+            console.log(approver_manager);
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("UpdateData", "LeaveAuthen")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { department, approver_manager, approver_director },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    }
+                }
+            });
+            $('#SpinModal').modal('hide');
+        });
+
     </script>
 }

@@ -8,8 +8,8 @@ namespace WebENG.LeaveInterfaces
 {
     public interface IApprover
     {
-        List<ApproverModel> GetDepartments();
-        string Insert(ApproverModel approver);
-        string Update(ApproverModel approver);
+        List<ApproverModel> GetApprovers();
+        string Inserts(List<ApproverModel> approvers);
+        string Delete(string department);
     }
 }

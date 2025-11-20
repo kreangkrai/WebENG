@@ -9,6 +9,7 @@ namespace WebENG.LeaveModels
     {
         public int id { get; set; }
         public string approver_id { get; set; }
+        public string approver_name { get; set; }
         public string department { get; set; }
         public int approver_level { get; set; }
         public bool is_active { get; set; }
