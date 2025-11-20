@@ -75,8 +75,15 @@ namespace WebENG.Controllers
             departments = departments.Where(w => w.department == department).OrderBy(o => o.department).ToList();
             List<ApproverModel> approvers = Approver.GetApprovers();
             approvers = approvers.Where(w => w.department == department).OrderBy(o => o.department).ToList();
+            var data = new { departments = departments, approvers = approvers };
+            return Json(data);
+        }
+
+        [HttpGet]
+        public IActionResult GetDataChecker()
+        {
             List<CheckerModel> checkers = Checker.GetCheckers();
-            var data = new { departments = departments, approvers = approvers, checkers = checkers };
+            var data = new {checkers = checkers };
             return Json(data);
         }
 
@@ -115,90 +122,109 @@ namespace WebENG.Controllers
             return Json(message);
         }
 
-    //    [HttpPost]
-    //    public IActionResult CreateUser(string emp_id)
-    //    {
-    //        List<CTLModels.EmployeeModel> employees = CTLEmployees.GetEmployees();
-    //        CTLModels.EmployeeModel employee = employees.Where(w => w.emp_id == emp_id).FirstOrDefault();
-    //        List<LeavePositionModel> ps = Position.GetPositions();
-    //        bool chk = ps.Any(a => a.emp_id == emp_id);
-    //        if (!chk)
-    //        {
-    //            List<PositionModel> positions = new List<PositionModel>()
-    //        {
-    //            new PositionModel()
-    //            {
-    //                emp_id = emp_id,
-    //                emp_name = employee.name_en,
-    //                department = "",
-    //                level = "",
-    //                img = "",
-    //                is_active = true,
-    //                position = employee.position,
-    //            }
-    //        };
-    //            string message = Position.insert(positions);
-    //            return Json(message);
-    //        }
-    //        return Json("emp id already exists");
-    //    }
+        [HttpPost]
+        public IActionResult UpdateDataChecker(List<CheckerModel> approver_checker)
+        {
+            approver_checker.ForEach(f => {
+                f.is_active = true;
+                f.checker_level = 3;
+            });
 
-    //    [HttpPost]
-    //    public IActionResult UpdateUser(string emp_id,string[] manager_departments,bool director,bool auditor)
-    //    {
-    //        string message = Position.delete(emp_id);
-    //        if (message == "Success")
-    //        {
-    //            // Manager Of Department
-    //            List<PositionModel> positions = new List<PositionModel>();
-    //            for (int i = 0; i < manager_departments.Length; i++)
-    //            {
-    //                PositionModel position = new PositionModel()
-    //                {
-    //                    emp_id = emp_id,
-    //                    emp_name = "",
-    //                    department = manager_departments[i],
-    //                    level = "Manager",
-    //                    img = "",
-    //                    is_active = true,
-    //                    position = "",
-    //                };
-    //                positions.Add(position);
-    //            }
+            string message = "";
+            message = Checker.Delete();
+            {
+                if (message == "Success")
+                {
+                    message = Checker.Inserts(approver_checker);                   
+                }
+            }
+            return Json(message);
+        }
 
-    //            //Director
-    //            if (director)
-    //            {
-    //                PositionModel position = new PositionModel()
-    //                {
-    //                    emp_id = emp_id,
-    //                    emp_name = "",
-    //                    department = "",
-    //                    level = "Director",
-    //                    img = "",
-    //                    is_active = true,
-    //                    position = "",
-    //                };
-    //                positions.Add(position);
-    //            }
-    //            //Auditor
-    //            if (auditor)
-    //            {
-    //                PositionModel position = new PositionModel()
-    //                {
-    //                    emp_id = emp_id,
-    //                    emp_name = "",
-    //                    department = "",
-    //                    level = "Auditor",
-    //                    img = "",
-    //                    is_active = true,
-    //                    position = "",
-    //                };
-    //                positions.Add(position);
-    //            }
-    //            message = Position.insert(positions);
-    //        }
-    //        return Json(message);
-    //    }
+        //    [HttpPost]
+        //    public IActionResult CreateUser(string emp_id)
+        //    {
+        //        List<CTLModels.EmployeeModel> employees = CTLEmployees.GetEmployees();
+        //        CTLModels.EmployeeModel employee = employees.Where(w => w.emp_id == emp_id).FirstOrDefault();
+        //        List<LeavePositionModel> ps = Position.GetPositions();
+        //        bool chk = ps.Any(a => a.emp_id == emp_id);
+        //        if (!chk)
+        //        {
+        //            List<PositionModel> positions = new List<PositionModel>()
+        //        {
+        //            new PositionModel()
+        //            {
+        //                emp_id = emp_id,
+        //                emp_name = employee.name_en,
+        //                department = "",
+        //                level = "",
+        //                img = "",
+        //                is_active = true,
+        //                position = employee.position,
+        //            }
+        //        };
+        //            string message = Position.insert(positions);
+        //            return Json(message);
+        //        }
+        //        return Json("emp id already exists");
+        //    }
+
+        //    [HttpPost]
+        //    public IActionResult UpdateUser(string emp_id,string[] manager_departments,bool director,bool auditor)
+        //    {
+        //        string message = Position.delete(emp_id);
+        //        if (message == "Success")
+        //        {
+        //            // Manager Of Department
+        //            List<PositionModel> positions = new List<PositionModel>();
+        //            for (int i = 0; i < manager_departments.Length; i++)
+        //            {
+        //                PositionModel position = new PositionModel()
+        //                {
+        //                    emp_id = emp_id,
+        //                    emp_name = "",
+        //                    department = manager_departments[i],
+        //                    level = "Manager",
+        //                    img = "",
+        //                    is_active = true,
+        //                    position = "",
+        //                };
+        //                positions.Add(position);
+        //            }
+
+        //            //Director
+        //            if (director)
+        //            {
+        //                PositionModel position = new PositionModel()
+        //                {
+        //                    emp_id = emp_id,
+        //                    emp_name = "",
+        //                    department = "",
+        //                    level = "Director",
+        //                    img = "",
+        //                    is_active = true,
+        //                    position = "",
+        //                };
+        //                positions.Add(position);
+        //            }
+        //            //Auditor
+        //            if (auditor)
+        //            {
+        //                PositionModel position = new PositionModel()
+        //                {
+        //                    emp_id = emp_id,
+        //                    emp_name = "",
+        //                    department = "",
+        //                    level = "Auditor",
+        //                    img = "",
+        //                    is_active = true,
+        //                    position = "",
+        //                };
+        //                positions.Add(position);
+        //            }
+        //            message = Position.insert(positions);
+        //        }
+        //        return Json(message);
+        //    }
     }
 }

@@ -359,9 +359,17 @@
 <div class="row" style="row-gap:1px; padding:10px">
     <div class="col-12 kanit-bold">
         <h4 style="letter-spacing:2px; padding:10px; padding-left:15px; color:white; border-top-left-radius:20px; border-top-right-radius:20px; background: #2178BE;
-                    background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);">
+            background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);">
             แผนก
         </h4>
+        <div class="form-group row">
+            <div class="col-xl-2 col-md-3 col-sm-6">
+                <button type="button" class="btn btn-outline-success form-control kanit-medium leave-group-btn"
+                        style="border-radius:7px; height:40px" onclick="CheckerClicked()">
+                    ตั้งค่าผู้ตรวจสอบ
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="col-xl-2 col-md-3 col-sm-12">
@@ -386,7 +394,7 @@
                     </ul>
                 </div>
             </form>
-            <div class="card-body" style="height:650px; overflow-y:auto;">
+            <div class="card-body" style="height:600px; overflow-y:auto;">
                 <form>                  
                     <div class="tab-content" style="padding-top:20px">
                         <div class="tab-pane fade show active" id="SettingDepartment">
@@ -529,26 +537,141 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modal_checker" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content" style="border-radius: 10px; overflow: hidden;">
+            <div class="modal-header" style="background: #34ba7c;
+                                            background: linear-gradient(90deg, rgba(52, 186, 124, 1) 0%, rgba(0, 138, 112, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title kanit-medium" style="color: white; font-size: 20px; letter-spacing: 1px;" id="modal_leave_title">เพิ่มผู้ตรวจสอบ</h5>
+                <button type="button" class="close" style="color: white;" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mb-4" style="height:250px; color:#555555">
+                <form>
+                    <div class="row">
+                        <div class="col-xl-12 col-md-12 col-sm-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color:powderblue">
+                                    <div class="row">
+                                        <div class="col-xl-6 col-md-6 col-sm-12">
+                                            <span class="kanit-bold" style="color:dimgrey">ผู้ตรวจสอบ</span>
+                                        </div>
+                                        <div class="col-xl-6 col-md-6 col-sm-12 d-flex justify-content-end">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="card-tools">
+                                                        <button type="button" class="btn btn-tool" data-card-widget="collapse" style="color:black">
+                                                            <i class="fas fa-chevron-down"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row" style="row-gap:1px">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <div id="div_entitlement_checker">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-3 col-md-3 col-sm-6">
+                                            <input type="button" class="kanit-light form-control btn btn-outline-info" onclick="EntitlementCheckerClicked()" value="+ เพิ่ม" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer d-flex">
+                <div class="container d-flex justify-content-end">
+                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-center">
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="btn modern-btn btn-cancel kanit-medium" style="background-color:red; color:white; border-radius:10px;width:80px" data-dismiss="modal">
+                                    ยกเลิก
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button id="btn_checker_save" class="btn modern-btn btn-save kanit-medium" style="background-color:#034694; color:white; border-radius:10px;width:80px">
+                                    บันทึก
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <partial name="ModalSpin" />
 
 @section Scripts
 {
     <script type="text/javascript">
-
-
         let departments = [];
         let employees = [];
-        let last_leave_id = "";
         let approver_manager = [];
         let approver_director = [];
-        let approver_admin = [];
+        let approver_checker = [];
         let entitlement_manager = 0;
         let entitlement_director = 0;
+        let entitlement_checker = 0;
         $(document).ready(async function () {
             await GetDepartments();
         });
+
+        async function CheckerClicked() {
+            $('#modal_checker').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+           
+            $('#modal_checker').modal('show');
+            try {
+                const response = await $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GetDataChecker", "LeaveAuthen")',
+                    timeout: 1000,  
+                    data: {}
+                });
+
+                approver_checker = []; 
+                let entitlement_checker = 0;
+
+                response.checkers.forEach(item => {
+                    approver_checker.push({
+                        id: entitlement_checker++,
+                        checker_id: item.checker_id,
+                        checker_name: item.checker_name
+                    });
+                });
+                CreateEntitlementChecker();
+
+            } catch (error) {
+                $('#modal_checker .modal-body').html(
+                    '<div class="alert alert-danger text-center">'
+                    + '<i class="fas fa-exclamation-triangle"></i><br>'
+                    + 'โหลดข้อมูล Checker ไม่สำเร็จ<br>'
+                    + (error.statusText === "timeout" ? "เชื่อมต่อช้าเกินไป" : error.statusText)
+                    + '<br><button type="button" class="btn btn-sm btn-primary mt-2" onclick="CheckerClicked()">ลองใหม่</button>'
+                    + '</div>'
+                );
+            }
+        }
+
         async function GetDepartments() {
             await $.ajax({
                 type: "GET",
@@ -567,7 +690,7 @@
             var html = '';
             for (var i = 0; i < departments.length; i++) {
                 html += `<div class="form-group row">
-                                       <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                       <button type="button" id="department_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
                                        style="border-radius:7px; height:40px" onClick="DepartmentClicked('${departments[i]}', this)">
                                     ${departments[i]}
                                </button>
@@ -589,7 +712,6 @@
                 success: function (response) {
                     let managers = response.departments;
                     let directors = response.approvers;
-                    let admins = response.checkers;
                     entitlement_manager = 0;
                     entitlement_director = 0;
                     approver_manager = [];
@@ -607,6 +729,85 @@
 
                 }
             });
+        }
+
+        /* Checker */
+        function EntitlementCheckerClicked() {
+            approver_checker.push({ "id": entitlement_checker, "checker_id": "", "checker_name": "Please Select" });
+            CreateEntitlementChecker();
+            entitlement_checker++;
+        }
+
+        function CreateEntitlementChecker() {
+            $('#div_entitlement_checker').empty();
+            for (let i = 0; i < approver_checker.length; i++) {
+
+                let html = `
+
+                                                                        <div class="row pt-2">
+                                                                            <div class="col-2">
+                                                                                <label class="kanit-light" style="color:dimgrey">คนที่ ${i + 1}</label>
+                                                                            </div>
+                                                                            <div class="col-8">
+                                                                                <select id="EntitlementChecker${approver_checker[i].id}" onchange = "CheckerChanged(${approver_checker[i].id})" class="kanit-light form-control">
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-1">
+                                                                                    <div class="form-group">
+                                                                                        <div class="input-group d-flex justify-content-start">
+                                                                                                <button type="button" class="btn btn-tool pt-3" style="color:red" onClick="EntitlementCheckerDelete(${approver_checker[i].id})">
+                                                                                            <i class="fas fa-trash" style="transform:scale(1.2)"></i>
+                                                                                        </button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                        </div>
+                                                                                `;
+
+
+                $('#div_entitlement_checker').append(html);
+                GenerateCheckerOption(approver_checker[i].id);
+                $('#EntitlementChecker' + approver_checker[i].id).val(approver_checker[i].checker_id);
+            }
+        }
+
+        function GenerateCheckerOption(id) {
+            let emps = employees;
+            let select = $('#EntitlementChecker' + id);
+            select.empty();
+            select.append(`<option value="" selected disabled>Please Select</option>`);
+            for (let i = 0; i < emps.length; i++) {
+
+                select.append(`<option value="${emps[i].emp_id}">${emps[i].name_en}</option>`);
+            }
+        }
+
+        function CheckerChanged(id) {
+            let emp_id = $('#EntitlementChecker' + id).val();
+            let emp_name = $('#EntitlementChecker' + id + " :selected").text();
+            let check = approver_checker.filter(f => f.checker_id === emp_id);
+            if (check.length == 0) {
+                const index = approver_checker.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    approver_checker[index] = {
+                        id: id,
+                        checker_name: emp_name,
+                        checker_id: emp_id
+                    };
+                }
+            } else {
+                alert('มีชื่ออยู่แล้ว');
+                $('#EntitlementChecker' + id).val("");
+            }
+        }
+
+        function EntitlementCheckerDelete(id) {
+            approver_checker = approver_checker.filter(item => item.id !== id);
+            const index = approver_checker.findIndex(item => item.id === id);
+            if (index !== -1) {
+                approver_checker.splice(index, 1);
+            }
+            CreateEntitlementChecker();
         }
 
          /* Manager */
@@ -733,7 +934,6 @@
             select.empty();
             select.append(`<option value="" selected disabled>Please Select</option>`);
             for (let i = 0; i < emps.length; i++) {
-
                 select.append(`<option value="${emps[i].emp_id}">${emps[i].name_en}</option>`);
             }
         }
@@ -785,7 +985,6 @@
         $('#confirm_ok').on('click', async function () {
             $('#SpinModal').modal();
             let department = $('#div_department').text().split(':')[1].trim();
-            console.log(approver_manager);
             await $.ajax({
                 type: "POST",
                 url: '@Url.Action("UpdateData", "LeaveAuthen")',
@@ -797,6 +996,27 @@
                     }
                 }
             });
+            $('#SpinModal').modal('hide');
+        });
+
+        $('#btn_checker_save').on('click', async function () {
+            $('#SpinModal').modal();
+            let chk_checker = approver_checker.filter(f => f.checker_id === "");
+            if (chk_checker.length === 0 && approver_checker.length > 0) {
+                await $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("UpdateDataChecker", "LeaveAuthen")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { approver_checker },
+                    success: function (response) {
+                        if (response === "Success") {
+                            location.reload();
+                        }
+                    }
+                });
+            } else {
+                alert('กรุณาใส่ข้อมูลให้ถูกต้อง');
+            }
             $('#SpinModal').modal('hide');
         });
 
