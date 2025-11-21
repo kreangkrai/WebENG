@@ -77,6 +77,11 @@ namespace WebENG.Controllers
             var endDate = Convert.ToDateTime(end);
 
             var allEmps = Employee.GetEmps();
+            //var allEmps = new List<EmpModel>() { new EmpModel()
+            //{
+            //    emp_id = "059197",
+            //    name = "kriangkrai rattanawan"
+            //} };
             var allEmployees = Employee.GetEmployees();
 
 

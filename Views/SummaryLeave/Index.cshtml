@@ -639,12 +639,13 @@
             const currentYearMonth = year + '-' + String(month).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
             day_of_month = new Date(year, month, 0).getDate();
+
             GetDataLeave();
             let total_day = new Date(year, month, 0).getDate();
             let start = `${year}-${month}-01`;
             let end = `${year}-${month}-${total_day}`;
-            
-            generateDateHeaders(start,end);
+
+            generateDateHeaders(start, end);
             init(start, end);
         });
 
@@ -698,7 +699,6 @@
             };
         }
         
-
         $('#select_department').on('change', function () {
             if (selectMonth) {
                 const input = $('#monthPicker');
@@ -722,24 +722,31 @@
                 let start = `${year}-${month}-01`;
                 let end = `${year}-${month}-${total_day}`;
 
+                day_of_month = new Date(year, month, 0).getDate();
+
                 if (isSameMonthAndYear(start, end)) {
                     index_today = today.getDate();
                 } else {
                     index_today = -1;
                 }
-
+                generateDateHeaders(start, end);
                 init(start, end);
-                setTimeout(() => {
-                    generateDateHeaders(start, end);
-                }, 100);
             } else {
                 let week = $('#week').val();
                 const range = weekToDateRange(week);
                 let start = range.start;
                 let end = range.end;
 
-                index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+                let today = new Date();
+                if (today >= new Date(start) && today <= new Date(end)) {
+                    index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+                }
+                else {
+                    index_today = -1;
+                }
 
+                day_of_month = 7;
+             
                 init(start, end);
                 setTimeout(() => {
                     generateDateHeaders(start, end);
@@ -752,8 +759,14 @@
             const range = weekToDateRange(week);
             let start = range.start;
             let end = range.end;
-
-            index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+            let today = new Date();
+            if (today >= new Date(start) && today <= new Date(end)) {
+                index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+            }
+            else {
+                index_today = -1;
+            }
+            day_of_month = 7;
 
             init(start, end);
             setTimeout(() => {
@@ -771,12 +784,20 @@
             const range = weekToDateRange(week);
             let start = range.start;
             let end = range.end;
-            index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+            let today = new Date();
+            if (today >= new Date(start) && today <= new Date(end)) {
+                index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+            }
+            else {
+                index_today = -1;
+            }
+
+            day_of_month = 7;
 
             init(start, end);
-            setTimeout(() => {
+            setTimeout(() => {               
                 generateDateHeaders(start, end);
-            }, 200);
+            },100);
 
             selectMonth = false;
         });
@@ -798,6 +819,7 @@
 
             let start = `${year}-${monthIndex + 1}-01`;
             let end = `${year}-${monthIndex + 1}-${total_day}`;
+            day_of_month = new Date(year, monthIndex + 1, 0).getDate();
 
             if (isSameMonthAndYear(start, end)) {
                 index_today = today.getDate();
@@ -807,7 +829,6 @@
 
             generateDateHeaders(start, end);
             init(start, end);
-
             selectMonth = true;
         });
 
@@ -820,31 +841,27 @@
         }
 
         function generateDateHeaders(start, end) {
-            
-                let s = new Date(start);
-                let e = new Date(end);
-                const dateRow = $('#dateRow');
-                if (dateRow.length === 0) {
-                    return;
-                }
+            const dateRow = $('#dateRow');
+            dateRow.empty();
 
-                dateRow.empty();
+            const startDate = new Date(start);
+            const endDate = new Date(end);
 
-                let day = new Date(s);
+            let currentDate = new Date(startDate);
+            while (currentDate <= endDate) {
+                const dayNumber = currentDate.getDate();
+                const dayName = currentDate.toLocaleDateString('th-TH', { weekday: 'short' });
 
-                while (day <= e) {
-                    const dayName = day.toLocaleDateString('th-TH', { weekday: 'short' });
-                    const dayNumber = day.getDate();
+                dateRow.append(`
+            <th class="kanit-bold freeze-head text-center" style="min-width:40px; width:40px;">
+                ${dayNumber}<br><small class="text-muted">${dayName}</small>
+            </th>
+        `);
 
-                    dateRow.append(`
-        <th class="kanit-bold freeze-head" style="min-width:40px;">
-            ${dayNumber}<br><small>${dayName}</small>
-        </th>
-    `);
-                    day.setDate(day.getDate() + 1);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
 
-                }
-        
+            //day_of_month = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
         }
 
         $('#prevMonth').on('click', function () {
@@ -868,13 +885,15 @@
             let start = `${year}-${monthIndex + 1}-01`;
             let end = `${year}-${monthIndex + 1}-${total_day}`;
 
+            day_of_month = new Date(year, monthIndex + 1, 0).getDate();
+
             if (isSameMonthAndYear(start, end)) {
                 index_today = today.getDate();
             } else {
                 index_today = -1;
             }
 
-            generateDateHeaders(start,end);
+            generateDateHeaders(start, end);
             init(start, end);
         });
 
@@ -900,9 +919,12 @@
 
             const total_day = new Date(year, month, 0).getDate();
 
-            input.val(newVal);
+            
             let start = `${year}-${month}-01`;
             let end = `${year}-${month}-${total_day}`;
+            input.val(newVal);
+
+            day_of_month = new Date(year, month, 0).getDate();
 
             if (isSameMonthAndYear(start, end)) {
                 index_today = today.getDate();
@@ -910,10 +932,9 @@
                 index_today = -1;
             }
             
+            generateDateHeaders(start, end);
             init(start, end);
-            setTimeout(() => {
-                generateDateHeaders(start, end);
-            }, 100);
+            console.log(end);
         }
 
         async function GetDataLeave() {
@@ -958,63 +979,62 @@
         }
 
         function init(start, end) {
+            if (table !== undefined) {
+                table.destroy();
+                $('#table_leave tbody').empty();
+            }
+            let department = $('#select_department').val();
+            table = $('#table_leave').DataTable({
+                ajax: {
+                    type: "GET",
+                    url: '@Url.Action("GetDataByMonth", "SummaryLeave")',
+                    contentType: 'application/x-www-form-urlencoded',
+                    data: { department, start, end },
+                    dataSrc: '',
+                },
+                columns: Array(day_of_month + 1).fill({ data: null, defaultContent: "" }),
+                columnDefs: (() => {
+                    const defs = [];
+                    for (let i = 0; i <= day_of_month; i++) {
 
-            $(document).ready(async function () {
-                if (table !== undefined) {
-                    table.destroy();
-                }
-                let department = $('#select_department').val();
-                table = $('#table_leave').DataTable({
-                    ajax: {
-                        type: "GET",
-                        url: '@Url.Action("GetDataByMonth", "SummaryLeave")',
-                        contentType: 'application/x-www-form-urlencoded',
-                        data: { department, start, end },
-                        dataSrc: '',
-                    },
-                    columns: Array(day_of_month + 1).fill({ data: null, defaultContent: "" }),
-                    columnDefs: (() => {
-                        const defs = [];
-                        for (let i = 0; i <= day_of_month; i++) {
+                        const request_status = [
+                            { status_en: "Pending", status_th: "รออนุมัติ" },
+                            { status_en: "Resubmit", status_th: "ส่งใหม่" },
+                            { status_en: "Cancelled", status_th: "ยกเลิก" },
+                            { status_en: "Approved", status_th: "อนุมัติ" },
+                            { status_en: "Rejected", status_th: "ไม่อนุมัติ" },
+                            { status_en: "Returned", status_th: "ตีกลับ" },
+                            { status_en: "Success", status_th: "สำเร็จ" },
+                        ];
+                        const colors = [{ "code": "color-brown", "color": "#6D4C41" },
+                        { "code": "color-sky", "color": "#4FC3F7" },
+                        { "code": "color-yellow", "color": "#FFD54F" },
+                        { "code": "color-green", "color": "#43A047" },
+                        { "code": "color-blue", "color": "#1976D2" },
+                        { "code": "color-red", "color": "#E53935" },
+                        { "code": "color-pink", "color": "#F06292" },
+                        { "code": "color-bluegrey ", "color": "#90A4AE" },
+                        { "code": "color-orange ", "color": "#FF8A65" },
+                        { "code": "color-purple ", "color": "#8E24AA" },
+                        ];
+                        const duration_classes = [{ "duration": "half-left", "class": "half-left" },
+                        { "duration": "half-right", "class": "half-right" },
+                        { "duration": "quarter-top-left", "class": "quarter-top-left" },
+                        { "duration": "quarter-bottom-left", "class": "quarter-bottom-left" },
+                        { "duration": "quarter-top-right", "class": "quarter-top-right" },
+                        { "duration": "quarter-bottom-right", "class": "quarter-bottom-right" },
+                        { "duration": "three-quarter-left", "class": "three-quarter-left" }
+                        ];
 
-                            const request_status = [
-                                { status_en: "Pending", status_th: "รออนุมัติ" },
-                                { status_en: "Resubmit", status_th: "ส่งใหม่" },
-                                { status_en: "Cancelled", status_th: "ยกเลิก" },
-                                { status_en: "Approved", status_th: "อนุมัติ" },
-                                { status_en: "Rejected", status_th: "ไม่อนุมัติ" },
-                                { status_en: "Returned", status_th: "ตีกลับ" },
-                                { status_en: "Success", status_th: "สำเร็จ" },
-                            ];
-                            const colors = [{ "code": "color-brown", "color": "#6D4C41" },
-                            { "code": "color-sky", "color": "#4FC3F7" },
-                            { "code": "color-yellow", "color": "#FFD54F" },
-                            { "code": "color-green", "color": "#43A047" },
-                            { "code": "color-blue", "color": "#1976D2" },
-                            { "code": "color-red", "color": "#E53935" },
-                            { "code": "color-pink", "color": "#F06292" },
-                            { "code": "color-bluegrey ", "color": "#90A4AE" },
-                            { "code": "color-orange ", "color": "#FF8A65" },
-                            { "code": "color-purple ", "color": "#8E24AA" },
-                            ];
-                            const duration_classes = [{ "duration": "half-left", "class": "half-left" },
-                            { "duration": "half-right", "class": "half-right" },
-                            { "duration": "quarter-top-left", "class": "quarter-top-left" },
-                            { "duration": "quarter-bottom-left", "class": "quarter-bottom-left" },
-                            { "duration": "quarter-top-right", "class": "quarter-top-right" },
-                            { "duration": "quarter-bottom-right", "class": "quarter-bottom-right" },
-                            { "duration": "three-quarter-left", "class": "three-quarter-left" }
-                            ];
-
-                            if (i == 0) {
-                                defs.push({
-                                    targets: i,
-                                    render: function (data, type, row) {
-                                        var imgSrc = '/images/default-avatar.png';
-                                        if (row.img) {
-                                            imgSrc = 'data:image/jpeg;base64,' + row.img;
-                                        }
-                                        return `
+                        if (i == 0) {
+                            defs.push({
+                                targets: i,
+                                render: function (data, type, row) {
+                                    var imgSrc = '/img/AdminLTELogo.png';
+                                    if (row.img) {
+                                        imgSrc = 'data:image/jpeg;base64,' + row.img;
+                                    }
+                                    return `
                                            <div class="row align-items-center" style="width:300px">
                                              <div class="col-2 d-flex justify-content-center">
                                                     <img src="${imgSrc}"
@@ -1029,28 +1049,28 @@
                                                     </div>
                                                 </div>
                                            </div>`;
-                                    }
-                                });
-                            }
-                            else {
-                                defs.push({
-                                    targets: i,
-                                    render: function (data, type, row) {
-                                        if (row.leaves[i - 1] !== null) {
-                                            let leave = row.leaves[i - 1];
-                                            if (!leave) {
-                                                return '';
-                                            }
-                                            const duration = leave.duration;
-                                            let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
-                                            let status = request_status.filter(f => f.status_en === leave.status).map(m => m.status_th);
-                                            let value = "";
-                                            if (status !== "Successed") {
-                                                value = "✸";
-                                            }
-                                            if (duration !== "full") {
-                                                let classes = duration_classes.filter(f => f.duration === duration).map(m => m.class);
-                                                return `
+                                }
+                            });
+                        }
+                        else {
+                            defs.push({
+                                targets: i,
+                                render: function (data, type, row) {
+                                    if (row.leaves[i - 1] !== null) {
+                                        let leave = row.leaves[i - 1];
+                                        if (!leave) {
+                                            return '';
+                                        }
+                                        const duration = leave.duration;
+                                        let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
+                                        let status = request_status.filter(f => f.status_en === leave.status).map(m => m.status_th);
+                                        let value = "";
+                                        if (status !== "Successed") {
+                                            value = "✸";
+                                        }
+                                        if (duration !== "full") {
+                                            let classes = duration_classes.filter(f => f.duration === duration).map(m => m.class);
+                                            return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
                                                    class="kanit-bold btn ${classes}"
@@ -1063,8 +1083,8 @@
                                                 </div>
                                             </div>
                                         `;
-                                            } else {
-                                                return `
+                                        } else {
+                                            return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
                                                    class="kanit-bold btn btn-danger}"
@@ -1077,42 +1097,40 @@
                                                 </div>
                                             </div>
                                         `;
-                                            }
                                         }
                                     }
-                                });
-                            }
-                        }
-                        return defs;
-                    })(),
-
-                    rowCallback: function (row, data, index) {
-                        if (is_this_month) {
-                            $('td', row).each(function (colIndex) {
-                                if (colIndex === index_today) {
-                                    $('td:eq(' + index_today + ')', row).addClass('leave-info');
                                 }
                             });
                         }
-                    },
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
-                    },
-                    "bStateSave": false,
-                    "retrieve": true,
-                    "info": false,
-                    "paging": false,
-                    "searching": false,
-                    "ordering": false,
-                    fixedColumns: {
-                        left: 1
-                    },
-                    scrollX: false,
-                    scrollCollapse: true,
-                    fixedHeader: true,
-                    destroy: true,
-                    render: true
-                });
+                    }
+                    return defs;
+                })(),
+
+                rowCallback: function (row, data, index) {
+                    if (is_this_month) {
+                        $('td', row).each(function (colIndex) {
+                            if (colIndex === index_today) {
+                                $('td:eq(' + index_today + ')', row).addClass('leave-info');
+                            }
+                        });
+                    }
+                },
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
+                },
+                "bStateSave": false,
+                "retrieve": true,
+                "info": false,
+                "paging": false,
+                "searching": false,
+                "ordering": false,
+                fixedColumns: {
+                    left: 1
+                },
+                scrollX: false,
+                scrollCollapse: true,
+                fixedHeader: true,
+                destroy: true,
             });
         }
 
