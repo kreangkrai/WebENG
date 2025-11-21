@@ -13,6 +13,7 @@ namespace WebENG.LeaveInterfaces
         List<RequestModel> GetRequestByEmpID(string emp_id);
         List<RequestModel> GetRequestByDate(string date);
         List<RequestModel> GetRequestByMonth(string month);
+        List<RequestModel> GetRequestByDurationDay(string start_day,string end_day);
         string Insert(RequestModel request);
         string Update(RequestModel request);
     }

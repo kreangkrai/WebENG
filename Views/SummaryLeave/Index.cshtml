@@ -557,7 +557,7 @@
     
     <div class="container-fluid">
         <h4 class="text-center kanit-medium" style="color: #2c3e50;">สรุปการลาวันนี้</h4>
-        <div class="col-8">
+        <div class="col-10">
             <div class="row" id="div_summary_leave">
             </div>
         </div>
@@ -570,14 +570,29 @@
 
                     <div class="form-group">
                         <div class="mb-3 d-flex justify-content-between align-items-center">
-                            <!-- Filter Monthly-->
-                            <div class="col-12 d-flex align-items-center justify-content-center">
-                                <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
-                                <input type="month" id="monthPicker" class="form-control kanit-regular" style="width:200px; display:inline-block;">
-                                <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
+                            @*Filter Monthly*@
+                            <div class="col-xl-2 col-md-2 col-sm-12 d-flex justify-content-start">
+                                <select id="select_department" class="form-control"></select>
+                            </div>
+                            <div class="row d-flex align-items-center justify-content-center">
+                                <div id="div_month">
+                                    <div class="col-12 d-flex align-items-center justify-content-center">
+                                        <input type="button" id="prevMonth" class="btn btn-outline-secondary me-2" value="<" />
+                                        <input type="month" id="monthPicker" class="form-control kanit-regular" style="width:200px; display:inline-block;">
+                                        <input type="button" id="nextMonth" class="btn btn-outline-secondary ms-2" value=">" />
+                                    </div>
+                                </div>
+                                <div id="div_week" hidden>
+                                    <div class="col-12 d-flex align-items-center justify-content-center">
+                                        <input id="week" type="week" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                    <button id="btn_group_week" type="button" class="btn btn-outline-info">สัปดาห์</button>
+                                    <button id="btn_group_month" type="button" class="btn btn-outline-success active">เดือน</button>
+                                </div>
                             </div>
                         </div>
-
                         <!-- Status Data Employees -->
                         <div class="freeze-pane">
                             <table id="table_leave" class="table table-sm compact table-bordered table-hover text-center w-100">
@@ -605,58 +620,231 @@
     <script type="text/javascript">
         let table_leave = null;
         let leaves = [];
-        let index_today = 0;
+        let index_today = -1;
         let is_this_month = true;
         let day_of_month = 0;
         var table;
+        let departments = [];
+        let selectMonth = true;
         $(document).ready(async function () {
-
+            await GetDepartments();
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth() + 1;
             index_today = now.getDate();
 
+            const [y, w] = getISOWeek(now);
+            document.getElementById('week').value = `${y}-W${w.toString().padStart(2, '0')}`;
+
             const currentYearMonth = year + '-' + String(month).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
             day_of_month = new Date(year, month, 0).getDate();
-            const currentMonth = $('#monthPicker').val();
             GetDataLeave();
-            generateDateHeaders(currentMonth);
-
-            const months = String(now.getMonth() + 1).padStart(2, '0');
-            const month_ = `${year}-${months}`;
-            init(month_);
+            let total_day = new Date(year, month, 0).getDate();
+            let start = `${year}-${month}-01`;
+            let end = `${year}-${month}-${total_day}`;
+            
+            generateDateHeaders(start,end);
+            init(start, end);
         });
 
-        function generateDateHeaders(forceYearMonth = null) {
-            const dateRow = $('#dateRow');
-            if (dateRow.length === 0) {
-                return;
+        async function GetDepartments() {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDapartments", "SummaryLeave")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {},
+                success: function (response) {
+                    departments = response.departments;
+                    GenerateDepartments(departments);
+                }
+            });
+        }
+        function GenerateDepartments(departments) {
+            let select = $('#select_department');
+            select.empty();
+            for (let i = 0; i < departments.length; i++) {
+                if (i === 0) {
+                    select.append(`<option value="${departments[i]}" selected>${departments[i]}</option>`);
+                } else {
+                    select.append(`<option value="${departments[i]}">${departments[i]}</option>`);
+                }
             }
+        }
 
-            const val = forceYearMonth || $('#monthPicker').val();
-            if (!val || val === '') {
-                return;
+        function getISOWeek(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+            const yearStart = new Date(d.getFullYear(), 0, 1);
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return [d.getFullYear(), weekNo];
+        }
+
+        function weekToDateRange(weekStr) {
+            const [year, week] = weekStr.split('-W').map(Number);
+            const jan4 = new Date(year, 0, 4);
+            const start = new Date(jan4);
+            start.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7) + (week - 1) * 7 + 1);
+
+            const end = new Date(start);
+            end.setDate(start.getDate() + 6);
+
+            const fmt = d => d.toISOString().slice(0, 10);
+
+            return {
+                start: fmt(start),
+                end: fmt(end)
+            };
+        }
+        
+
+        $('#select_department').on('change', function () {
+            if (selectMonth) {
+                const input = $('#monthPicker');
+                let current = input.val();
+
+                const today = new Date();
+                if (!current) {
+                    
+                    current = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+                    input.val(current);
+                }
+
+                const [y, m] = current.split('-');
+                let year = parseInt(y, 10);
+                let month = parseInt(m, 10);
+
+                if (month > 12) { month = 1; year++; }
+                if (month < 1) { month = 12; year--; }
+
+                const total_day = new Date(year, month, 0).getDate();
+                let start = `${year}-${month}-01`;
+                let end = `${year}-${month}-${total_day}`;
+
+                if (isSameMonthAndYear(start, end)) {
+                    index_today = today.getDate();
+                } else {
+                    index_today = -1;
+                }
+
+                init(start, end);
+                setTimeout(() => {
+                    generateDateHeaders(start, end);
+                }, 100);
+            } else {
+                let week = $('#week').val();
+                const range = weekToDateRange(week);
+                let start = range.start;
+                let end = range.end;
+
+                index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+
+                init(start, end);
+                setTimeout(() => {
+                    generateDateHeaders(start, end);
+                }, 100);
             }
+        });
 
-            const [y, m] = val.split('-');
+        $('#week').on('change', function () {
+            let week = $('#week').val();
+            const range = weekToDateRange(week);
+            let start = range.start;
+            let end = range.end;
+
+            index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+
+            init(start, end);
+            setTimeout(() => {
+                generateDateHeaders(start, end);
+            }, 100);
+        });
+
+        $('#btn_group_week').on('click', function () {
+            $('#btn_group_week').addClass('active');
+            $('#btn_group_month').removeClass('active');
+            $('#div_month').prop('hidden', true);
+            $('#div_week').prop('hidden', false);
+
+            let week = $('#week').val();
+            const range = weekToDateRange(week);
+            let start = range.start;
+            let end = range.end;
+            index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+
+            init(start, end);
+            setTimeout(() => {
+                generateDateHeaders(start, end);
+            }, 200);
+
+            selectMonth = false;
+        });
+
+        $('#btn_group_month').on('click', function () {
+            $('#btn_group_week').removeClass('active');
+            $('#btn_group_month').addClass('active');
+            $('#div_month').prop('hidden', false);
+            $('#div_week').prop('hidden', true);
+
+            const today = new Date();
+            const newVal = $('#monthPicker').val();
+
+            const [y, m] = newVal.split('-');
             const year = parseInt(y, 10);
-            const monthIndex = parseInt(m, 10) - 1; // 0-11
+            const monthIndex = parseInt(m, 10) - 1;
 
-            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            const total_day = new Date(year, monthIndex + 1, 0).getDate();
 
-            dateRow.empty();
+            let start = `${year}-${monthIndex + 1}-01`;
+            let end = `${year}-${monthIndex + 1}-${total_day}`;
 
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, monthIndex, day);
-                const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
-                
-                dateRow.append(`
-            <th class="kanit-bold freeze-head" style="min-width:40px;">
-                ${day}<br><small>${dayName}</small>
-            </th>
-        `);
+            if (isSameMonthAndYear(start, end)) {
+                index_today = today.getDate();
+            } else {
+                index_today = -1;
             }
+
+            generateDateHeaders(start, end);
+            init(start, end);
+
+            selectMonth = true;
+        });
+
+        function isSameMonthAndYear(date1, date2) {
+            const d1 = new Date(date1);
+            const d2 = new Date(date2);
+
+            return d1.getFullYear() === d2.getFullYear() &&
+                d1.getMonth() === d2.getMonth();
+        }
+
+        function generateDateHeaders(start, end) {
+            
+                let s = new Date(start);
+                let e = new Date(end);
+                const dateRow = $('#dateRow');
+                if (dateRow.length === 0) {
+                    return;
+                }
+
+                dateRow.empty();
+
+                let day = new Date(s);
+
+                while (day <= e) {
+                    const dayName = day.toLocaleDateString('th-TH', { weekday: 'short' });
+                    const dayNumber = day.getDate();
+
+                    dateRow.append(`
+        <th class="kanit-bold freeze-head" style="min-width:40px;">
+            ${dayNumber}<br><small>${dayName}</small>
+        </th>
+    `);
+                    day.setDate(day.getDate() + 1);
+
+                }
+        
         }
 
         $('#prevMonth').on('click', function () {
@@ -668,17 +856,35 @@
         });
 
         $('#monthPicker').on('change', function () {
+            let today = new Date();
             const newVal = this.value;
-            generateDateHeaders(newVal);
-            init(newVal);
+
+            const [y, m] = newVal.split('-');
+            const year = parseInt(y, 10);
+            const monthIndex = parseInt(m, 10) - 1;
+
+            const total_day = new Date(year, monthIndex + 1, 0).getDate();
+
+            let start = `${year}-${monthIndex + 1}-01`;
+            let end = `${year}-${monthIndex + 1}-${total_day}`;
+
+            if (isSameMonthAndYear(start, end)) {
+                index_today = today.getDate();
+            } else {
+                index_today = -1;
+            }
+
+            generateDateHeaders(start,end);
+            init(start, end);
         });
 
         function changeMonth(direction) {
             const input = $('#monthPicker');
             let current = input.val();
 
+            const today = new Date();
             if (!current) {
-                const today = new Date();
+                
                 current = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
                 input.val(current);
             }
@@ -691,11 +897,22 @@
             if (month < 1) { month = 12; year--; }
 
             const newVal = `${year}-${String(month).padStart(2, '0')}`;
-            input.val(newVal);
 
-            init(newVal);
+            const total_day = new Date(year, month, 0).getDate();
+
+            input.val(newVal);
+            let start = `${year}-${month}-01`;
+            let end = `${year}-${month}-${total_day}`;
+
+            if (isSameMonthAndYear(start, end)) {
+                index_today = today.getDate();
+            } else {
+                index_today = -1;
+            }
+            
+            init(start, end);
             setTimeout(() => {
-                generateDateHeaders(newVal);
+                generateDateHeaders(start, end);
             }, 100);
         }
 
@@ -740,17 +957,19 @@
             $('#div_summary_leave').append(html);
         }
 
-        function init(month) {
+        function init(start, end) {
+
             $(document).ready(async function () {
                 if (table !== undefined) {
                     table.destroy();
                 }
+                let department = $('#select_department').val();
                 table = $('#table_leave').DataTable({
                     ajax: {
                         type: "GET",
                         url: '@Url.Action("GetDataByMonth", "SummaryLeave")',
                         contentType: 'application/x-www-form-urlencoded',
-                        data: { month },
+                        data: { department, start, end },
                         dataSrc: '',
                     },
                     columns: Array(day_of_month + 1).fill({ data: null, defaultContent: "" }),
@@ -790,7 +1009,7 @@
                             if (i == 0) {
                                 defs.push({
                                     targets: i,
-                                    render: function (data, type, row) {                                       
+                                    render: function (data, type, row) {
                                         var imgSrc = '/images/default-avatar.png';
                                         if (row.img) {
                                             imgSrc = 'data:image/jpeg;base64,' + row.img;
@@ -813,25 +1032,29 @@
                                     }
                                 });
                             }
-                            else{
+                            else {
                                 defs.push({
                                     targets: i,
                                     render: function (data, type, row) {
-                                        if (row.leaves[i-1] !== null) {
-                                            let leave = row.leaves[i-1];
+                                        if (row.leaves[i - 1] !== null) {
+                                            let leave = row.leaves[i - 1];
                                             if (!leave) {
                                                 return '';
                                             }
                                             const duration = leave.duration;
                                             let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
                                             let status = request_status.filter(f => f.status_en === leave.status).map(m => m.status_th);
+                                            let value = "";
+                                            if (status !== "Successed") {
+                                                value = "✸";
+                                            }
                                             if (duration !== "full") {
                                                 let classes = duration_classes.filter(f => f.duration === duration).map(m => m.class);
                                                 return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
-                                                   class="kanit-light btn ${classes}"
-                                                   style="width:30px;height:30px;border-radius:15px; background-color:${color}"/>
+                                                   class="kanit-bold btn ${classes}"
+                                                   style="width:34px;height:34px;border-radius:17px; background-color:${color};font-size:18px;font-weight:600;padding:3px;color:white" value="${value}"/>
 
                                                 <!-- Tooltip แบบกำหนดเอง -->
                                                 <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
@@ -844,8 +1067,8 @@
                                                 return `
                                             <div class="tooltip-wrapper">
                                                 <input type="button"
-                                                   class="kanit-light btn btn-danger}"
-                                                   style="width:30px;height:30px;border-radius:15px; background-color:${color}"/>
+                                                   class="kanit-bold btn btn-danger}"
+                                                   style="width:34px;height:34px;border-radius:17px; background-color:${color};font-size:18px;font-weight:600;padding:3px;color:white" value="${value}"/>
 
                                                 <!-- Tooltip แบบกำหนดเอง -->
                                                 <div class="custom-tooltip kanit-light" style="background-color:darkslategrey">
@@ -861,7 +1084,8 @@
                             }
                         }
                         return defs;
-                    })(),                   
+                    })(),
+
                     rowCallback: function (row, data, index) {
                         if (is_this_month) {
                             $('td', row).each(function (colIndex) {
@@ -886,7 +1110,8 @@
                     scrollX: false,
                     scrollCollapse: true,
                     fixedHeader: true,
-                    destroy: true,                  
+                    destroy: true,
+                    render: true
                 });
             });
         }
