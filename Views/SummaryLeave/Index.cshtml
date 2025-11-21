@@ -344,7 +344,7 @@
     }
 
     .leave-info {
-        background-color: #d1ecf1 !important;
+        background-color: #90A4AE !important;
         border-left: 4px solid #17a2b8 !important;
     }
 
@@ -620,9 +620,7 @@
     <script type="text/javascript">
         let table_leave = null;
         let leaves = [];
-        let index_today = -1;
         let is_this_month = true;
-        let day_of_month = 0;
         var table;
         let departments = [];
         let selectMonth = true;
@@ -631,21 +629,18 @@
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth() + 1;
-            index_today = now.getDate();
 
             const [y, w] = getISOWeek(now);
             document.getElementById('week').value = `${y}-W${w.toString().padStart(2, '0')}`;
 
             const currentYearMonth = year + '-' + String(month).padStart(2, '0');
             $('#monthPicker').val(currentYearMonth);
-            day_of_month = new Date(year, month, 0).getDate();
 
             GetDataLeave();
             let total_day = new Date(year, month, 0).getDate();
             let start = `${year}-${month}-01`;
             let end = `${year}-${month}-${total_day}`;
 
-            generateDateHeaders(start, end);
             init(start, end);
         });
 
@@ -706,7 +701,7 @@
 
                 const today = new Date();
                 if (!current) {
-                    
+
                     current = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
                     input.val(current);
                 }
@@ -722,35 +717,15 @@
                 let start = `${year}-${month}-01`;
                 let end = `${year}-${month}-${total_day}`;
 
-                day_of_month = new Date(year, month, 0).getDate();
-
-                if (isSameMonthAndYear(start, end)) {
-                    index_today = today.getDate();
-                } else {
-                    index_today = -1;
-                }
-                generateDateHeaders(start, end);
                 init(start, end);
+
             } else {
                 let week = $('#week').val();
                 const range = weekToDateRange(week);
                 let start = range.start;
                 let end = range.end;
 
-                let today = new Date();
-                if (today >= new Date(start) && today <= new Date(end)) {
-                    index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
-                }
-                else {
-                    index_today = -1;
-                }
-
-                day_of_month = 7;
-             
                 init(start, end);
-                setTimeout(() => {
-                    generateDateHeaders(start, end);
-                }, 100);
             }
         });
 
@@ -759,19 +734,10 @@
             const range = weekToDateRange(week);
             let start = range.start;
             let end = range.end;
-            let today = new Date();
-            if (today >= new Date(start) && today <= new Date(end)) {
-                index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
-            }
-            else {
-                index_today = -1;
-            }
-            day_of_month = 7;
 
+            selectMonth = false;
             init(start, end);
-            setTimeout(() => {
-                generateDateHeaders(start, end);
-            }, 100);
+            
         });
 
         $('#btn_group_week').on('click', function () {
@@ -784,22 +750,9 @@
             const range = weekToDateRange(week);
             let start = range.start;
             let end = range.end;
-            let today = new Date();
-            if (today >= new Date(start) && today <= new Date(end)) {
-                index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
-            }
-            else {
-                index_today = -1;
-            }
-
-            day_of_month = 7;
-
-            init(start, end);
-            setTimeout(() => {               
-                generateDateHeaders(start, end);
-            },100);
 
             selectMonth = false;
+            init(start, end);
         });
 
         $('#btn_group_month').on('click', function () {
@@ -819,17 +772,10 @@
 
             let start = `${year}-${monthIndex + 1}-01`;
             let end = `${year}-${monthIndex + 1}-${total_day}`;
-            day_of_month = new Date(year, monthIndex + 1, 0).getDate();
 
-            if (isSameMonthAndYear(start, end)) {
-                index_today = today.getDate();
-            } else {
-                index_today = -1;
-            }
-
-            generateDateHeaders(start, end);
-            init(start, end);
             selectMonth = true;
+            init(start, end);
+            
         });
 
         function isSameMonthAndYear(date1, date2) {
@@ -860,8 +806,6 @@
 
                 currentDate.setDate(currentDate.getDate() + 1);
             }
-
-            //day_of_month = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
         }
 
         $('#prevMonth').on('click', function () {
@@ -873,7 +817,6 @@
         });
 
         $('#monthPicker').on('change', function () {
-            let today = new Date();
             const newVal = this.value;
 
             const [y, m] = newVal.split('-');
@@ -885,16 +828,9 @@
             let start = `${year}-${monthIndex + 1}-01`;
             let end = `${year}-${monthIndex + 1}-${total_day}`;
 
-            day_of_month = new Date(year, monthIndex + 1, 0).getDate();
-
-            if (isSameMonthAndYear(start, end)) {
-                index_today = today.getDate();
-            } else {
-                index_today = -1;
-            }
-
-            generateDateHeaders(start, end);
+            selectMonth = true;
             init(start, end);
+            
         });
 
         function changeMonth(direction) {
@@ -924,17 +860,9 @@
             let end = `${year}-${month}-${total_day}`;
             input.val(newVal);
 
-            day_of_month = new Date(year, month, 0).getDate();
-
-            if (isSameMonthAndYear(start, end)) {
-                index_today = today.getDate();
-            } else {
-                index_today = -1;
-            }
-            
-            generateDateHeaders(start, end);
+            selectMonth = true;
             init(start, end);
-            console.log(end);
+           
         }
 
         async function GetDataLeave() {
@@ -983,6 +911,30 @@
                 table.destroy();
                 $('#table_leave tbody').empty();
             }
+
+            let today = new Date();
+            if (selectMonth) {
+                if (today >= new Date(start) && today <= new Date(end)) {
+                    index_today = today.getDate();
+                } else {
+                    index_today = -1;
+                }
+            } else {
+                if (today >= new Date(start) && today <= new Date(end)) {
+                    index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+                }
+                else {
+                    index_today = -1;
+                }
+            }
+
+            generateDateHeaders(start, end);
+
+            let startDate = new Date(start);
+            let endDate = new Date(end);
+
+            let day_of_month = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            
             let department = $('#select_department').val();
             table = $('#table_leave').DataTable({
                 ajax: {
