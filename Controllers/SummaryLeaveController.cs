@@ -58,92 +58,132 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
+
         [HttpGet]
-        public IActionResult GetDataByMonth(string month)
+        public IActionResult GetDapartments()
         {
-            List<EmpModel> emps = Employee.GetEmps();
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
-            List<RequestModel> requests = Requests.GetRequestByMonth(month);
-            int year = Convert.ToInt32(month.Split('-')[0]);
-            int m = Convert.ToInt32(month.Split('-')[1]);
-            requests = requests.Where(w => w.status_request == "Pending" || w.status_request == "Successed").ToList();
-            List<string> request_empid = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
-            emps = emps.Where(w => request_empid.Contains(w.emp_id)).ToList();
-            var result = emps.Select(emp => new
+            employees = employees.OrderBy(o => o.name_en).ToList();
+            List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
+            var data = new { departments = departments };
+            return Json(data);
+        }
+
+        [HttpGet]
+        public IActionResult GetDataByMonth(string department, string start, string end)
+        {
+
+            var startDate = Convert.ToDateTime(start);
+            var endDate = Convert.ToDateTime(end);
+
+            var allEmps = Employee.GetEmps();
+            var allEmployees = Employee.GetEmployees();
+
+
+            var positionDict = allEmployees
+                .Where(e => e.department == department)
+                .ToDictionary(e => e.emp_id, e => e.position);
+
+            var deptEmpIds = positionDict.Keys.ToHashSet();
+
+            var empsInDept = allEmps
+                .Where(e => deptEmpIds.Contains(e.emp_id))
+                .ToList();
+
+            if (!empsInDept.Any())
+                return Json(new object[0]);
+
+            var requests = Requests.GetRequestByDurationDay(
+                startDate.ToString("yyyy-MM-dd"),
+                endDate.ToString("yyyy-MM-dd"))
+                .Where(r => r.status_request == "Pending" || r.status_request == "Successed")
+                .ToList();
+
+            var empIdsWithLeave = requests
+                .Select(r => r.emp_id)
+                .Distinct()
+                .Where(id => deptEmpIds.Contains(id))
+                .ToHashSet();
+
+            var finalEmps = empsInDept
+                .Where(e => empIdsWithLeave.Contains(e.emp_id))
+                .ToList();
+
+            var dateRange = Enumerable.Range(0, (endDate - startDate).Days + 1)
+                                      .Select(i => startDate.AddDays(i))
+                                      .ToList();
+            var requestLookup = requests
+                .GroupBy(r => new { r.emp_id, Date = r.start_request_date.Date })
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.First()
+                );
+
+
+            var result = finalEmps.Select(emp => new
             {
                 emp_id = emp.emp_id,
                 name = emp.name,
                 img = emp.img,
-                position = employees.Where(w=>w.emp_id == emp.emp_id).Select(s=>s.position).FirstOrDefault(),
-                leaves = Enumerable.Range(1, DateTime.DaysInMonth(year, m))
-                           .Select(day =>
-                           {
-                               var req = requests.FirstOrDefault(r =>
-                                   r.emp_id == emp.emp_id &&
-                                   r.start_request_date.Date == new DateTime(year, m, day).Date);
-                               if (req == null) return null;
+                position = positionDict.GetValueOrDefault(emp.emp_id, "-"),
 
-                               string duration = "";
-                               string time = "";
-                               if (req.is_full_day)
-                               {
-                                   duration = "full";
-                                   time = "08:30 - 17:30";
-                               }
-                               else
-                               {
-                                   TimeSpan t0830 = new TimeSpan(8, 30, 0);
-                                   TimeSpan t1000 = new TimeSpan(10, 0, 0);
-                                   TimeSpan t1030 = new TimeSpan(10, 30, 0);
-                                   TimeSpan t1200 = new TimeSpan(12, 0, 0);
-                                   TimeSpan t1300 = new TimeSpan(13, 0, 0);
-                                   TimeSpan t1500 = new TimeSpan(15, 0, 0);
-                                   TimeSpan t1730 = new TimeSpan(17, 30, 0);
+                leaves = dateRange.Select(day =>
+                {
+                    var key = new { emp_id = emp.emp_id, Date = day.Date };
+                    if (!requestLookup.TryGetValue(key, out var req))
+                        return null;
 
-                                   TimeSpan start = req.start_request_time - TimeSpan.FromDays(req.start_request_time.Days);
-                                   TimeSpan end = req.end_request_time - TimeSpan.FromDays(req.start_request_time.Days);
-                                   TimeSpan durationSpan = end - start;
+                    string duration = "";
+                    string time = "";
 
-                                   if (start == t0830 && end == t1200)
-                                   {
-                                       duration = "half-left";
-                                   }
-                                   else if (start == t1300 && end == t1730)
-                                   {
-                                       duration = "half-right";
-                                   }
- 
-                                   else if (durationSpan == TimeSpan.FromHours(2))
-                                   {
-                                       if (start >= t0830 && end <= t1030)
-                                           duration = "quarter-top-left";
-                                       else if (start >= t0830 && end <= t1200)
-                                           duration = "quarter-bottom-left";
-                                       else if (start >= t1300 && end <= t1500)
-                                           duration = "quarter-top-right";
-                                       else if (start >= t1500 && end <= t1730)
-                                           duration = "quarter-bottom-right";
-                                   }
-                                   else if (durationSpan >= TimeSpan.FromHours(6))
-                                   {
-                                       duration = "three-quarter-left";
-                                   }
+                    if (req.is_full_day)
+                    {
+                        duration = "full";
+                        time = "08:30 - 17:30";
+                    }
+                    else
+                    {
+                        var startTs = new TimeSpan(req.start_request_time.Hours, req.start_request_time.Minutes, 0);
+                        var endTs = new TimeSpan(req.end_request_time.Hours, req.end_request_time.Minutes, 0);
 
-                                   time = $"{req.start_request_time.ToString(@"hh\:mm")} - {req.end_request_time.ToString(@"hh\:mm")}";
-                               }
-                               return
+                        var t0830 = new TimeSpan(8, 30, 0);
+                        var t1200 = new TimeSpan(12, 0, 0);
+                        var t1300 = new TimeSpan(13, 0, 0);
+                        var t1730 = new TimeSpan(17, 30, 0);
 
-                               new
-                               {
-                                   type = req.leave_name_th,
-                                   duration = duration,
-                                   time = time,
-                                   color_code = req.color_code,
-                                   status = req.status_request
-                               };
-                           }).ToArray()
+                        if (startTs == t0830 && endTs == t1200) duration = "half-left";
+                        else if (startTs == t1300 && endTs == t1730) duration = "half-right";
+                        else if ((endTs - startTs) == TimeSpan.FromHours(2))
+                        {
+                            if (startTs >= t0830 && endTs <= new TimeSpan(10, 30, 0)) duration = "quarter-top-left";
+                            else if (startTs >= t0830 && endTs <= t1200) duration = "quarter-bottom-left";
+                            else if (startTs >= t1300 && endTs <= new TimeSpan(15, 0, 0)) duration = "quarter-top-right";
+                            else if (startTs >= new TimeSpan(15, 0, 0) && endTs <= t1730) duration = "quarter-bottom-right";
+                        }
+                        else if ((endTs - startTs) >= TimeSpan.FromHours(6))
+                        {
+                            duration = "three-quarter-left";
+                        }
+
+                        time = req.start_request_time.ToString(@"hh\:mm") + " - " + req.end_request_time.ToString(@"hh\:mm");
+                    }
+
+                    return new
+                    {
+                        date = day.ToString("yyyy-MM-dd"),
+                        type = req.leave_name_th,
+                        duration = duration,
+                        time = time,
+                        color_code = req.color_code,
+                        status = req.status_request
+                    };
+
+                }).ToArray()
+
             }).ToArray();
+
             return Json(result);
+
         }
 
         [HttpGet]

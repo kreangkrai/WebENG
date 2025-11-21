@@ -638,17 +638,17 @@
                 backdrop: 'static',
                 keyboard: false
             });
-           
+
             $('#modal_checker').modal('show');
+           
             try {
                 const response = await $.ajax({
                     type: "GET",
                     url: '@Url.Action("GetDataChecker", "LeaveAuthen")',
-                    timeout: 1000,  
                     data: {}
                 });
 
-                approver_checker = []; 
+                approver_checker = [];
                 let entitlement_checker = 0;
 
                 response.checkers.forEach(item => {
@@ -772,7 +772,7 @@
         }
 
         function GenerateCheckerOption(id) {
-            let emps = employees;
+            let emps = employees.filter(f => f.department.includes("HRS") || f.department.includes("ACF"));
             let select = $('#EntitlementChecker' + id);
             select.empty();
             select.append(`<option value="" selected disabled>Please Select</option>`);
