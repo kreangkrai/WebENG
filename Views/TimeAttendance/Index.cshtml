@@ -318,7 +318,7 @@
         border-spacing: 0;
         table-layout: fixed !important; /* สำคัญที่สุด! */
         overflow-x: auto;
-        width: 100%; /* บังคับให้เต็ม container */
+        width: auto; /* บังคับให้เต็ม container */
         /* border-radius: 12px !important; */
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
@@ -463,69 +463,50 @@
         @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
     </div>
 
-    <div class="col-xl-5 col-sm-12">
-    <!-- Top Left Side: Employee Info -->
-    <div>
-        <form>
-            <div class="col-12">
-                <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
-                    <div class="card-header text-white" style="background: linear-gradient(90deg, #2178BE 0%, #28475F 100%); padding: 12px 15px;">
-                        <h5 class="kanit-medium" style="font-size: 20px; letter-spacing: 2px;">ตัวกรอง</h5>
-                    </div>
-                    <div class="card-body p-4">
-
-                        <!-- แผนก -->
-                        <div class="form-group row align-items-center ">
-                            <label for="departmentSelect" class="col-lg-3 col-md-4 col-form-label kanit-regular text-muted text-md-right" style="font-size: 18px;">
-                                แผนก
-                            </label>
-                            <div class="col-lg-9 col-md-8">
+    <div class="col-xl-2 col-sm-12">
+        <!-- Top Left Side: Filter -->
+        <div class=" mb-3">
+            <form>
+                <div class="col-12">
+                    <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
+                        <div class="card-header text-white" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); padding: 12px 15px;">
+                            <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ตัวกรอง</h5>
+                        </div>
+                        <div class="card-body p-3">
+                            <!-- Dropdown กรองแผนก -->
+                            <div class="form-group mb-3">
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
                                 <select id="departmentSelect" class="form-control kanit-regular" style="font-size: 16px;">
                                 </select>
                             </div>
-                        </div>
-
-                        <!-- วันที่เริ่มต้น -->
-                        <div class="form-group row align-items-center ">
-                            <label for="date_start" class="col-lg-3 col-md-4 col-form-label kanit-regular text-muted text-md-right" style="font-size: 18px;">
-                                วันที่เริ่มต้น
-                            </label>
-                            <div class="col-lg-9 col-md-8">
+                            <!-- วันที่เริ่มต้น -->
+                            <div class="form-group mb-3">
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">วันที่เริ่มต้น</label>
                                 <input type="date" class="form-control kanit-regular" id="date_start">
                             </div>
-                        </div>
-
-                        <!-- วันที่สิ้นสุด -->
-                        <div class="form-group row align-items-center ">
-                            <label for="date_end" class="col-lg-3 col-md-4 col-form-label kanit-regular text-muted text-md-right" style="font-size: 18px;">
-                                วันที่สิ้นสุด
-                            </label>
-                            <div class="col-lg-9 col-md-8">
+                            <!-- วันที่สิ้นสุด -->
+                            <div class="form-group mb-3">
+                                <label class="kanit-regular text-muted" style="font-size: 18px;">วันที่สิ้นสุด</label>
                                 <input type="date" class="form-control kanit-regular" id="date_end">
                             </div>
                         </div>
-
                     </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 
-   </div>
-        <!-- ********************************************************************************************************** -->
-
-    <!-- Table Leave Log -->
-    <div class="col-xl-12 col-md-12 col-sm-12">
+    <!-- Right Side : Table Leave History-->
+    <div class="col-xl-10 col-md-9 col-sm-12">
         <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
-
-            <div class="card-header  d-flex justify-content-between align-items-center"
+            <div class="card-header p-3 d-flex justify-content-between align-items-center"
                  style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
-                 border-radius: 20px 20px 0 0;">
+                 border-radius: 20px 20px 0 0; min-height: 60px;">
 
-                <!-- HEADER -->
-                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center"
-                    style="letter-spacing: 1px; font-size: 22px; gap: 12px;">
-                    ประวัติการอนุมัติ
+                <!-- ซ้าย: หัวข้อ -->
+                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
+                    style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
+                    สถิติการลา
                 </h4>
 
                 <!-- ขวา: ปุ่ม Export ชิดขวา -->
@@ -546,14 +527,23 @@
                             <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
                             <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
                             <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
-                            <th>วันที่ยื่นลา</th>
-                            <th>วันที่ลา</th>
-                            <th>เวลาที่ลา</th>
-                            <th>ระยะเวลา (วัน)</th>
-                            <th>ประเภทการลา</th>
-                            <th>รายละเอียด</th>
-                            <th>แนบไฟล์</th>
-                            <th>สถานะ</th>
+                            <th>สิทธิ์การลาพักร้อน</th>
+                            <th>พักร้อนคงเหลือ</th>
+                            <th>รวมวันลาทั้งหมด</th>
+                            <th>ลาป่วย</th>
+                            <th>ไม่รับค่าจ้าง</th>
+                            <th>พักร้อน</th>
+                            <th>ลาบวช</th>
+                            <th>ลาคลอด</th>
+                            <th>ลาสมรส</th>
+                            <th>ลาฌาปนกิจ</th>
+                            <th>ลากิจ(ราชการ)</th>
+                            <th>สาย(ครั้ง)</th>
+                            <th>สาย(นาที)</th>
+                            <th>ลืมสแกนหน้า(ครั้ง)</th>
+                            <th>แผนกเดิมปี 2024</th>
+                            <th>แผนกใหม่ปี 2025</th>
+                            
                         </tr>
                     </thead>
 
@@ -632,48 +622,12 @@
                             <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
                             <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!------------------------------------------------------------>
-    <div class="col-xl-12 col-md-12 col-sm-12">
-        <div class="card card-dark">
-            <div class="card-body" style="height:700px; overflow-y:auto">
-                <form>
-                    <div class="form-group">
-                        <div class="d-flex justify-content-end">
-                            <div class="col-xl-2 col-md-2 col-sm-6">
-                                <select class="kanit-light form-control">
-                                    <option value="Pending">รออนุมัติ</option>
-                                    <option value="Approved">อนุมัติแล้ว</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <table id="table_leave" class="table table-sm table-bordered table-hover text-center w-100">
-                            <thead class="kanit-light" style="background-color:lightgrey">
-                                <tr>
-                                    <th>รหัสพนักงาน</th>
-                                    <th>รายชื่อ</th>
-                                    <th>ระดับ</th>
-                                    <th>แผนก</th>
-                                    <th>วันที่เริ่มทำงาน</th>
-                                    <th>สถานะ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 @section Scripts
