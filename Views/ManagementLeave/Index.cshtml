@@ -609,7 +609,6 @@
                                 </div>
                             </td>
                         </tr>
-
                     </tbody>
                 </table>
             </div>
@@ -774,7 +773,7 @@
         <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
             <div class="modal-content kanit-regular">
                 <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
-                    <h5 class="modal-title" id="modal_leave_title">ยื่นการลา</h5>
+                    <h5 class="modal-title" id="modal_leave_title">อนุมัติการลา</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true" style="color: white;">&times;</span>
                     </button>
@@ -782,140 +781,33 @@
                 <div class="modal-body" style="overflow-y:auto;height:600px; color:#555555">
                     <form>
                         <div class="form-group row">
-                            <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
-                                <input id="emp_id" type="text" class="form-control" placeholder="EM010101" />
-                            </fieldset>
-                            <fieldset disabled class="col-xl-8 col-md-8 col-sm-6">
-                                <input id="emp_name" type="text" class="form-control" placeholder="นายชัยวัฒน์ สุขสม" />
-                            </fieldset>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-xl-6 col-md-6 col-sm-12 ">
-                                <label for="request_id">ประเภทการลา</label>
-                                <select id="select_leave_type" class="form-control">
-                                    <option value="">ลาพักร้อน</option>
-                                    <option value="">ลาป่วย</option>
-                                </select>
-                            </div>
-                            <div class="col-xl-6 col-md-6 col-sm-12">
-                                <label for="working_date">ช่วงเวลา</label>
-                                <div class="row">
-                                    <div class="btn-group" role="group" aria-label="Basic example">
-                                        <button id="leave_full" type="button" class="btn btn-outline-primary">ทั้งวัน</button>
-                                        <button id="leave_half" type="button" class="btn btn-outline-info">ครึ่งวัน</button>
-                                        <button id="leave_hours" type="button" class="btn btn-outline-secondary">รายชั่วโมง</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div div class="col-8">
-                                <label class="kanit-bold">สิทธิ์การลา</label>
-                            </div>
-                            <div div class="col-4 d-flex justify-content-end">
-                                <span class="kanit-light">5 วัน</span>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-xl-12 col-md-12 col-sm-12">
-                                <div class="card collapsed-card">
-
-                                    <div class="card-header" style=" background: #EEE;cursor:pointer" data-card-widget="collapse">
-                                        <div class="row">
-                                            <div class="col-11 d-flex justify-content-end">
-                                                <span class="kanit-bold" style="color:#555;">เงื่อนไขการลา</span>
-                                            </div>
-                                            <div class="col-1 d-flex justify-content-end">
-                                                <div class="row">
-                                                    <div class="col-6">
-                                                        <div class="card-tools">
-                                                            <button type="button" class="btn btn-tool" style="color:#555 ; font-size:20px">
-                                                                <i class="fas fa-chevron-down"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row" style="row-gap:1px">
-                                            <div class="col-12">
-                                                <div id="div_entitlement_manager">
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-12">
-                                                        <span class="kanit-light">
-                                                            หลักการ: ลูกจ้างมีสิทธิลาเพื่อกิจธุระอันจำเป็นได้ปีละไม่น้อยกว่า 3 วันทำงาน โดยนายจ้างต้องจ่ายค่าจ้างตามปกติ
-                                                            การขอลา: ต้องยื่นใบลาต่อผู้บังคับบัญชา และต้องได้รับอนุญาตก่อนจึงจะหยุดได้
-                                                            ข้อยกเว้น: หากมีเหตุจำเป็นที่ไม่สามารถรอการอนุญาตได้ทัน สามารถลาไปก่อนได้ แต่ต้องชี้แจงเหตุผลให้ผู้บังคับบัญชาทราบโดยเร็ว
-                                                            ข้อสังเกต: จำนวนวันที่ลาติดต่อกันขึ้นอยู่กับดุลยพินิจของนายจ้างและความเหมาะสมของแต่ละกรณี
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="date_group" class="form-group row">
-                            <div class="col-xl-4 col-md-6 col-sm-6">
-                                <label for="start_date">ลาตั้งแต่วันที่</label>
-                                <input id="start_date" type="date" class="form-control" />
-                            </div>
-                            <div class="col-xl-4 col-md-4 col-sm-12">
-                                <label for="amount_leave">ลาจำนวน</label>
-                                <div class="input-group">
-                                    <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">วัน</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <fieldset disabled class="col-xl-4 col-md-6 col-sm-6">
-                                <label for="start_date">ถึงวันที่</label>
-                                <input id="stop_date" type="text" class="form-control" />
-                            </fieldset>
-                        </div>
-                        <div id="time_group" class="form-group row">
-                            <div class="col-xl-4 col-md-4 col-sm-12">
-                                <label for="stop_date">ระยะเวลา</label>
-                                <div class="input-group">
-                                    <select id="" class="form-control">
-                                        <option value="">Select...</option>
-                                        <option value="">2 ชั่วโมง</option>
-                                        <option value="">4 ชั่วโมง</option>
-                                        <option value="">6 ชั่วโมง</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-xl-4 col-md-4 col-sm-6">
-                                <label for="start_time">ตั้งแต่เวลา</label>
-                                <input id="start_time" type="time" class="form-control" />
-                            </div>
-                            <fieldset disabled class="col-xl-4 col-md-4 col-sm-6">
-                                <label for="stop_time">ถึงเวลา</label>
-                                <input id="stop_time" type="time" class="form-control" />
-                            </fieldset>
-                        </div>
-                        <div class="form-group row">
                             <div class="col-12">
                                 <div class="form-group">
-                                    <label for="note">รายละเอียด</label>
-                                    <textarea id="note" class="form-control" rows="2" placeholder="Note or Description"></textarea>
+                                    <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">ข้อมูลการลา</label>
+                                    <div style="padding-left:20px;">
+                                        <div>
+                                            <label class="col-12 kanit-light">นายสาริศ ตรีปทุมรัตน์ (CES-RD)</label>
+                                            <label class="col-12 kanit-light">ลากิจ(ราชการ) (1 วัน)</label>
+                                            <label class="col-12 kanit-light">ทำบัตรประชาชน</label>
+                                            <label class="col-12 kanit-light">ลาวันที่ จ. 24/11/25 เวลา 08:30-17:30</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <hr />
-
+                        <!--------------------------------------------------------->
+                        @*<div class="form-group row">
+                             <div style="padding:10px;">
+                                <span class="col-12 kanit-regular">นายสาริศ ตรีปทุมรัตน์ (066403)</span>
+                                <span class="col-12 kanit-light">แผนก: </span>
+                                <span class="col-12 kanit-regular">CES-RD</span>
+                            </div> 
+                        </div>*@
+                        <!--------------------------------------------------------->
                         <!-- ส่วนแสดงรายการไฟล์ -->
                         <div id="fileList" class="form-group row">
                             <div class="col-12">
-                                <label class="kanit-medium">เอกสารที่แนบ</label>
+                                <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">เอกสารที่แนบ</label>
                                 <div class="card" style="border-radius: 10px; overflow: hidden;">
                                     <div class="list-group" id="fileListContainer">
                                         <!-- ตัวอย่างไฟล์ -->
@@ -932,32 +824,17 @@
                             </div>
                         </div>
                         <!----------------------------------------------------------------------------------------->
-                        <hr />
-
+                        
                         <div class="form-group row">
                             <div class="col-12">
-                                <label for="approvers" class="kanit-medium">ผู้อนุมัติ</label>
+                                <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">ไทม์ไลน์</label>
                                 <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                    <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
-                                    <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
-                                        <i class="fas fa-info-circle mr-2"></i>เลือกอนุมัติโดย 1 ใน 2 ผู้จัดการด้านล่าง
-                                    </div>
                                     <div class="list-group" id="approverList">
                                         <!-- ผู้อนุมัติคนที่ 1 -->
                                         <div class="list-group-item d-flex align-items-center approver-item">
                                             <div class="col-6">
                                                 <i class="fas fa-user-check mr-2 text-primary"></i>
                                                 <span class="kanit-regular">Chakrit R.</span>
-                                            </div>
-                                            <div class="col-6">
-                                                <span class="kanit-regular text-muted">Manager</span>
-                                            </div>
-                                        </div>
-                                        <!-- ผู้อนุมัติคนที่ 2 (ถ้ามี) -->
-                                        <div class="list-group-item d-flex align-items-center approver-item">
-                                            <div class="col-6">
-                                                <i class="fas fa-user-check mr-2 text-primary"></i>
-                                                <span class="kanit-regular">Kriangkrai R.</span>
                                             </div>
                                             <div class="col-6">
                                                 <span class="kanit-regular text-muted">Manager</span>
@@ -979,16 +856,29 @@
                         </div>
                     </form>
                 </div>
+                <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
                 <div class="modal-footer d-flex">
-                    <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                        <i class="mr-1 fas fa-trash-alt"></i>ลบการลา
-                    </button>
-                    <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
-                        <i class="mr-1 fas fa-times"></i> ปิด
-                    </button>
-                    <button id="btn_accept" type="button" class="btn btn-primary elevation-1">
-                        <i class="fas fa-edit"></i> ส่งแก้ไข
-                    </button>
+                    <div class="container d-flex justify-content-end">
+                        <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
+                            <div class="row">
+                                <div class="col-4">
+                                    <button id="btn_reject_leave" data-target="#modal_reject" class="btn modern-btn btn-outline-danger kanit-medium" style=" border-radius:8px; width:90px; letter-spacing:1px">
+                                        ปฏิเสธ
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button id="btn_resubmit_leave" data-target="#modal_resubmit" class="btn modern-btn btn-outline-warning kanit-medium" style=" border-radius:8px; width:90px; letter-spacing:1px">
+                                        ส่งกลับ
+                                    </button>
+                                </div>
+                                <div class="col-4">
+                                    <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success kanit-medium" style=" border-radius:8px; width:90px; letter-spacing:1px">
+                                        อนุมัติ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
