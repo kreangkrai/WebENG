@@ -353,6 +353,7 @@
     }
     /* ม่วง */
 
+    
 </style>
 <!-------------------------------------------------------------------------------------------------------------------->
 
@@ -362,14 +363,7 @@
             background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);">
             แผนก
         </h4>
-        <div class="form-group row">
-            <div class="col-xl-2 col-md-3 col-sm-6">
-                <button type="button" class="btn btn-outline-success form-control kanit-medium leave-group-btn"
-                        style="border-radius:7px; height:40px" onclick="CheckerClicked()">
-                    ตั้งค่าผู้ตรวจสอบ
-                </button>
-            </div>
-        </div>
+        
     </div>
 
     <div class="col-xl-2 col-md-3 col-sm-12">
@@ -396,18 +390,26 @@
             </form>
             <div class="card-body" style="height:600px; overflow-y:auto;">
                 <form>                  
-                    <div class="tab-content" style="padding-top:20px">
+                    <div class="tab-content">
                         <div class="tab-pane fade show active" id="SettingDepartment">
                             <div class="container d-flex justify-content-center">
                                 <div class="col-xl-12 col-md-12 col-sm-12">
                                     <div class="row">                                      
-                                        <div class="col-xl-12 col-md-12 col-sm-12">                                         
-                                            <span id="div_department" class="kanit-bold mb-2" style="color:dimgrey;font-size:20px"></span>
+                                        <div class="col-xl-12 col-md-12 col-sm-12">
+                                            @* <div class="badge kanit-bold py-2 px-4 mb-3">
+                                                <span id="div_department" class="kanit-bold" style="color:steelblue;font-size:20px"></span>
+                                            </div> *@
+                                            <div class="mb-3">
+                                                <span id="div_department"
+                                                      class="badge badge-pill kanit-medium py-2 px-3"
+                                                      style="font-size: 20px; background-color:#2178BE; color:white; letter-spacing:2px">
+                                                </span>
+                                            </div>
                                             <div class="card">
-                                                <div class="card-header" style="background-color:powderblue">
+                                                <div class="card-header" style="background-color:#EEE">
                                                     <div class="row">
                                                         <div class="col-xl-4 col-md-4 col-sm-12">
-                                                            <span class="kanit-bold" style="color:dimgrey">ผู้จัดการแผนก (ผู้อนุมัติ 1)</span>
+                                                            <span class="kanit-medium" style="color:dimgrey; font-size:18px; letter-spacing:1px">ผู้อนุมัติ 1 (ผู้จัดการแผนก)</span>
                                                         </div>
                                                         <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
                                                             <div class="row">
@@ -447,10 +449,10 @@
                                     <div class="row">
                                         <div class="col-xl-12 col-md-12 col-sm-12">
                                             <div class="card">
-                                                <div class="card-header" style="background-color:powderblue">
+                                                <div class="card-header" style="background-color:#EEE">
                                                     <div class="row">
                                                         <div class="col-xl-4 col-md-4 col-sm-12">
-                                                            <span class="kanit-bold" style="color:dimgrey">ผู้อนุมัติ 2</span>
+                                                            <span class="kanit-medium" style="color:dimgrey; font-size:18px; letter-spacing:1px">ผู้อนุมัติ 2</span>
                                                         </div>
                                                         <div class="col-xl-8 col-md-8 col-sm-12 d-flex justify-content-end">
                                                             <div class="row">
@@ -552,10 +554,10 @@
                     <div class="row">
                         <div class="col-xl-12 col-md-12 col-sm-12">
                             <div class="card">
-                                <div class="card-header" style="background-color:powderblue">
+                                <div class="card-header" style="background-color:#EEE">
                                     <div class="row">
                                         <div class="col-xl-6 col-md-6 col-sm-12">
-                                            <span class="kanit-bold" style="color:dimgrey">ผู้ตรวจสอบ</span>
+                                            <span class="kanit-medium" style="color:dimgrey; font-size:18px; letter-spacing:1px">ผู้ตรวจสอบ</span>
                                         </div>
                                         <div class="col-xl-6 col-md-6 col-sm-12 d-flex justify-content-end">
                                             <div class="row">
@@ -689,8 +691,16 @@
         function GenerateDepartments(departments) {
             var html = '';
             for (var i = 0; i < departments.length; i++) {
+                if(i===0){
+                    html += `<div class="form-group row">
+                                <button type="button" class="btn btn-info form-control kanit-medium department-group-btn"
+                                style="border-radius:7px; height:40px" onclick="CheckerClicked()">
+                            ตั้งค่าผู้ตรวจสอบ
+                        </button>
+                </div>`;
+                }
                 html += `<div class="form-group row">
-                                       <button type="button" id="department_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                               <button type="button" id="department_group_${i}" class="btn btn-outline-primary form-control kanit-medium department-group-btn
                                        style="border-radius:7px; height:40px" onClick="DepartmentClicked('${departments[i]}', this)">
                                     ${departments[i]}
                                </button>
