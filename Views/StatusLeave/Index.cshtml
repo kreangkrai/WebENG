@@ -383,16 +383,26 @@
                             <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ข้อมูลพนักงาน</h5>
                         </div>
                         <div class="card-body p-3">
+                            <!-- Dropdown วันที่เริ่มต้น -->
+                            <div class="form-group row mb-3">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันที่เริ่มต้น</label>
+                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_start">
+                            </div>
+                            <!-- Dropdown วันที่สิ้นสุด -->
+                            <div class="form-group row mb-3">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันที่สิ้นสุด</label>
+                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_stop">
+                            </div>
                             <!-- Dropdown กรองแผนก -->
-                            <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
-                                <select id="departmentSelect" class="form-control form-control-sm kanit-regular" style="font-size: 16px;">
+                            <div class="form-group row mb-3">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
+                                <select id="departmentSelect" class="col-8 form-control kanit-regular" style="font-size: 16px; border-radius:20px">
                                 </select>
                             </div>
                             <!-- Dropdown เลือกพนักงาน -->
                             <div class="form-group mb-3">
                                 <label class="kanit-regular text-muted" style="font-size: 18px;">พนักงาน</label>
-                                <select id="employeeSelect" class="form-control form-control-sm kanit-regular" style="font-size: 16px;">
+                                <select id="employeeSelect" class="form-control kanit-regular" style="font-size: 16px;border-radius:20px">
                                     <option value="All">ทุกคน</option>
                                 </select>
                             </div>
@@ -404,8 +414,8 @@
                                 <label class="kanit-regular text-muted" style="font-size: 18px;">ค้นหาโดยตรง</label>
                                 <div class="dropdown-search">
                                     <div class="input-group">
-                                        <input type="text" id="employeeSearch" class="form-control form-control-sm kanit-regular"
-                                               placeholder="ค้นหา รหัส/ชื่อพนักงาน" style="font-size: 15px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+                                        <input type="text" id="employeeSearch" class="form-control kanit-regular"
+                                               placeholder="ค้นหา รหัส/ชื่อพนักงาน" style="font-size: 15px; border-radius:20px">
                                         <div class="input-group-append">
                                             <button id="clearSearch" class="btn btn-outline-secondary btn-sm" type="button" style="display:none; border-top-right-radius: 0; border-bottom-right-radius: 0;">
                                                 <i class="fas fa-times"></i>
@@ -420,28 +430,28 @@
                             <!-- แสดงข้อมูลพนักงาน -->
                             <div id="employeeInfo" class="text-left" style="font-size: 16px; display: none;">
                                 <div class="row">
-                                    <div class="col-6 kanit-light text-muted">รหัสพนักงาน</div>
-                                    <label class="col-6 kanit-light text-dark d-flex justify-content-end" id="EmpId"></label>
+                                    <div class="col-4 kanit-light text-muted">รหัสพนักงาน</div>
+                                    <label class="col-8 kanit-light text-dark d-flex justify-content-end" id="EmpId"></label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 kanit-light text-muted">ชื่อ-สกุล</div>
-                                    <label class="col-6 kanit-light text-dark d-flex justify-content-end" id="EmpName">-</label>
+                                    <div class="col-4 kanit-light text-muted">ชื่อ-สกุล</div>
+                                    <label class="col-8 kanit-light text-dark d-flex justify-content-end" id="EmpName">-</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 kanit-light text-muted">แผนก</div>
-                                    <label class="col-6 kanit-light text-dark d-flex justify-content-end" id="department">-</label>
+                                    <div class="col-4 kanit-light text-muted">แผนก</div>
+                                    <label class="col-8 kanit-light text-dark d-flex justify-content-end" id="department">-</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 kanit-light text-muted">ตำแหน่ง</div>
-                                    <label class="col-6 kanit-light text-dark d-flex justify-content-end" id="position">-</label>
+                                    <div class="col-4 kanit-light text-muted">ตำแหน่ง</div>
+                                    <label class="col-8 kanit-light text-dark d-flex justify-content-end" id="position">-</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 kanit-light text-muted">เบอร์โทร</div>
-                                    <label class="col-6 kanit-light text-dark d-flex justify-content-end" id="phone">-</label>
+                                    <div class="col-4 kanit-light text-muted">เบอร์โทร</div>
+                                    <label class="col-8 kanit-light text-dark d-flex justify-content-end" id="phone">-</label>
                                 </div>
                                 <div class="row">
-                                    <div class="col-6 kanit-light text-muted">วันที่เริ่มงาน</div>
-                                    <label class="col-6 kanit-light text-dark d-flex justify-content-end" id="startDate">-</label>
+                                    <div class="col-4 kanit-light text-muted">วันที่เริ่มงาน</div>
+                                    <label class="col-8 kanit-light text-dark d-flex justify-content-end" id="startDate">-</label>
                                 </div>
                             </div>
 
@@ -463,8 +473,8 @@
                     <div class="card shadow-sm modern-card" style="border-radius:10px; padding:10px">
                         <div class="card-body" overflow-y:auto">
                             <div class="form-group row">
-                                <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาคงเหลือ (วัน)</label>
-                                <label id="emp_th_balance_leave" class="kanit-regular" style="letter-spacing:1px; color:#666;font-size:20px"></label>
+                                <label class="kanit-regular col-12" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาที่ใช้ (วัน)</label>
+                                <label id="emp_th_balance_leave" class="kanit-regular col-12" style="letter-spacing:1px; color:#666;font-size:20px"></label>
                                 <div class="col-12" style="font-size:18px; ">
                                     <div id="div_leaves_balance"></div>
                                 </div>
@@ -486,7 +496,10 @@
                 <!-- ซ้าย: หัวข้อ + ปี + เดือน -->
                 <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
                     style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
-                    ประวัติการลา -
+                    ประวัติการลา @*: วันที่
+                      <input type="date" class="form-control kanit-regular" style="border-radius:20px" id="date_start">
+                    -
+                    <input type="date" class="form-control kanit-regular" style="border-radius:20px" id="date_end">
                     <select id="yearFilter" class="form-control form-control-sm kanit-medium"
                             style="width: 90px; color:#555; font-size: 18px; border-radius: 8px; height: 36px; padding: 0 8px; flex-shrink: 0;">
                         @{ 
@@ -511,14 +524,20 @@
                         <option value="10">ตุลาคม</option>
                         <option value="11">พฤศจิกายน</option>
                         <option value="12">ธันวาคม</option>
-                    </select>
+                    </select> *@
                 </h4>
 
                 <!-- ขวา: ปุ่ม Export ชิดขวา -->
-                <button class="btn btn-success ml-auto kanit-regular" data-toggle="modal" data-target="#sendModal"
-                        style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
-                    <i class="fas fa-file-excel"></i> Export to Excel
-                </button>
+                <div class="ml-auto">
+                    <button class="btn btn-light mr-2 kanit-regular" data-toggle="modal" data-target="#sendModal"
+                            style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
+                        <i class="fas fa-file-alt mr-2"></i>Export to Text
+                    </button>
+                    <button class="btn btn-success  kanit-regular" data-toggle="modal" data-target="#sendModal"
+                            style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
+                        <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                    </button>
+                </div>
             </div>
 
             <div class="freeze-pane">
@@ -760,13 +779,13 @@
             </div>
             <div class="modal-footer d-flex">
                 <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                    <i class="fas fa-trash-alt"></i> ลบ
+                    <i class="mr-1 fas fa-trash-alt"></i>ลบการลา
                 </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
-                    <i class="fas fa-times"></i> ยกเลิก
+                    <i class="mr-1 fas fa-times"></i> ปิด
                 </button>
                 <button id="btn_accept" type="button" class="btn btn-primary elevation-1">
-                    <i class="fas fa-check"></i> ส่งเอกสาร
+                    <i class="fas fa-edit"></i> ส่งแก้ไข
                 </button>
             </div>
         </div>
@@ -1059,7 +1078,7 @@
 
                 let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
                 const tr = $(`
-                    <tr class="clickable-row kanit-regular" style="color:#555; font-size: 14px;"
+                    <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
                         data-toggle="modal" data-target="#modal_leave"
                         data-id="${row.request_id}" data-emp-id="${row.emp_id}"
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"

@@ -318,7 +318,7 @@
         border-spacing: 0;
         table-layout: fixed !important; /* สำคัญที่สุด! */
         overflow-x: auto;
-        width: auto; /* บังคับให้เต็ม container */
+        width: 2500px; /* บังคับให้เต็ม container */
         /* border-radius: 12px !important; */
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
@@ -527,6 +527,7 @@
                             <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
                             <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
                             <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                            <th>แผนก</th>
                             <th>สิทธิ์การลาพักร้อน</th>
                             <th>พักร้อนคงเหลือ</th>
                             <th>รวมวันลาทั้งหมด</th>
@@ -550,78 +551,52 @@
                     <tbody>
                         <tr class="clickable-row kanit-regular"
                             style="color:#555;">
-                            <td>1</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 08:33</td>
-                            <td>ศ. 31/10/25</td>
-                            <td>08:30 - 17:30</td>
-                            <td>1</td>
-                            <td>ลาป่วย</td>
-                            <td>ท้องเสีย</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>2</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 08:46</td>
-                            <td>ศ. 07/11/25 - จ. 10/11/25</td>
-                            <td>08:30 - 17:30</td>
-                            <td>2</td>
-                            <td>ลาพักร้อน</td>
+                            <td class="freeze-left-1" style="width:70px;">1</td>
+                            <td class ="freeze-left-2" style="width:100px;">066403</td>
+                            <td class="freeze-left-3" style="width:180px;">นายสาริศ ตรีปทุมรัตน์</td>
+                            <td>CES-RD</td>
+                            <td>7</td>
+                            <td>0</td>
+                            <td>8</td>
                             <td>-</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>3</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 09:00</td>
-                            <td>อ. 04/11/25</td>
-                            <td>08:30 - 12:00</td>
-                            <td>0.5</td>
-                            <td>ลาพักร้อนไม่รับค่าจ้าง</td>
+                            <td>1</td>
+                            <td>7</td>
                             <td>-</td>
-                            <td></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>52</td>
+                            <td>377</td>
+                            <td>2</td>
+                            <td>ENG</td>
+                            <td>CES</td>
                         </tr>
 
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
+                        <tr class="clickable-row kanit-regular"
+                            style="color:#555;">
+                            <td class="freeze-left-1" style="width:70px;">1</td>
+                            <td class="freeze-left-2" style="width:100px;">059197</td>
+                            <td class="freeze-left-3" style="width:180px;">นายเกรียงไกร รัตนวัน</td>
+                            <td>CES-RD</td>
+                            <td>10</td>
+                            <td>7</td>
                             <td>4</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 10/11/25 09:50</td>
-                            <td>พ. 05/11/25</td>
-                            <td>13:30 - 15:30</td>
-                            <td>0.25</td>
-                            <td>ลากิจ(ราชการ)</td>
-                            <td>ทำบัตรประชาชน</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>3</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>1</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>ENG</td>
+                            <td>CES</td>
                         </tr>
 
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>5</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 10/11/25 09:50</td>
-                            <td>พ. 05/11/25</td>
-                            <td>13:00 - 17:30</td>
-                            <td>0.5</td>
-                            <td>ลากิจ(ราชการ)</td>
-                            <td>ทำบัตรประชาชน</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:20px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
