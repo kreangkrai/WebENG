@@ -1321,7 +1321,7 @@
             $('#working_hour_id').val(last_id);
             $('#user_id').val(user_id);
             $('#working_date_group').show();
-            $('#working_date').attr('disabled', true);
+            $('#working_date').prop('disabled', true);
             $('#working_date').val(date_start);
             $('#date_group').hide();
             $('#start_date').val(null);
@@ -1340,13 +1340,13 @@
             $('$working_hour_id').val(last_id);
             $('#user_id').val(user_id);
             $('#working_date_group').hide();
-            $('#working_date').attr('disabled', true);
+            $('#working_date').prop('disabled', true);
             $('#working_date').val(null);
             $('#date_group').show();
             $('#start_date').val(date_start);
             $('#stop_date').val(date_end);
-            $('#location').attr('disabled', true);
-            $('#task_id').attr('disabled', true);
+            $('#location').prop('disabled', true);
+            $('#task_id').prop('disabled', true);
             $('#start_time').val("08:30");
             $('#stop_time').val("17:30");
             $('#note').val(null);
@@ -1385,7 +1385,7 @@
         $('#job_id').on('change', async function () {
             let job_id = $('#job_id').val();
             let enable_location = (job_id !== "") ? 1 : 0;
-            $('#location').attr('disabled', !enable_location);
+            $('#location').prop('disabled', !enable_location);
 
             let job = list_process_system.filter(f=>f.job_id == job_id).map(m=>m)[0];
             let _processes = job.processes;
@@ -1405,22 +1405,22 @@
             $('#task_id').empty();
             $('#task_id').append(tasks_str);
             let en = $('#job_id').val() !== "" ? true : false;
-            $('#task_id').attr('disabled', !en);
+            $('#task_id').prop('disabled', !en);
         });
 
         $('#task_id').on('change', function () {
             let en = $('#job_id').val() !== "" ? true : false;
             en *= $('#task_id').val() !== "" ? true : false;
             if (en) {
-                $('#start_time').attr('disabled', !en);
+                $('#start_time').prop('disabled', !en);
                 if (wh_day.length === 0) {
                     $('#start_time').val("08:30");
-                    $('#stop_time').attr('disabled', false);
+                    $('#stop_time').prop('disabled', false);
                     $('#stop_time').val("17:30");
                 }
             }
             else {
-                $('#start_time').attr('disabled', !en);
+                $('#start_time').prop('disabled', !en);
                 $('#start_time').val();
             }
         });
@@ -1429,7 +1429,7 @@
 
             let start_time = $('#start_time').val();
             document.getElementById("stop_time").min = start_time;
-            $('#stop_time').attr('disabled', false);
+            $('#stop_time').prop('disabled', false);
             $('#stop_time').val(start_time);
             let date = new Date($('#working_date').val());
             date.setHours($('#start_time').val().split(":")[0]);
@@ -1464,60 +1464,60 @@
             let total_minute_start = (parseInt(hours_start) * 60) + parseInt(minutes_start);
             let total_minute_stop = (parseInt(hours_stop) * 60) + parseInt(minutes_stop);
             if (total_minute_start > 720 && total_minute_stop > 720) {  // > 12:00
-                $('#lunch_full').attr('checked', false);
-                $('#lunch_half').attr('checked', false);
-                $('#lunch_full').attr('disabled', true);
-                $('#lunch_half').attr('disabled', true);
+                $('#lunch_full').prop('checked', false);
+                $('#lunch_half').prop('checked', false);
+                $('#lunch_full').prop('disabled', true);
+                $('#lunch_half').prop('disabled', true);
 
                 if (total_minute_stop > 1050) {  // > 17:30
-                    $('#dinner_full').attr('checked', true);
-                    $('#dinner_half').attr('checked', false);
-                    $('#dinner_full').attr('disabled', false);
-                    $('#dinner_half').attr('disabled', false);
+                    $('#dinner_full').prop('checked', true);
+                    $('#dinner_half').prop('checked', false);
+                    $('#dinner_full').prop('disabled', false);
+                    $('#dinner_half').prop('disabled', false);
                 }
             } else {
-                $('#lunch_full').attr('checked', true);
-                $('#lunch_half').attr('checked', false);
-                $('#lunch_full').attr('disabled', false);
-                $('#lunch_half').attr('disabled', false);
+                $('#lunch_full').prop('checked', true);
+                $('#lunch_half').prop('checked', false);
+                $('#lunch_full').prop('disabled', false);
+                $('#lunch_half').prop('disabled', false);
 
             }
 
             if (total_minute_start <= 720 && total_minute_stop <= 720) {  // < 12:00
-                $('#dinner_full').attr('checked', false);
-                $('#dinner_half').attr('checked', false);
-                $('#dinner_full').attr('disabled', true);
-                $('#dinner_half').attr('disabled', true);
+                $('#dinner_full').prop('checked', false);
+                $('#dinner_half').prop('checked', false);
+                $('#dinner_full').prop('disabled', true);
+                $('#dinner_half').prop('disabled', true);
 
-                $('#lunch_full').attr('checked', false);
-                $('#lunch_half').attr('checked', false);
-                $('#lunch_full').attr('disabled', true);
-                $('#lunch_half').attr('disabled', true);
+                $('#lunch_full').prop('checked', false);
+                $('#lunch_half').prop('checked', false);
+                $('#lunch_full').prop('disabled', true);
+                $('#lunch_half').prop('disabled', true);
 
             } else {
-                $('#dinner_full').attr('checked', true);
-                $('#dinner_half').attr('checked', false);
-                $('#dinner_full').attr('disabled', false);
-                $('#dinner_half').attr('disabled', false);
+                $('#dinner_full').prop('checked', true);
+                $('#dinner_half').prop('checked', false);
+                $('#dinner_full').prop('disabled', false);
+                $('#dinner_half').prop('disabled', false);
             }
 
             if (total_minute_start > 1050 && total_minute_stop > 1050) {  // < 12:00
-                $('#dinner_full').attr('checked', true);
-                $('#dinner_half').attr('checked', false);
-                $('#dinner_full').attr('disabled', false);
-                $('#dinner_half').attr('disabled', false);
+                $('#dinner_full').prop('checked', true);
+                $('#dinner_half').prop('checked', false);
+                $('#dinner_full').prop('disabled', false);
+                $('#dinner_half').prop('disabled', false);
             } else {
-                $('#dinner_full').attr('checked', false);
-                $('#dinner_half').attr('checked', false);
-                $('#dinner_full').attr('disabled', true);
-                $('#dinner_half').attr('disabled', true);
+                $('#dinner_full').prop('checked', false);
+                $('#dinner_half').prop('checked', false);
+                $('#dinner_full').prop('disabled', true);
+                $('#dinner_half').prop('disabled', true);
             }
 
             if (total_minute_stop > 1050) {  // > 17:30
-                $('#dinner_full').attr('checked', true);
-                $('#dinner_half').attr('checked', false);
-                $('#dinner_full').attr('disabled', false);
-                $('#dinner_half').attr('disabled', false);
+                $('#dinner_full').prop('checked', true);
+                $('#dinner_half').prop('checked', false);
+                $('#dinner_full').prop('disabled', false);
+                $('#dinner_half').prop('disabled', false);
             }
         });
 
@@ -2155,33 +2155,33 @@
                         type_duration = "Day";
                         CheckAttachFileRequire(type_duration);
 
-                        $('#leave_full').attr('disabled', false);
-                        $('#leave_half').attr('disabled', false);
-                        $('#leave_hours').attr('disabled', false);
-                        $('#leave_stop_date').attr('disabled', false);
+                        $('#leave_full').prop('disabled', false);
+                        $('#leave_half').prop('disabled', false);
+                        $('#leave_hours').prop('disabled', false);
+                        $('#leave_stop_date').prop('disabled', false);
                     } else {
                         alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
                         $('#btn_leave_send').prop('disabled', true);
-                        $('#leave_full').attr('disabled', true);
-                        $('#leave_half').attr('disabled', true);
-                        $('#leave_hours').attr('disabled', true);
-                        $('#leave_stop_date').attr('disabled', true);
+                        $('#leave_full').prop('disabled', true);
+                        $('#leave_half').prop('disabled', true);
+                        $('#leave_hours').prop('disabled', true);
+                        $('#leave_stop_date').prop('disabled', true);
                     }
                 } else {
                     alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
                     $('#btn_leave_send').prop('disabled', true);
-                    $('#leave_full').attr('disabled', true);
-                    $('#leave_half').attr('disabled', true);
-                    $('#leave_hours').attr('disabled', true);
-                    $('#leave_stop_date').attr('disabled', true);
+                    $('#leave_full').prop('disabled', true);
+                    $('#leave_half').prop('disabled', true);
+                    $('#leave_hours').prop('disabled', true);
+                    $('#leave_stop_date').prop('disabled', true);
                 }
             } else {
                 alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
                 $('#btn_leave_send').prop('disabled', true);
-                $('#leave_full').attr('disabled', true);
-                $('#leave_half').attr('disabled', true);
-                $('#leave_hours').attr('disabled', true);
-                $('#leave_stop_date').attr('disabled', true);
+                $('#leave_full').prop('disabled', true);
+                $('#leave_half').prop('disabled', true);
+                $('#leave_hours').prop('disabled', true);
+                $('#leave_stop_date').prop('disabled', true);
             }
             is_full_day = true;
         });
@@ -2530,7 +2530,6 @@
                 return count;
             }
 
-            // เริ่มต้นด้วยการเลือก "ทั้งวัน" เป็นค่าเริ่มต้น
             function timeToMinutes(timeStr) {
                 const [hours, minutes] = timeStr.split(':').map(Number);
                 return hours * 60 + minutes;
@@ -2840,7 +2839,7 @@
         });
 
         $('#confirm_ok').on('click', async function () {
-             let emp_id = '@Html.Raw(Model.emp_id)';
+            let emp_id = '@Html.Raw(Model.emp_id)';
             let leave_type_id = $('#select_leave_type').val();
             let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             let leave_type_code = leave.leave_type_code;
@@ -2858,44 +2857,44 @@
                 start_request_time = hour + ":" + minute;
                 end_request_time = $('#leave_stop_time').val();
             }
-            if (!file_require || (file_require && tempFileIds.length > 0 && tempFileIds !== null)) {
-                let str = JSON.stringify({
-                    "emp_id": emp_id,
-                    "leave_type_id": leave_type_id,
-                    "leave_type_code": leave_type_code,
-                    "start_request_date": start_request_date,
-                    "end_request_date": end_request_date,
-                    "path_file": "",
-                    "status_request": "Pending",
-                    "decsription" : decsription,
-                    "start_request_time": start_request_time,
-                    "end_request_time": end_request_time,
-                    "amount_leave_day": amount_leave_day,
-                    "is_two_step_approve": is_two_step_approve,
-                    "is_full_day": is_full_day,
-                    "amount_leave_hour": 0,
-                });
-                await $.ajax({
-                    type: "POST",
-                    url: '@Url.Action("CreateRequest", "Leave")',
-                    contentType: 'application/x-www-form-urlencoded',
-                    data: {
-                        str, tempFileIds
-                    },
-                    success: function (response) {
-                        if (response === "Success") {
-                            alert("ส่งวันลาเรียบร้อย");
-                            $('#modal_confirm').modal('hide');
-                            $('#modal_leave').modal('hide');
-                            location.reload();
-                        } else {
-                            alert(response);
-                        }
+            //if (!file_require || (file_require && tempFileIds.length > 0 && tempFileIds !== null)) {
+            let str = JSON.stringify({
+                "emp_id": emp_id,
+                "leave_type_id": leave_type_id,
+                "leave_type_code": leave_type_code,
+                "start_request_date": start_request_date,
+                "end_request_date": end_request_date,
+                "path_file": "",
+                "status_request": "Pending",
+                "decsription": decsription,
+                "start_request_time": start_request_time,
+                "end_request_time": end_request_time,
+                "amount_leave_day": amount_leave_day,
+                "is_two_step_approve": is_two_step_approve,
+                "is_full_day": is_full_day,
+                "amount_leave_hour": 0,
+            });
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("CreateRequest", "Leave")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    str, tempFileIds
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        alert("ส่งวันลาเรียบร้อย");
+                        $('#modal_confirm').modal('hide');
+                        $('#modal_leave').modal('hide');
+                        location.reload();
+                    } else {
+                        alert(response);
                     }
-                });
-            } else {
-                alert('กรุณาแนบไฟล์');
-            }
+                }
+            });
+            //} else {
+            //    alert('กรุณาแนบไฟล์');
+            //}
         });
         function formatDate(date) {
             const daysThai = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];

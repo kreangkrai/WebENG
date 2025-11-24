@@ -56,6 +56,7 @@ namespace WebENG.LeaveServices
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
+                                                          ,[request].comment
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] IS NOT NULL");
@@ -94,7 +95,8 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
-                            color_code = dr["color_code"].ToString()
+                            color_code = dr["color_code"].ToString(),
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -147,6 +149,7 @@ namespace WebENG.LeaveServices
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
+                                                          ,[request].comment
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] = @request_id");
@@ -186,7 +189,8 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
-                            color_code = dr["color_code"].ToString()
+                            color_code = dr["color_code"].ToString(),
+                            comment = dr["comment"].ToString()
                         };
                     }
                     dr.Close();
@@ -225,7 +229,8 @@ namespace WebENG.LeaveServices
                                                    ,[request_date]
                                                    ,[decsription]
                                                    ,[status_request]
-                                                   ,[is_two_step_approve])
+                                                   ,[is_two_step_approve]
+                                                   ,[comment])
                                              VALUES
                                                    (@request_id
                                                    ,@emp_id
@@ -241,7 +246,8 @@ namespace WebENG.LeaveServices
                                                    ,@request_date
                                                    ,@decsription
                                                    ,@status_request
-                                                   ,@is_two_step_approve)");
+                                                   ,@is_two_step_approve
+                                                   ,@comment)");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@request_id", request.request_id);
                 command.Parameters.AddWithValue("@emp_id", request.emp_id);
@@ -258,6 +264,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
                 command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
+                command.Parameters.AddWithValue("@comment", request.comment);
                 command.ExecuteNonQuery();
             }
             finally
@@ -301,6 +308,7 @@ namespace WebENG.LeaveServices
                                                       ,[decsription] = @decsription
                                                       ,[status_request] = @status_request
                                                       ,[is_two_step_approve] = @is_two_step_approve
+                                                      ,[comment] = @comment
                                                  WHERE [request_id] = @request_id AND  [emp_id] = @emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@request_id", request.request_id);
@@ -327,6 +335,7 @@ namespace WebENG.LeaveServices
                 command.Parameters.AddWithValue("@decsription", request.decsription);
                 command.Parameters.AddWithValue("@status_request", request.status_request);
                 command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
+                command.Parameters.AddWithValue("@comment", request.comment);
                 command.ExecuteNonQuery();
             }
             finally
@@ -376,6 +385,7 @@ namespace WebENG.LeaveServices
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [emp_id] = @emp_id");
@@ -415,7 +425,8 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
-                            color_code = dr["color_code"].ToString()
+                            color_code = dr["color_code"].ToString(),
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -469,6 +480,7 @@ namespace WebENG.LeaveServices
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
+                                                          ,[request].comment
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] = @start_request_date");
@@ -508,7 +520,8 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
-                            color_code = dr["color_code"].ToString()
+                            color_code = dr["color_code"].ToString(),
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -562,6 +575,7 @@ namespace WebENG.LeaveServices
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
+                                                          ,[request].comment
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] LIKE '{month}%'");
@@ -600,7 +614,8 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
-                            color_code = dr["color_code"].ToString()
+                            color_code = dr["color_code"].ToString(),
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -654,6 +669,7 @@ namespace WebENG.LeaveServices
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
+                                                          ,[request].comment
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] BETWEEN '{start_day}' AND '{end_day}'");
@@ -692,7 +708,8 @@ namespace WebENG.LeaveServices
                             decsription = dr["decsription"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
-                            color_code = dr["color_code"].ToString()
+                            color_code = dr["color_code"].ToString(),
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }

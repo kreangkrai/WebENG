@@ -352,19 +352,54 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult PreviewTempFile(string tempId, string fileName)
         {
+            if (string.IsNullOrEmpty(tempId) || string.IsNullOrEmpty(fileName))
+                return BadRequest();
+
+            if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+                return BadRequest("Invalid file name");
+
             var filePath = Path.Combine("Uploads", "temp", tempId, fileName);
 
             if (!System.IO.File.Exists(filePath))
                 return NotFound();
 
-            var mimeType = fileName.EndsWith(".pdf")
-                ? "application/pdf"
-                : GetImageMimeType(fileName);
+            var mimeType = GetMimeType(fileName);
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            return File(stream, mimeType, fileName);
+            Response.Headers.Add("Content-Disposition", "inline");
+
+            return new FileStreamResult(stream, mimeType);
         }
 
+        private string GetMimeType(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return "application/octet-stream";
+
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            switch (extension)
+            {
+                case ".pdf":
+                    return "application/pdf";
+
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+
+                case ".png":
+                    return "image/png";
+
+                case ".xls":
+                    return "application/vnd.ms-excel";
+
+                case ".xlsx":
+                    return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                default:
+                    return "application/octet-stream";
+            }
+        }
         private string GetImageMimeType(string fileName)
         {
             var ext = Path.GetExtension(fileName).ToLowerInvariant();

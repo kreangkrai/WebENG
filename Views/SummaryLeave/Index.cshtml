@@ -338,6 +338,46 @@
 
      /*    end Three Quarter   */
 
+    /* วงกลม 3/4 ส่วน (75% เทาอ่อน #E0E0E0 + 25% โปร่งใส) */
+    .three-quarter-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: none;
+        background: conic-gradient(transparent 0deg 270deg, #E0E0E0 270deg 360deg);
+        display: inline-block;
+        margin: 20px;
+        position: relative;
+    }
+
+        /* ทิศทางต่าง ๆ */
+        .three-quarter-circle.left {
+            transform: rotate(0deg);
+        }
+        /* เทาซ้าย 3 ส่วน (ค่าเริ่มต้น) */
+        .three-quarter-circle.right {
+            transform: rotate(90deg);
+        }
+        /* เทาขวา 3 ส่วน */
+        .three-quarter-circle.top {
+            transform: rotate(180deg);
+        }
+        /* เทาบน 3 ส่วน */
+        .three-quarter-circle.bottom {
+            transform: rotate(270deg);
+        }
+        /* เทาล่าง 3 ส่วน */
+
+        /* ถ้าอยากได้เส้นกั้นสีขาว/เทาบาง ๆ ระหว่างส่วนเทากับส่วนใส */
+        .three-quarter-circle.with-line::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 1px solid #ffffff33; /* เส้นขาวอ่อน ๆ */
+            pointer-events: none;
+        }
+
     .leave-warning {
         background-color: #f8d7da !important;
         border-left: 4px solid #dc3545 !important;
@@ -921,13 +961,13 @@
                 }
             } else {
                 if (today >= new Date(start) && today <= new Date(end)) {
-                    index_today = Math.floor((new Date(end) - new Date(start)) / (1000 * 60 * 60 * 24)) - 1;
+                    index_today = Math.floor((today - new Date(start)) / (1000 * 60 * 60 * 24)) + 1;
                 }
                 else {
                     index_today = -1;
                 }
             }
-
+            
             generateDateHeaders(start, end);
 
             let startDate = new Date(start);
@@ -975,7 +1015,7 @@
                         { "duration": "quarter-bottom-left", "class": "quarter-bottom-left" },
                         { "duration": "quarter-top-right", "class": "quarter-top-right" },
                         { "duration": "quarter-bottom-right", "class": "quarter-bottom-right" },
-                        { "duration": "three-quarter-left", "class": "three-quarter-left" }
+                            { "duration": "three-quarter-left", "class": "three-quarter-circle left with-line" }
                         ];
 
                         if (i == 0) {
