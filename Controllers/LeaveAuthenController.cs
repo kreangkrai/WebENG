@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Interface;
@@ -91,6 +92,10 @@ namespace WebENG.Controllers
         [HttpPost]
         public IActionResult UpdateData(string department, List<DepartmentModel> approver_manager, List<ApproverModel> approver_director)
         {
+            if (string.IsNullOrWhiteSpace(department)) {
+                return Json("Invalid department");
+            }
+
             approver_manager.ForEach(f => {
                 f.department = department;
                 f.is_active = true;
@@ -103,24 +108,49 @@ namespace WebENG.Controllers
                 f.level = 2;               
             });
         
-
-            string message = "";
-            message = Department.Delete(department);
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
             {
-                if (message == "Success")
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
                 {
-                    message = Department.Inserts(approver_manager);
-                    if (message == "Success")
+                    try
                     {
-                        message = Approver.Delete(department);
-                        if (message == "Success")
-                        {
-                            message = Approver.Inserts(approver_director);
-                        }
+                        var deptService = new DepartmentService();
+                        var apprService = new ApproverService();
+
+                        deptService.Delete(department, tran);
+                        deptService.Inserts(approver_manager, tran);
+
+                        apprService.Delete(department, tran);
+                        apprService.Inserts(approver_director, tran);
+
+                        tran.Commit();
+                        return Json("Success");
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
                     }
                 }
             }
-            return Json(message);
+                //message = Department.Delete(department);
+            //{
+            //    if (message == "Success")
+            //    {
+            //        message = Department.Inserts(approver_manager);
+            //        if (message == "Success")
+            //        {
+            //            message = Approver.Delete(department);
+            //            if (message == "Success")
+            //            {
+            //                message = Approver.Inserts(approver_director);
+            //            }
+            //        }
+            //    }
+            //}
+            //return Json(message);
         }
 
         [HttpPost]
