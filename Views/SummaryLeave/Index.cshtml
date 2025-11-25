@@ -612,7 +612,7 @@
                         <div class="mb-3 d-flex justify-content-between align-items-center">
                             @*Filter Monthly*@
                             <div class="col-xl-2 col-md-2 col-sm-12 d-flex justify-content-start">
-                                <select id="select_department" class="form-control"></select>
+                                <select id="select_department" class="form-control kanit-regular"></select>
                             </div>
                             <div class="row d-flex align-items-center justify-content-center">
                                 <div id="div_month">
@@ -628,8 +628,8 @@
                                     </div>
                                 </div>
                                 <div class="btn-group kanit-regular" role="group" aria-label="Basic example">
-                                    <button id="btn_group_week" type="button" class="btn btn-outline-info">สัปดาห์</button>
-                                    <button id="btn_group_month" type="button" class="btn btn-outline-success active">เดือน</button>
+                                    <button id="btn_group_week" type="button" class="btn btn-outline-info kanit-regular">สัปดาห์</button>
+                                    <button id="btn_group_month" type="button" class="btn btn-outline-success active kanit-regular">เดือน</button>
                                 </div>
                             </div>
                         </div>
@@ -699,9 +699,10 @@
         function GenerateDepartments(departments) {
             let select = $('#select_department');
             select.empty();
+            select.append(`<option value="ALL" selected>ทุกแผนก</option>`);
             for (let i = 0; i < departments.length; i++) {
                 if (i === 0) {
-                    select.append(`<option value="${departments[i]}" selected>${departments[i]}</option>`);
+                    select.append(`<option value="${departments[i]}">${departments[i]}</option>`);
                 } else {
                     select.append(`<option value="${departments[i]}">${departments[i]}</option>`);
                 }

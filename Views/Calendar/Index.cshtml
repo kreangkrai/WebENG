@@ -616,7 +616,7 @@
                             <div class="col-xl-4 col-md-4 col-sm-12">
                                 <label for="amount_leave">ลาจำนวน</label>
                                 <div class="input-group">
-                                    <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="200" />
+                                    <input id="amount_leave" type="number" class="form-control" style="text-align:end" value="1" min="1" max="200" disabled/>
                                     <div class="input-group-append">
                                         <span class="input-group-text">วัน</span>
                                     </div>
@@ -2146,7 +2146,7 @@
                         leaveFullBtn.classList.add('active');
                         toggleGroupDisplay(dateGroup, true);
                         toggleGroupDisplay(timeGroup, false);
-                        daysInput.disabled = false;
+                        //daysInput.disabled = false;
                         daysInput.value = 1;
                         stopDateInput.value = startDateInput.value;
                         stopDateInput.disabled = false;
@@ -2323,7 +2323,7 @@
                 leaveFullBtn.classList.add('active');
                 toggleGroupDisplay(dateGroup, true);
                 toggleGroupDisplay(timeGroup, false);
-                daysInput.disabled = false;
+                //daysInput.disabled = false;
                 daysInput.value = 1;
                 stopDateInput.value = startDateInput.value;
                 stopDateInput.disabled = false;
@@ -2342,7 +2342,7 @@
                 toggleGroupDisplay(dateGroup, true); // แสดง date_group
                 toggleGroupDisplay(timeGroup, true); // แสดง time_group
                 setHalfDayOptions(); // เปลี่ยนตัวเลือกเป็นครึ่งวันเช้า/บ่าย
-                daysInput.disabled = true; // DISABLE ลาจำนวน
+                //daysInput.disabled = true; // DISABLE ลาจำนวน
 
                 //Check attachment_required
                 type_duration = "Half";
@@ -2357,7 +2357,7 @@
                 toggleGroupDisplay(dateGroup, true); // แสดง date_group
                 toggleGroupDisplay(timeGroup, true); // แสดง time_group
                 setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
-                daysInput.disabled = true; // DISABLE ลาจำนวน
+                //daysInput.disabled = true; // DISABLE ลาจำนวน
 
                 //Check attachment_required
                 type_duration = "Hours";

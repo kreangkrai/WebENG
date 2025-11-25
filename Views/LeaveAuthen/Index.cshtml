@@ -1,6 +1,6 @@
 ﻿@model WebENG.Models.UserModel;
 @{
-    ViewData["Title"] = "Leave Authen";
+    ViewData["Title"] = "Leave Authen";   
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
@@ -656,8 +656,8 @@
                 response.checkers.forEach(item => {
                     approver_checker.push({
                         id: entitlement_checker++,
-                        checker_id: item.checker_id,
-                        checker_name: item.checker_name
+                        emp_id: item.emp_id,
+                        emp_name: item.emp_name
                     });
                 });
                 CreateEntitlementChecker();
@@ -727,11 +727,11 @@
                     approver_manager = [];
                     approver_director = [];
                     for (let i = 0; i < managers.length; i++) {
-                        approver_manager.push({ "id": entitlement_manager, "manager_id": `${managers[i].manager_id}`, "manager_name": `${managers[i].manager_name}` });
+                        approver_manager.push({ "id": entitlement_manager, "emp_id": `${managers[i].emp_id}`, "emp_name": `${managers[i].emp_name}` });
                         entitlement_manager++;
                     }
                     for (let i = 0; i < directors.length; i++) {
-                        approver_director.push({ "id": entitlement_director, "approver_id": `${directors[i].approver_id}`, "approver_name": `${directors[i].approver_name}` });
+                        approver_director.push({ "id": entitlement_director, "emp_id": `${directors[i].emp_id}`, "emp_name": `${directors[i].emp_name}` });
                         entitlement_director++;
                     }
                     CreateEntitlementManager();
@@ -743,7 +743,7 @@
 
         /* Checker */
         function EntitlementCheckerClicked() {
-            approver_checker.push({ "id": entitlement_checker, "checker_id": "", "checker_name": "Please Select" });
+            approver_checker.push({ "id": entitlement_checker, "emp_id": "", "emp_name": "Please Select" });
             CreateEntitlementChecker();
             entitlement_checker++;
         }
@@ -777,7 +777,7 @@
 
                 $('#div_entitlement_checker').append(html);
                 GenerateCheckerOption(approver_checker[i].id);
-                $('#EntitlementChecker' + approver_checker[i].id).val(approver_checker[i].checker_id);
+                $('#EntitlementChecker' + approver_checker[i].id).val(approver_checker[i].emp_id);
             }
         }
 
@@ -795,14 +795,14 @@
         function CheckerChanged(id) {
             let emp_id = $('#EntitlementChecker' + id).val();
             let emp_name = $('#EntitlementChecker' + id + " :selected").text();
-            let check = approver_checker.filter(f => f.checker_id === emp_id);
+            let check = approver_checker.filter(f => f.emp_id === emp_id);
             if (check.length == 0) {
                 const index = approver_checker.findIndex(item => item.id === id);
                 if (index !== -1) {
                     approver_checker[index] = {
                         id: id,
-                        checker_name: emp_name,
-                        checker_id: emp_id
+                        emp_name: emp_name,
+                        emp_id: emp_id
                     };
                 }
             } else {
@@ -822,7 +822,7 @@
 
          /* Manager */
         function EntitlementManagerClicked() {
-            approver_manager.push({ "id": entitlement_manager, "manager_id": "", "manager_name": "Please Select" });
+            approver_manager.push({ "id": entitlement_manager, "emp_id": "", "emp_name": "Please Select" });
             CreateEntitlementManager();
             entitlement_manager++;
         }
@@ -856,7 +856,7 @@
 
                 $('#div_entitlement_manager').append(html);
                 GenerateManagerOption(approver_manager[i].id);
-                $('#EntitlementManager' + approver_manager[i].id).val(approver_manager[i].manager_id);
+                $('#EntitlementManager' + approver_manager[i].id).val(approver_manager[i].emp_id);
             }
         }
 
@@ -880,8 +880,8 @@
                 if (index !== -1) {
                     approver_manager[index] = {
                         id: id,
-                        manager_name: emp_name,
-                        manager_id: emp_id
+                        emp_name: emp_name,
+                        emp_id: emp_id
                     };
                 }
             } else {
@@ -901,7 +901,7 @@
 
         /* Director */
         function EntitlementDirectorClicked() {
-            approver_director.push({ "id": entitlement_director, "approver_id": "", "approver_name": "Please Select" });
+            approver_director.push({ "id": entitlement_director, "emp_id": "", "emp_name": "Please Select" });
             CreateEntitlementDirector();
             entitlement_director++;
         }
@@ -934,7 +934,7 @@
 
                 $('#div_entitlement_director').append(html);
                 GenerateDirectorOption(approver_director[i].id);
-                $('#EntitlementDirector' + approver_director[i].id).val(approver_director[i].approver_id);
+                $('#EntitlementDirector' + approver_director[i].id).val(approver_director[i].emp_id);
             }
         }
 
@@ -951,14 +951,14 @@
         function DirectorChanged(id) {
             let emp_id = $('#EntitlementDirector' + id).val();
             let emp_name = $('#EntitlementDirector' + id + " :selected").text();
-            let check = approver_director.filter(f => f.approver_id === emp_id);
+            let check = approver_director.filter(f => f.emp_id === emp_id);
             if (check.length === 0) {
                 const index = approver_director.findIndex(item => item.id === id);
                 if (index !== -1) {
                     approver_director[index] = {
                         id: id,
-                        approver_name: emp_name,
-                        approver_id: emp_id
+                        emp_name: emp_name,
+                        emp_id: emp_id
                     };
                 }
             } else {
@@ -979,8 +979,8 @@
 
         function UpdateSave() {
             let department = $('#div_department').text();
-            let chk_mamanger = approver_manager.filter(f => f.manager_id === "");
-            let chk_director = approver_director.filter(f => f.approver_id === "");
+            let chk_mamanger = approver_manager.filter(f => f.emp_id === "");
+            let chk_director = approver_director.filter(f => f.emp_id === "");
             if (department !== "") {
                 if (chk_mamanger.length === 0 && chk_director.length === 0 && approver_manager.length > 0 && approver_director.length > 0) {
                     $('#modal_confirm').modal();
@@ -1011,7 +1011,7 @@
 
         $('#btn_checker_save').on('click', async function () {
             $('#SpinModal').modal();
-            let chk_checker = approver_checker.filter(f => f.checker_id === "");
+            let chk_checker = approver_checker.filter(f => f.emp_id === "");
             if (chk_checker.length === 0 && approver_checker.length > 0) {
                 await $.ajax({
                     type: "POST",

@@ -29,12 +29,12 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"SELECT [id]
-                                                  ,[checker_id]
-                                                  ,[checker_level]
-	                                              ,emp.name_en as checker_name
+                                                  ,[Checkers].[emp_id]
+                                                  ,[level]
+	                                              ,emp.name_en as emp_name
                                                   ,[is_active]
                                               FROM [dbo].[Checkers]
-                                              LEFT JOIN [CTL].dbo.[Employees] emp ON [Checkers].checker_id = emp.emp_id");
+                                              LEFT JOIN [CTL].dbo.[Employees] emp ON [Checkers].emp_id = emp.emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -44,9 +44,9 @@ namespace WebENG.LeaveServices
                         CheckerModel checker = new CheckerModel()
                         {
                             id = Int32.Parse(dr["id"].ToString()),
-                            checker_id = dr["checker_id"].ToString(),
-                            checker_name = dr["checker_name"].ToString(),
-                            checker_level = dr["checker_level"] != DBNull.Value ? Convert.ToInt32(dr["checker_level"].ToString()) : 0,
+                            emp_id = dr["emp_id"].ToString(),
+                            emp_name = dr["emp_name"].ToString(),
+                            level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 0,
                             is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false
                         };
                         checkers.Add(checker);
@@ -73,21 +73,21 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"INSERT INTO [dbo].[Checkers]
-                                                   ([checker_id]
-                                                   ,[checker_level]
+                                                   ([emp_id]
+                                                   ,[level]
                                                    ,[is_active])
                                              VALUES
-                                                   (@checker_id
-                                                   ,@checker_level
+                                                   (@emp_id
+                                                   ,@level
                                                    ,@is_active)");
                 SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.Add("@checker_id", SqlDbType.Text);
-                command.Parameters.Add("@checker_level", SqlDbType.Int);
+                command.Parameters.Add("@emp_id", SqlDbType.Text);
+                command.Parameters.Add("@level", SqlDbType.Int);
                 command.Parameters.Add("@is_active", SqlDbType.Bit);
                 for (int i = 0; i < checkers.Count; i++)
                 {
-                    command.Parameters[0].Value = checkers[i].checker_id;
-                    command.Parameters[1].Value = checkers[i].checker_level;
+                    command.Parameters[0].Value = checkers[i].emp_id;
+                    command.Parameters[1].Value = checkers[i].level;
                     command.Parameters[2].Value = checkers[i].is_active;
                     command.ExecuteNonQuery();
                 }

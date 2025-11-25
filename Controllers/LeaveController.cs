@@ -189,6 +189,7 @@ namespace WebENG.Controllers
             request.request_id = request_id;
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
             request.path_file = request_id;
+            request.comment = "";
             List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
             if (!requests.Any(a=>a.start_request_date.Date == request.start_request_date.Date)) //  Check Date
             {

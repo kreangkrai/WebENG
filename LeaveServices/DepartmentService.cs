@@ -31,12 +31,12 @@ namespace WebENG.LeaveServices
                 string strCmd = string.Format($@"SELECT [id]
                                                   ,[departments].[department]
                                                   ,[department_name]
-                                                  ,[approver_level]
-                                                  ,[manager_id]
-	                                              ,emp.name_en as manager_name
+                                                  ,[level]
+                                                  ,[departments].[emp_id]
+	                                              ,emp.name_en as emp_name
                                                   ,[is_active]
                                               FROM [dbo].[departments]
-                                              LEFT JOIN [CTL].dbo.[Employees] emp ON [departments].manager_id = emp.emp_id");
+                                              LEFT JOIN [CTL].dbo.[Employees] emp ON [departments].emp_id = emp.emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -48,9 +48,9 @@ namespace WebENG.LeaveServices
                             id = Int32.Parse(dr["id"].ToString()),
                             department = dr["department"].ToString(),
                             department_name = dr["department_name"].ToString(),
-                            approver_level = dr["approver_level"] != DBNull.Value ? Convert.ToInt32(dr["approver_level"].ToString()) : 0,
-                            manager_id = dr["manager_id"].ToString(),
-                            manager_name = dr["manager_name"].ToString(),
+                            level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 0,
+                            emp_id = dr["emp_id"].ToString(),
+                            emp_name = dr["emp_name"].ToString(),
                             is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()): false
                         };
                         departments.Add(department);
@@ -81,27 +81,27 @@ namespace WebENG.LeaveServices
                 string strCmd = string.Format($@"INSERT INTO [dbo].[departments]
                                                    ([department]
                                                    ,[department_name]
-                                                   ,[approver_level]
-                                                   ,[manager_id]
+                                                   ,[level]
+                                                   ,[emp_id]
                                                    ,[is_active])
                                              VALUES
                                                    (@department
                                                    ,@department_name
-                                                   ,@approver_level
-                                                   ,@manager_id
+                                                   ,@level
+                                                   ,@emp_id
                                                    ,@is_active)");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.Add("@department", SqlDbType.Text);
                 command.Parameters.Add("@department_name", SqlDbType.Text);
-                command.Parameters.Add("@approver_level", SqlDbType.Int);
-                command.Parameters.Add("@manager_id", SqlDbType.Text);
+                command.Parameters.Add("@level", SqlDbType.Int);
+                command.Parameters.Add("@emp_id", SqlDbType.Text);
                 command.Parameters.Add("@is_active", SqlDbType.Bit);
                 for (int i = 0; i < departments.Count; i++)
                 {
                     command.Parameters[0].Value = departments[i].department;
                     command.Parameters[1].Value = departments[i].department_name;
-                    command.Parameters[2].Value = departments[i].approver_level;
-                    command.Parameters[3].Value = departments[i].manager_id;
+                    command.Parameters[2].Value = departments[i].level;
+                    command.Parameters[3].Value = departments[i].emp_id;
                     command.Parameters[4].Value = departments[i].is_active;
                     command.ExecuteNonQuery();
                 }

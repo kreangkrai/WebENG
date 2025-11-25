@@ -1,7 +1,16 @@
 ﻿@model WebENG.Models.UserModel;
+@using WebENG.LeaveModels;
 @{
     List<int> years = ViewBag.listYears;
+    List<LevelModel> levels = ViewBag.levels;
     ViewData["Title"] = "Leave Status";
+    LevelModel operation_only = new LevelModel();
+    if (levels.Count == 1)
+    {
+        operation_only = levels.Where(w => w.level == 0).FirstOrDefault();
+    }  
+
+    string year = DateTime.Now.Year.ToString();
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
@@ -370,6 +379,7 @@
         <span class="kanit-bold d-flex justify-content-center " style="font-size:30px; color:#1C4698; text-align:center;">
             ข้อมูล & ประวัติการลา
         </span>
+       
         @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
     </div>
 
@@ -377,22 +387,33 @@
         <!-- Top Left Side: Employee Info -->
         <div class=" mb-3">
             <form>
-                <div class="col-12">
+                <div class="col-12">       
                     <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
                         <div class="card-header text-white" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); padding: 12px 15px;">
-                            <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ข้อมูลพนักงาน</h5>
+                            <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ตัวกรองวันที่</h5>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="form-group row">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันเริ่มต้น</label>
+                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_start">
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันสิ้นสุด</label>
+                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_stop">
+                            </div>
+                           
+                        </div>
+                    </div>
+                        @if (levels.Any(a => a.level > 0))
+                        {
+                    <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
+                        <div class="card-header text-white" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); padding: 12px 15px;">
+                            <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ข้อมูลพนักงาน</h5>                          
                         </div>
                         <div class="card-body p-3">
                             <!-- Dropdown วันที่เริ่มต้น -->
-                            <div class="form-group row mb-3">
-                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันที่เริ่มต้น</label>
-                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_start">
-                            </div>
-                            <!-- Dropdown วันที่สิ้นสุด -->
-                            <div class="form-group row mb-3">
-                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันที่สิ้นสุด</label>
-                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_stop">
-                            </div>
+                          
+                            
                             <!-- Dropdown กรองแผนก -->
                             <div class="form-group row mb-3">
                                 <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
@@ -417,7 +438,7 @@
                                         <input type="text" id="employeeSearch" class="form-control kanit-regular"
                                                placeholder="ค้นหา รหัส/ชื่อพนักงาน" style="font-size: 15px; border-radius:20px">
                                         <div class="input-group-append">
-                                            <button id="clearSearch" class="btn btn-outline-secondary btn-sm" type="button" style="display:none; border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                            <button id="clearSearch" class="btn btn-outline-secondary btn-sm" type="button" style="border:none;">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
@@ -427,6 +448,8 @@
                             </div>
 
                             <hr />
+                            
+                            
                             <!-- แสดงข้อมูลพนักงาน -->
                             <div id="employeeInfo" class="text-left" style="font-size: 16px; display: none;">
                                 <div class="row">
@@ -462,7 +485,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                        }
+                </div>                       
             </form>
         </div>
 
@@ -473,10 +497,10 @@
                     <div class="card shadow-sm modern-card" style="border-radius:10px; padding:10px">
                         <div class="card-body" overflow-y:auto">
                             <div class="form-group row">
-                                <label class="kanit-regular col-12" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาที่ใช้ (วัน)</label>
-                                <label id="emp_th_balance_leave" class="kanit-regular col-12" style="letter-spacing:1px; color:#666;font-size:20px"></label>
+                                <label class="kanit-regular col-12" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาที่ใช้ปี @year (วัน)</label>
+                                <label id="emp_th_used_leave" class="kanit-regular col-12" style="letter-spacing:1px; color:#666;font-size:20px"></label>
                                 <div class="col-12" style="font-size:18px; ">
-                                    <div id="div_leaves_balance"></div>
+                                    <div id="div_leaves_used"></div>
                                 </div>
                             </div>
                         </div>
@@ -494,37 +518,8 @@
                  border-radius: 20px 20px 0 0; min-height: 60px;">
 
                 <!-- ซ้าย: หัวข้อ + ปี + เดือน -->
-                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
-                    style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
-                    ประวัติการลา @*: วันที่
-                      <input type="date" class="form-control kanit-regular" style="border-radius:20px" id="date_start">
-                    -
-                    <input type="date" class="form-control kanit-regular" style="border-radius:20px" id="date_end">
-                    <select id="yearFilter" class="form-control form-control-sm kanit-medium"
-                            style="width: 90px; color:#555; font-size: 18px; border-radius: 8px; height: 36px; padding: 0 8px; flex-shrink: 0;">
-                        @{ 
-                            for (int i = 0; i < years.Count; i++) {
-                        <option value="@years[i]">@years[i]</option>
-                                }
-                            }
-                    </select>
-                    /
-                    <select id="monthFilter" class="form-control form-control-sm kanit-medium"
-                            style="width: 130px; color:#555; font-size: 18px; border-radius: 8px; height: 36px; padding: 0 8px; flex-shrink: 0;">
-                        <option value="-1">ทุกเดือน</option>
-                        <option value="1">มกราคม</option>
-                        <option value="2">กุมภาพันธ์</option>
-                        <option value="3">มีนาคม</option>
-                        <option value="4">เมษายน</option>
-                        <option value="5">พฤษภาคม</option>
-                        <option value="6">มิถุนายน</option>
-                        <option value="7">กรกฎาคม</option>
-                        <option value="8">สิงหาคม</option>
-                        <option value="9">กันยายน</option>
-                        <option value="10">ตุลาคม</option>
-                        <option value="11">พฤศจิกายน</option>
-                        <option value="12">ธันวาคม</option>
-                    </select> *@
+                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap" style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
+                ประวัติการลา
                 </h4>
 
                 <!-- ขวา: ปุ่ม Export ชิดขวา -->
@@ -646,10 +641,10 @@
                                             <div class="row">
                                                 <div class="col-12">
                                                     <span class="kanit-light">
-                                                        หลักการ: ลูกจ้างมีสิทธิลาเพื่อกิจธุระอันจำเป็นได้ปีละไม่น้อยกว่า 3 วันทำงาน โดยนายจ้างต้องจ่ายค่าจ้างตามปกติ
-                                                        การขอลา: ต้องยื่นใบลาต่อผู้บังคับบัญชา และต้องได้รับอนุญาตก่อนจึงจะหยุดได้
-                                                        ข้อยกเว้น: หากมีเหตุจำเป็นที่ไม่สามารถรอการอนุญาตได้ทัน สามารถลาไปก่อนได้ แต่ต้องชี้แจงเหตุผลให้ผู้บังคับบัญชาทราบโดยเร็ว
-                                                        ข้อสังเกต: จำนวนวันที่ลาติดต่อกันขึ้นอยู่กับดุลยพินิจของนายจ้างและความเหมาะสมของแต่ละกรณี
+                                                        @*หลักการ: ลูกจ้างมีสิทธิลาเพื่อกิจธุระอันจำเป็นได้ปีละไม่น้อยกว่า 3 วันทำงาน โดยนายจ้างต้องจ่ายค่าจ้างตามปกติ
+                                                            การขอลา: ต้องยื่นใบลาต่อผู้บังคับบัญชา และต้องได้รับอนุญาตก่อนจึงจะหยุดได้
+                                                            ข้อยกเว้น: หากมีเหตุจำเป็นที่ไม่สามารถรอการอนุญาตได้ทัน สามารถลาไปก่อนได้ แต่ต้องชี้แจงเหตุผลให้ผู้บังคับบัญชาทราบโดยเร็ว
+                                                            ข้อสังเกต: จำนวนวันที่ลาติดต่อกันขึ้นอยู่กับดุลยพินิจของนายจ้างและความเหมาะสมของแต่ละกรณี*@
                                                     </span>
                                                 </div>
                                             </div>
@@ -816,17 +811,34 @@
         ];
 
         $(document).ready(async function () {
-            await GetEmployee();
+            const today = new Date().toISOString().split('T')[0];
+            let start = new Date(today);
+            start.setDate(1);
+            start = start.toISOString().split('T')[0];
+            document.getElementById('date_start').value = start;
+            document.getElementById('date_stop').value = today;
+
+            await GetEmployee(start, today);
             initSearchEvents();
             loadInitialLeaveHistory();
+
+            // Check Operation Only
+            let operation_only = @Html.Raw(Json.Serialize(operation_only));
+            if (operation_only !== null) {
+                const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
+                selectEmployee(emp);
+            } else {
+                await GetEmployee(start, today);
+            }
+
         });
 
-        async function GetEmployee() {
+        async function GetEmployee(start,stop) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetEmployee", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { },
+                data: { start, stop },
                 success: function (response) {
                     departments = response.departments;
                     employees = response.employees;
@@ -839,15 +851,15 @@
             });
         }
 
-        async function GetRequestHistory(emp_id,year,month) {
+        async function GetRequestHistory(emp_id,start,stop) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetRequestHistory", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { emp_id, year, month },
+                data: { emp_id, start, stop },
                 success: function (response) {
                     requestHistory = response;
-                    
+
                 },
                 error: function () {
                     console.error('โหลดข้อมูลพนักงานล้มเหลว');
@@ -855,21 +867,21 @@
             });
         }
 
-        async function GetLeaveBalance(emp_id, year) {
-            let balances = [];
+        async function GetLeaveUsed(emp_id) {
+            let useds = [];
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetLeaveBalanceByEmpID", "StatusLeave")',
+                url: '@Url.Action("GetLeaveUsedByEmpID", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { emp_id, year },
+                data: { emp_id},
                 success: function (response) {
-                    balances = response;
+                    useds = response;
                 },
                 error: function () {
                     console.error('โหลดสิทธิ์ลาล้มเหลว');
                 }
             });
-            return balances;
+            return useds;
         }
 
         function GenerateDepartmentOption(departments) {
@@ -888,21 +900,44 @@
             });
         }
 
-        function GenerateBalanceLeave(emp_th, balances) {
-            const $div = $('#div_leaves_balance').empty();
+        function GenerateUsedLeave(emp_th, useds) {
+            const $div = $('#div_leaves_used').empty();
             let str = '';
-            balances.forEach(b => {
+            useds.forEach(b => {
                 str += `
                     <div class="row mb-1">
                         <div class="col-8 kanit-light" style="text-align:start">${b.leave_name_th}</div>
                         <div class="col-4 kanit-light" style="text-align:end">
-                            <strong>${b.balance}</strong> / <strong>${b.amount_entitlement}</strong>
+                            <strong>${b.used}</strong> / <strong>${b.amount_entitlement}</strong>
                         </div>
                     </div>`;
             });
             $div.append(str);
-            $('#emp_th_balance_leave').text(emp_th);
+            $('#emp_th_used_leave').text(emp_th);
         }
+
+        $('#date_start').on('change', async function () {
+            let operation_only = @Html.Raw(Json.Serialize(operation_only));
+            let start = $('#date_start').val();
+            let stop = $('#date_stop').val();
+            if (operation_only !== null) {
+                const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
+                selectEmployee(emp);
+            } else {
+                await GetEmployee(start, stop);
+            }
+        });
+        $('#date_stop').on('change', async function () {
+            let operation_only = @Html.Raw(Json.Serialize(operation_only));
+            let start = $('#date_start').val();
+            let stop = $('#date_stop').val();
+            if (operation_only !== null) {
+                const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
+                selectEmployee(emp);
+            } else {
+                await GetEmployee(start, stop);
+            }
+        });
 
         // ===== AUTO-COMPLETE CUSTOM (หลัก) =====
         function initSearchEvents() {
@@ -1032,15 +1067,18 @@
             $('#noEmployee').hide();
             $('#employeeSelect').val(emp.emp_id);
 
-            loadLeaveBalanceAndHistory(emp.emp_id, emp.name_th);
+            loadLeaveUsedAndHistory(emp.emp_id, emp.name_th);
         }
 
-        async function loadLeaveBalanceAndHistory(emp_id, emp_th_name) {
-            const year = new Date().getFullYear();
-            const month = new Date().getMonth() + 1;
-            GetRequestHistory(emp_id, year, month);
-            const balances = await GetLeaveBalance(emp_id, year);          
-            GenerateBalanceLeave(emp_th_name, balances);           
+        async function loadLeaveUsedAndHistory(emp_id, emp_th_name) {
+            //const year = new Date().getFullYear();
+            //const month = new Date().getMonth() + 1;
+            let start = $('#date_start').val();
+            let stop = $('#date_stop').val();
+
+            GetRequestHistory(emp_id, start, stop);
+            const useds = await GetLeaveUsed(emp_id);
+            GenerateUsedLeave(emp_th_name, useds);
             renderLeaveHistory(emp_id);
         }
         function GetDayOfWeekName(date) {
@@ -1052,12 +1090,22 @@
             const [h, m] = timePart.split(':').map(Number);
             return h * 60 + m;
         }
-        
+
         function renderLeaveHistory(emp_id) {
             const $tbody = $('#table_leave tbody').empty();
             requestHistory.forEach((row, index) => {
-                let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${row.request_date.split('T')[0]}`;
-                let start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${row.start_request_date.split('T')[0]}`;
+                let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${new Date(row.request_date).toLocaleDateString('th-TH')}`;
+                let start_request_date = "";
+                if (row.is_full_day) {
+                    if (row.amount_leave_day > 1) {
+                        start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('th-TH')} - ${GetDayOfWeekName(new Date(row.end_request_date))} ${new Date(row.end_request_date).toLocaleDateString('th-TH')}`;
+                    } else {
+                        start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                    }
+                } else {
+                    start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                }
+
                 let duration = 0;
                 let start_request_time = "08:30";
                 let end_request_time = "17:30";

@@ -29,13 +29,13 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"SELECT [id]
-                                              ,[approver_id]
-	                                          ,emp.name_en as approver_name
+                                              ,[Approvers].[emp_id]
+	                                          ,emp.name_en as emp_name
                                               ,[Approvers].[department]
-                                              ,[approver_level]
+                                              ,[level]
                                               ,[is_active]
                                           FROM [dbo].[Approvers]
-                                          LEFT JOIN [CTL].dbo.[Employees] emp ON [Approvers].approver_id = emp.emp_id");
+                                          LEFT JOIN [CTL].dbo.[Employees] emp ON [Approvers].emp_id = emp.emp_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -46,9 +46,9 @@ namespace WebENG.LeaveServices
                         {
                             id = Int32.Parse(dr["id"].ToString()),
                             department = dr["department"].ToString(),
-                            approver_id = dr["approver_id"].ToString(),
-                            approver_name = dr["approver_name"].ToString(),
-                            approver_level = dr["approver_level"] != DBNull.Value ? Convert.ToInt32(dr["approver_level"].ToString()) : 0,
+                            emp_id = dr["emp_id"].ToString(),
+                            emp_name = dr["emp_name"].ToString(),
+                            level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 0,
                             is_active = dr["is_active"] != DBNull.Value ? Convert.ToBoolean(dr["is_active"].ToString()) : false
                         };
                         approvers.Add(approver);
@@ -75,25 +75,25 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"INSERT INTO [dbo].[Approvers]
-                                                                   ([approver_id]
+                                                                   ([emp_id]
                                                                    ,[department]
-                                                                   ,[approver_level]
+                                                                   ,[level]
                                                                    ,[is_active])
                                                              VALUES
-                                                                   (@approver_id
+                                                                   (@emp_id
                                                                    ,@department
-                                                                   ,@approver_level
+                                                                   ,@level
                                                                    ,@is_active)");
                 SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.Add("@approver_id", SqlDbType.Text);
+                command.Parameters.Add("@emp_id", SqlDbType.Text);
                 command.Parameters.Add("@department", SqlDbType.Text);
-                command.Parameters.Add("@approver_level", SqlDbType.Int);
+                command.Parameters.Add("@level", SqlDbType.Int);
                 command.Parameters.Add("@is_active", SqlDbType.Bit);
                 for (int i = 0; i < approvers.Count; i++)
                 {
-                    command.Parameters[0].Value = approvers[i].approver_id;
+                    command.Parameters[0].Value = approvers[i].emp_id;
                     command.Parameters[1].Value = approvers[i].department;
-                    command.Parameters[2].Value = approvers[i].approver_level;
+                    command.Parameters[2].Value = approvers[i].level;
                     command.Parameters[3].Value = approvers[i].is_active;
                     command.ExecuteNonQuery();
                 }

@@ -21,6 +21,7 @@ namespace WebENG.Controllers
         private IDepartment Department;
         private IApprover Approver;
         private IChecker Checker;
+   
         public LeaveAuthenController()
         {
             Accessory = new AccessoryService();
@@ -94,12 +95,12 @@ namespace WebENG.Controllers
                 f.department = department;
                 f.is_active = true;
                 f.department_name = department;
-                f.approver_level = 1;
+                f.level = 1;
             });
             approver_director.ForEach(f => {
                 f.department = department;
                 f.is_active = true;
-                f.approver_level = 2;               
+                f.level = 2;               
             });
         
 
@@ -127,7 +128,7 @@ namespace WebENG.Controllers
         {
             approver_checker.ForEach(f => {
                 f.is_active = true;
-                f.checker_level = 3;
+                f.level = 3;
             });
 
             string message = "";

@@ -24,6 +24,7 @@ namespace WebENG.Controllers
         private ILeaveType LeaveType;
         private IRequest Requests;
         private ILeave Leave;
+        private ILevel Level;
         public StatusLeaveController()
         {
             Accessory = new AccessoryService();
@@ -33,6 +34,7 @@ namespace WebENG.Controllers
             LeaveType = new LeaveTypeService();
             Requests = new RequestService();
             Leave = new LeaveService();
+            Level = new LevelService();
         }
         public IActionResult Index()
         {
@@ -59,6 +61,10 @@ namespace WebENG.Controllers
                     years.Add(y);
                 }
                 ViewBag.listYears = years;
+
+                List<LevelModel> levels = Level.GetLevelByEmpID(u.emp_id);
+                ViewBag.levels = levels;
+
                 return View(u);
             }
             else
@@ -69,19 +75,23 @@ namespace WebENG.Controllers
 
 
         [HttpGet]
-        public IActionResult GetEmployee()
+        public IActionResult GetEmployee(string start, string stop)
         {
+            List<RequestModel> requests = Requests.GetRequestByDurationDay(start,stop);
+            List<string> emps = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
+
             List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
-            employees = employees.OrderBy(o => o.name_en).ToList();
+            employees = employees.Where(w => emps.Contains(w.emp_id)).OrderBy(o => o.name_en).ToList();
             List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
             var data = new { employees = employees, departments = departments };
             return Json(data);
         }
 
         [HttpGet]
-        public IActionResult GetLeaveBalanceByEmpID(string emp_id, int year)
+        public IActionResult GetLeaveUsedByEmpID(string emp_id)
         {
-            List<BalanceLeaveModel> balances = new List<BalanceLeaveModel>();
+            int year = DateTime.Now.Year;
+            List<UsedLeaveModel> useds = new List<UsedLeaveModel>();
             List<string> status_pending = new List<string>()
             {
                 "Pending",
@@ -127,39 +137,42 @@ namespace WebENG.Controllers
                         used_leave += Math.Round(((double)requests[j].amount_leave_hour) / 8.0, 2);
                     }
                 }
-                decimal b = (decimal)((double)leaves[i].amount_entitlement - used_leave);
+                //decimal b = (decimal)((double)leaves[i].amount_entitlement - used_leave);
 
-                BalanceLeaveModel balance = new BalanceLeaveModel()
+                UsedLeaveModel used = new UsedLeaveModel()
                 {
                     leave_type_id = leaves[i].leave_type_id,
                     leave_type_code = leaves[i].leave_type_code,
                     leave_name_en = leaves[i].leave_name_en,
                     leave_name_th =leaves[i].leave_name_th,
                     amount_entitlement = leaves[i].amount_entitlement,
-                    balance = b
+                    used = (decimal)used_leave
                 };
-                balances = balances.GroupBy(g => g.leave_type_code).Select(s => new BalanceLeaveModel()
+                useds = useds.GroupBy(g => g.leave_type_code).Select(s => new UsedLeaveModel()
                 {
                     leave_type_code = s.Key,
                     leave_type_id = s.FirstOrDefault().leave_type_id,
                     leave_name_en = s.FirstOrDefault().leave_name_en,
                     leave_name_th= s.FirstOrDefault().leave_name_th.Split(' ')[0],
                     amount_entitlement = s.FirstOrDefault().amount_entitlement,
-                    balance = s.FirstOrDefault().balance
+                    used = s.FirstOrDefault().used
 
                 }).ToList();
-                balances.Add(balance);
+                useds.Add(used);
 
             }
             
-            return Json(balances);
+            return Json(useds);
         }
 
         [HttpGet]
-        public IActionResult GetRequestHistory(string emp_id,int year,int month)
+        public IActionResult GetRequestHistory(string emp_id,string start , string stop)
         {
+            DateTime _start = DateTime.Parse(start);
+            DateTime _stop = DateTime.Parse(stop);
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
-            requests = requests.Where(w => w.start_request_date.Year == year && w.start_request_date.Month == month).ToList();
+            requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
+            requests = requests.OrderBy(o => o.start_request_date).ToList();
             return Json(requests);
         }
     }
