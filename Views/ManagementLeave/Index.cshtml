@@ -451,6 +451,35 @@
         z-index: 15 !important;
     }
 
+    #modal_leave .modal-body {
+        height: auto !important; /* ลบ 600px ออก */
+        max-height: 70vh; 
+    }
+
+    .modal-footer {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        z-index: 1;
+        box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+    }
+
+    /* ทำให้ modal ลูกซ้อนทับ modal หลักได้สวย ๆ */
+    .modal-backdrop.show:nth-of-type(even) {
+        opacity: 0.6 !important;
+    }
+
+    /* modal หลักย่อลงนิดนึงตอนมี modal ลูก */
+    body.modal-open .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+
+    /* modal ลูกเด้งเต็ม */
+    body.modal-open .modal + .modal .modal-dialog {
+        transform: scale(1);
+        z-index: 1060 !important;
+    }
+
 </style>
 
 <div class="row" style="row-gap:15px">
@@ -614,7 +643,7 @@
             </div>
 
             <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
-            <div class="modal-footer d-flex">
+            @* <div class="modal-footer d-flex">
                 <div class="container d-flex justify-content-end">
                     <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                         <div class="row">
@@ -636,7 +665,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> *@
 
             @* <!-- Modal : บันทึกการตั้งค่า-->
             <div class="modal fade" id="modal_reject" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true" >
@@ -769,7 +798,7 @@
     <!------------------------------------------------------------------------------------------->
 
     <!-- Task Modal -->
-    <div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
             <div class="modal-content kanit-regular">
                 <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
@@ -778,104 +807,170 @@
                         <span aria-hidden="true" style="color: white;">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" style="overflow-y:auto;height:600px; color:#555555">
+                <div class="modal-body" style=" color:#555555; overflow-y:auto">
                     <form>
-                        <div class="form-group row">
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">ข้อมูลการลา</label>
-                                    <div style="padding-left:20px;">
-                                        <div>
-                                            <label class="col-12 kanit-light">นายสาริศ ตรีปทุมรัตน์ (CES-RD)</label>
-                                            <label class="col-12 kanit-light">ลากิจ(ราชการ) (1 วัน)</label>
-                                            <label class="col-12 kanit-light">ทำบัตรประชาชน</label>
-                                            <label class="col-12 kanit-light">ลาวันที่ จ. 24/11/25 เวลา 08:30-17:30</label>
-                                        </div>
+                        <!-- ข้อมูลการลา -->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                                    <i class="fas fa-info-circle mr-2"></i>ข้อมูลการลา
+                                </label>
+                                <div style="padding-left:20px;">
+                                    <div>
+                                        <label class="col-12 kanit-light">นายสาริศ ตรีปทุมรัตน์ (CES-RD)</label>
+                                        <label class="col-6 kanit-light">ลากิจ(ราชการ) (1 วัน)</label>
+                                        <label class="col-6 kanit-light">ทำบัตรประชาชน</label>
+                                        <label class="col-12 kanit-light">ลาวันที่ จ. 24/11/25 เวลา 08:30-17:30</label>
                                     </div>
                                 </div>
+                                <hr />
                             </div>
                         </div>
-                        <!--------------------------------------------------------->
-                        @*<div class="form-group row">
-                             <div style="padding:10px;">
-                                <span class="col-12 kanit-regular">นายสาริศ ตรีปทุมรัตน์ (066403)</span>
-                                <span class="col-12 kanit-light">แผนก: </span>
-                                <span class="col-12 kanit-regular">CES-RD</span>
-                            </div> 
-                        </div>*@
-                        <!--------------------------------------------------------->
+
                         <!-- ส่วนแสดงรายการไฟล์ -->
-                        <div id="fileList" class="form-group row">
-                            <div class="col-12">
-                                <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">เอกสารที่แนบ</label>
-                                <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                    <div class="list-group" id="fileListContainer">
-                                        <!-- ตัวอย่างไฟล์ -->
-                                        <div class="list-group-item d-flex align-items-center file-item">
-                                            <i class="fas fa-file-image text-primary mr-2"></i>
-                                            <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
+                        <div class="col-12 mb-4" id="fileList">
+                            <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                                <i class="fas fa-paperclip mr-2"></i>เอกสารที่แนบ
+                            </label>
+                            <div class="card" style="border-radius: 10px; ">
+                                <div class="list-group" id="fileListContainer">
+                                    <!-- ตัวอย่างไฟล์ -->
+                                    <div class="list-group-item d-flex align-items-center file-item">
+                                        <i class="fas fa-file-image text-primary mr-2"></i>
+                                        <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
+                                    </div>
+                                    <div class="list-group-item d-flex align-items-center file-item">
+                                        <i class="fas fa-file-pdf text-danger mr-2"></i>
+                                        <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="col-12">
+                            <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
+                                <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
+                            </label>
+
+                            <div class="timeline-container" style="position: relative; padding-left: 35px;">
+                                <!-- เส้นกลาง -->
+                                <div style="position: absolute; left: 15px; top: 15px; bottom: 10px; width: 3px; background: #e9ecef; border-radius: 3px;"></div>
+                                
+                                <div class="d-flex align-items-center mb-3 text-success">
+                                    <i class="fas fa-check-circle fa-lg mr-3"></i>
+                                    <div class="flex-grow-1">
+                                        <span class="kanit-medium" style="color:#555">Chakrit R.</span>
+                                        <span class="text-muted kanit-regular">(Manager)</span>
+                                        <div>
+                                            <span class="text-success kanit-medium">อนุมัติแล้ว</span>
+                                            <span class="text-muted kanit-medium"> • 26/11/25 14:32</span>
                                         </div>
-                                        <div class="list-group-item d-flex align-items-center file-item">
-                                            <i class="fas fa-file-pdf text-danger mr-2"></i>
-                                            <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
+                                    </div>
+                                    <hr />
+                                </div>
+                                <div class="d-flex align-items-center mb-3 text-warning">
+                                    <i class="fas fa-clock fa-lg mr-3"></i>
+                                    <div class="flex-grow-1">
+                                        <span class="kanit-medium" style="color:#555">Siriporn S.</span>
+                                        <span class="text-muted kanit-regular">(Checker)</span>
+                                        <div>
+                                            <span class="text-muted kanit-medium">รอตรวจสอบ</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!----------------------------------------------------------------------------------------->
-                        
-                        <div class="form-group row">
-                            <div class="col-12">
-                                <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">ไทม์ไลน์</label>
-                                <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                    <div class="list-group" id="approverList">
-                                        <!-- ผู้อนุมัติคนที่ 1 -->
-                                        <div class="list-group-item d-flex align-items-center approver-item">
-                                            <div class="col-6">
-                                                <i class="fas fa-user-check mr-2 text-primary"></i>
-                                                <span class="kanit-regular">Chakrit R.</span>
+                                
+                                <!-- รายการที่ 1 (อนุมัติแล้ว) -->
+                                @* <div class="d-flex mb-4" style="position: relative;">
+                                    <div style="position: absolute; left: -31px; top: 2px;">
+                                        <i class="fas fa-check-circle text-success" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div class="bg-white rounded shadow-sm p-3 flex-grow-1" style="border-left: 4px solid #28a745;">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong class="kanit-medium">Chakrit R.</strong>
+                                                <span class="text-muted kanit-regular" style="font-size: 0.9rem;"> (Manager)</span>
                                             </div>
-                                            <div class="col-6">
-                                                <span class="kanit-regular text-muted">Manager</span>
-                                            </div>
+                                            <span class="badge badge-success kanit-medium">อนุมัติ</span>
                                         </div>
-                                        <!-- ผู้อนุมัติคนที่ 3 -->
-                                        <div class="list-group-item d-flex align-items-center approver-item">
-                                            <div class="col-6">
-                                                <i class="fas fa-user-check mr-2 text-primary"></i>
-                                                <span class="kanit-regular">Siriporn S.</span>
-                                            </div>
-                                            <div class="col-6">
-                                                <span class="kanit-regular text-muted">Admin</span>
-                                            </div>
+                                        <div class="text-muted mt-1" style="font-size: 0.85rem;">
+                                            <i class="far fa-clock mr-1"></i>24 พ.ย. 2568 14:32 น.
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                </div> 
+
+                                <!-- รายการที่ 2 (รออนุมัติ) -->
+                                <div class="d-flex mb-4" style="position: relative;">
+                                    <div style="position: absolute; left: -31px; top: 2px;">
+                                        <i class="fas fa-clock text-warning" style="font-size: 24px;"></i>
+                                    </div>
+                                    <div class="bg-white rounded shadow-sm p-3 flex-grow-1" style="border-left: 4px solid #ffc107; opacity: 0.8;">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <strong class="kanit-medium">Siriporn S.</strong>
+                                                <span class="text-muted kanit-regular" style="font-size: 0.9rem;"> (Admin)</span>
+                                            </div>
+                                            <span class="badge badge-warning text-dark kanit-medium">รออนุมัติ</span>
+                                        </div>
+                                        <div class="text-muted mt-1" style="font-size: 0.85rem;">
+                                            <i class="far fa-clock mr-1"></i>ยังไม่ดำเนินการ
+                                        </div>
+                                    </div>
+                                </div>*@
+                            
                     </form>
                 </div>
                 <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
                 <div class="modal-footer d-flex">
-                    <div class="container d-flex justify-content-end">
-                        <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
-                            <div class="row">
-                                <div class="col-4">
-                                    <button id="btn_reject_leave" data-target="#modal_reject" class="btn modern-btn btn-outline-danger kanit-medium" style=" border-radius:8px; width:90px; letter-spacing:1px">
-                                        ปฏิเสธ
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button id="btn_resubmit_leave" data-target="#modal_resubmit" class="btn modern-btn btn-outline-warning kanit-medium" style=" border-radius:8px; width:90px; letter-spacing:1px">
-                                        ส่งกลับ
-                                    </button>
-                                </div>
-                                <div class="col-4">
-                                    <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success kanit-medium" style=" border-radius:8px; width:90px; letter-spacing:1px">
-                                        อนุมัติ
-                                    </button>
-                                </div>
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" aria-label="Username" aria-describedby="basic-addon1">
+                    </div>
+                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
+                        <div class="row kanit-medium">
+                            @* <div class="ml-2">
+                            <button id="btn_reject_leave" data-target="#modal_reject" class="btn modern-btn btn-outline-danger" style=" border-radius:8px; width:90px; letter-spacing:1px">
+                            ปฏิเสธ
+                            </button>
+                            </div>
+                            <div class="ml-2">
+                            <button id="btn_resubmit_leave" data-target="#modal_resubmit" class="btn modern-btn btn-outline-warning" style=" border-radius:8px; width:90px; letter-spacing:1px">
+                            ส่งกลับ
+                            </button>
+                            </div>
+                            <div class="ml-2">
+                            <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success" style=" border-radius:8px; width:90px; letter-spacing:1px">
+                            อนุมัติ
+                            </button>
+                            </div>*@
+                            <div class="ml-2">
+                                <button id="btn_reject_leave"
+                                        class="btn modern-btn btn-outline-danger"
+                                        style="border-radius:8px; width:90px; letter-spacing:1px"
+                                        data-toggle="modal"
+                                        data-target="#modal_reject">
+                                    ปฏิเสธ
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button id="btn_resubmit_leave"
+                                        class="btn modern-btn btn-outline-warning"
+                                        style="border-radius:8px; width:90px; letter-spacing:1px"
+                                        data-toggle="modal"
+                                        data-target="#modal_resubmit">
+                                    ส่งกลับ
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button id="btn_approve_leave"
+                                        class="btn modern-btn btn-success"
+                                        style="border-radius:8px; width:90px; letter-spacing:1px"
+                                        data-toggle="modal"
+                                        data-target="#modal_approve">
+                                    อนุมัติ
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -884,8 +979,6 @@
         </div>
     </div>
     <!------------------------------------------------------------------------------------------------>
-
-
 
     <!-- Table Leave Log -->
     <div class="col-xl-12 col-md-12 col-sm-12">
@@ -1005,77 +1098,10 @@
                 </table>
             </div>
 
-            <!-- Modal : บันทึกการตั้งค่า-->
-            <div class="modal fade" id="modal_confirm" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true">
-                <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-                    <div class="modal-content kanit-regular" style="border-radius: 10px; overflow: hidden;">
-                        <div class="modal-header" style="background: linear-gradient(90deg, #034694 0%, #022f5b 100%); border-bottom: none; padding: 15px;">
-                            <h5 class="modal-title kanit-medium" style="color: white; font-size: 24px; letter-spacing: 1px;" id="modal_confirm_title">บันทึกการตั้งค่า</h5>
-                            <button type="button" class="close" style="color: white; font-size: 24px;" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" style="padding: 20px; text-align: center;">
-                            <div id="confirm_content">
-                                <i class="fas fa-save icon-shadow mb-3" style="font-size: 40px; color: #034694;"></i>
-                                <p class="kanit-light" style="font-size: 20px; color: #333; margin-bottom: 0;">คุณต้องการบันทึกหรือไม่?</p>
-                            </div>
-                        </div>
-                        <div class="modal-footer" style="border-top: none; padding: 15px 30px; background-color: #f8f9fa;">
-                            <div class="row justify-content-center" style=" width: 100%;">
-                                <div class="col-xl-4 col-md-4 col-sm-4">
-                                    <button type="button" class="btn modern-btn btn-cancel kanit-medium" data-dismiss="modal">ยกเลิก</button>
-                                </div>
-                                <div class="col-xl-4 col-md-4 col-sm-4">
-                                    <button type="button" class="btn modern-btn btn-save kanit-medium" id="confirm_ok">ยืนยัน</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 
-
-
-
-    <!------------------------------------------------------------>
-    <div class="col-xl-12 col-md-12 col-sm-12">
-        <div class="card card-dark">
-            <div class="card-body" style="height:700px; overflow-y:auto">
-                <form>
-                    <div class="form-group">
-                        <div class="d-flex justify-content-end">
-                            <div class="col-xl-2 col-md-2 col-sm-6">
-                                <select class="kanit-light form-control">
-                                    <option value="Pending">รออนุมัติ</option>
-                                    <option value="Approved">อนุมัติแล้ว</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <table id="table_leave" class="table table-sm table-bordered table-hover text-center w-100">
-                            <thead class="kanit-light" style="background-color:lightgrey">
-                                <tr>
-                                    <th>รหัสพนักงาน</th>
-                                    <th>รายชื่อ</th>
-                                    <th>ระดับ</th>
-                                    <th>แผนก</th>
-                                    <th>วันที่เริ่มทำงาน</th>
-                                    <th>สถานะ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>          
-        </div>
-    </div>
 </div>
 
 <partial name="ModalSpin" />
@@ -1085,48 +1111,6 @@
     <script type="text/javascript">
         let table_leave = null;
         let leaves = [];
-        $(document).ready(async function () {
-            //await GetData();
-            init();
-
-                // ปุ่มปฏิเสธ
-                $('#btn_reject_leave').on('click', function () {
-                    $('#modal_reject').modal('show');
-                });
-
-                $('#confirm_reject').on('click', function () {
-                    // TODO: เรียก API หรือ submit form ปฏิเสธ
-                    alert('ปฏิเสธคำขอเรียบร้อยแล้ว');
-                    $('#modal_reject').modal('hide');
-                });
-
-                // ปุ่มส่งกลับ
-                $('#btn_resubmit_leave').on('click', function () {
-                    $('#modal_resubmit').modal('show');
-                });
-
-                $('#confirm_resubmit').on('click', function () {
-                    let reason = $('#resubmit_reason').val().trim();
-                    if (!reason) {
-                        alert('กรุณาระบุเหตุผลที่ส่งกลับ');
-                        return;
-                    }
-                    // TODO: ส่ง reason ไปยัง backend
-                    alert('ส่งกลับเรียบร้อยแล้ว\nเหตุผล: ' + reason);
-                    $('#modal_resubmit').modal('hide');
-                });
-
-                // ปุ่มอนุมัติ
-                $('#btn_approve_leave').on('click', function () {
-                    $('#modal_approve').modal('show');
-                });
-
-                $('#confirm_approve').on('click', function () {
-                    // TODO: เรียก API อนุมัติ
-                    alert('อนุมัติคำขอเรียบร้อยแล้ว');
-                    $('#modal_approve').modal('hide');
-                });
-        });
 
         async function GetData() {
             await $.ajax({
@@ -1142,43 +1126,29 @@
         }
 
         $(document).ready(function () {
-    // ปุ่มปฏิเสธ
-    $('#btn_reject_leave').on('click', function () {
-        $('#modal_reject').modal('show');
-    });
+            // เมื่อกดยืนยันใน modal ลูก → ปิดทั้งคู่
+            $('#confirm_reject').on('click', function () {
+                alert('ปฏิเสธเรียบร้อยแล้ว');
+                $('#modal_reject').modal('hide');
+                $('#modal_leave').modal('hide'); // ปิด modal หลักด้วย
+            });
 
-    $('#confirm_reject').on('click', function () {
-        // TODO: เรียก API หรือ submit form ปฏิเสธ
-        alert('ปฏิเสธคำขอเรียบร้อยแล้ว');
-        $('#modal_reject').modal('hide');
-    });
+            $('#confirm_resubmit').on('click', function () {
+                let reason = $('#resubmit_reason').val().trim();
+                if (!reason) {
+                    alert('กรุณาระบุเหตุผล');
+                    return;
+                }
+                alert('ส่งกลับแล้ว: ' + reason);
+                $('#modal_resubmit').modal('hide');
+                $('#modal_leave').modal('hide');
+            });
 
-    // ปุ่มส่งกลับ
-    $('#btn_resubmit_leave').on('click', function () {
-        $('#modal_resubmit').modal('show');
-    });
-
-    $('#confirm_resubmit').on('click', function () {
-        let reason = $('#resubmit_reason').val().trim();
-        if (!reason) {
-            alert('กรุณาระบุเหตุผลที่ส่งกลับ');
-            return;
-        }
-        // TODO: ส่ง reason ไปยัง backend
-        alert('ส่งกลับเรียบร้อยแล้ว\nเหตุผล: ' + reason);
-        $('#modal_resubmit').modal('hide');
-    });
-
-    // ปุ่มอนุมัติ
-    $('#btn_approve_leave').on('click', function () {
-        $('#modal_approve').modal('show');
-    });
-
-    $('#confirm_approve').on('click', function () {
-        // TODO: เรียก API อนุมัติ
-        alert('อนุมัติคำขอเรียบร้อยแล้ว');
-        $('#modal_approve').modal('hide');
-    });
+            $('#confirm_approve').on('click', function () {
+                alert('อนุมัติเรียบร้อยแล้ว');
+                $('#modal_approve').modal('hide');
+                $('#modal_leave').modal('hide');
+            });
 
 
             // 1. เมื่อคลิก Select All
@@ -1213,16 +1183,7 @@
                 }
             });
 
-            // 3. (เพิ่มเติม) ป้องกันการคลิกแถวแล้ว checkbox ไม่เปลี่ยน (ถ้ามี clickable-row)
-            $('.clickable-row').on('click', function (e) {
-                // ถ้าคลิกที่ checkbox เอง ไม่ต้องทำอะไร
-                if ($(e.target).closest('input[type="checkbox"]').length) {
-                    return;
-                }
-
-                var checkbox = $(this).find('.approve-checkbox');
-                checkbox.prop('checked', !checkbox.prop('checked')).trigger('change');
-            });
+            
 });
         // function init() {
         //     $(document).ready(function () {
