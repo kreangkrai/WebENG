@@ -908,11 +908,42 @@
         /* action เพิ่มประเภทการลา */
         function GenerateLeaveGroup(leaves) {
             var html = '';
-            for (var i = 0; i < leaves.length; i++) {
+            let annual = leaves.filter(f => f.leave_name_th.includes("ลาพักร้อน")).map(m => m)[0];
+            if (annual !== undefined) {
                 html += `<div class="form-group row">
+                                       <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                       style="border-radius:7px; height:40px" onClick="LeaveGroupClicked('${annual.leave_type_id}', this)">
+                                    ${annual.leave_name_th}
+                               </button>
+                         </div>`;
+            }
+            let sick = leaves.filter(f => f.leave_name_th.includes("ลาป่วย")).map(m => m)[0];
+            if (sick !== undefined) {
+                html += `<div class="form-group row">
+                                       <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                       style="border-radius:7px; height:40px" onClick="LeaveGroupClicked('${sick.leave_type_id}', this)">
+                                    ${sick.leave_name_th}
+                               </button>
+                         </div>`;
+            }
+           
+            for (var i = 0; i < leaves.length; i++) {
+                if (!leaves[i].leave_name_th.includes("ลาพักร้อน") && !leaves[i].leave_name_th.includes("ลาป่วย") && !leaves[i].leave_name_th.includes("ลาไม่รับค่าจ้าง")) {
+                    html += `<div class="form-group row">
                                        <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
                                        style="border-radius:7px; height:40px" onClick="LeaveGroupClicked('${leaves[i].leave_type_id}', this)">
                                     ${leaves[i].leave_name_th}
+                               </button>
+                         </div>`;
+                }
+            }
+
+            let unpaid = leaves.filter(f => f.leave_name_th.includes("ลาไม่รับค่าจ้าง")).map(m => m)[0];
+            if (unpaid !== undefined) {
+                html += `<div class="form-group row">
+                                       <button type="button" id="leave_group_${i}" class="btn btn-outline-primary form-control kanit-medium leave-group-btn"
+                                       style="border-radius:7px; height:40px" onClick="LeaveGroupClicked('${unpaid.leave_type_id}', this)">
+                                    ${unpaid.leave_name_th}
                                </button>
                          </div>`;
             }

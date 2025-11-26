@@ -39,7 +39,7 @@ namespace WebENG.LeaveServices
                                                     SELECT [ELEAVE].dbo.[Approvers].emp_id,
                                                     emp.name_en as emp_name,
                                                     'Director' as position,
-                                                    emp.department,
+                                                    [ELEAVE].dbo.[Approvers].department,
                                                     level
                                                     FROM [ELEAVE].dbo.[Approvers]
                                                     LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Approvers].emp_id = emp.emp_id

@@ -18,7 +18,6 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly CTLInterfaces.IEmployee CTLEmployees;
-        private IPosition Position;
         private IDepartment Department;
         private IApprover Approver;
         private IChecker Checker;
@@ -27,7 +26,6 @@ namespace WebENG.Controllers
         {
             Accessory = new AccessoryService();
             CTLEmployees = new CTLServices.EmployeeService();
-            Position = new PositionService();
             Department = new DepartmentService();
             Approver = new ApproverService();
             Checker = new CheckerService();
@@ -135,22 +133,6 @@ namespace WebENG.Controllers
                     }
                 }
             }
-                //message = Department.Delete(department);
-            //{
-            //    if (message == "Success")
-            //    {
-            //        message = Department.Inserts(approver_manager);
-            //        if (message == "Success")
-            //        {
-            //            message = Approver.Delete(department);
-            //            if (message == "Success")
-            //            {
-            //                message = Approver.Inserts(approver_director);
-            //            }
-            //        }
-            //    }
-            //}
-            //return Json(message);
         }
 
         [HttpPost]
@@ -171,91 +153,5 @@ namespace WebENG.Controllers
             }
             return Json(message);
         }
-
-        //    [HttpPost]
-        //    public IActionResult CreateUser(string emp_id)
-        //    {
-        //        List<CTLModels.EmployeeModel> employees = CTLEmployees.GetEmployees();
-        //        CTLModels.EmployeeModel employee = employees.Where(w => w.emp_id == emp_id).FirstOrDefault();
-        //        List<LeavePositionModel> ps = Position.GetPositions();
-        //        bool chk = ps.Any(a => a.emp_id == emp_id);
-        //        if (!chk)
-        //        {
-        //            List<PositionModel> positions = new List<PositionModel>()
-        //        {
-        //            new PositionModel()
-        //            {
-        //                emp_id = emp_id,
-        //                emp_name = employee.name_en,
-        //                department = "",
-        //                level = "",
-        //                img = "",
-        //                is_active = true,
-        //                position = employee.position,
-        //            }
-        //        };
-        //            string message = Position.insert(positions);
-        //            return Json(message);
-        //        }
-        //        return Json("emp id already exists");
-        //    }
-
-        //    [HttpPost]
-        //    public IActionResult UpdateUser(string emp_id,string[] manager_departments,bool director,bool auditor)
-        //    {
-        //        string message = Position.delete(emp_id);
-        //        if (message == "Success")
-        //        {
-        //            // Manager Of Department
-        //            List<PositionModel> positions = new List<PositionModel>();
-        //            for (int i = 0; i < manager_departments.Length; i++)
-        //            {
-        //                PositionModel position = new PositionModel()
-        //                {
-        //                    emp_id = emp_id,
-        //                    emp_name = "",
-        //                    department = manager_departments[i],
-        //                    level = "Manager",
-        //                    img = "",
-        //                    is_active = true,
-        //                    position = "",
-        //                };
-        //                positions.Add(position);
-        //            }
-
-        //            //Director
-        //            if (director)
-        //            {
-        //                PositionModel position = new PositionModel()
-        //                {
-        //                    emp_id = emp_id,
-        //                    emp_name = "",
-        //                    department = "",
-        //                    level = "Director",
-        //                    img = "",
-        //                    is_active = true,
-        //                    position = "",
-        //                };
-        //                positions.Add(position);
-        //            }
-        //            //Auditor
-        //            if (auditor)
-        //            {
-        //                PositionModel position = new PositionModel()
-        //                {
-        //                    emp_id = emp_id,
-        //                    emp_name = "",
-        //                    department = "",
-        //                    level = "Auditor",
-        //                    img = "",
-        //                    is_active = true,
-        //                    position = "",
-        //                };
-        //                positions.Add(position);
-        //            }
-        //            message = Position.insert(positions);
-        //        }
-        //        return Json(message);
-        //    }
     }
 }

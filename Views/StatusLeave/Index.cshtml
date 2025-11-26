@@ -826,7 +826,9 @@
             let operation_only = @Html.Raw(Json.Serialize(operation_only));
             if (operation_only !== null) {
                 const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
-                selectEmployee(emp);
+                if (emp !== undefined) {
+                    selectEmployee(emp);
+                }
             } else {
                 await GetEmployee(start, today);
             }
@@ -922,7 +924,9 @@
             let stop = $('#date_stop').val();
             if (operation_only !== null) {
                 const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
-                selectEmployee(emp);
+                if (emp !== undefined) {
+                    selectEmployee(emp);
+                }
             } else {
                 await GetEmployee(start, stop);
             }
@@ -933,7 +937,9 @@
             let stop = $('#date_stop').val();
             if (operation_only !== null) {
                 const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
-                selectEmployee(emp);
+                if (emp !== undefined) {
+                    selectEmployee(emp);
+                }
             } else {
                 await GetEmployee(start, stop);
             }
@@ -1131,7 +1137,7 @@
                         data-id="${row.request_id}" data-emp-id="${row.emp_id}"
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"
                         data-time="${row.start_request_time}" data-duration="${duration}"
-                        data-type="${row.leave_name_th}" data-note="${row.decsription}" data-status="${row.status_request}">
+                        data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
                         <td class="freeze-left-1">${index + 1}</td>
                         <td class="freeze-left-2">${row.emp_id}</td>
                         <td class="freeze-left-3">${selectedEmployee ? (selectedEmployee.name_en) : '-'}</td>
@@ -1140,7 +1146,7 @@
                         <td>${start_request_time}-${end_request_time}</td>
                         <td>${duration}</td>
                         <td>${row.leave_name_th}</td>
-                        <td>${row.decsription}</td>
+                        <td>${row.description}</td>
                         <td><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
                     </tr>
                 `);

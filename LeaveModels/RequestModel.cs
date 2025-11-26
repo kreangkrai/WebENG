@@ -22,20 +22,11 @@ namespace WebENG.LeaveModels
         public decimal amount_leave_hour { get; set; }
         public string path_file { get; set; }
         public DateTime request_date { get; set; }
-        public string manager_approver_status { get; set; }
-        public string manager_approver { get; set; }
-        public DateTime manager_approve_date { get; set; }
-        public string director_approver_status { get; set; }
-        public string director_approver { get; set; }
-        public DateTime director_approve_date { get; set; }
-        public string admin_approver_status { get; set; }
-        public string admin_approver { get; set; }
-        public DateTime admin_approve_date { get; set; }
-        public string decsription { get; set; }
+        public string description { get; set; }
         public string status_request { get; set; }
         public bool is_two_step_approve { get; set; }
         public string color_code { get; set; }
-        public string comment { get; set; }
+        public int level_step { get; set; }
 
     }
     public class GroupRequestAmountModel

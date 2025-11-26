@@ -41,22 +41,13 @@ namespace WebENG.LeaveServices
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
-                                                          ,[manager_approver_status]
-                                                          ,[manager_approver]
-                                                          ,[manager_approve_date]
-                                                          ,[director_approver_status]
-                                                          ,[director_approver]
-                                                          ,[director_approve_date]
-                                                          ,[admin_approver_status]
-                                                          ,[admin_approver]
-                                                          ,[admin_approve_date]
-                                                          ,[decsription]
+                                                          ,[request].[description]
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
-                                                          ,[request].comment
+                                                          ,[level_step]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] IS NOT NULL");
@@ -83,20 +74,11 @@ namespace WebENG.LeaveServices
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
-                            manager_approver = dr["manager_approver"].ToString(),
-                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
-                            manager_approver_status = dr["manager_approver_status"].ToString(),
-                            director_approver = dr["director_approver"].ToString(),
-                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
-                            director_approver_status = dr["director_approver_status"].ToString(),
-                            admin_approver = dr["admin_approver"].ToString(),
-                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
-                            admin_approver_status = dr["admin_approver_status"].ToString(),
-                            decsription = dr["decsription"].ToString(),
+                            description = dr["description"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            comment = dr["comment"].ToString()
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
                         };
                         requests.Add(request);
                     }
@@ -134,22 +116,13 @@ namespace WebENG.LeaveServices
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
-                                                          ,[manager_approver_status]
-                                                          ,[manager_approver]
-                                                          ,[manager_approve_date]
-                                                          ,[director_approver_status]
-                                                          ,[director_approver]
-                                                          ,[director_approve_date]
-                                                          ,[admin_approver_status]
-                                                          ,[admin_approver]
-                                                          ,[admin_approve_date]
-                                                          ,[decsription]
+                                                          ,[request].[description]
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
-                                                          ,[request].comment
+                                                          ,[level_step]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] = @request_id");
@@ -177,20 +150,11 @@ namespace WebENG.LeaveServices
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
-                            manager_approver = dr["manager_approver"].ToString(),
-                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
-                            manager_approver_status = dr["manager_approver_status"].ToString(),
-                            director_approver = dr["director_approver"].ToString(),
-                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
-                            director_approver_status = dr["director_approver_status"].ToString(),
-                            admin_approver = dr["admin_approver"].ToString(),
-                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
-                            admin_approver_status = dr["admin_approver_status"].ToString(),
-                            decsription = dr["decsription"].ToString(),
+                            description = dr["description"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            comment = dr["comment"].ToString()
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
                         };
                     }
                     dr.Close();
@@ -204,148 +168,6 @@ namespace WebENG.LeaveServices
                 }
             }
             return request;
-        }
-
-        public string Insert(RequestModel request)
-        {
-            try
-            {
-                if (con.State == ConnectionState.Closed)
-                {
-                    con.Open();
-                }
-                string strCmd = string.Format($@"INSERT INTO [dbo].[request]
-                                                   ([request_id]
-                                                   ,[emp_id]
-                                                   ,[leave_type_id]
-                                                   ,[is_full_day]
-                                                   ,[start_request_date]
-                                                   ,[end_request_date]
-                                                   ,[amount_leave_day]
-                                                   ,[start_request_time]
-                                                   ,[end_request_time]
-                                                   ,[amount_leave_hour]
-                                                   ,[path_file]
-                                                   ,[request_date]
-                                                   ,[decsription]
-                                                   ,[status_request]
-                                                   ,[is_two_step_approve]
-                                                   ,[comment])
-                                             VALUES
-                                                   (@request_id
-                                                   ,@emp_id
-                                                   ,@leave_type_id
-                                                   ,@is_full_day
-                                                   ,@start_request_date
-                                                   ,@end_request_date
-                                                   ,@amount_leave_day
-                                                   ,@start_request_time
-                                                   ,@end_request_time
-                                                   ,@amount_leave_hour
-                                                   ,@path_file
-                                                   ,@request_date
-                                                   ,@decsription
-                                                   ,@status_request
-                                                   ,@is_two_step_approve
-                                                   ,@comment)");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@request_id", request.request_id);
-                command.Parameters.AddWithValue("@emp_id", request.emp_id);
-                command.Parameters.AddWithValue("@leave_type_id", request.leave_type_id);
-                command.Parameters.AddWithValue("@is_full_day", request.is_full_day);
-                command.Parameters.AddWithValue("@start_request_date", request.start_request_date);
-                command.Parameters.AddWithValue("@end_request_date", request.end_request_date);
-                command.Parameters.AddWithValue("@amount_leave_day", request.amount_leave_day);
-                command.Parameters.AddWithValue("@start_request_time", request.start_request_time);
-                command.Parameters.AddWithValue("@end_request_time", request.end_request_time);
-                command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
-                command.Parameters.AddWithValue("@path_file", request.path_file);
-                command.Parameters.AddWithValue("@request_date", request.request_date);
-                command.Parameters.AddWithValue("@decsription", request.decsription);
-                command.Parameters.AddWithValue("@status_request", request.status_request);
-                command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
-                command.Parameters.AddWithValue("@comment", request.comment);
-                command.ExecuteNonQuery();
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            return "Success";
-        }
-
-        public string Update(RequestModel request)
-        {
-            try
-            {
-                if (con.State == ConnectionState.Closed)
-                {
-                    con.Open();
-                }
-                string strCmd = string.Format($@"UPDATE [dbo].[request]
-                                                   SET [leave_type_id] = @leave_type_id
-                                                      ,[is_full_day] = @is_full_day
-                                                      ,[start_request_date] = @start_request_date
-                                                      ,[end_request_date] = @end_request_date
-                                                      ,[amount_leave_day] = @amount_leave_day
-                                                      ,[start_request_time] = @start_request_time
-                                                      ,[end_request_time] = @end_request_time
-                                                      ,[amount_leave_hour] = @amount_leave_hour
-                                                      ,[path_file] = @path_file
-                                                      ,[request_date] = @request_date
-                                                      ,[manager_approver_status] = @manager_approver_status
-                                                      ,[manager_approver] = @manager_approver
-                                                      ,[manager_approve_date] = @manager_approve_date
-                                                      ,[director_approver_status] = @director_approver_status
-                                                      ,[director_approver] = @director_approver
-                                                      ,[director_approve_date] = @director_approve_date
-                                                      ,[admin_approver_status] = @admin_approver_status
-                                                      ,[admin_approver] = @admin_approver
-                                                      ,[admin_approve_date] = @admin_approve_date
-                                                      ,[decsription] = @decsription
-                                                      ,[status_request] = @status_request
-                                                      ,[is_two_step_approve] = @is_two_step_approve
-                                                      ,[comment] = @comment
-                                                 WHERE [request_id] = @request_id AND  [emp_id] = @emp_id");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@request_id", request.request_id);
-                command.Parameters.AddWithValue("@emp_id", request.emp_id);
-                command.Parameters.AddWithValue("@leave_type_id", request.leave_type_id);
-                command.Parameters.AddWithValue("@is_full_day", request.is_full_day);
-                command.Parameters.AddWithValue("@start_request_date", request.start_request_date);
-                command.Parameters.AddWithValue("@end_request_date", request.end_request_date);
-                command.Parameters.AddWithValue("@amount_leave_day", request.amount_leave_day);
-                command.Parameters.AddWithValue("@start_request_time", request.start_request_time);
-                command.Parameters.AddWithValue("@end_request_time", request.end_request_time);
-                command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
-                command.Parameters.AddWithValue("@path_file", request.path_file);
-                command.Parameters.AddWithValue("@request_date", request.request_date);
-                command.Parameters.AddWithValue("@manager_approver", request.manager_approver);
-                command.Parameters.AddWithValue("@manager_approve_date", request.manager_approve_date);
-                command.Parameters.AddWithValue("@manager_approver_status", request.manager_approver_status);
-                command.Parameters.AddWithValue("@director_approver", request.director_approver);
-                command.Parameters.AddWithValue("@director_approve_date", request.director_approve_date);
-                command.Parameters.AddWithValue("@director_approver_status", request.director_approver_status);
-                command.Parameters.AddWithValue("@admin_approver", request.admin_approver);
-                command.Parameters.AddWithValue("@admin_approve_date", request.admin_approve_date);
-                command.Parameters.AddWithValue("@admin_approver_status", request.admin_approver_status);
-                command.Parameters.AddWithValue("@decsription", request.decsription);
-                command.Parameters.AddWithValue("@status_request", request.status_request);
-                command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
-                command.Parameters.AddWithValue("@comment", request.comment);
-                command.ExecuteNonQuery();
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            return "Success";
         }
 
         public List<RequestModel> GetRequestByEmpID(string emp_id)
@@ -370,22 +192,13 @@ namespace WebENG.LeaveServices
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
-                                                          ,[manager_approver_status]
-                                                          ,[manager_approver]
-                                                          ,[manager_approve_date]
-                                                          ,[director_approver_status]
-                                                          ,[director_approver]
-                                                          ,[director_approve_date]
-                                                          ,[admin_approver_status]
-                                                          ,[admin_approver]
-                                                          ,[admin_approve_date]
-                                                          ,[decsription]
+                                                          ,[request].[description]
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
-                                                          ,[request].[comment]
+                                                          ,[level_step]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [emp_id] = @emp_id");
@@ -413,20 +226,11 @@ namespace WebENG.LeaveServices
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
-                            manager_approver = dr["manager_approver"].ToString(),
-                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
-                            manager_approver_status = dr["manager_approver_status"].ToString(),
-                            director_approver = dr["director_approver"].ToString(),
-                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
-                            director_approver_status = dr["director_approver_status"].ToString(),
-                            admin_approver = dr["admin_approver"].ToString(),
-                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
-                            admin_approver_status = dr["admin_approver_status"].ToString(),
-                            decsription = dr["decsription"].ToString(),
+                            description = dr["description"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            comment = dr["comment"].ToString()
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
                         };
                         requests.Add(request);
                     }
@@ -465,22 +269,13 @@ namespace WebENG.LeaveServices
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
-                                                          ,[manager_approver_status]
-                                                          ,[manager_approver]
-                                                          ,[manager_approve_date]
-                                                          ,[director_approver_status]
-                                                          ,[director_approver]
-                                                          ,[director_approve_date]
-                                                          ,[admin_approver_status]
-                                                          ,[admin_approver]
-                                                          ,[admin_approve_date]
-                                                          ,[decsription]
+                                                          ,[request].[description]
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
-                                                          ,[request].comment
+                                                          ,[level_step]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] = @start_request_date");
@@ -508,20 +303,11 @@ namespace WebENG.LeaveServices
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
-                            manager_approver = dr["manager_approver"].ToString(),
-                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
-                            manager_approver_status = dr["manager_approver_status"].ToString(),
-                            director_approver = dr["director_approver"].ToString(),
-                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
-                            director_approver_status = dr["director_approver_status"].ToString(),
-                            admin_approver = dr["admin_approver"].ToString(),
-                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
-                            admin_approver_status = dr["admin_approver_status"].ToString(),
-                            decsription = dr["decsription"].ToString(),
+                            description = dr["description"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            comment = dr["comment"].ToString()
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
                         };
                         requests.Add(request);
                     }
@@ -560,22 +346,13 @@ namespace WebENG.LeaveServices
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
-                                                          ,[manager_approver_status]
-                                                          ,[manager_approver]
-                                                          ,[manager_approve_date]
-                                                          ,[director_approver_status]
-                                                          ,[director_approver]
-                                                          ,[director_approve_date]
-                                                          ,[admin_approver_status]
-                                                          ,[admin_approver]
-                                                          ,[admin_approve_date]
-                                                          ,[decsription]
+                                                          ,[request].[description]
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
-                                                          ,[request].comment
+                                                          ,[level_step]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] LIKE '{month}%'");
@@ -602,20 +379,11 @@ namespace WebENG.LeaveServices
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
-                            manager_approver = dr["manager_approver"].ToString(),
-                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
-                            manager_approver_status = dr["manager_approver_status"].ToString(),
-                            director_approver = dr["director_approver"].ToString(),
-                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
-                            director_approver_status = dr["director_approver_status"].ToString(),
-                            admin_approver = dr["admin_approver"].ToString(),
-                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
-                            admin_approver_status = dr["admin_approver_status"].ToString(),
-                            decsription = dr["decsription"].ToString(),
+                            description = dr["description"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            comment = dr["comment"].ToString()
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
                         };
                         requests.Add(request);
                     }
@@ -654,22 +422,13 @@ namespace WebENG.LeaveServices
                                                           ,[amount_leave_hour]
                                                           ,[path_file]
                                                           ,[request_date]
-                                                          ,[manager_approver_status]
-                                                          ,[manager_approver]
-                                                          ,[manager_approve_date]
-                                                          ,[director_approver_status]
-                                                          ,[director_approver]
-                                                          ,[director_approve_date]
-                                                          ,[admin_approver_status]
-                                                          ,[admin_approver]
-                                                          ,[admin_approve_date]
-                                                          ,[decsription]
+                                                          ,[request].[description]
                                                           ,[status_request]
 														  ,Leave_type.leave_name_th
 														  ,Leave_type.leave_name_en
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
-                                                          ,[request].comment
+                                                          ,[level_step]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] BETWEEN '{start_day}' AND '{end_day}'");
@@ -696,20 +455,11 @@ namespace WebENG.LeaveServices
                             amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
                             path_file = dr["path_file"].ToString(),
                             request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
-                            manager_approver = dr["manager_approver"].ToString(),
-                            manager_approve_date = dr["manager_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["manager_approve_date"].ToString()) : DateTime.MinValue,
-                            manager_approver_status = dr["manager_approver_status"].ToString(),
-                            director_approver = dr["director_approver"].ToString(),
-                            director_approve_date = dr["director_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["director_approve_date"].ToString()) : DateTime.MinValue,
-                            director_approver_status = dr["director_approver_status"].ToString(),
-                            admin_approver = dr["admin_approver"].ToString(),
-                            admin_approve_date = dr["admin_approve_date"] != DBNull.Value ? Convert.ToDateTime(dr["admin_approve_date"].ToString()) : DateTime.MinValue,
-                            admin_approver_status = dr["admin_approver_status"].ToString(),
-                            decsription = dr["decsription"].ToString(),
+                            description = dr["description"].ToString(),
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            comment = dr["comment"].ToString()
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
                         };
                         requests.Add(request);
                     }
@@ -724,6 +474,152 @@ namespace WebENG.LeaveServices
                 }
             }
             return requests;
+        }
+
+        public string Insert(RequestModel request)
+        {
+            return Insert(request, null);
+        }
+        public string Insert(RequestModel request, SqlTransaction tran)
+        {
+            if (request == null) return "Success";
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string sql = string.Format($@"INSERT INTO [dbo].[request]
+                                                   ([request_id]
+                                                   ,[emp_id]
+                                                   ,[leave_type_id]
+                                                   ,[is_full_day]
+                                                   ,[start_request_date]
+                                                   ,[end_request_date]
+                                                   ,[amount_leave_day]
+                                                   ,[start_request_time]
+                                                   ,[end_request_time]
+                                                   ,[amount_leave_hour]
+                                                   ,[path_file]
+                                                   ,[request_date]
+                                                   ,[description]
+                                                   ,[status_request]
+                                                   ,[is_two_step_approve]
+                                                   ,[level_step])
+                                             VALUES
+                                                   (@request_id
+                                                   ,@emp_id
+                                                   ,@leave_type_id
+                                                   ,@is_full_day
+                                                   ,@start_request_date
+                                                   ,@end_request_date
+                                                   ,@amount_leave_day
+                                                   ,@start_request_time
+                                                   ,@end_request_time
+                                                   ,@amount_leave_hour
+                                                   ,@path_file
+                                                   ,@request_date
+                                                   ,@description
+                                                   ,@status_request
+                                                   ,@is_two_step_approve
+                                                   ,@level_step)");
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@request_id", request.request_id);
+                    command.Parameters.AddWithValue("@emp_id", request.emp_id);
+                    command.Parameters.AddWithValue("@leave_type_id", request.leave_type_id);
+                    command.Parameters.AddWithValue("@is_full_day", request.is_full_day);
+                    command.Parameters.AddWithValue("@start_request_date", request.start_request_date);
+                    command.Parameters.AddWithValue("@end_request_date", request.end_request_date);
+                    command.Parameters.AddWithValue("@amount_leave_day", request.amount_leave_day);
+                    command.Parameters.AddWithValue("@start_request_time", request.start_request_time);
+                    command.Parameters.AddWithValue("@end_request_time", request.end_request_time);
+                    command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
+                    command.Parameters.AddWithValue("@path_file", request.path_file);
+                    command.Parameters.AddWithValue("@request_date", request.request_date);
+                    command.Parameters.AddWithValue("@description", request.description);
+                    command.Parameters.AddWithValue("@status_request", request.status_request);
+                    command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
+                    command.Parameters.AddWithValue("@level_step", request.level_step);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Insert failed: " + ex.Message, ex);
+            }
+            finally
+            {
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
+            }
+            return "Success";
+        }
+
+        public string Update(RequestModel request)
+        {
+            return Update(request, null);
+        }
+        public string Update(RequestModel request, SqlTransaction tran)
+        {
+            if (request == null) return "Success";
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string sql = string.Format($@"UPDATE [dbo].[request]
+                                                   SET [leave_type_id] = @leave_type_id
+                                                      ,[is_full_day] = @is_full_day
+                                                      ,[start_request_date] = @start_request_date
+                                                      ,[end_request_date] = @end_request_date
+                                                      ,[amount_leave_day] = @amount_leave_day
+                                                      ,[start_request_time] = @start_request_time
+                                                      ,[end_request_time] = @end_request_time
+                                                      ,[amount_leave_hour] = @amount_leave_hour
+                                                      ,[path_file] = @path_file
+                                                      ,[request_date] = @request_date
+                                                      ,[description] = @description
+                                                      ,[status_request] = @status_request
+                                                      ,[is_two_step_approve] = @is_two_step_approve
+                                                      ,[level_step] = @level_step
+                                                 WHERE [request_id] = @request_id AND  [emp_id] = @emp_id");
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@request_id", request.request_id);
+                    command.Parameters.AddWithValue("@emp_id", request.emp_id);
+                    command.Parameters.AddWithValue("@leave_type_id", request.leave_type_id);
+                    command.Parameters.AddWithValue("@is_full_day", request.is_full_day);
+                    command.Parameters.AddWithValue("@start_request_date", request.start_request_date);
+                    command.Parameters.AddWithValue("@end_request_date", request.end_request_date);
+                    command.Parameters.AddWithValue("@amount_leave_day", request.amount_leave_day);
+                    command.Parameters.AddWithValue("@start_request_time", request.start_request_time);
+                    command.Parameters.AddWithValue("@end_request_time", request.end_request_time);
+                    command.Parameters.AddWithValue("@amount_leave_hour", request.amount_leave_hour);
+                    command.Parameters.AddWithValue("@path_file", request.path_file);
+                    command.Parameters.AddWithValue("@request_date", request.request_date);
+                    command.Parameters.AddWithValue("@description", request.description);
+                    command.Parameters.AddWithValue("@status_request", request.status_request);
+                    command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
+                    command.Parameters.AddWithValue("@level_step", request.level_step);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update failed: " + ex.Message, ex);
+            }
+            finally
+            {
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
+            }
+            return "Success";
         }
     }
 }

@@ -54,8 +54,8 @@ namespace WebENG.LeaveServices
                                                           ,[amount_entitlement]
                                                           ,[length_start_date]
                                                       FROM [dbo].[leave_type]
-													  LEFT JOIN Employees emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
-													  LEFT JOIN Employees emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
+													  LEFT JOIN [CTL].dbo.[Employees] emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
+													  LEFT JOIN [CTL].dbo.[Employees] emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
 													  WHERE [leave_type_id] IS NOT NULL");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
@@ -133,6 +133,7 @@ namespace WebENG.LeaveServices
                                                           ,[is_unpaid]
                                                           ,[is_active]
                                                           ,[created_at]
+                                                          ,[created_by]
                                                           ,emp1.name_en as created_by
                                                           ,[updated_at]
                                                           ,emp2.name_en as updated_by
@@ -141,8 +142,8 @@ namespace WebENG.LeaveServices
                                                           ,[amount_entitlement]
                                                           ,[length_start_date]
                                                       FROM [dbo].[leave_type]
-													  LEFT JOIN Employees emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
-													  LEFT JOIN Employees emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
+													  LEFT JOIN [CTL].dbo.[Employees] emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
+													  LEFT JOIN [CTL].dbo.[Employees] emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
 													  WHERE [leave_type_id] = @leave_type_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@leave_type_id", leave_type_id);

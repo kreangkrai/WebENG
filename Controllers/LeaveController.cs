@@ -15,11 +15,12 @@ using WebENG.Models;
 using WebENG.Service;
 using Newtonsoft.Json;
 using System.IO;
+using System.Data.SqlClient;
 /*
 
 Pending , Resubmit => Operation, Manager
 Cancelled , Approved, Rejected ,Returned
-Successed
+Completed
 
 */
 namespace WebENG.Controllers
@@ -27,7 +28,7 @@ namespace WebENG.Controllers
     public class LeaveController : Controller
     {
         readonly IAccessory Accessory;
-        readonly IHierarchy Hierarchy;
+        private IRequestLog RequestLog;
         readonly INotification Notification;
         readonly ILeaveType LeaveType;
         readonly ILeave Leave;
@@ -35,10 +36,11 @@ namespace WebENG.Controllers
         readonly IRequest Requests;
         private IWorkingHours WorkingHoursService;
         readonly CTLInterfaces.IHoliday Holiday;
+        private ILevel Level;
         public LeaveController()
         {
             Accessory = new AccessoryService();
-            Hierarchy = new HierarchyService();
+            RequestLog = new RequestLogService();
             Notification = new NotificationService();
             LeaveType = new LeaveTypeService();
             Leave = new LeaveService();
@@ -46,6 +48,7 @@ namespace WebENG.Controllers
             Requests = new RequestService();
             WorkingHoursService = new WorkingHoursService();
             Holiday = new CTLServices.HolidayService();
+            Level = new LevelService();
 
         }
         public IActionResult Index()
@@ -67,17 +70,17 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
 
-                List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
-                List<HierarchyDepartmentModel> hierarchies_depaartment = Hierarchy.GetDepartmentHierarchies();
+                //List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
+                //List<HierarchyDepartmentModel> hierarchies_depaartment = Hierarchy.GetDepartmentHierarchies();
 
-                CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel()
-                {
-                    start_date = new DateTime (2025,6,15),
-                    promote_manager_date = new DateTime (2025,6,15),
-                    position = "Manager"
-                };
+                //CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel()
+                //{
+                //    start_date = new DateTime (2025,6,15),
+                //    promote_manager_date = new DateTime (2025,6,15),
+                //    position = "Manager"
+                //};
 
-                double leave = Leave.CalculateLeaveDays(emp, 2025, 6, 10, 10, 12); 
+                //double leave = Leave.CalculateLeaveDays(emp, 2025, 6, 10, 10, 12); 
                 return View(u);
             }
             else
@@ -189,11 +192,51 @@ namespace WebENG.Controllers
             request.request_id = request_id;
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
             request.path_file = request_id;
-            request.comment = "";
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            request.level_step = level.FirstOrDefault().level;
+
             List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
+            string message = "";
             if (!requests.Any(a=>a.start_request_date.Date == request.start_request_date.Date)) //  Check Date
             {
-                string message = Requests.Insert(request);
+                var connect = new ConnectSQL();
+                using (SqlConnection con = connect.OpenLeaveConnect())
+                {
+                    con.Open();
+                    using (SqlTransaction tran = con.BeginTransaction())
+                    {
+                        try
+                        {
+                            var requestService = Requests;
+                            var requestLogService = RequestLog;
+                            requestService.Insert(request);
+
+                            RequestLogModel requestLog = new RequestLogModel()
+                            {
+                                action_by = request.emp_id,
+                                action_by_name = level.FirstOrDefault().emp_name,
+                                action_by_level = level.FirstOrDefault().level,
+                                old_status = "",
+                                new_status = "Pending",
+                                comment = "",
+                                old_level_step = -1,
+                                new_level_step = level.FirstOrDefault().level,
+                                request_id = request.request_id,
+                                log_date = DateTime.Now
+                            };
+                            requestLogService.Insert(requestLog);
+
+                            tran.Commit();
+                            message = "Success";
+                        }
+                        catch (Exception ex)
+                        {
+                            tran.Rollback();
+                            message = $"Error {ex.Message}";
+                        }
+                    }
+                }
+
                 if (message == "Success")
                 {
                     if (tempFileIds != null)
@@ -281,22 +324,6 @@ namespace WebENG.Controllers
                      /request_id {emp_id_yyyyMMddHHmmss}
                           /xxxx.csv
          */
-        //[HttpPost]
-        //public async Task<IActionResult> UploadTempFile(IFormFile file)
-        //{
-        //    if (file == null || file.Length == 0) return BadRequest("No file");
-
-        //    var tempId = Guid.NewGuid().ToString();
-        //    var tempPath = Path.Combine("Uploads", "temp", tempId);
-        //    Directory.CreateDirectory(tempPath);
-
-        //    var filePath = Path.Combine(tempPath, file.FileName);
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        await file.CopyToAsync(stream);
-        //    }
-        //    return Json(new { tempId });
-        //}
         [HttpPost]
         public async Task<IActionResult> UploadTempFile(IFormFile file)
         {

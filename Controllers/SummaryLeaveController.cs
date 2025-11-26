@@ -19,14 +19,14 @@ namespace WebENG.Controllers
     public class SummaryLeaveController : Controller
     {
         readonly IAccessory Accessory;
-        readonly IHierarchy Hierarchy;
+        //readonly IHierarchy Hierarchy;
         readonly CTLInterfaces.IEmployee Employee;
         readonly IRequest Requests;
         readonly ILeaveType LeaveType;
         public SummaryLeaveController()
         {
             Accessory = new AccessoryService();
-            Hierarchy = new HierarchyService();
+            //Hierarchy = new HierarchyService();
             Employee = new CTLServices.EmployeeService();
             Requests = new RequestService();
             LeaveType = new LeaveTypeService();

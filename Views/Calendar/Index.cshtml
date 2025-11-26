@@ -379,7 +379,6 @@
                         <div id="div_form_leave" class="col-4 col-md-4pt-5">
                             <label for="leave">Leave</label>
                             <input id="leave" class="btn btn-primary form-control" type="button" value="ยื่นวันลา" />
-
                         </div>
                     </div>
                     <div id="date_group" class="form-group row">
@@ -2846,7 +2845,7 @@
             let is_two_step_approve = leave.is_two_step_approve;
             let start_request_date = $('#leave_start_date').val();
             let end_request_date = $('#leave_stop_date').val();
-            let decsription = $('#leave_note').val();
+            let description = $('#leave_note').val();
             let amount_leave_day = $('#amount_leave').val();
 
             let start_request_time = "00:00:00";
@@ -2866,7 +2865,7 @@
                 "end_request_date": end_request_date,
                 "path_file": "",
                 "status_request": "Pending",
-                "decsription": decsription,
+                "description": description,
                 "start_request_time": start_request_time,
                 "end_request_time": end_request_time,
                 "amount_leave_day": amount_leave_day,

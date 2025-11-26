@@ -18,9 +18,7 @@ namespace WebENG.Controllers
     public class StatusLeaveController : Controller
     {
         readonly IAccessory Accessory;
-        readonly IHierarchy Hierarchy;
         readonly CTLInterfaces.IEmployee Employees;
-        private IPosition Position;
         private ILeaveType LeaveType;
         private IRequest Requests;
         private ILeave Leave;
@@ -28,9 +26,7 @@ namespace WebENG.Controllers
         public StatusLeaveController()
         {
             Accessory = new AccessoryService();
-            Hierarchy = new HierarchyService();
             Employees = new CTLServices.EmployeeService();
-            Position = new PositionService();
             LeaveType = new LeaveTypeService();
             Requests = new RequestService();
             Leave = new LeaveService();

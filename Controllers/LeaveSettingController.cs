@@ -19,17 +19,13 @@ namespace WebENG.Controllers
     public class LeaveSettingController : Controller
     {
         readonly IAccessory Accessory;
-        readonly IHierarchy Hierarchy;
         private ILeaveType LeaveType;
-        //private ILeaveEntitlementRule LeaveEntitlement;
-        private CTLInterfaces.IEmployee Employee;
+        private IEmployee Employee;
         public LeaveSettingController()
         {
             Accessory = new AccessoryService();
-            Hierarchy = new HierarchyService();
             LeaveType = new LeaveTypeService();
-            Employee = new CTLServices.EmployeeService();
-            //LeaveEntitlement = new LeaveEntitlementRuleService();
+            Employee = new EmployeeService();
         }
         public IActionResult Index()
         {
@@ -49,9 +45,6 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
-
-                List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
-                List<HierarchyDepartmentModel> hierarchies_depaartment = Hierarchy.GetDepartmentHierarchies();
 
                 return View(u);
             }
@@ -107,11 +100,10 @@ namespace WebENG.Controllers
             LeaveTypeModel m_leave = LeaveType.GetLeaveTypeByID(leave_.leave_type_id);
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
-            string admin = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
-            string create_by = employees.Where(w => w.name_en.ToLower() == m_leave.created_by.ToLower()).Select(s => s.emp_id).FirstOrDefault();
+            string admin = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();     
             DateTime date = DateTime.Now;
             leave_.created_at = m_leave.created_at;
-            leave_.created_by = create_by;
+            leave_.created_by = m_leave.created_by;
             leave_.updated_at =date;
             leave_.updated_by = admin;
 
@@ -123,9 +115,7 @@ namespace WebENG.Controllers
         public IActionResult GetLeaveGroup()
         {
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            leaves = leaves.OrderBy(o => o.leave_type_code).ToList();
-            //List<LeaveEntitlementRuleModel> entitlements = LeaveEntitlement.GetLeaveEntitlementRules();
-            //entitlements = entitlements.OrderBy(o => o.start_age).ThenBy(t => t.before_age).ToList();
+            leaves = leaves.OrderBy(o => o.leave_name_th).ToList();
             var data = new { leaves = leaves};
             return Json(data);
         }
