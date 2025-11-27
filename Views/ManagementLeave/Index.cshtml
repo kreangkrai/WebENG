@@ -603,10 +603,8 @@
                     </thead>
 
                     <tbody>
-                        <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
+                        <!--<tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
                             data-toggle="modal" data-target="#modal_leave">
-                            @* class="clickable-row kanit-regular"
-                            style="color:#555;"> *@
                             <td>1</td>
                             <td>EM010101</td>
                             <td>นายชัยวัฒน์ สุขสม</td>
@@ -616,94 +614,14 @@
                             <td>1</td>
                             <td>ลาป่วย</td>
                             <td>ท้องเสีย</td>
-                            <td><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>
-                            <td>
+                            <td><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>--> @*fas fa-minus-circle*@
+                            <!--<td>
                                 <div class="form-check form-check-inline mb-1">
                                     <input class="form-check-input approve-checkbox" type="checkbox">
                                     <label class="form-check-label"></label>
                                 </div>
                             </td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>2</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 08:46</td>
-                            <td>ศ. 07/11/25 - จ. 10/11/25</td>
-                            <td>08:30 - 17:30</td>
-                            <td>2</td>
-                            <td>ลาพักร้อน</td>
-                            <td>-</td>
-                            <td></td>
-                            <td>
-                                <div class="form-check form-check-inline mb-1">
-                                    <input class="form-check-input approve-checkbox" type="checkbox">
-                                    <label class="form-check-label"></label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>3</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 09:00</td>
-                            <td>อ. 04/11/25</td>
-                            <td>08:30 - 12:00</td>
-                            <td>0.5</td>
-                            <td>ลาพักร้อนไม่รับค่าจ้าง</td>
-                            <td>-</td>
-                            <td></td>
-                            <td>
-                                <div class="form-check form-check-inline mb-1">
-                                    <input class="form-check-input approve-checkbox" type="checkbox">
-                                    <label class="form-check-label"></label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>4</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 10/11/25 09:50</td>
-                            <td>พ. 05/11/25</td>
-                            <td>13:30 - 15:30</td>
-                            <td>0.25</td>
-                            <td>ลากิจ(ราชการ)</td>
-                            <td>ทำบัตรประชาชน</td>
-                            <td><i class="fas fa-minus-circle" style="color: orangered; font-size:22px"></i></td>
-                            <td>
-                                <div class="form-check form-check-inline mb-1">
-                                    <input class="form-check-input approve-checkbox" type="checkbox">
-                                    <label class="form-check-label"></label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>5</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 10/11/25 09:50</td>
-                            <td>พ. 05/11/25</td>
-                            <td>13:00 - 17:30</td>
-                            <td>0.5</td>
-                            <td>ลากิจ(ราชการ)</td>
-                            <td>ทำบัตรประชาชน</td>
-                            <td><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>
-                            <td>
-                                <div class="form-check form-check-inline mb-1">
-                                    <input class="form-check-input approve-checkbox" type="checkbox">
-                                    <label class="form-check-label"></label>
-                                </div>
-                            </td>
-                        </tr>
+                        </tr>-->
                     </tbody>
                 </table>
             </div>
@@ -1167,10 +1085,10 @@
 @section Scripts
 {
     <script type="text/javascript">
-        let table_leave = null;
-        let leaves = [];
+        let table_approve= null;
+        //let leaves = [];
 
-        async function GetData() {
+        @*async function GetData() {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetData", "ManagementLeave")',
@@ -1181,137 +1099,225 @@
                     init(leaves);
                 }
             });
-        }
+        }*@
 
         $(document).ready(function () {
+            init();
             // เมื่อกดยืนยันใน modal ลูก → ปิดทั้งคู่
-            $('#confirm_reject').on('click', function () {
-                alert('ปฏิเสธเรียบร้อยแล้ว');
-                $('#modal_reject').modal('hide');
-                $('#modal_leave').modal('hide'); // ปิด modal หลักด้วย
-            });
+            //$('#confirm_reject').on('click', function () {
+            //    alert('ปฏิเสธเรียบร้อยแล้ว');
+            //    $('#modal_reject').modal('hide');
+            //    $('#modal_leave').modal('hide'); // ปิด modal หลักด้วย
+            //});
 
-            $('#confirm_resubmit').on('click', function () {
-                let reason = $('#resubmit_reason').val().trim();
-                if (!reason) {
-                    alert('กรุณาระบุเหตุผล');
-                    return;
-                }
-                alert('ส่งกลับแล้ว: ' + reason);
-                $('#modal_resubmit').modal('hide');
-                $('#modal_leave').modal('hide');
-            });
+            //$('#confirm_resubmit').on('click', function () {
+            //    let reason = $('#resubmit_reason').val().trim();
+            //    if (!reason) {
+            //        alert('กรุณาระบุเหตุผล');
+            //        return;
+            //    }
+            //    alert('ส่งกลับแล้ว: ' + reason);
+            //    $('#modal_resubmit').modal('hide');
+            //    $('#modal_leave').modal('hide');
+            //});
 
-            $('#confirm_approve').on('click', function () {
-                alert('อนุมัติเรียบร้อยแล้ว');
-                $('#modal_approve').modal('hide');
-                $('#modal_leave').modal('hide');
-            });
+            //$('#confirm_approve').on('click', function () {
+            //    alert('อนุมัติเรียบร้อยแล้ว');
+            //    $('#modal_approve').modal('hide');
+            //    $('#modal_leave').modal('hide');
+            //});
 
 
-            // 1. เมื่อคลิก Select All
-            $('#selectAllApprove').on('change', function () {
-                var isChecked = $(this).is(':checked');
-                $('.approve-checkbox').prop('checked', isChecked);
+            //// 1. เมื่อคลิก Select All
+            //$('#selectAllApprove').on('change', function () {
+            //    var isChecked = $(this).is(':checked');
+            //    $('.approve-checkbox').prop('checked', isChecked);
 
-                // ปรับสถานะให้สวย (optional)
-                $(this).prop('indeterminate', false);
-            });
+            //    // ปรับสถานะให้สวย (optional)
+            //    $(this).prop('indeterminate', false);
+            //});
 
-            // 2. เมื่อมีการเปลี่ยนแปลง checkbox ในรายการ
-            $(document).on('change', '.approve-checkbox', function () {
-                var totalCheckboxes = $('.approve-checkbox').length;
-                var checkedCheckboxes = $('.approve-checkbox:checked').length;
+            //// 2. เมื่อมีการเปลี่ยนแปลง checkbox ในรายการ
+            //$(document).on('change', '.approve-checkbox', function () {
+            //    var totalCheckboxes = $('.approve-checkbox').length;
+            //    var checkedCheckboxes = $('.approve-checkbox:checked').length;
 
-                if (checkedCheckboxes === 0) {
-                    $('#selectAllApprove').prop({
-                        checked: false,
-                        indeterminate: false
-                    });
-                } else if (checkedCheckboxes === totalCheckboxes) {
-                    $('#selectAllApprove').prop({
-                        checked: true,
-                        indeterminate: false
-                    });
-                } else {
-                    $('#selectAllApprove').prop({
-                        checked: false,
-                        indeterminate: true
-                    });
-                }
-            });
+            //    if (checkedCheckboxes === 0) {
+            //        $('#selectAllApprove').prop({
+            //            checked: false,
+            //            indeterminate: false
+            //        });
+            //    } else if (checkedCheckboxes === totalCheckboxes) {
+            //        $('#selectAllApprove').prop({
+            //            checked: true,
+            //            indeterminate: false
+            //        });
+            //    } else {
+            //        $('#selectAllApprove').prop({
+            //            checked: false,
+            //            indeterminate: true
+            //        });
+            //    }
+            //});
 
-            //////////// Custom Modal ซ้อน Modal ////////////
-            $(document).on('show.bs.modal', '.modal', function () {
-                var zIndex = 1040 + (10 * $('.modal:visible').length);
-                $(this).css('z-index', zIndex);
-                setTimeout(function () {
-                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-                }, 0);
-            });
+            ////////////// Custom Modal ซ้อน Modal ////////////
+            //$(document).on('show.bs.modal', '.modal', function () {
+            //    var zIndex = 1040 + (10 * $('.modal:visible').length);
+            //    $(this).css('z-index', zIndex);
+            //    setTimeout(function () {
+            //        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+            //    }, 0);
+            //});
 
-            $(document).on('shown.bs.modal', '.modal', function () {
-                if ($('.modal.show').length > 1) {
-                    $('.modal.show').first().addClass('modal-blur-scale');
-                }
-            });
+            //$(document).on('shown.bs.modal', '.modal', function () {
+            //    if ($('.modal.show').length > 1) {
+            //        $('.modal.show').first().addClass('modal-blur-scale');
+            //    }
+            //});
 
-            $(document).on('hidden.bs.modal', '.modal', function () {
-                $('.modal-blur-scale').removeClass('modal-blur-scale');
-            });
+            //$(document).on('hidden.bs.modal', '.modal', function () {
+            //    $('.modal-blur-scale').removeClass('modal-blur-scale');
+            //});
             /////////////////////////////////////////////////
 
-});
-        // function init() {
-        //     $(document).ready(function () {
-        //         $('#table_leave').DataTable({
-        //             ajax: {
-        //                 type: "GET",
-        //                 url: '@Url.Action("GetData", "ManagementLeave")',
-        //                 contentType: 'application/x-www-form-urlencoded',
-        //                 dataSrc: ''
-        //             },
-        //             columnDefs: [
-        //                 {
-        //                     targets: 1,
-        //                     render: function (data, type, row) {
-        //                         var imgSrc = '/images/default-avatar.png'; 
+        });
+        //let table_approve;
 
-        //                         if (row.img) {
-        //                             imgSrc = 'data:image/jpeg;base64,' + row.img;
-        //                         }
+        function init() {
+            table_approve = $('#table_approve').DataTable({
+                ajax: {
+                    type: "GET",
+                    url: '@Url.Action("GetRequest", "ManagementLeave")',
+                    dataSrc: ''
+                },
+                columns: [
+                    {
+                        data: null,
+                        width: "70px",
+                        className: "text-center",
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;  // ลำดับ
+                        }
+                    },
+                    {
+                        data: "emp_id",
+                        width: "100px",
+                        className: "text-center"
+                    },
+                    {
+                        data: "emp_id",
+                        width: "180px",
+                        //render: function (data, type, row) {
+                        //    const displayName = row.name || row.emp_id || "ไม่ระบุชื่อ";
+                        //    return `
+                        //    <div class="d-flex align-items-center">
+                        //        <img src="/images/profile/default-avatar.png"
+                        //             class="rounded-circle me-2"
+                        //             style="width: 36px; height: 36px; object-fit: cover;"
+                        //             alt="${displayName}">
+                        //        <div>
+                        //            <div class="fw-bold kanit-light">${displayName}</div>
+                        //            <small class="text-muted">พนักงานทั่วไป</small>
+                        //        </div>
+                        //    </div>`;
+                        //}
+                    },
+                    {
+                        data: "request_date",
+                        render: function (data) {
+                            return formatThaiDate(data);
+                        }
+                    },
+                    {
+                        data: "start_request_date",
+                        render: function (data, type, row) {
+                            const dateStr = formatThaiDate(data);
+                            return row.is_full_day ? dateStr : `${dateStr}<br><small class="text-muted">${formatTime(row.start_request_time)}</small>`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            if (row.is_full_day) {
+                                return '<span class="badge bg-info">เต็มวัน</span>';
+                            } else {
+                                return formatTime(row.start_request_time) + " - " + formatTime(row.end_request_time);
+                            }
+                        }
+                    },
+                    {
+                        data: "amount_leave_day",
+                        render: function (data, type, row) {
+                            if (row.amount_leave_hour > 0) {
+                                return `${row.amount_leave_day} วัน ${row.amount_leave_hour} ชม.`;
+                            }
+                            return data + (data > 1 ? " วัน" : " วัน");
+                        }
+                    },
+                    {
+                        data: "leave_name_th",
+                        render: function (data, type, row) {
+                            return `<span class="badge ${row.color_code || 'bg-secondary'}">${data}</span>`;
+                        }
+                    },
+                    {
+                        data: "description",
+                        render: function (data) {
+                            return data || "-";
+                        }
+                    },
+                    {
+                        data: "path_file",
+                        width: "70px",
+                        render: function (data) {
+                            if (data) {
+                                return `<a href="/Upload/Leave/${data}" target="_blank" class="text-success"><i class="fas fa-paperclip"></i></a>`;
+                            }
+                            return "-";
+                        }
+                    },
+                    {
+                        data: null,
+                        width: "50px",
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return `
+                            <div class="form-check">
+                                <input class="form-check-input chk-approve" type="checkbox" value="${row.request_id}">
+                            </div>`;
+                        }
+                    }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
+                },
+                createdRow: function (row, data, dataIndex) {
+                    if (data.status_request === "Pending") {
+                        $(row).addClass('table-warning');
+                    }
+                },
+                info: false,
+                searching: false,
+                paging:false,
+            });
 
-        //                         return `
-        //                 <div class="row">
-        //                     <div class="col-1 d-flex align-items-center justify-content-start">
-        //                         <img src="${imgSrc}"
-        //                             class="rounded-circle me-2"
-        //                             style="width: 32px; height: 32px; object-fit: cover;"
-        //                             alt="${row.name}" />                    
-                                
-        //                      </div>
-        //                      <div class="col-11 d-flex align-items-center justify-content-start">
-        //                         <div>
-        //                             <span class="kanit-light d-block text-start fw-bold d-flex justify-content-start">${row.name}</span>
-        //                             <span class="kanit-light d-block text-start text-muted small d-flex justify-content-start">พนักงานทั่วไป</span>
-        //                         </div>
-        //                     </div>                        
-        //                </div>`;
-        //                     }
-        //                 },
-        //                 {
-        //                     targets: 5,
-        //                     render: function (data, type, row) {
-        //                         return `
-        //                             <input type="button" class="kanit-light btn btn-primary" value="OK" />`;
-        //                     }
-        //                 },
-        //             ],
-        //             language: {
-        //                 url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
-        //             }
-        //         });
-        //     });
-        // }
+            // Select All Checkbox
+            $('#selectAllApprove').on('click', function () {
+                $('.chk-approve').prop('checked', this.checked);
+            });
+        }
+
+// ---------- ฟังก์ชันช่วยแปลงวันที่/เวลา ----------
+        function formatThaiDate(isoDate) {
+            if (!isoDate) return "-";
+            const date = new Date(isoDate);
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('th-TH', options).replace(/ /g, ' ');
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr || timeStr === "739581.00:00:00") return "ทั้งวัน";
+            return timeStr.split('.')[1]?.substring(0, 5) || timeStr;
+        }
     </script>
 }

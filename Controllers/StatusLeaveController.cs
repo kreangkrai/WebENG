@@ -94,7 +94,7 @@ namespace WebENG.Controllers
                 "Resubmit",
                 "Approved",
                 "Returned",
-                "Successed"
+                "Completed"
             };
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
@@ -102,7 +102,7 @@ namespace WebENG.Controllers
            
             for (int i = 0; i < leaves.Count; i++)
             {
-                requests = requests.Where(w => w.leave_type_code == leaves[i].leave_type_code &&
+                List<RequestModel>  _requests = requests.Where(w => w.leave_type_code == leaves[i].leave_type_code &&
                 w.start_request_date.Year == year &&
                 status_pending.Contains(w.status_request)).ToList();
 
@@ -122,15 +122,15 @@ namespace WebENG.Controllers
                     leaves[i].amount_entitlement = (decimal)_leave;
                 }
                 double used_leave = 0;
-                for (int j = 0; j < requests.Count; j++)
+                for (int j = 0; j < _requests.Count; j++)
                 {
-                    if (requests[j].is_full_day)
+                    if (_requests[j].is_full_day)
                     {
-                        used_leave += requests[j].amount_leave_day;
+                        used_leave += _requests[j].amount_leave_day;
                     }
                     else
                     {
-                        used_leave += Math.Round(((double)requests[j].amount_leave_hour) / 8.0, 2);
+                        used_leave += Math.Round(((double)_requests[j].amount_leave_hour) / 8.0, 2);
                     }
                 }
                 //decimal b = (decimal)((double)leaves[i].amount_entitlement - used_leave);
