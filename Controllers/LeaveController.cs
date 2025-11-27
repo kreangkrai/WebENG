@@ -191,7 +191,15 @@ namespace WebENG.Controllers
             request.request_date = now;
             request.request_id = request_id;
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
-            request.path_file = request_id;
+
+            if (tempFileIds.Length > 0) // มีไฟล์แนบมา
+            {
+                request.path_file = request_id;
+            }
+            else
+            {
+                request.path_file = "";
+            }
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
             request.level_step = level.FirstOrDefault().level;
 

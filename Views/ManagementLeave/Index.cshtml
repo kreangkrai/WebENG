@@ -313,7 +313,7 @@
     }
 
     /* ตารางมีมุมโค้งมน */
-    #table_approve {
+    .table {
         border-collapse: separate !important;
         border-spacing: 0;
         table-layout: fixed !important; /* สำคัญที่สุด! */
@@ -324,30 +324,30 @@
     }
 
         /* เส้นขอบแนวนอนใน tbody */
-        #table_approve tbody td {
+        .table tbody td {
             border-top: 1px solid #dee2e6 !important;
             border-bottom: none !important;
         }
 
         /* ลบเส้นแนวตั้งทั้งหมด (ถ้าต้องการ) */
-        #table_approve th,
-        #table_approve td {
+        .table th,
+        .table td {
             border-left: none !important;
             border-right: none !important;
             padding: 10px 10px !important; /* ทำให้เซลล์สูงขึ้น */
             vertical-align: middle !important; /* สำรองถ้า Bootstrap ไม่ทำงาน */
         }
 
-        #table_approve th {
+        .table th {
             padding: 3px 10px !important; /* ทำให้เซลล์สูงขึ้น */
         }
 
-        #table_approve td {
+        .table td {
             padding: 10px 10px !important; /* ทำให้เซลล์สูงขึ้น */
         }
 
         /* Badge โค้งมน */
-        #table_approve .badge {
+        .table .badge {
             border-radius: 20px;
             padding: 6px 12px;
             font-size: 14px;
@@ -391,9 +391,9 @@
     }
 
     /* 2. body sticky (td) เป็นสีขาว */
-    #table_approve tbody td.freeze-left-1,
-    #table_approve tbody td.freeze-left-2,
-    #table_approve tbody td.freeze-left-3 {
+    .table tbody td.freeze-left-1,
+    .table tbody td.freeze-left-2,
+    .table tbody td.freeze-left-3 {
         background: white !important;
         z-index: 10;
     }
@@ -693,7 +693,7 @@
             @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
 
             <div class="freeze-pane">
-                <table id="table_approve" class="table table-sm table-hover text-center mb-0 overflow-auto">
+                <table id="table_complete" class="table table-sm table-hover text-center mb-0 overflow-auto">
                     <thead style="font-size:18px; color:#555">
                         @* <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
                             <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
@@ -1086,238 +1086,233 @@
 {
     <script type="text/javascript">
         let table_approve= null;
-        //let leaves = [];
+        let requests = [];
 
-        @*async function GetData() {
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetData", "ManagementLeave")',
-	            contentType: 'application/x-www-form-urlencoded',
-                data: {  },
-                success: function (response) {
-                    leaves = response;
-                    init(leaves);
-                }
-            });
-        }*@
+        const request_status = [
+            { status_en: "Pending", status: { status_th: "รออนุมัติ", class: "warning" } },
+            { status_en: "Resubmit", status: { status_th: "ส่งใหม่", class: "secondary" } },
+            { status_en: "Cancelled", status: { status_th: "ยกเลิก", class: "dark" } },
+            { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
+            { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
+            { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
+            { status_en: "Completed", status: { status_th: "สำเร็จ", class: "primary" } },
+        ];
 
         $(document).ready(function () {
-            init();
-            // เมื่อกดยืนยันใน modal ลูก → ปิดทั้งคู่
-            //$('#confirm_reject').on('click', function () {
-            //    alert('ปฏิเสธเรียบร้อยแล้ว');
-            //    $('#modal_reject').modal('hide');
-            //    $('#modal_leave').modal('hide'); // ปิด modal หลักด้วย
-            //});
-
-            //$('#confirm_resubmit').on('click', function () {
-            //    let reason = $('#resubmit_reason').val().trim();
-            //    if (!reason) {
-            //        alert('กรุณาระบุเหตุผล');
-            //        return;
-            //    }
-            //    alert('ส่งกลับแล้ว: ' + reason);
-            //    $('#modal_resubmit').modal('hide');
-            //    $('#modal_leave').modal('hide');
-            //});
-
-            //$('#confirm_approve').on('click', function () {
-            //    alert('อนุมัติเรียบร้อยแล้ว');
-            //    $('#modal_approve').modal('hide');
-            //    $('#modal_leave').modal('hide');
-            //});
-
-
-            //// 1. เมื่อคลิก Select All
-            //$('#selectAllApprove').on('change', function () {
-            //    var isChecked = $(this).is(':checked');
-            //    $('.approve-checkbox').prop('checked', isChecked);
-
-            //    // ปรับสถานะให้สวย (optional)
-            //    $(this).prop('indeterminate', false);
-            //});
-
-            //// 2. เมื่อมีการเปลี่ยนแปลง checkbox ในรายการ
-            //$(document).on('change', '.approve-checkbox', function () {
-            //    var totalCheckboxes = $('.approve-checkbox').length;
-            //    var checkedCheckboxes = $('.approve-checkbox:checked').length;
-
-            //    if (checkedCheckboxes === 0) {
-            //        $('#selectAllApprove').prop({
-            //            checked: false,
-            //            indeterminate: false
-            //        });
-            //    } else if (checkedCheckboxes === totalCheckboxes) {
-            //        $('#selectAllApprove').prop({
-            //            checked: true,
-            //            indeterminate: false
-            //        });
-            //    } else {
-            //        $('#selectAllApprove').prop({
-            //            checked: false,
-            //            indeterminate: true
-            //        });
-            //    }
-            //});
-
-            ////////////// Custom Modal ซ้อน Modal ////////////
-            //$(document).on('show.bs.modal', '.modal', function () {
-            //    var zIndex = 1040 + (10 * $('.modal:visible').length);
-            //    $(this).css('z-index', zIndex);
-            //    setTimeout(function () {
-            //        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-            //    }, 0);
-            //});
-
-            //$(document).on('shown.bs.modal', '.modal', function () {
-            //    if ($('.modal.show').length > 1) {
-            //        $('.modal.show').first().addClass('modal-blur-scale');
-            //    }
-            //});
-
-            //$(document).on('hidden.bs.modal', '.modal', function () {
-            //    $('.modal-blur-scale').removeClass('modal-blur-scale');
-            //});
-            /////////////////////////////////////////////////
-
+            GetRequests();
+            
         });
-        //let table_approve;
 
-        function init() {
-            table_approve = $('#table_approve').DataTable({
-                ajax: {
-                    type: "GET",
-                    url: '@Url.Action("GetRequest", "ManagementLeave")',
-                    dataSrc: ''
+        async function GetRequests() {
+            let useds = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetRequest", "ManagementLeave")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {},
+                success: function (response) {
+                    requests = response;
+                    let completes = requests.filter(f => f.status_request === "Completed").map(m => m);
+                    let uncompletes = requests.filter(f => f.status_request !== "Completed").map(m => m);
+                    renderRequestHistory(uncompletes);
+                    renderRequestCompleteHistory(completes);
                 },
-                columns: [
-                    {
-                        data: null,
-                        width: "70px",
-                        className: "text-center",
-                        render: function (data, type, row, meta) {
-                            return meta.row + 1;  // ลำดับ
-                        }
-                    },
-                    {
-                        data: "emp_id",
-                        width: "100px",
-                        className: "text-center"
-                    },
-                    {
-                        data: "emp_id",
-                        width: "180px",
-                        //render: function (data, type, row) {
-                        //    const displayName = row.name || row.emp_id || "ไม่ระบุชื่อ";
-                        //    return `
-                        //    <div class="d-flex align-items-center">
-                        //        <img src="/images/profile/default-avatar.png"
-                        //             class="rounded-circle me-2"
-                        //             style="width: 36px; height: 36px; object-fit: cover;"
-                        //             alt="${displayName}">
-                        //        <div>
-                        //            <div class="fw-bold kanit-light">${displayName}</div>
-                        //            <small class="text-muted">พนักงานทั่วไป</small>
-                        //        </div>
-                        //    </div>`;
-                        //}
-                    },
-                    {
-                        data: "request_date",
-                        render: function (data) {
-                            return formatThaiDate(data);
-                        }
-                    },
-                    {
-                        data: "start_request_date",
-                        render: function (data, type, row) {
-                            const dateStr = formatThaiDate(data);
-                            return row.is_full_day ? dateStr : `${dateStr}<br><small class="text-muted">${formatTime(row.start_request_time)}</small>`;
-                        }
-                    },
-                    {
-                        data: null,
-                        render: function (data, type, row) {
-                            if (row.is_full_day) {
-                                return '<span class="badge bg-info">เต็มวัน</span>';
-                            } else {
-                                return formatTime(row.start_request_time) + " - " + formatTime(row.end_request_time);
-                            }
-                        }
-                    },
-                    {
-                        data: "amount_leave_day",
-                        render: function (data, type, row) {
-                            if (row.amount_leave_hour > 0) {
-                                return `${row.amount_leave_day} วัน ${row.amount_leave_hour} ชม.`;
-                            }
-                            return data + (data > 1 ? " วัน" : " วัน");
-                        }
-                    },
-                    {
-                        data: "leave_name_th",
-                        render: function (data, type, row) {
-                            return `<span class="badge ${row.color_code || 'bg-secondary'}">${data}</span>`;
-                        }
-                    },
-                    {
-                        data: "description",
-                        render: function (data) {
-                            return data || "-";
-                        }
-                    },
-                    {
-                        data: "path_file",
-                        width: "70px",
-                        render: function (data) {
-                            if (data) {
-                                return `<a href="/Upload/Leave/${data}" target="_blank" class="text-success"><i class="fas fa-paperclip"></i></a>`;
-                            }
-                            return "-";
-                        }
-                    },
-                    {
-                        data: null,
-                        width: "50px",
-                        orderable: false,
-                        render: function (data, type, row) {
-                            return `
-                            <div class="form-check">
-                                <input class="form-check-input chk-approve" type="checkbox" value="${row.request_id}">
-                            </div>`;
-                        }
-                    }
-                ],
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/th.json'
-                },
-                createdRow: function (row, data, dataIndex) {
-                    if (data.status_request === "Pending") {
-                        $(row).addClass('table-warning');
-                    }
-                },
-                info: false,
-                searching: false,
-                paging:false,
+                error: function () {
+                    console.error('โหลดสิทธิ์ลาล้มเหลว');
+                }
             });
-
-            // Select All Checkbox
-            $('#selectAllApprove').on('click', function () {
-                $('.chk-approve').prop('checked', this.checked);
-            });
+            return useds;
         }
 
-// ---------- ฟังก์ชันช่วยแปลงวันที่/เวลา ----------
-        function formatThaiDate(isoDate) {
-            if (!isoDate) return "-";
-            const date = new Date(isoDate);
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return date.toLocaleDateString('th-TH', options).replace(/ /g, ' ');
+        function timeToMinutes(timeStr) {
+            const timePart = timeStr.split('.').pop();
+            const [h, m] = timePart.split(':').map(Number);
+            return h * 60 + m;
         }
 
-        function formatTime(timeStr) {
-            if (!timeStr || timeStr === "739581.00:00:00") return "ทั้งวัน";
-            return timeStr.split('.')[1]?.substring(0, 5) || timeStr;
+        function renderRequestHistory(uncompletes) {
+            const $tbody = $('#table_approve tbody').empty();
+            uncompletes.forEach((row, index) => {
+                let request_date = `${new Date(row.request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.request_date).toLocaleDateString('th-TH')}`;
+                let start_request_date = "";
+                if (row.is_full_day) {
+                    if (row.amount_leave_day > 1) {
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')} - ${new Date(row.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.end_request_date).toLocaleDateString('th-TH')}`;
+                    } else {
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                    }
+                } else {
+                    start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                }
+
+                let duration = 0;
+                let start_request_time = "08:30";
+                let end_request_time = "17:30";
+                if (row.is_full_day) {
+                    duration = row.amount_leave_day;
+                } else {
+                    let start = timeToMinutes(row.start_request_time);
+                    let end = timeToMinutes(row.end_request_time);
+                    let diff = end - start;
+                    duration = (diff / 480).toFixed(2);
+                    if (duration > 0.3 && duration < 0.6) {
+                        duration = 0.50;
+                    }
+                    if (duration >= 0.65 && duration <= 0.9) {
+                        duration = 0.75;
+                    }
+
+                    start_request_time = row.start_request_time.split('.')[1].substring(0, 5);
+                    end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
+                }
+
+                let class_path_file = `<td></td>`;
+                
+                if (row.attachment_required) {
+                    if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                        if (row.path_file === "" || row.path_file === null) {
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>
+                        <td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox" hidden>
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                        } else {
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: green; font-size:22px"></i></td>
+                        <td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                        }
+                    }
+                }
+                const tr = $(`
+                    <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
+                        data-toggle="modal" data-target="#modal_leave"
+                        data-id="${row.request_id}" data-emp-id="${row.emp_id}"
+                        data-request-date="${request_date}" data-leave-date="${start_request_date}"
+                        data-time="${row.start_request_time}" data-duration="${duration}"
+                        data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
+                        <td class="freeze-left-1 clickable-col">${index + 1}</td>
+                        <td class="freeze-left-2 clickable-col">${row.emp_id}</td>
+                        <td class="freeze-left-3 clickable-col">${row.emp_name}</td>
+                        <td class="clickable-col">${request_date}</td>
+                        <td class="clickable-col">${start_request_date}</td>
+                        <td class="clickable-col">${start_request_time}-${end_request_time}</td>
+                        <td class="clickable-col">${duration}</td>
+                        <td class="clickable-col">${row.leave_name_th}</td>
+                        <td class="clickable-col">${row.description}</td>
+                        ${class_path_file}
+                    </tr>
+                `);
+
+                tr.on('click', '.clickable-col', function (e) {
+                    e.stopPropagation();
+                    const $row = $(this).closest('tr');
+                    $('#modal_leave').modal('show');
+                    const data = $row.data();
+                    //$('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
+                    //$('#modal_leave_title').text('แก้ไขการลา');
+                });
+
+                tr.on('click', function (e) {
+                    if (!$(e.target).hasClass('clickable-col') &&
+                        !$(e.target).closest('.clickable-col').length) {
+                        e.stopPropagation();
+                    }
+                });
+                $tbody.append(tr);
+            });
+        }
+        function renderRequestCompleteHistory(completes) {
+            const $tbody = $('#table_complete tbody').empty();
+            completes.forEach((row, index) => {
+                let request_date = `${new Date(row.request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.request_date).toLocaleDateString('th-TH')}`;
+                let start_request_date = "";
+                if (row.is_full_day) {
+                    if (row.amount_leave_day > 1) {
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')} - ${new Date(row.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.end_request_date).toLocaleDateString('th-TH')}`;
+                    } else {
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                    }
+                } else {
+                    start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                }
+
+                let duration = 0;
+                let start_request_time = "08:30";
+                let end_request_time = "17:30";
+                if (row.is_full_day) {
+                    duration = row.amount_leave_day;
+                } else {
+                    let start = timeToMinutes(row.start_request_time);
+                    let end = timeToMinutes(row.end_request_time);
+                    let diff = end - start;
+                    duration = (diff / 480).toFixed(2);
+                    if (duration > 0.3 && duration < 0.6) {
+                        duration = 0.50;
+                    }
+                    if (duration >= 0.65 && duration <= 0.9) {
+                        duration = 0.75;
+                    }
+
+                    start_request_time = row.start_request_time.split('.')[1].substring(0, 5);
+                    end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
+                }
+
+                let class_path_file = `<td></td>`;
+                if (row.attachment_required) {
+                    if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                        if (row.path_file === "" || row.path_file === null) {
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
+                        } else {
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: green; font-size:22px"></i></td>`;
+                        }
+                    }
+                }
+                let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
+                const tr = $(`
+                    <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
+                        data-toggle="modal" data-target="#modal_leave"
+                        data-id="${row.request_id}" data-emp-id="${row.emp_id}"
+                        data-request-date="${request_date}" data-leave-date="${start_request_date}"
+                        data-time="${row.start_request_time}" data-duration="${duration}"
+                        data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
+                        <td class="freeze-left-1 clickable-col">${index + 1}</td>
+                        <td class="freeze-left-2 clickable-col">${row.emp_id}</td>
+                        <td class="freeze-left-3 clickable-col">${row.emp_name}</td>
+                        <td class="clickable-col">${request_date}</td>
+                        <td class="clickable-col">${start_request_date}</td>
+                        <td class="clickable-col">${start_request_time}-${end_request_time}</td>
+                        <td class="clickable-col">${duration}</td>
+                        <td class="clickable-col">${row.leave_name_th}</td>
+                        <td class="clickable-col">${row.description}</td>
+                        ${class_path_file}
+                        <td class="clickable-col"><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
+                    </tr>
+                `);
+                
+                tr.on('click', '.clickable-col', function (e) {
+                    e.stopPropagation();
+                    const $row = $(this).closest('tr');
+                    $('#modal_leave').modal('show');
+                    const data = $row.data();
+                    //$('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
+                    //$('#modal_leave_title').text('แก้ไขการลา');
+                });
+
+                tr.on('click', function (e) {
+                    if (!$(e.target).hasClass('clickable-col') &&
+                        !$(e.target).closest('.clickable-col').length) {
+                        e.stopPropagation();
+                    }
+                });
+
+                $tbody.append(tr);
+            });
         }
     </script>
 }

@@ -8,9 +8,9 @@
     if (levels.Count == 1)
     {
         operation_only = levels.Where(w => w.level == 0).FirstOrDefault();
-    }  
+    }
 
-    string year = DateTime.Now.Year.ToString();
+    string emp_id = ViewBag.emp;
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
@@ -497,7 +497,7 @@
                     <div class="card shadow-sm modern-card" style="border-radius:10px; padding:10px">
                         <div class="card-body" overflow-y:auto">
                             <div class="form-group row">
-                                <label class="kanit-regular col-12" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาที่ใช้ปี @year (วัน)</label>
+                                <label id="label_entitlement" class="kanit-regular col-12" style="font-size:22px; letter-spacing:1px; color:#1C4698;">สิทธิ์การลาที่ใช้ปี (วัน)</label>
                                 <label id="emp_th_used_leave" class="kanit-regular col-12" style="letter-spacing:1px; color:#666;font-size:20px"></label>
                                 <div class="col-12" style="font-size:18px; ">
                                     <div id="div_leaves_used"></div>
@@ -807,7 +807,7 @@
             { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
             { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
             { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
-            { status_en: "Success", status: { status_th: "สำเร็จ", class: "primary" } },
+            { status_en: "Completed", status: { status_th: "สำเร็จ", class: "primary" } },
         ];
 
         $(document).ready(async function () {
@@ -824,12 +824,15 @@
 
             // Check Operation Only
             let operation_only = @Html.Raw(Json.Serialize(operation_only));
-            if (operation_only !== null) {
+            if (operation_only.emp_id !== null) {
                 const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
                 if (emp !== undefined) {
                     selectEmployee(emp);
                 }
             } else {
+                let year = new Date(start).getFullYear();
+                let emp_id = '@Html.Raw(emp_id)';
+                await GetLeaveUsed(emp_id, year);
                 await GetEmployee(start, today);
             }
 
@@ -869,13 +872,13 @@
             });
         }
 
-        async function GetLeaveUsed(emp_id) {
+        async function GetLeaveUsed(emp_id,year) {
             let useds = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetLeaveUsedByEmpID", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { emp_id},
+                data: { emp_id , year},
                 success: function (response) {
                     useds = response;
                 },
@@ -903,6 +906,7 @@
         }
 
         function GenerateUsedLeave(emp_th, useds) {
+
             const $div = $('#div_leaves_used').empty();
             let str = '';
             useds.forEach(b => {
@@ -918,31 +922,27 @@
             $('#emp_th_used_leave').text(emp_th);
         }
 
-        $('#date_start').on('change', async function () {
-            let operation_only = @Html.Raw(Json.Serialize(operation_only));
-            let start = $('#date_start').val();
-            let stop = $('#date_stop').val();
-            if (operation_only !== null) {
-                const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
-                if (emp !== undefined) {
-                    selectEmployee(emp);
-                }
-            } else {
-                await GetEmployee(start, stop);
-            }
-        });
         $('#date_stop').on('change', async function () {
+            $('#emp_th_used_leave').text("");
+            $('#div_leaves_used').empty();
+            $('#employeeInfo').hide();
+
             let operation_only = @Html.Raw(Json.Serialize(operation_only));
             let start = $('#date_start').val();
             let stop = $('#date_stop').val();
-            if (operation_only !== null) {
+            let year = new Date(start).getFullYear();
+            if (operation_only.emp_id !== null) {
                 const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
                 if (emp !== undefined) {
                     selectEmployee(emp);
                 }
             } else {
+                let emp_id = '@Html.Raw(emp_id)';
+                await GetLeaveUsed(emp_id, year);
                 await GetEmployee(start, stop);
             }
+
+            $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
         });
 
         // ===== AUTO-COMPLETE CUSTOM (หลัก) =====
@@ -1072,18 +1072,15 @@
             $('#employeeInfo').show();
             $('#noEmployee').hide();
             $('#employeeSelect').val(emp.emp_id);
-
             loadLeaveUsedAndHistory(emp.emp_id, emp.name_th);
         }
 
         async function loadLeaveUsedAndHistory(emp_id, emp_th_name) {
-            //const year = new Date().getFullYear();
-            //const month = new Date().getMonth() + 1;
             let start = $('#date_start').val();
             let stop = $('#date_stop').val();
-
+            let year = new Date(start).getFullYear();
             GetRequestHistory(emp_id, start, stop);
-            const useds = await GetLeaveUsed(emp_id);
+            const useds = await GetLeaveUsed(emp_id, year);
             GenerateUsedLeave(emp_th_name, useds);
             renderLeaveHistory(emp_id);
         }
@@ -1151,11 +1148,10 @@
                     </tr>
                 `);
 
-                // คลิกแถว → เปิด Modal + เติม emp_id, emp_name
                 tr.on('click', function () {
                     $('#emp_id').val(emp_id);
                     $('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
-                    $('#modal_leave_title').text('แก้ไขการลา'); // ถ้าต้องการ
+                    $('#modal_leave_title').text('แก้ไขการลา');
                     $('#modal_leave').modal('show');
                 });
 

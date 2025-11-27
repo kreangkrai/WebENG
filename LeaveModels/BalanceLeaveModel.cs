@@ -13,5 +13,6 @@ namespace WebENG.LeaveModels
         public string leave_name_en { get; set; }
         public decimal amount_entitlement { get; set; }
         public decimal used { get; set; }
+        public int priority { get; set; }
     }
 }

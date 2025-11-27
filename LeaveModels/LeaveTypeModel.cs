@@ -32,5 +32,6 @@ namespace WebENG.LeaveModels
         public bool calculate_auto { get; set; }
         public decimal amount_entitlement { get; set; }
         public decimal length_start_date { get; set; }
+        public int priority { get; set; }
     }
 }

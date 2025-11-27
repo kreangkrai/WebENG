@@ -53,6 +53,7 @@ namespace WebENG.LeaveServices
                                                           ,[calculate_auto]
                                                           ,[amount_entitlement]
                                                           ,[length_start_date]
+                                                          ,[priority]
                                                       FROM [dbo].[leave_type]
 													  LEFT JOIN [CTL].dbo.[Employees] emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
 													  LEFT JOIN [CTL].dbo.[Employees] emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
@@ -90,6 +91,7 @@ namespace WebENG.LeaveServices
                             calculate_auto = dr["calculate_auto"] != DBNull.Value ? Convert.ToBoolean(dr["calculate_auto"].ToString()) : false,
                             amount_entitlement = dr["amount_entitlement"] != DBNull.Value ? Convert.ToDecimal(dr["amount_entitlement"].ToString()) : 0,
                             length_start_date = dr["length_start_date"] != DBNull.Value ? Convert.ToDecimal(dr["length_start_date"].ToString()) : 0,
+                            priority = dr["priority"] != DBNull.Value ? Convert.ToInt32(dr["priority"].ToString()) : 88
                         };
                         leaves.Add(leave);
                     }
@@ -141,6 +143,7 @@ namespace WebENG.LeaveServices
                                                           ,[calculate_auto]
                                                           ,[amount_entitlement]
                                                           ,[length_start_date]
+                                                          ,[priority]
                                                       FROM [dbo].[leave_type]
 													  LEFT JOIN [CTL].dbo.[Employees] emp1 ON [dbo].[leave_type].[created_by] = emp1.emp_id
 													  LEFT JOIN [CTL].dbo.[Employees] emp2 ON [dbo].[leave_type].[updated_by] = emp2.emp_id
@@ -179,6 +182,7 @@ namespace WebENG.LeaveServices
                             calculate_auto = dr["calculate_auto"] != DBNull.Value ? Convert.ToBoolean(dr["calculate_auto"].ToString()) : false,
                             amount_entitlement = dr["amount_entitlement"] != DBNull.Value ? Convert.ToDecimal(dr["amount_entitlement"].ToString()) : 0,
                             length_start_date = dr["length_start_date"] != DBNull.Value ? Convert.ToDecimal(dr["length_start_date"].ToString()) : 0,
+                            priority = dr["priority"] != DBNull.Value ? Convert.ToInt32(dr["priority"].ToString()) : 88
                         };
                     }
                     dr.Close();                    

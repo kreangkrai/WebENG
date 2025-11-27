@@ -154,7 +154,7 @@ namespace WebENG.LeaveServices
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
                         };
                     }
                     dr.Close();
@@ -230,7 +230,7 @@ namespace WebENG.LeaveServices
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
                         };
                         requests.Add(request);
                     }
@@ -307,7 +307,7 @@ namespace WebENG.LeaveServices
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
                         };
                         requests.Add(request);
                     }
@@ -383,7 +383,7 @@ namespace WebENG.LeaveServices
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
                         };
                         requests.Add(request);
                     }
@@ -459,7 +459,7 @@ namespace WebENG.LeaveServices
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
                         };
                         requests.Add(request);
                     }

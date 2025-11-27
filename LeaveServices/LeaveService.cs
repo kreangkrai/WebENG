@@ -82,7 +82,13 @@ namespace WebENG.LeaveServices
                 }
                 else
                 {
-                    return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear), max_leave_staft), 2);
+                    if (emp.start_date.Day <= 15 && emp.start_date.Month == 1) { 
+                        return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear), max_leave_staft), 2);
+                    }
+                    else
+                    {
+                        return Math.Round((double)Math.Min(min_leave_staft + (targetYear - hireYear) - 1, max_leave_staft), 2);
+                    }
                 }
             }
         }

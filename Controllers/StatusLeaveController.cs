@@ -60,7 +60,7 @@ namespace WebENG.Controllers
 
                 List<LevelModel> levels = Level.GetLevelByEmpID(u.emp_id);
                 ViewBag.levels = levels;
-
+                ViewBag.emp = u.emp_id;
                 return View(u);
             }
             else
@@ -84,9 +84,8 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetLeaveUsedByEmpID(string emp_id)
+        public IActionResult GetLeaveUsedByEmpID(string emp_id , int year)
         {
-            int year = DateTime.Now.Year;
             List<UsedLeaveModel> useds = new List<UsedLeaveModel>();
             List<string> status_pending = new List<string>()
             {
@@ -142,7 +141,8 @@ namespace WebENG.Controllers
                     leave_name_en = leaves[i].leave_name_en,
                     leave_name_th =leaves[i].leave_name_th,
                     amount_entitlement = leaves[i].amount_entitlement,
-                    used = (decimal)used_leave
+                    used = (decimal)used_leave,
+                    priority = leaves[i].priority
                 };
                 useds = useds.GroupBy(g => g.leave_type_code).Select(s => new UsedLeaveModel()
                 {
@@ -151,13 +151,14 @@ namespace WebENG.Controllers
                     leave_name_en = s.FirstOrDefault().leave_name_en,
                     leave_name_th= s.FirstOrDefault().leave_name_th.Split(' ')[0],
                     amount_entitlement = s.FirstOrDefault().amount_entitlement,
-                    used = s.FirstOrDefault().used
+                    used = s.FirstOrDefault().used,
+                    priority = s.FirstOrDefault().priority
 
                 }).ToList();
                 useds.Add(used);
 
             }
-            
+            useds = useds.OrderBy(o => o.priority).ThenBy(t => t.leave_name_th).ToList();
             return Json(useds);
         }
 

@@ -75,7 +75,7 @@ namespace WebENG.Controllers
             List<RequestModel> requests = Requests.GetRequests();
             List<RequestModel> _requests = new List<RequestModel>();
             for (int i = 0; i < requests.Count; i++)
-            {
+            {              
                 if (level.Count > 0)
                 {
                     if (requests[i].is_two_step_approve)
@@ -98,7 +98,7 @@ namespace WebENG.Controllers
                         else
                         {
                             //One Step Approve
-                            bool chk_level = level.Any(a => a == requests[i].level_step + 2);
+                            bool chk_level = level.Any(a => a == requests[i].level_step + 1); //2
                             if (chk_level)
                             {
                                 string request_department = employees.Where(w => w.emp_id == requests[i].emp_id).Select(s => s.department).FirstOrDefault();
@@ -126,8 +126,26 @@ namespace WebENG.Controllers
                 }                
             }
 
-            requests = _requests;
-            return Json(requests);
+            var data = _requests.Select(s => new
+            {
+                emp_id = s.emp_id,
+                emp_name = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
+                request_date = s.request_date,
+                start_request_date = s.start_request_date,
+                end_request_date = s.end_request_date,
+                start_request_time = s.start_request_time,
+                end_request_time = s.end_request_time,
+                amount_leave_day = s.amount_leave_day,
+                leave_name_th = s.leave_name_th,
+                description = s.description,
+                path_file = s.path_file,
+                is_full_day = s.is_full_day,
+                status_request = s.status_request,
+                attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
+                attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
+            }).ToList();
+
+            return Json(data);
         }
 
 
