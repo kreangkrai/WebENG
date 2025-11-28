@@ -1,6 +1,7 @@
 ﻿@model WebENG.Models.UserModel;
 @{
     ViewData["Title"] = "Leave Management";
+
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
@@ -555,7 +556,6 @@
         <span class="kanit-bold d-flex justify-content-center " style="font-size:30px; color:#1C4698; text-align:center;">
             อนุมัติ & ตรวจสอบการลาพนักงาน
         </span>
-        @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
     </div>
 
     <!-- Table Leave Approve -->
@@ -570,14 +570,12 @@
                 <h4 class="kanit-medium mb-0 text-white d-flex align-items-center"
                     style="letter-spacing: 1px; font-size: 22px; gap: 12px;">
                     รายการรออนุมัติ
-                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning kanit-bold"
-                          style="width: 30px; height: 30px; font-size: 16px; padding-left:2px; box-shadow: 0 0px 12px rgba(0, 0, 0, 0.2);">
-                        5
+                    <span id="request_amount" class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning kanit-bold"
+                          style="width: 30px; height: 30px; font-size: 18px; text-align:center; box-shadow: 0 0px 12px rgba(0, 0, 0, 0.2);">
+                        0
                     </span>
                 </h4>
             </div>
-
-               @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
                
             <div class="freeze-pane">
                 <table id="table_approve" class="table table-sm table-hover text-center mb-0">
@@ -601,27 +599,7 @@
                             </th>
                         </tr>
                     </thead>
-
                     <tbody>
-                        <!--<tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
-                            data-toggle="modal" data-target="#modal_leave">
-                            <td>1</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 08:33</td>
-                            <td>ศ. 31/10/25</td>
-                            <td>08:30 - 17:30</td>
-                            <td>1</td>
-                            <td>ลาป่วย</td>
-                            <td>ท้องเสีย</td>
-                            <td><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>--> @*fas fa-minus-circle*@
-                            <!--<td>
-                                <div class="form-check form-check-inline mb-1">
-                                    <input class="form-check-input approve-checkbox" type="checkbox">
-                                    <label class="form-check-label"></label>
-                                </div>
-                            </td>
-                        </tr>-->
                     </tbody>
                 </table>
             </div>
@@ -632,7 +610,7 @@
                     <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                         <div class="row">
                             <div class="col-4">
-                                <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success kanit-medium" style=" border-radius:8px; width:120px; letter-spacing:2px;">
+                                <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success kanit-medium" style=" border-radius:8px; width:120px; letter-spacing:2px;" hidden>
                                     อนุมัติ
                                 </button>
                             </div>
@@ -640,37 +618,6 @@
                     </div>
                 </div>
             </div> 
-
-            @* <!-- Modal : บันทึกการตั้งค่า-->
-            <div class="modal fade" id="modal_reject" tabindex="-1" role="dialog" aria-labelledby="modal_confirm_title" aria-hidden="true" >
-                <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-                    <div class="modal-content kanit-regular" style="border-radius: 10px; overflow: hidden;">
-                        <div class="modal-header" style="background: linear-gradient(90deg, #034694 0%, #022f5b 100%); border-bottom: none; padding: 15px;">
-                            <h5 class="modal-title kanit-medium" style="color: white; font-size: 24px; letter-spacing: 1px;" id="modal_confirm_title">บันทึกการตั้งค่า</h5>
-                            <button type="button" class="close" style="color: white; font-size: 24px;" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body" style="padding: 20px; text-align: center;">
-                            <div id="confirm_content">
-                                <i class="fas fa-save icon-shadow mb-3" style="font-size: 40px; color: #034694;"></i>
-                                <p class="kanit-light" style="font-size: 20px; color: #333; margin-bottom: 0;">คุณต้องการบันทึกหรือไม่?</p>
-                            </div>
-                        </div>
-                        <div class="modal-footer" style="border-top: none; padding: 15px 30px; background-color: #f8f9fa;">
-                            <div class="row justify-content-center" style=" width: 100%;">
-                                <div class="col-xl-4 col-md-4 col-sm-4">
-                                    <button type="button" class="btn modern-btn btn-cancel kanit-medium" data-dismiss="modal">ยกเลิก</button>
-                                </div>
-                                <div class="col-xl-4 col-md-4 col-sm-4">
-                                    <button type="button" class="btn modern-btn btn-save kanit-medium" id="confirm_ok">ยืนยัน</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div> *@
-
         </div>
     </div>
     
@@ -690,15 +637,9 @@
                 </h4>
             </div>
 
-            @*  <label class="kanit-regular" style="font-size:22px; letter-spacing:1px; color:#1C4698;">ประวัติการลา (ปี 2568)</label> *@
-
             <div class="freeze-pane">
                 <table id="table_complete" class="table table-sm table-hover text-center mb-0 overflow-auto">
                     <thead style="font-size:18px; color:#555">
-                        @* <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
-                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
-                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th> *@
                         <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
                             <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
                             <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
@@ -713,82 +654,7 @@
                             <th>สถานะ</th>
                         </tr>
                     </thead>
-
-                    <tbody>
-                        <tr class="clickable-row kanit-regular"
-                            style="color:#555;">
-                            <td>1</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 08:33</td>
-                            <td>ศ. 31/10/25</td>
-                            <td>08:30 - 17:30</td>
-                            <td>1</td>
-                            <td>ลาป่วย</td>
-                            <td>ท้องเสีย</td>
-                            <td><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>2</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 08:46</td>
-                            <td>ศ. 07/11/25 - จ. 10/11/25</td>
-                            <td>08:30 - 17:30</td>
-                            <td>2</td>
-                            <td>ลาพักร้อน</td>
-                            <td>-</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>3</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 03/11/25 09:00</td>
-                            <td>อ. 04/11/25</td>
-                            <td>08:30 - 12:00</td>
-                            <td>0.5</td>
-                            <td>ลาพักร้อนไม่รับค่าจ้าง</td>
-                            <td>-</td>
-                            <td></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>4</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 10/11/25 09:50</td>
-                            <td>พ. 05/11/25</td>
-                            <td>13:30 - 15:30</td>
-                            <td>0.25</td>
-                            <td>ลากิจ(ราชการ)</td>
-                            <td>ทำบัตรประชาชน</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
-
-                        <tr class="clickable-row align-content-center text-center kanit-regular"
-                            style="color:#555">
-                            <td>5</td>
-                            <td>EM010101</td>
-                            <td>นายชัยวัฒน์ สุขสม</td>
-                            <td>จ. 10/11/25 09:50</td>
-                            <td>พ. 05/11/25</td>
-                            <td>13:00 - 17:30</td>
-                            <td>0.5</td>
-                            <td>ลากิจ(ราชการ)</td>
-                            <td>ทำบัตรประชาชน</td>
-                            <td><i class="far fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>
-                            <td><span class="badge badge-success p-2 kanit-regular" style="font-size:16px; border-radius:20px;">อนุมัติ</span></td>
-                        </tr>
+                    <tbody>                       
                     </tbody>
                 </table>
             </div>
@@ -817,10 +683,7 @@
                             </label>
                             <div style="padding-left:20px;">
                                 <div>
-                                    <label class="col-12 kanit-light">นายสาริศ ตรีปทุมรัตน์ (CES-RD)</label>
-                                    <label class="col-6 kanit-light">ลากิจ(ราชการ) (1 วัน)</label>
-                                    <label class="col-6 kanit-light">ทำบัตรประชาชน</label>
-                                    <label class="col-12 kanit-light">ลาวันที่ จ. 24/11/25 เวลา 08:30-17:30</label>
+                                    <label id="leave_description" class="col-12 kanit-light" style="white-space:pre-line"></label>
                                 </div>
                             </div>
                             <hr />
@@ -828,26 +691,16 @@
                     </div>
 
                     <!-- ส่วนแสดงรายการไฟล์ -->
-                    <div class="col-12 mb-4" id="fileList">
+                    <div class="col-12 mb-4" id="div_fileList" hidden>
                         <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
                             <i class="fas fa-paperclip mr-2"></i>เอกสารที่แนบ
                         </label>
                         <div class="card" style="border-radius: 10px; ">
                             <div class="list-group" id="fileListContainer">
-                                <!-- ตัวอย่างไฟล์ -->
-                                <div class="list-group-item d-flex align-items-center file-item">
-                                    <i class="fas fa-file-image text-primary mr-2"></i>
-                                    <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
-                                </div>
-                                <div class="list-group-item d-flex align-items-center file-item">
-                                    <i class="fas fa-file-pdf text-danger mr-2"></i>
-                                    <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
-                                </div>
+                               
                             </div>
                         </div>
                     </div>
-
-                    <hr />
 
                     <div class="col-12">
                         <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
@@ -855,9 +708,6 @@
                         </label>
 
                         <div class="timeline-container" style="position: relative; padding-left: 35px;">
-                            <!-- เส้นกลาง -->
-                            <div style="position: absolute; left: 15px; top: 15px; bottom: 10px; width: 3px; background: #e9ecef; border-radius: 3px;"></div>
-
                             <div class="d-flex align-items-center mb-3 text-success">
                                 <i class="fas fa-check-circle fa-lg mr-3"></i>
                                 <div class="flex-grow-1">
@@ -882,93 +732,33 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- รายการที่ 1 (อนุมัติแล้ว) -->
-                    @* <div class="d-flex mb-4" style="position: relative;">
-                    <div style="position: absolute; left: -31px; top: 2px;">
-                    <i class="fas fa-check-circle text-success" style="font-size: 24px;"></i>
-                    </div>
-                    <div class="bg-white rounded shadow-sm p-3 flex-grow-1" style="border-left: 4px solid #28a745;">
-                    <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                    <strong class="kanit-medium">Chakrit R.</strong>
-                    <span class="text-muted kanit-regular" style="font-size: 0.9rem;"> (Manager)</span>
-                    </div>
-                    <span class="badge badge-success kanit-medium">อนุมัติ</span>
-                    </div>
-                    <div class="text-muted mt-1" style="font-size: 0.85rem;">
-                    <i class="far fa-clock mr-1"></i>24 พ.ย. 2568 14:32 น.
-                    </div>
-                    </div>
-                    </div>
-
-                    <!-- รายการที่ 2 (รออนุมัติ) -->
-                    <div class="d-flex mb-4" style="position: relative;">
-                    <div style="position: absolute; left: -31px; top: 2px;">
-                    <i class="fas fa-clock text-warning" style="font-size: 24px;"></i>
-                    </div>
-                    <div class="bg-white rounded shadow-sm p-3 flex-grow-1" style="border-left: 4px solid #ffc107; opacity: 0.8;">
-                    <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                    <strong class="kanit-medium">Siriporn S.</strong>
-                    <span class="text-muted kanit-regular" style="font-size: 0.9rem;"> (Admin)</span>
-                    </div>
-                    <span class="badge badge-warning text-dark kanit-medium">รออนุมัติ</span>
-                    </div>
-                    <div class="text-muted mt-1" style="font-size: 0.85rem;">
-                    <i class="far fa-clock mr-1"></i>ยังไม่ดำเนินการ
-                    </div>
-                    </div>
-                    </div>*@
-
                 </form>
             </div>
             <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
             <div class="modal-footer d-flex">
                 <div class="input-group mb-2">
-                    <input type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" aria-label="Username" aria-describedby="basic-addon1">
+                    <textarea id="leave_reason" type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" rows="2" ></textarea>
                 </div>
                 <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                     <div class="row kanit-medium">
-                        @* <div class="ml-2">
-                        <button id="btn_reject_leave" data-target="#modal_reject" class="btn modern-btn btn-outline-danger" style=" border-radius:8px; width:90px; letter-spacing:1px">
-                        ปฏิเสธ
-                        </button>
-                        </div>
-                        <div class="ml-2">
-                        <button id="btn_resubmit_leave" data-target="#modal_resubmit" class="btn modern-btn btn-outline-warning" style=" border-radius:8px; width:90px; letter-spacing:1px">
-                        ส่งกลับ
-                        </button>
-                        </div>
-                        <div class="ml-2">
-                        <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success" style=" border-radius:8px; width:90px; letter-spacing:1px">
-                        อนุมัติ
-                        </button>
-                        </div>*@
                         <div class="ml-2">
                             <button id="btn_reject_leave"
                                     class="btn modern-btn btn-outline-danger"
-                                    style="border-radius:8px; width:90px; letter-spacing:1px"
-                                    data-toggle="modal"
-                                    data-target="#modal_reject">
+                                    style="border-radius:8px; width:90px; letter-spacing:1px" onclick="RejectClicked()">
                                 ปฏิเสธ
                             </button>
                         </div>
                         <div class="ml-2">
                             <button id="btn_resubmit_leave"
                                     class="btn modern-btn btn-outline-warning"
-                                    style="border-radius:8px; width:90px; letter-spacing:1px"
-                                    data-toggle="modal"
-                                    data-target="#modal_resubmit">
+                                    style="border-radius:8px; width:90px; letter-spacing:1px" onclick="ResubmitClicked()">
                                 ส่งกลับ
                             </button>
                         </div>
                         <div class="ml-2">
                             <button id="btn_approve_leave"
                                     class="btn modern-btn btn-success"
-                                    style="border-radius:8px; width:90px; letter-spacing:1px"
-                                    data-toggle="modal"
-                                    data-target="#modal_approve">
+                                    style="border-radius:8px; width:90px; letter-spacing:1px" onclick="ApproveClicked()">
                                 อนุมัติ
                             </button>
                         </div>
@@ -981,7 +771,7 @@
 
 <!-- ====================== Modal ปฏิเสธ ====================== -->
 <div class="modal fade" id="modal_reject" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
             <div class="modal-header bg-danger text-white" style="border-radius: 12px 12px 0 0;">
                 <h5 class="modal-title kanit-semibold">
@@ -1013,7 +803,7 @@
 
 <!-- ====================== Modal ส่งกลับ ====================== -->
 <div class="modal fade" id="modal_resubmit" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
             <div class="modal-header bg-warning text-dark" style="border-radius: 12px 12px 0 0;">
                 <h5 class="modal-title kanit-semibold">
@@ -1028,10 +818,6 @@
                 <p class="kanit-medium mb-3" style="font-size: 1.1rem;">
                     คุณต้องการ <strong class="text-warning">ส่งกลับ</strong> คำขอนี้ให้พนักงานแก้ไขหรือไม่?
                 </p>
-                <div class="form-group text-left">
-                    <label class="kanit-medium">เหตุผลที่ส่งกลับ <span class="text-danger">*</span></label>
-                    <textarea class="form-control" id="resubmit_reason" rows="3" placeholder="กรุณาระบุเหตุผล..." required></textarea>
-                </div>
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0">
                 <button type="button" class="btn btn-secondary kanit-medium px-4" data-dismiss="modal" style="border-radius: 8px;">
@@ -1047,7 +833,7 @@
 
 <!-- ====================== Modal อนุมัติ ====================== -->
 <div class="modal fade" id="modal_approve" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
             <div class="modal-header bg-success text-white" style="border-radius: 12px 12px 0 0;">
                 <h5 class="modal-title kanit-semibold">
@@ -1097,8 +883,55 @@
 
         $(document).ready(function () {
             GetRequests();
-            
+
+            $('#modal_reject, #modal_resubmit, #modal_approve').on('show.bs.modal', function () {
+                var $modal = $(this);
+
+                $modal.css('z-index', 1060);
+                setTimeout(function () {
+                    $('.modal-backdrop').last().css('z-index', 1059);
+                }, 50);
+                setTimeout(function () {
+                    var $dialog = $modal.find('.modal-dialog');
+                    $dialog.css({
+                        'left': '-5px',
+                        'top': '',
+                        'transform': 'none'
+                    });
+                }, 150);
+            });
         });
+
+        function ResubmitClicked() {
+            let reason = $('#leave_reason').val().trim();
+            if (reason !== "" && reason !== null) {
+                $('#modal_resubmit').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            } else {
+                alert("กรุณาใส่เหตุผลการส่งกลับ");
+            }
+        }
+
+        function RejectClicked() {
+            let reason = $('#leave_reason').val().trim();
+            if (reason !== "" && reason !== null) {
+                $('#modal_reject').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+            } else {
+                alert("กรุณาใส่เหตุผลการส่งปฏิเสธ");
+            }
+        }
+
+        function ApproveClicked() {
+            $('#modal_approve').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
 
         async function GetRequests() {
             let useds = [];
@@ -1113,6 +946,7 @@
                     let uncompletes = requests.filter(f => f.status_request !== "Completed").map(m => m);
                     renderRequestHistory(uncompletes);
                     renderRequestCompleteHistory(completes);
+                    $('#request_amount').text(uncompletes.length);
                 },
                 error: function () {
                     console.error('โหลดสิทธิ์ลาล้มเหลว');
@@ -1130,16 +964,16 @@
         function renderRequestHistory(uncompletes) {
             const $tbody = $('#table_approve tbody').empty();
             uncompletes.forEach((row, index) => {
-                let request_date = `${new Date(row.request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.request_date).toLocaleDateString('th-TH')}`;
+                let request_date = `${new Date(row.request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.request_date).toLocaleDateString('en-GB')}`;
                 let start_request_date = "";
                 if (row.is_full_day) {
                     if (row.amount_leave_day > 1) {
-                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')} - ${new Date(row.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.end_request_date).toLocaleDateString('th-TH')}`;
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('en-GB')} - ${new Date(row.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.end_request_date).toLocaleDateString('en-GB')}`;
                     } else {
-                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
                     }
                 } else {
-                    start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                    start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
                 }
 
                 let duration = 0;
@@ -1164,20 +998,20 @@
                 }
 
                 let class_path_file = `<td></td>`;
-                
+                let class_check = `<td></td>`;
                 if (row.attachment_required) {
                     if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
                         if (row.path_file === "" || row.path_file === null) {
-                            class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>
-                        <td>
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
+                            class_check = `<td>
                             <div class="form-check form-check-inline mb-1">
                                 <input class="form-check-input approve-checkbox" type="checkbox" hidden>
                                 <label class="form-check-label"></label>
                             </div>
                         </td>`;
                         } else {
-                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: green; font-size:22px"></i></td>
-                        <td>
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`;
+                            class_check = `<td>
                             <div class="form-check form-check-inline mb-1">
                                 <input class="form-check-input approve-checkbox" type="checkbox">
                                 <label class="form-check-label"></label>
@@ -1185,7 +1019,16 @@
                         </td>`;
                         }
                     }
+                } else {
+                    class_path_file = `<td></td>`;
+                    class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
                 }
+
                 const tr = $(`
                     <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
                         data-toggle="modal" data-target="#modal_leave"
@@ -1195,7 +1038,7 @@
                         data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
                         <td class="freeze-left-1 clickable-col">${index + 1}</td>
                         <td class="freeze-left-2 clickable-col">${row.emp_id}</td>
-                        <td class="freeze-left-3 clickable-col">${row.emp_name}</td>
+                        <td class="freeze-left-3 clickable-col">${row.emp_name_th}</td>
                         <td class="clickable-col">${request_date}</td>
                         <td class="clickable-col">${start_request_date}</td>
                         <td class="clickable-col">${start_request_time}-${end_request_time}</td>
@@ -1203,6 +1046,7 @@
                         <td class="clickable-col">${row.leave_name_th}</td>
                         <td class="clickable-col">${row.description}</td>
                         ${class_path_file}
+                        ${class_check}
                     </tr>
                 `);
 
@@ -1210,9 +1054,40 @@
                     e.stopPropagation();
                     const $row = $(this).closest('tr');
                     $('#modal_leave').modal('show');
-                    const data = $row.data();
-                    //$('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
-                    //$('#modal_leave_title').text('แก้ไขการลา');
+                    const requestId = $row.attr('data-id');
+                    const request = uncompletes.filter(f => f.request_id === requestId).map(m => m)[0];
+                    let description = "";
+                    if (request.is_full_day) {
+                        if (request.amount_leave_day > 1) {
+                            description = `ชื่อ : ${request.emp_name_th}
+                                         ประเภทการลา : ${request.leave_name_th}
+                                         ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} -  ${new Date(request.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.end_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
+                                         รายละเอียด : ${request.description}`;
+                        } else {
+                            description = `ชื่อ : ${request.emp_name_th}
+                                         ประเภทการลา : ${request.leave_name_th}
+                                         ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
+                                         รายละเอียด : ${request.description}`;
+                        }
+                    } else {
+                        description = `ชื่อ : ${request.emp_name_th}
+                                         ประเภทการลา : ${request.leave_name_th}
+                                         ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')}
+                                         เวลา : ${request.start_request_time.split('.')[1].substring(0, 5)} - ${request.end_request_time.split('.')[1].substring(0, 5)}
+                                         รายละเอียด : ${request.description}`;
+                    }
+                    $('#leave_description').text(description);
+
+                    //Check Attach File List
+                    if (request.attachment_required) {
+                        let year = new Date(request.start_request_date).getFullYear();
+                        GetFiles(request.leave_type_id, request.request_id, year);
+
+                        $('#div_fileList').attr('hidden', false);
+                    } else {
+                        $('#div_fileList').attr('hidden', true);
+                    }
+                    console.log(request);
                 });
 
                 tr.on('click', function (e) {
@@ -1227,16 +1102,16 @@
         function renderRequestCompleteHistory(completes) {
             const $tbody = $('#table_complete tbody').empty();
             completes.forEach((row, index) => {
-                let request_date = `${new Date(row.request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.request_date).toLocaleDateString('th-TH')}`;
+                let request_date = `${new Date(row.request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.request_date).toLocaleDateString('en-GB')}`;
                 let start_request_date = "";
                 if (row.is_full_day) {
                     if (row.amount_leave_day > 1) {
-                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')} - ${new Date(row.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.end_request_date).toLocaleDateString('th-TH')}`;
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('en-GB')} - ${new Date(row.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.end_request_date).toLocaleDateString('en-GB')}`;
                     } else {
-                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                        start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
                     }
                 } else {
-                    start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('th-TH')}`;
+                    start_request_date = `${new Date(row.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
                 }
 
                 let duration = 0;
@@ -1280,7 +1155,7 @@
                         data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
                         <td class="freeze-left-1 clickable-col">${index + 1}</td>
                         <td class="freeze-left-2 clickable-col">${row.emp_id}</td>
-                        <td class="freeze-left-3 clickable-col">${row.emp_name}</td>
+                        <td class="freeze-left-3 clickable-col">${row.emp_name_th}</td>
                         <td class="clickable-col">${request_date}</td>
                         <td class="clickable-col">${start_request_date}</td>
                         <td class="clickable-col">${start_request_time}-${end_request_time}</td>
@@ -1291,12 +1166,13 @@
                         <td class="clickable-col"><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
                     </tr>
                 `);
-                
+
                 tr.on('click', '.clickable-col', function (e) {
                     e.stopPropagation();
                     const $row = $(this).closest('tr');
                     $('#modal_leave').modal('show');
                     const data = $row.data();
+
                     //$('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
                     //$('#modal_leave_title').text('แก้ไขการลา');
                 });
@@ -1311,5 +1187,148 @@
                 $tbody.append(tr);
             });
         }
+
+        $('#selectAllApprove').on('change', function () {
+            const isChecked = this.checked;
+            const $checkboxes = $('#table_approve tbody .approve-checkbox');
+
+            $checkboxes.not(':hidden').prop('checked', isChecked).trigger('change');
+
+            $('#table_approve tbody tr').each(function () {
+                const $cb = $(this).find('.approve-checkbox');
+                if (!$cb.is(':hidden')) {
+                    $(this).toggleClass('table-primary', isChecked);
+                }
+            });
+        });
+
+        $(document).on('change', '#table_approve tbody .approve-checkbox', function () {
+            const totalVisible = $('#table_approve tbody .approve-checkbox').not(':hidden').length;
+            const totalChecked = $('#table_approve tbody .approve-checkbox:checked').not(':hidden').length;
+
+            const allChecked = totalVisible > 0 && totalChecked === totalVisible;
+            const someChecked = totalChecked > 0 && totalChecked < totalVisible;
+
+            const $selectAll = $('#selectAllApprove');
+            $selectAll.prop({
+                checked: allChecked,
+                indeterminate: someChecked
+            });
+
+            $(this).closest('tr').toggleClass('table-primary', this.checked);
+            if (allChecked || someChecked) {
+                $('#btn_approve_leave').attr('hidden', false);
+            } else {
+                $('#btn_approve_leave').attr('hidden', true);
+            }
+        });
+
+        function getSelectedRows() {
+            const selectedRows = [];
+
+            $('#table_approve tbody .approve-checkbox:checked').each(function () {
+                const $row = $(this).closest('tr');
+                const rowData = {
+                    request_id: $row.data('id'),
+                    emp_id: $row.data('emp-id'),
+                    emp_name_th: $row.find('td.freeze-left-3').text().trim(),
+                    request_date: $row.data('request-date'),
+                    leave_date: $row.data('leave-date'),
+                    leave_time: $row.find('td:eq(5)').text().trim(),
+                    duration_days: parseFloat($row.find('td:eq(6)').text()),
+                    leave_type: $row.data('type'),
+                    description: $row.data('note'),
+                    status: $row.data('status'),
+                };
+
+                selectedRows.push(rowData);
+            });
+
+            return selectedRows;
+        }
+
+        $('#btn_approve_leave').on('click', function () {
+            const selected = getSelectedRows();
+
+            console.log('รายการที่เลือกทั้งหมด:', selected);
+
+        });
+
+        async function GetFiles(leave_type_id, request_id, year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetFiles", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    leave_type_id, request_id, year
+                },
+                success: function (response) {
+                    const myFiles = response;
+                    console.log(myFiles);
+                    loadExistingFiles(myFiles);
+                }
+            });
+        }
+
+        
+        function createFileItem(fileName, fileType, fileUrl) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'list-group-item d-flex align-items-center file-item added';
+
+            const viewLink = document.createElement('a');
+            viewLink.href = fileUrl;
+            viewLink.target = '_blank';
+            viewLink.rel = 'noopener';
+            viewLink.className = 'text-decoration-none flex-grow-1 d-flex align-items-center';
+            viewLink.style.cursor = 'pointer';
+
+            const iconClass = fileType.includes('pdf')
+                ? 'fas fa-file-pdf text-danger'
+                : 'fas fa-file-image text-primary';
+
+            viewLink.innerHTML = `
+        <i class="${iconClass} mr-2"></i>
+        <span class="kanit-regular text-dark">${fileName}</span>
+    `;
+            fileItem.appendChild(viewLink);
+
+            return fileItem;
+        }
+
+        function loadExistingFiles(fileArray) {
+            $('#fileListContainer').empty();
+            const container = document.getElementById('fileListContainer');
+
+            if (fileArray.length > 0) {
+                fileArray.forEach(file => {
+                    let fileType = file.type;
+                    if (!fileType && file.filename) {
+                        const ext = file.filename.split('.').pop().toLowerCase();
+                        if (['pdf'].includes(ext)) fileType = 'pdf';
+                        else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) fileType = 'image';
+                        else if (['doc', 'docx'].includes(ext)) fileType = 'word';
+                        else if (['xls', 'xlsx'].includes(ext)) fileType = 'excel';
+                        else fileType = 'file';
+                    }
+
+                    const item = createFileItem(file.filename, fileType, file.path);
+                    container.appendChild(item);
+                });
+            } else {
+                container.appendChild(createTextMessage("ไม่มีเอกสาร", "text-danger"));
+            }
+        }
+
+        function createTextMessage(message, textColor = "text-danger") {
+            const div = document.createElement('div');
+            div.className = `list-group-item text-center py-4 ${textColor}`;
+            div.style.fontSize = '1.1rem';
+            div.innerHTML = `
+        <i class="fas fa-info-circle fa-2x mb-3 opacity-50"></i><br>
+        <span class="kanit-regular">${message}</span>
+    `;
+            return div;
+        }
+
     </script>
 }

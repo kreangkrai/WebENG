@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.CTLInterfaces;
@@ -52,6 +53,13 @@ namespace WebENG.Controllers
 
                 GetRequest();
 
+                string fileName = "J25-0203 AGC TANK MONITOR - AutoBackup.pdf";
+                var previewUrl = Url.Action(
+                "PreviewFile",
+                "ManagementLeave",
+                new { fileName },
+                Request.Scheme
+                );
 
                 return View(u);
             }
@@ -128,8 +136,11 @@ namespace WebENG.Controllers
 
             var data = _requests.Select(s => new
             {
+                request_id = s.request_id,
+                leave_type_id = s.leave_type_id,
                 emp_id = s.emp_id,
-                emp_name = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
+                emp_name_en = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
+                emp_name_th = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_th).FirstOrDefault(),
                 request_date = s.request_date,
                 start_request_date = s.start_request_date,
                 end_request_date = s.end_request_date,
@@ -154,6 +165,102 @@ namespace WebENG.Controllers
         {
             List<EmpModel> emps = Employee.GetEmps();
             return Ok(emps);
+        }
+
+        [HttpGet]
+        public IActionResult GetFiles(string leave_type_id, string request_id,int year)
+        {
+            List<FileModel> files = new List<FileModel>();
+            var tempFolder = Path.Combine("Uploads", leave_type_id, year.ToString(), request_id);
+
+            if (!Directory.Exists(tempFolder))
+                return Json(files);
+
+            try
+            {
+                foreach (var fullPath in Directory.GetFiles(tempFolder, "*.*", SearchOption.AllDirectories))
+                {
+                    var fileNameOnly = Path.GetFileName(fullPath);
+                    
+                    var relativePath = Path.GetRelativePath(
+                        Path.Combine(Directory.GetCurrentDirectory(), tempFolder),
+                        fullPath).Replace("\\", "/");
+                    string type = GetMimeType(relativePath);
+                    var previewUrl = Url.Action(
+                        "PreviewFile",
+                        "ManagementLeave",
+                        new { filename = relativePath , leave_type_id = leave_type_id,year = year , request_id = request_id },
+                        Request.Scheme);
+
+                    files.Add(new FileModel()
+                    {
+                        type = type,
+                        filename = fileNameOnly,
+                        path = previewUrl
+                    });
+                }
+            }
+            catch { }
+
+            return Json(files);
+
+        }
+
+        [HttpGet]
+        public IActionResult PreviewFile(string fileName, string leave_type_id, int year,string request_id)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return BadRequest();
+
+            if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\") ||
+                fileName.Contains(":") || Path.IsPathRooted(fileName))
+                return BadRequest("Invalid file name");
+
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", leave_type_id, year.ToString(), request_id);
+
+            var fullPath = Path.GetFullPath(Path.Combine(basePath, fileName));
+
+            if (!fullPath.StartsWith(basePath + Path.DirectorySeparatorChar))
+                return BadRequest("Access denied");
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            var mimeType = GetMimeType(fileName);
+            var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            Response.Headers["Content-Disposition"] = "inline";
+            return new FileStreamResult(stream, mimeType);
+        }
+
+        private string GetMimeType(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return "application/octet-stream";
+
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            switch (extension)
+            {
+                case ".pdf":
+                    return "application/pdf";
+
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+
+                case ".png":
+                    return "image/png";
+
+                case ".xls":
+                    return "application/vnd.ms-excel";
+
+                case ".xlsx":
+                    return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                default:
+                    return "application/octet-stream";
+            }
         }
     }
 }

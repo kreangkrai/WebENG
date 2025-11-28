@@ -18,10 +18,18 @@ using System.IO;
 using System.Data.SqlClient;
 /*
 
-Pending , Resubmit => Operation, Manager
-Cancelled , Approved, Rejected ,Returned
-Completed
+1 Step
+Returned = Wait Edit and Resubmit
+1. Created <==> Resubmit (ส่งใหม่)
+2. Approved , Canceled , Rejected , Returned
+3. Completed
 
+2 Step
+Returned = Wait Edit and Resubmit
+1. Created <==> Resubmit (ส่งใหม่)
+2. Pending , Canceled , Rejected , Returned
+3. Approved , Canceled , Rejected , Returned
+4. Completed
 */
 namespace WebENG.Controllers
 {
@@ -134,7 +142,8 @@ namespace WebENG.Controllers
                 "Resubmit",
                 "Approved",
                 "Returned",
-                "Successed"
+                "Completed",
+                "Created"
             };
             LeaveTypeModel leave = LeaveType.GetLeaveTypeByID(leave_type_id);
             string leave_type_code = leave.leave_type_code;
@@ -190,6 +199,7 @@ namespace WebENG.Controllers
             string request_id = $"{request.emp_id}_{now.ToString("yyyyMMddHHmmss")}";
             request.request_date = now;
             request.request_id = request_id;
+            request.status_request = "Created";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
 
             if (tempFileIds.Length > 0) // มีไฟล์แนบมา
@@ -225,7 +235,7 @@ namespace WebENG.Controllers
                                 action_by_name = level.FirstOrDefault().emp_name,
                                 action_by_level = level.FirstOrDefault().level,
                                 old_status = "",
-                                new_status = "Pending",
+                                new_status = "Created",
                                 comment = "",
                                 old_level_step = -1,
                                 new_level_step = level.FirstOrDefault().level,
