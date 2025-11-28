@@ -369,6 +369,125 @@
     .freeze-corner {
         z-index: 15 !important;
     }
+
+    #modal_leave .modal-body {
+        height: auto !important; /* ลบ 600px ออก */
+        max-height: 70vh;
+    }
+
+    .modal-footer {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        z-index: 1;
+        box-shadow: 0 -5px 10px rgba(0,0,0,0.05);
+    }
+
+    /* ปุ่มทันสมัย 2025 - ใช้ชุดแรก แต่ไม่มี shimmer */
+    .modern-btn {
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 12px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        min-width: 110px;
+    }
+
+        /* Hover สวย ยกขึ้น + เงาเข้มขึ้น (ไม่มีแสงวิ่งแล้ว) */
+        .modern-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+        }
+
+    /* ปุ่มปฏิเสธ */
+    .btn-outline-danger.modern-btn {
+        color: #e74c3c;
+        border: 2px solid #e74c3c;
+        background: transparent;
+    }
+
+        .btn-outline-danger.modern-btn:hover {
+            background: #e74c3c;
+            color: white;
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+        }
+
+    /* ปุ่มส่งกลับ */
+    .btn-outline-warning.modern-btn {
+        color: #f39c12;
+        border: 2px solid #f39c12;
+        background: transparent;
+    }
+
+        .btn-outline-warning.modern-btn:hover {
+            background: #f39c12;
+            color: white;
+            box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+        }
+
+    /* ปุ่มอนุมัติ */
+    .btn-success.modern-btn {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        border: 2px solid #27ae60;
+        color: white;
+        background-size: 200% 200%;
+        transition: all 0.4s ease;
+    }
+
+        .btn-success.modern-btn:hover {
+            background-position: 100% 100%;
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);
+            transform: translateY(-3px);
+        }
+
+    /* ปุ่ม Primary แบบใหม่ – เข้ากับชุดปุ่มอนุมัติ/ปฏิเสธ 100% */
+    .btn-primary.modern-btn {
+        background: linear-gradient(135deg, #2c79c9, #3498db); /* น้ำเงินสวย ดูเป็นองค์กร */
+        background-size: 200% 200%;
+        border: none;
+        color: white;
+        transition: all 0.4s ease;
+    }
+
+        .btn-primary.modern-btn:hover {
+            background-position: 100% 100%; /* ไหลลื่นเหมือนปุ่มอนุมัติ */
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.35);
+            transform: translateY(-3px);
+            color: white;
+        }
+
+    /* ถ้าอยากใช้แบบ outline (เส้นขอบ) บางกรณี */
+    .btn-outline-primary.modern-btn {
+        color: #3498db;
+        border: 2px solid #3498db;
+        background: transparent;
+    }
+
+        .btn-outline-primary.modern-btn:hover {
+            background: #3498db;
+            color: white;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+    /* ไอคอนยังคงสวยงาม */
+    .modern-btn i {
+        margin-right: 6px;
+        font-size: 1.1em;
+    }
+
+    body, .modal, .btn, .toast * {
+        font-family: 'Kanit', sans-serif !important;
+    }
+
+    .toast-header strong,
+    .toast-body {
+        font-weight: 400 !important; /* Kanit Regular */
+    }
+
+    .toast-header {
+        font-weight: 500 !important; /* หัวข้อ Toast ตัวหนาเล็กน้อยให้อ่านง่าย */
+    }
 </style>
 
 
@@ -562,12 +681,118 @@
 </div>
 
 <!-- Task Modal -->
-
-<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
         <div class="modal-content kanit-regular">
             <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title" id="modal_leave_title">ยื่นการลา</h5>
+                <h5 class="modal-title" id="modal_leave_title">ข้อมูลการลา</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style=" color:#555555; overflow-y:auto">
+                <form>
+                    <!-- ข้อมูลการลา -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                                <i class="fas fa-info-circle mr-2"></i>ข้อมูลการลา
+                            </label>
+                            <div style="padding-left:20px;">
+                                <div>
+                                    <label class="col-12 kanit-light">นายสาริศ ตรีปทุมรัตน์ (CES-RD)</label>
+                                    <label class="col-6 kanit-light">ลากิจ(ราชการ) (1 วัน)</label>
+                                    <label class="col-6 kanit-light">ทำบัตรประชาชน</label>
+                                    <label class="col-12 kanit-light">ลาวันที่ จ. 24/11/25 เวลา 08:30-17:30</label>
+                                </div>
+                            </div>
+                            <hr />
+                        </div>
+                    </div>
+
+                    <!-- ส่วนแสดงรายการไฟล์ -->
+                    <div class="col-12 mb-4" id="fileList">
+                        <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                            <i class="fas fa-paperclip mr-2"></i>เอกสารที่แนบ
+                        </label>
+                        <div class="card" style="border-radius: 10px; ">
+                            <div class="list-group" id="fileListContainer">
+                                <!-- ตัวอย่างไฟล์ -->
+                                <div class="list-group-item d-flex align-items-center file-item">
+                                    <i class="fas fa-file-image text-primary mr-2"></i>
+                                    <a href="#" class="file-link kanit-regular flex-grow-1">File_001.png</a>
+                                </div>
+                                <div class="list-group-item d-flex align-items-center file-item">
+                                    <i class="fas fa-file-pdf text-danger mr-2"></i>
+                                    <a href="#" class="file-link kanit-regular flex-grow-1">File_002.pdf</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="col-12">
+                        <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
+                            <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
+                        </label>
+
+                        <div class="timeline-container" style="position: relative; padding-left: 35px;">
+                            <!-- เส้นกลาง -->
+                            <div style="position: absolute; left: 15px; top: 15px; bottom: 10px; width: 3px; background: #e9ecef; border-radius: 3px;"></div>
+
+                            <div class="d-flex align-items-center mb-3 text-success">
+                                <i class="fas fa-check-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">Chakrit R.</span>
+                                    <span class="text-muted kanit-regular">(Manager)</span>
+                                    <div>
+                                        <span class="text-success kanit-medium">อนุมัติแล้ว</span>
+                                        <span class="text-muted kanit-medium"> • 26/11/25 14:32</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>
+                            <div class="d-flex align-items-center mb-3 text-warning">
+                                <i class="fas fa-clock fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555"> </span>
+                                    <span class="text-muted kanit-regular">(Checker)</span>
+                                    <div>
+                                        <span class="text-muted kanit-medium">รอตรวจสอบ</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
+            <div class="modal-footer d-flex">
+                <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-center">
+                    <div class="row kanit-medium">
+                        <div class="ml-2">
+                            <button id="btn_approve_leave"
+                                    class="btn modern-btn btn-outline-primary"
+                                    style="border-radius:8px;  letter-spacing:1px"
+                                    data-toggle="modal"
+                                    data-target="#modal_edit_leave">
+                                แก้ไขการลา
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="modal_edit_leave" tabindex="-1" role="dialog" aria-hidden="true" style="overflow-y:hidden">
+    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title" id="modal_leave_title">แก้ไขการลา</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
@@ -727,60 +952,94 @@
                     <!----------------------------------------------------------------------------------------->
                     <hr />
 
-                    <div class="form-group row">
-                        <div class="col-12">
-                            <label for="approvers" class="kanit-medium">ผู้อนุมัติ</label>
-                            <div class="card" style="border-radius: 10px; overflow: hidden;">
-                                <!-- ข้อความแนะนำ (ถ้ามีผู้จัดการ 2 คน) -->
-                                <div class="p-3 kanit-regular text-muted" id="approver-note" style="display: none;">
-                                    <i class="fas fa-info-circle mr-2"></i>เลือกอนุมัติโดย 1 ใน 2 ผู้จัดการด้านล่าง
+
+                    <div class="col-12">
+                        <label class="kanit-medium" style="letter-spacing:1px; font-size:16px; color:#555;">
+                            ไทม์ไลน์การอนุมัติ
+                        </label>
+
+                        <div class="timeline-container" style="position: relative; padding-left: 35px;">
+                            <!-- เส้นกลาง -->
+                            <div style="position: absolute; left: 15px; top: 15px; bottom: 10px; width: 3px; background: #e9ecef; border-radius: 3px;"></div>
+
+                            <div class="d-flex align-items-center mb-3 text-success">
+                                <i class="fas fa-check-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">Chakrit R.</span>
+                                    <span class="text-muted kanit-regular">(Manager)</span>
+                                    <div>
+                                        <span class="text-success kanit-medium">อนุมัติแล้ว</span>
+                                        <span class="text-muted kanit-medium"> • 26/11/25 14:32</span>
+                                    </div>
                                 </div>
-                                <div class="list-group" id="approverList">
-                                    <!-- ผู้อนุมัติคนที่ 1 -->
-                                    <div class="list-group-item d-flex align-items-center approver-item">
-                                        <div class="col-6">
-                                            <i class="fas fa-user-check mr-2 text-primary"></i>
-                                            <span class="kanit-regular">Chakrit R.</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <span class="kanit-regular text-muted">Manager</span>
-                                        </div>
-                                    </div>
-                                    <!-- ผู้อนุมัติคนที่ 2 (ถ้ามี) -->
-                                    <div class="list-group-item d-flex align-items-center approver-item">
-                                        <div class="col-6">
-                                            <i class="fas fa-user-check mr-2 text-primary"></i>
-                                            <span class="kanit-regular">Kriangkrai R.</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <span class="kanit-regular text-muted">Manager</span>
-                                        </div>
-                                    </div>
-                                    <!-- ผู้อนุมัติคนที่ 3 -->
-                                    <div class="list-group-item d-flex align-items-center approver-item">
-                                        <div class="col-6">
-                                            <i class="fas fa-user-check mr-2 text-primary"></i>
-                                            <span class="kanit-regular">Siriporn S.</span>
-                                        </div>
-                                        <div class="col-6">
-                                            <span class="kanit-regular text-muted">Admin</span>
-                                        </div>
+                                <hr />
+                            </div>
+                            <div class="d-flex align-items-center mb-3 text-warning">
+                                <i class="fas fa-clock fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555"> </span>
+                                    <span class="text-muted kanit-regular">(Checker)</span>
+                                    <div>
+                                        <span class="text-muted kanit-medium">รอตรวจสอบ</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                 </form>
             </div>
             <div class="modal-footer d-flex">
-                <button id="btn_delete" type="button" class="btn btn-danger mr-auto elevation-1">
-                    <i class="mr-1 fas fa-trash-alt"></i>ลบการลา
+                <button id="btn_delete" type="button" class="btn modern-btn btn-danger mr-auto elevation-1" data-toggle="modal" data-target="#confirmDeleteModal">
+                    <i class="mr-1 fas fa-trash-alt"></i> ลบการลา
                 </button>
-                <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal">
-                    <i class="mr-1 fas fa-times"></i> ปิด
+                <button type="button" class="btn modern-btn btn-secondary elevation-1" data-dismiss="modal">
+                    <i class="fas fa-times"></i> ยกเลิก
                 </button>
-                <button id="btn_accept" type="button" class="btn btn-primary elevation-1">
+                <button id="btn_accept" type="button" class="btn modern-btn btn-primary elevation-1" data-toggle="modal" data-target="#confirmEditModal">
                     <i class="fas fa-edit"></i> ส่งแก้ไข
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ยืนยันการลบ -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h6 class="modal-title"><i class="fas fa-trash-alt mr-2"></i>ยืนยันการลบ</h6>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                <p class="mb-0">คุณต้องการลบรายการนี้หรือไม่?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn modern-btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btn_confirm_delete" class="btn modern-btn btn-danger">ลบ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ยืนยันการส่งแก้ไข -->
+<div class="modal fade" id="confirmEditModal" tabindex="-1">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h6 class="modal-title"><i class="fas fa-paper-plane mr-2"></i>ยืนยันส่งแก้ไข</h6>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-question-circle fa-3x text-primary mb-3"></i>
+                <p class="mb-0">ส่งแก้ไขรายการนี้หรือไม่?</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn modern-btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+                <button type="button" id="btn_confirm_edit" class="btn modern-btn btn-primary">
+                    <i class="fas fa-check mr-1"></i>ส่งเลย
                 </button>
             </div>
         </div>
@@ -1210,6 +1469,26 @@
             if (selectedEmployee) {
                 renderLeaveHistory(selectedEmployee.emp_id);
             }
+        });
+
+        $(function () {
+            $('#btn_confirm_delete').on('click', function () {
+                $('#confirmDeleteModal').modal('hide');
+                // TODO: โค้ดลบจริง
+                // $.post('/Leave/Delete', { id: 123 });
+
+                toastr.error('ลบรายการเรียบร้อยแล้ว');
+                setTimeout(() => { $('#yourMainModal').modal('hide'); location.reload(); }, 1000);
+            });
+
+            $('#btn_confirm_edit').on('click', function () {
+                $('#confirmEditModal').modal('hide');
+                // TODO: โค้ดส่งแก้ไขจริง
+                // $('#formEdit').submit();
+
+                toastr.success('ส่งแก้ไขเรียบร้อยแล้ว');
+                setTimeout(() => { $('#yourMainModal').modal('hide'); }, 1000);
+            });
         });
     </script>
 }

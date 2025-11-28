@@ -451,6 +451,77 @@
         z-index: 15 !important;
     }
 
+    .email-wrapper {
+        max-width: 620px;
+        margin: 20px auto;
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .header {
+        color: #fff;
+        padding: 30px 10px;
+        text-align: center;
+        letter-spacing: 1px;
+    }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 10px 0 0;
+            opacity: 0.95;
+            font-size: 16px;
+        }
+
+    .content {
+        padding: 40px 30px;
+    }
+
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 35px;
+        border-left: 5px solid #1e88e5;
+    }
+
+    .btn-single {
+        display: block;
+        width: 85%;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 18px 20px;
+        text-align: center;
+        background: #6bc97b;
+        background: linear-gradient(135deg,rgba(107, 201, 123, 1) 0%, rgba(79, 176, 95, 1) 100%);
+        color: #fff !important;
+        font-size: 20px;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        box-shadow: 0 8px 25px rgba(40,167,69,0.4);
+        transition: all 0.3s;
+    }
+
+        .btn-single:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(40,167,69,0.5);
+        }
+
+    .footer {
+        background: #1e88e5;
+        color: #fff;
+        text-align: center;
+        padding: 15px;
+        font-size: 14px;
+    }
+
 </style>
 
 <div class="row" style="row-gap:15px">
@@ -603,6 +674,129 @@
         </div>
     </div>
 
+</div>
+
+<button id="btn_delete" type="button" class="btn modern-btn btn-outline-primary mr-auto elevation-1 kanit-regular" data-toggle="modal" data-target="#NotiLeavePendingApproval">
+    แจ้งเตือนใบลารออนุมัติ
+</button>
+<button id="btn_delete" type="button" class="btn modern-btn btn-outline-warning mr-auto elevation-1 kanit-regular" data-toggle="modal" data-target="#NotiLeaveReturned">
+    ใบลาของท่านถูกส่งกลับ
+</button>
+
+<!-- Modal แจ้งเตือนใบลารออนุมัติ -->
+<div class="modal fade  bg-white" id="NotiLeavePendingApproval" tabindex="-1" style="height:800px">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="email-wrapper kanit-regular">
+
+            <!-- Header -->
+            <div class="header" style="background: linear-gradient(135deg,#1e88e5,#1565c0);">
+                <h1><i class="fas fa-calendar-check fa-fw"></i> แจ้งเตือนใบลารออนุมัติ</h1>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+
+                <p>มีพนักงานยื่นคำขอลาใหม่ รอการพิจารณาจากท่าน</p>
+
+                <div class="info-card">
+                    <table class="table table-borderless mb-0">
+                        <tr><th width="140"><i class="fas fa-user text-primary mr-1"></i> ผู้ยื่นคำขอ</th><td>นายสมชาย ใจดี (E12345)</td></tr>
+                        <tr><th><i class="fas fa-building text-primary mr-1"></i> แผนก</th><td>ฝ่ายเทคโนโลยีสารสนเทศ</td></tr>
+                        <tr><th><i class="fas fa-calendar-alt text-primary mr-1"></i> ประเภทการลา</th><td>ลาป่วย</td></tr>
+                        <tr><th><i class="fas fa-clock text-primary mr-1"></i> วันที่ลา</th><td>3 ธันวาคม 2568 – 5 ธันวาคม 2025</td></tr>
+                        <tr><th><i class="fas fa-hourglass-half text-primary mr-1"></i> จำนวนวัน</th><td>3 วัน</td></tr>
+                        <tr><th><i class="fas fa-comment-dots text-primary mr-1"></i> เหตุผล</th><td>มีอาการไข้สูงและปวดศีรษะ ต้องพักรักษาตัวตามคำแนะนำแพทย์</td></tr>
+                    </table>
+                </div>
+
+                <!-- ปุ่มเดียวขนาดใหญ่ -->
+                <div class="text-center">
+                    <a href="https://yourcompany.com/Leave/Detail/12345?token=abc123xyz"
+                       class="btn-single" style="letter-spacing:1px">
+                        ไปยังหน้าอนุมัติ LEAVE : CUP
+                    </a>
+                </div>
+
+                <div class="alert alert-info text-center mt-4">
+                    <i class="fas fa-info-circle"></i>
+                    คลิกปุ่มด้านบนเพื่อไปยังหน้าระบบลาโดยตรง<br>
+                    <small>
+                        (ท่านสามารถเลือก อนุมัติ หรือ ไม่อนุมัติ พร้อมพิมพ์เหตุผลได้ในหน้าเว็บ)<br>
+                    </small>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>ระบบการลาออนไลน์ • บริษัท คอนโทรลอจิค จำกัด</p>
+                <p>หากมีข้อสงสัยกรุณาติดต่อฝ่ายบุคคล โทร. 02-xxx-xxxx ต่อ 888 </p>
+                <small>© 2025 บริษัท คอนโทรลอจิค จำกัด สงวนลิขสิทธิ์</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ใบลาของท่านถูกส่งกลับ -->
+<div class="modal fade  bg-white" id="NotiLeaveReturned" tabindex="-1" style="height:800px">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="email-wrapper kanit-regular">
+
+            <!-- Header (สีส้มเตือน) -->
+            <div class="header" style="background-color:darkorange">
+                <h1><i class="fas fa-exclamation-triangle fa-fw"></i> ใบลาของท่านถูกส่งกลับ</h1>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+
+                <p>มีพนักงานยื่นคำขอลาใหม่ รอการพิจารณาจากท่าน</p>
+
+                <div class="alert-box mb-2">
+                    <strong><i class="fas fa-info-circle mr-1"></i> สถานะใบลาของท่าน:</strong><br>
+                    ผู้อนุมัติได้พิจารณาแล้ว และ <span style="color:#e65100;font-weight:600;">ส่งกลับเพื่อแก้ไขข้อมูลเพิ่มเติม</span>
+                </div>
+
+                <div class="info-card" style="background:#f8f9fa;border-radius:12px;padding:25px;border-left:5px solid #fb8c00;">
+                    <table class="table table-borderless mb-0">
+                        <tr><th width="140"><i class="fas fa-calendar-alt text-warning mr-1"></i> ประเภทการลา</th><td>ลากิจส่วนตัว</td></tr>
+                        <tr><th><i class="fas fa-clock text-warning mr-1"></i> วันที่ลา</th><td>10 ธันวาคม 2568 – 12 ธันวาคม 2025</td></tr>
+                        <tr><th><i class="fas fa-user-tie text-warning mr-1"></i> ผู้พิจารณา</th><td>นางสาวสมหญิง ดีมาก</td></tr>
+                    </table>
+                </div>
+
+                <!-- ความเห็นจากผู้อนุมัติ -->
+                <div class="comment-box mb-4">
+                    <strong><i class="fas fa-comment-dots mr-1"></i> ความเห็นจากผู้อนุมัติ:</strong><br><br>
+                    “กรุณาแนบใบรับรองแพทย์ตัวจริงเพิ่มเติม และระบุรายละเอียดอาการให้ชัดเจนกว่านี้ค่ะ
+                    เนื่องจากเป็นการลาป่วยเกิน 3 วัน ต้องมีเอกสารรับรองจากโรงพยาบาลนะคะ ขอบคุณค่ะ”
+                </div>
+
+                <!-- ปุ่มเดียวขนาดใหญ่ -->
+                <div class="text-center">
+                    <a href="https://yourcompany.com/Leave/Detail/12345?token=abc123xyz"
+                       class="btn-single" style="letter-spacing:1px">
+                        <i class="fas fa-edit fa-fw"></i> แก้ไขใบลาเดี๋ยวนี้
+                    </a>
+                </div>
+
+                <div class="alert alert-info text-center mt-4">
+                    <i class="fas fa-info-circle"></i>
+                    คลิกปุ่มด้านบนเพื่อไปยังหน้าระบบลาโดยตรง<br>
+                    <small>
+                        หลังจากแก้ไขเรียบร้อยแล้ว กรุณากด “ส่งอนุมัติใหม่”<br>
+                    </small>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>ระบบการลาออนไลน์ • บริษัท คอนโทรลอจิค จำกัด</p>
+                <p>หากมีข้อสงสัยกรุณาติดต่อฝ่ายบุคคล โทร. 02-xxx-xxxx ต่อ 888 </p>
+                <small>© 2025 บริษัท คอนโทรลอจิค จำกัด สงวนลิขสิทธิ์</small>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts
