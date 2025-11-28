@@ -926,6 +926,7 @@
             $('#emp_th_used_leave').text("");
             $('#div_leaves_used').empty();
             $('#employeeInfo').hide();
+            clearLeaveHistory();
 
             let operation_only = @Html.Raw(Json.Serialize(operation_only));
             let start = $('#date_start').val();

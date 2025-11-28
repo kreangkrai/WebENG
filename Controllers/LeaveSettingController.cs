@@ -115,7 +115,7 @@ namespace WebENG.Controllers
         public IActionResult GetLeaveGroup()
         {
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            leaves = leaves.OrderBy(o => o.leave_name_th).ToList();
+            leaves = leaves.OrderBy(o => o.priority).ThenBy(t=>t.leave_name_th).ToList();
             var data = new { leaves = leaves};
             return Json(data);
         }

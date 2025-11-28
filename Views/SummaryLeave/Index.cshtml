@@ -997,7 +997,7 @@
                             { status_en: "Approved", status_th: "อนุมัติ" },
                             { status_en: "Rejected", status_th: "ไม่อนุมัติ" },
                             { status_en: "Returned", status_th: "ตีกลับ" },
-                            { status_en: "Success", status_th: "สำเร็จ" },
+                            { status_en: "Completed", status_th: "สำเร็จ" },
                         ];
                         const colors = [{ "code": "color-brown", "color": "#6D4C41" },
                         { "code": "color-sky", "color": "#4FC3F7" },
@@ -1016,7 +1016,7 @@
                         { "duration": "quarter-bottom-left", "class": "quarter-bottom-left" },
                         { "duration": "quarter-top-right", "class": "quarter-top-right" },
                         { "duration": "quarter-bottom-right", "class": "quarter-bottom-right" },
-                            { "duration": "three-quarter-left", "class": "three-quarter-circle left with-line" }
+                        { "duration": "three-quarter-left", "class": "three-quarter-circle left with-line" }
                         ];
 
                         if (i == 0) {
@@ -1058,7 +1058,7 @@
                                         let color = colors.filter(f => f.code === leave.color_code).map(m => m.color);
                                         let status = request_status.filter(f => f.status_en === leave.status).map(m => m.status_th);
                                         let value = "";
-                                        if (status !== "Successed") {
+                                        if (status !== "Completed") {
                                             value = "✸";
                                         }
                                         if (duration !== "full") {
