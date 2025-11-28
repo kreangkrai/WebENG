@@ -13,6 +13,7 @@ using WebENG.LeaveServices;
 using WebENG.LeaveModels;
 using System;
 using Newtonsoft.Json;
+using System.Data.SqlClient;
 
 namespace WebENG.Controllers
 {
@@ -55,42 +56,61 @@ namespace WebENG.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateLeaveGroup(string leave_code,string leave_th,string leave_en)
+        public IActionResult CreateLeaveGroup(string leave_code, string leave_th, string leave_en)
         {
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string admin = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             DateTime date = DateTime.Now;
             string leave_id = Guid.NewGuid().ToString("N").Substring(0, 10);
-            string message = LeaveType.Insert(new LeaveTypeModel()
+
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
             {
-                leave_type_id = leave_id,
-                leave_name_th = leave_th,
-                leave_name_en = leave_en,
-                created_by = admin,
-                created_at = date,
-                updated_by = admin,
-                updated_at = date,
-                is_active = true,
-                leave_type_code = leave_code,
-                is_unpaid = false,
-                description = "",
-                attachment_threshold_days = 0,
-                attachment_required = false,
-                max_consecutive_days = 3,
-                count_holidays_as_leave = false,
-                gender_restriction = "Both",
-                is_consecutive = false,
-                min_request_hours = 2,
-                request_timing = "Both",
-                is_two_step_approve = false,
-                over_consecutive_days_for_two_step = 0,
-                color_code = "",
-                calculate_auto = false,
-                amount_entitlement = 0,
-                length_start_date = 0
-            });
-            return Json(message);
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var leaveTypeService = LeaveType;
+                        leaveTypeService.Insert(new LeaveTypeModel()
+                        {
+                            leave_type_id = leave_id,
+                            leave_name_th = leave_th,
+                            leave_name_en = leave_en,
+                            created_by = admin,
+                            created_at = date,
+                            updated_by = admin,
+                            updated_at = date,
+                            is_active = true,
+                            leave_type_code = leave_code,
+                            is_unpaid = false,
+                            description = "",
+                            attachment_threshold_days = 0,
+                            attachment_required = false,
+                            max_consecutive_days = 3,
+                            count_holidays_as_leave = false,
+                            gender_restriction = "Both",
+                            is_consecutive = false,
+                            min_request_hours = 2,
+                            request_timing = "Both",
+                            is_two_step_approve = false,
+                            over_consecutive_days_for_two_step = 0,
+                            color_code = "",
+                            calculate_auto = false,
+                            amount_entitlement = 0,
+                            length_start_date = 0
+                        });
+                        tran.Commit();
+                        return Json("Success");
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
+                    }
+                }
+            }
         }
 
         [HttpPut]
@@ -107,8 +127,26 @@ namespace WebENG.Controllers
             leave_.updated_at =date;
             leave_.updated_by = admin;
 
-            string message = LeaveType.Update(leave_);
-            return Json(message);
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var leaveTypeService = LeaveType;
+                        leaveTypeService.Update(leave_);
+                        tran.Commit();
+                        return Json("Success");
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
+                    }
+                }
+            }                      
         }
 
         [HttpGet]

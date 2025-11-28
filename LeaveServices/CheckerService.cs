@@ -66,13 +66,21 @@ namespace WebENG.LeaveServices
 
         public string Inserts(List<CheckerModel> checkers)
         {
+            return Inserts(checkers, null);
+        }
+        public string Inserts(List<CheckerModel> checkers, SqlTransaction tran)
+        {
+            if (checkers == null || !checkers.Any()) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"INSERT INTO [dbo].[Checkers]
+                string sql = string.Format($@"INSERT INTO [dbo].[Checkers]
                                                    ([emp_id]
                                                    ,[level]
                                                    ,[is_active])
@@ -80,48 +88,63 @@ namespace WebENG.LeaveServices
                                                    (@emp_id
                                                    ,@level
                                                    ,@is_active)");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.Add("@emp_id", SqlDbType.Text);
-                command.Parameters.Add("@level", SqlDbType.Int);
-                command.Parameters.Add("@is_active", SqlDbType.Bit);
-                for (int i = 0; i < checkers.Count; i++)
+
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
-                    command.Parameters[0].Value = checkers[i].emp_id;
-                    command.Parameters[1].Value = checkers[i].level;
-                    command.Parameters[2].Value = checkers[i].is_active;
-                    command.ExecuteNonQuery();
+                    var emp_id = command.Parameters.Add("@emp_id", SqlDbType.Text);
+                    var level = command.Parameters.Add("@level", SqlDbType.Int);
+                    var is_active = command.Parameters.Add("@is_active", SqlDbType.Bit);
+                    foreach(var checker in checkers)
+                    {
+                        emp_id.Value = checker.emp_id ?? (object)DBNull.Value;
+                        level.Value = checker.level;
+                        is_active.Value = checker.is_active;
+                        command.ExecuteNonQuery();
+                    }
                 }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Insert failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
 
         public string Delete()
         {
+            return Delete(null);
+        }
+        public string Delete(SqlTransaction tran)
+        {
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"DELETE FROM [dbo].[Checkers]");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.ExecuteNonQuery();
+                string sql = string.Format($@"DELETE FROM [dbo].[Checkers]");
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Delete failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
     }
 }

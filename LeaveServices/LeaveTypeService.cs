@@ -199,13 +199,21 @@ namespace WebENG.LeaveServices
         }
         public string Insert(LeaveTypeModel leave)
         {
+            return Insert(leave, null);
+        }
+        public string Insert(LeaveTypeModel leave, SqlTransaction tran)
+        {
+            if (leave == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"INSERT INTO [ELEAVE].[dbo].[leave_type]
+                string sql = string.Format($@"INSERT INTO [ELEAVE].[dbo].[leave_type]
                                                ([leave_type_id]
                                                ,[leave_type_code]
                                                ,[leave_name_th]
@@ -257,52 +265,65 @@ namespace WebENG.LeaveServices
                                                ,@calculate_auto
                                                ,@amount_entitlement
                                                ,@length_start_date)");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
-                command.Parameters.AddWithValue("@leave_type_code", leave.leave_type_code);
-                command.Parameters.AddWithValue("@leave_name_th", leave.leave_name_th);
-                command.Parameters.AddWithValue("@leave_name_en", leave.leave_name_en);
-                command.Parameters.AddWithValue("@description", leave.description);
-                command.Parameters.AddWithValue("@min_request_hours", leave.min_request_hours);
-                command.Parameters.AddWithValue("@request_timing", leave.request_timing);
-                command.Parameters.AddWithValue("@is_consecutive", leave.is_consecutive);
-                command.Parameters.AddWithValue("@max_consecutive_days", leave.max_consecutive_days);
-                command.Parameters.AddWithValue("@gender_restriction", leave.gender_restriction);
-                command.Parameters.AddWithValue("@attachment_required", leave.attachment_required);
-                command.Parameters.AddWithValue("@attachment_threshold_days", leave.attachment_threshold_days);
-                command.Parameters.AddWithValue("@count_holidays_as_leave", leave.count_holidays_as_leave);
-                command.Parameters.AddWithValue("@is_two_step_approve", leave.is_two_step_approve);
-                command.Parameters.AddWithValue("@over_consecutive_days_for_two_step", leave.over_consecutive_days_for_two_step);
-                command.Parameters.AddWithValue("@is_unpaid", leave.is_unpaid);
-                command.Parameters.AddWithValue("@is_active", leave.is_active);
-                command.Parameters.AddWithValue("@created_at", leave.created_at);
-                command.Parameters.AddWithValue("@created_by", leave.created_by);
-                command.Parameters.AddWithValue("@updated_at", leave.updated_at);
-                command.Parameters.AddWithValue("@updated_by", leave.updated_by);
-                command.Parameters.AddWithValue("@color_code", leave.color_code);
-                command.Parameters.AddWithValue("@calculate_auto", leave.calculate_auto);
-                command.Parameters.AddWithValue("@amount_entitlement", leave.amount_entitlement);
-                command.Parameters.AddWithValue("@length_start_date", leave.length_start_date);
-                command.ExecuteNonQuery();
+
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
+                    command.Parameters.AddWithValue("@leave_type_code", leave.leave_type_code);
+                    command.Parameters.AddWithValue("@leave_name_th", leave.leave_name_th);
+                    command.Parameters.AddWithValue("@leave_name_en", leave.leave_name_en);
+                    command.Parameters.AddWithValue("@description", leave.description);
+                    command.Parameters.AddWithValue("@min_request_hours", leave.min_request_hours);
+                    command.Parameters.AddWithValue("@request_timing", leave.request_timing);
+                    command.Parameters.AddWithValue("@is_consecutive", leave.is_consecutive);
+                    command.Parameters.AddWithValue("@max_consecutive_days", leave.max_consecutive_days);
+                    command.Parameters.AddWithValue("@gender_restriction", leave.gender_restriction);
+                    command.Parameters.AddWithValue("@attachment_required", leave.attachment_required);
+                    command.Parameters.AddWithValue("@attachment_threshold_days", leave.attachment_threshold_days);
+                    command.Parameters.AddWithValue("@count_holidays_as_leave", leave.count_holidays_as_leave);
+                    command.Parameters.AddWithValue("@is_two_step_approve", leave.is_two_step_approve);
+                    command.Parameters.AddWithValue("@over_consecutive_days_for_two_step", leave.over_consecutive_days_for_two_step);
+                    command.Parameters.AddWithValue("@is_unpaid", leave.is_unpaid);
+                    command.Parameters.AddWithValue("@is_active", leave.is_active);
+                    command.Parameters.AddWithValue("@created_at", leave.created_at);
+                    command.Parameters.AddWithValue("@created_by", leave.created_by);
+                    command.Parameters.AddWithValue("@updated_at", leave.updated_at);
+                    command.Parameters.AddWithValue("@updated_by", leave.updated_by);
+                    command.Parameters.AddWithValue("@color_code", leave.color_code);
+                    command.Parameters.AddWithValue("@calculate_auto", leave.calculate_auto);
+                    command.Parameters.AddWithValue("@amount_entitlement", leave.amount_entitlement);
+                    command.Parameters.AddWithValue("@length_start_date", leave.length_start_date);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Insert failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
         public string Update(LeaveTypeModel leave)
         {
+            return Update(leave, null);
+        }
+        public string Update(LeaveTypeModel leave, SqlTransaction tran)
+        {
+            if (leave == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"UPDATE [dbo].[leave_type]
+                string sql = string.Format($@"UPDATE [dbo].[leave_type]
                                                    SET [leave_type_code] = @leave_type_code
                                                       ,[leave_name_th] = @leave_name_th
                                                       ,[leave_name_en] = @leave_name_en
@@ -328,42 +349,46 @@ namespace WebENG.LeaveServices
                                                       ,[amount_entitlement] = @amount_entitlement
                                                       ,[length_start_date] = @length_start_date
                                                  WHERE [leave_type_id] = @leave_type_id");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
-                command.Parameters.AddWithValue("@leave_type_code", leave.leave_type_code);
-                command.Parameters.AddWithValue("@leave_name_th", leave.leave_name_th);
-                command.Parameters.AddWithValue("@leave_name_en", leave.leave_name_en);
-                command.Parameters.AddWithValue("@description", leave.description);
-                command.Parameters.AddWithValue("@min_request_hours", leave.min_request_hours);
-                command.Parameters.AddWithValue("@request_timing", leave.request_timing);
-                command.Parameters.AddWithValue("@is_consecutive", leave.is_consecutive);
-                command.Parameters.AddWithValue("@max_consecutive_days", leave.max_consecutive_days);
-                command.Parameters.AddWithValue("@gender_restriction", leave.gender_restriction);
-                command.Parameters.AddWithValue("@attachment_required", leave.attachment_required);
-                command.Parameters.AddWithValue("@attachment_threshold_days", leave.attachment_threshold_days);
-                command.Parameters.AddWithValue("@count_holidays_as_leave", leave.count_holidays_as_leave);
-                command.Parameters.AddWithValue("@is_two_step_approve", leave.is_two_step_approve);
-                command.Parameters.AddWithValue("@over_consecutive_days_for_two_step", leave.over_consecutive_days_for_two_step);
-                command.Parameters.AddWithValue("@is_unpaid", leave.is_unpaid);
-                command.Parameters.AddWithValue("@is_active", leave.is_active);
-                command.Parameters.AddWithValue("@created_at", leave.created_at);
-                command.Parameters.AddWithValue("@created_by", leave.created_by);
-                command.Parameters.AddWithValue("@updated_at", leave.updated_at);
-                command.Parameters.AddWithValue("@updated_by", leave.updated_by);
-                command.Parameters.AddWithValue("@color_code", leave.color_code);
-                command.Parameters.AddWithValue("@calculate_auto", leave.calculate_auto);
-                command.Parameters.AddWithValue("@amount_entitlement", leave.amount_entitlement);
-                command.Parameters.AddWithValue("@length_start_date", leave.length_start_date);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@leave_type_id", leave.leave_type_id);
+                    command.Parameters.AddWithValue("@leave_type_code", leave.leave_type_code);
+                    command.Parameters.AddWithValue("@leave_name_th", leave.leave_name_th);
+                    command.Parameters.AddWithValue("@leave_name_en", leave.leave_name_en);
+                    command.Parameters.AddWithValue("@description", leave.description);
+                    command.Parameters.AddWithValue("@min_request_hours", leave.min_request_hours);
+                    command.Parameters.AddWithValue("@request_timing", leave.request_timing);
+                    command.Parameters.AddWithValue("@is_consecutive", leave.is_consecutive);
+                    command.Parameters.AddWithValue("@max_consecutive_days", leave.max_consecutive_days);
+                    command.Parameters.AddWithValue("@gender_restriction", leave.gender_restriction);
+                    command.Parameters.AddWithValue("@attachment_required", leave.attachment_required);
+                    command.Parameters.AddWithValue("@attachment_threshold_days", leave.attachment_threshold_days);
+                    command.Parameters.AddWithValue("@count_holidays_as_leave", leave.count_holidays_as_leave);
+                    command.Parameters.AddWithValue("@is_two_step_approve", leave.is_two_step_approve);
+                    command.Parameters.AddWithValue("@over_consecutive_days_for_two_step", leave.over_consecutive_days_for_two_step);
+                    command.Parameters.AddWithValue("@is_unpaid", leave.is_unpaid);
+                    command.Parameters.AddWithValue("@is_active", leave.is_active);
+                    command.Parameters.AddWithValue("@created_at", leave.created_at);
+                    command.Parameters.AddWithValue("@created_by", leave.created_by);
+                    command.Parameters.AddWithValue("@updated_at", leave.updated_at);
+                    command.Parameters.AddWithValue("@updated_by", leave.updated_by);
+                    command.Parameters.AddWithValue("@color_code", leave.color_code);
+                    command.Parameters.AddWithValue("@calculate_auto", leave.calculate_auto);
+                    command.Parameters.AddWithValue("@amount_entitlement", leave.amount_entitlement);
+                    command.Parameters.AddWithValue("@length_start_date", leave.length_start_date);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
     }
 }

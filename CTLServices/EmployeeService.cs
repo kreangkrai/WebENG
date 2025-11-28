@@ -90,9 +90,12 @@ namespace WebENG.CTLServices
         {
             List<EmployeeModel> employees = GetEmployees();
             List<EmpModel> emps = new List<EmpModel>();
+            string ldapPath = "LDAP://192.168.15.1";
+            string username = "lor";     
+            string password = "P@ssw0rd";
             try
             {              
-                using (System.DirectoryServices.DirectoryEntry directoryEntry = new System.DirectoryServices.DirectoryEntry("LDAP://192.168.15.1"))
+                using (System.DirectoryServices.DirectoryEntry directoryEntry = new System.DirectoryServices.DirectoryEntry(ldapPath,username,password))
                 {
                     using (DirectorySearcher searcher = new DirectorySearcher(directoryEntry))
                     {

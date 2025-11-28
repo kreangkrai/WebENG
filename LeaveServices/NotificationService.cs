@@ -70,13 +70,21 @@ namespace WebENG.LeaveServices
 
         public string Insert(NotificationModel notification)
         {
+            return Insert(notification, null);
+        }
+        public string Insert(NotificationModel notification, SqlTransaction tran)
+        {
+            if (notification == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"
+                string sql = string.Format($@"
                                             INSERT INTO [ELEAVE].[dbo].[Notification]
                                                    ([notification_type]
                                                    ,[emp_id]
@@ -91,98 +99,114 @@ namespace WebENG.LeaveServices
                                                    ,@notification_date
                                                    ,@notification_description
                                                    ,@status)");
-                SqlCommand command = new SqlCommand(string_command, con);
-                command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@notification_type", notification.notification_type);
-                command.Parameters.AddWithValue("@emp_id", notification.emp_id);
-                command.Parameters.AddWithValue("@notification_issue", notification.notification_issue);
-                command.Parameters.AddWithValue("@notification_date", notification.notification_date);
-                command.Parameters.AddWithValue("@notification_description", notification.notification_description);
-                command.Parameters.AddWithValue("@status", notification.status);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@notification_type", notification.notification_type);
+                    command.Parameters.AddWithValue("@emp_id", notification.emp_id);
+                    command.Parameters.AddWithValue("@notification_issue", notification.notification_issue);
+                    command.Parameters.AddWithValue("@notification_date", notification.notification_date);
+                    command.Parameters.AddWithValue("@notification_description", notification.notification_description);
+                    command.Parameters.AddWithValue("@status", notification.status);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                throw new Exception("Insert failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
 
         public string Update(NotificationModel notification)
         {
+            return Update(notification, null);
+        }
+        public string Update(NotificationModel notification, SqlTransaction tran)
+        {
+            if (notification == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"UPDATE [ELEAVE].[dbo].[notification]
+                string sql = string.Format($@"UPDATE [ELEAVE].[dbo].[notification]
                                                            SET [notification_type] = @notification_type
                                                               ,[notification_issue] = @notification_issue
                                                               ,[notification_date] = @notification_date
                                                               ,[notification_description] = @notification_description
                                                               ,[status] = @status
                                                          WHERE [notification_id] = @notification_id AND [emp_id] = @emp_id");
-                SqlCommand command = new SqlCommand(string_command, con);
-                command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@notification_type", notification.notification_type);
-                command.Parameters.AddWithValue("@emp_id", notification.emp_id);
-                command.Parameters.AddWithValue("@notification_issue", notification.notification_issue);
-                command.Parameters.AddWithValue("@notification_date", notification.notification_date);
-                command.Parameters.AddWithValue("@notification_description", notification.notification_description);
-                command.Parameters.AddWithValue("@status", notification.status);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@notification_type", notification.notification_type);
+                    command.Parameters.AddWithValue("@emp_id", notification.emp_id);
+                    command.Parameters.AddWithValue("@notification_issue", notification.notification_issue);
+                    command.Parameters.AddWithValue("@notification_date", notification.notification_date);
+                    command.Parameters.AddWithValue("@notification_description", notification.notification_description);
+                    command.Parameters.AddWithValue("@status", notification.status);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                throw new Exception("Update failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
 
-        public string UpdateStatus(string emp_id,string status)
+        public string UpdateStatus(string emp_id, string status)
         {
+            return (UpdateStatus(emp_id, status, null));
+        }
+        public string UpdateStatus(string emp_id,string status, SqlTransaction tran)
+        {
+            if (emp_id == null && status == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"UPDATE [ELEAVE].[dbo].[notification]
+                string sql = string.Format($@"UPDATE [ELEAVE].[dbo].[notification]
                                                            SET [status] = @status
                                                          WHERE [emp_id] = @emp_id");
-                SqlCommand command = new SqlCommand(string_command, con);
-                command.CommandType = CommandType.Text;
-                command.Parameters.AddWithValue("@emp_id", emp_id);
-                command.Parameters.AddWithValue("@status", status);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@emp_id", emp_id);
+                    command.Parameters.AddWithValue("@status", status);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
             }
             catch (Exception ex)
             {
-                return ex.Message;
+                throw new Exception("Update failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
     }
 }

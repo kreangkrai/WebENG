@@ -78,17 +78,6 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
 
-                //List<HierarchyPersonalModel> hierarchies_personal = Hierarchy.GetPersonalHierarchies();
-                //List<HierarchyDepartmentModel> hierarchies_depaartment = Hierarchy.GetDepartmentHierarchies();
-
-                //CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel()
-                //{
-                //    start_date = new DateTime (2025,6,15),
-                //    promote_manager_date = new DateTime (2025,6,15),
-                //    position = "Manager"
-                //};
-
-                //double leave = Leave.CalculateLeaveDays(emp, 2025, 6, 10, 10, 12); 
                 return View(u);
             }
             else

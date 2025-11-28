@@ -545,6 +545,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@level_step", request.level_step);
                     command.ExecuteNonQuery();
                 }
+                return "Success";
             }
             catch (Exception ex)
             {
@@ -554,8 +555,7 @@ namespace WebENG.LeaveServices
             {
                 if (shouldClose && localCon.State == ConnectionState.Open)
                     localCon.Close();
-            }
-            return "Success";
+            }          
         }
 
         public string Update(RequestModel request)
@@ -609,6 +609,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@level_step", request.level_step);
                     command.ExecuteNonQuery();
                 }
+                return "Success";
             }
             catch (Exception ex)
             {
@@ -618,8 +619,7 @@ namespace WebENG.LeaveServices
             {
                 if (shouldClose && localCon.State == ConnectionState.Open)
                     localCon.Close();
-            }
-            return "Success";
+            }          
         }
     }
 }

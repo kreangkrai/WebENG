@@ -137,13 +137,21 @@ namespace WebENG.LeaveServices
 
         public string Insert(RequestLogModel request)
         {
+            return Insert(request, null);
+        }
+        public string Insert(RequestLogModel request, SqlTransaction tran)
+        {
+            if (request == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"INSERT INTO [dbo].[request_log]
+                string sql = string.Format($@"INSERT INTO [dbo].[request_log]
                                                        ([request_id]
                                                        ,[action_by]
                                                        ,[action_by_name]
@@ -165,27 +173,31 @@ namespace WebENG.LeaveServices
                                                        ,@new_level_step
                                                        ,@comment
                                                        ,@log_date)");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@request_id", request.request_id);
-                command.Parameters.AddWithValue("@action_by", request.action_by);
-                command.Parameters.AddWithValue("@action_by_name", request.action_by_name);
-                command.Parameters.AddWithValue("@action_by_level", request.action_by_level);
-                command.Parameters.AddWithValue("@old_status", request.old_status);
-                command.Parameters.AddWithValue("@new_status", request.new_status);
-                command.Parameters.AddWithValue("@old_level_step", request.old_level_step);
-                command.Parameters.AddWithValue("@new_level_step", request.new_level_step);
-                command.Parameters.AddWithValue("@log_date", request.log_date);
-                command.Parameters.AddWithValue("@comment", request.comment);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@request_id", request.request_id);
+                    command.Parameters.AddWithValue("@action_by", request.action_by);
+                    command.Parameters.AddWithValue("@action_by_name", request.action_by_name);
+                    command.Parameters.AddWithValue("@action_by_level", request.action_by_level);
+                    command.Parameters.AddWithValue("@old_status", request.old_status);
+                    command.Parameters.AddWithValue("@new_status", request.new_status);
+                    command.Parameters.AddWithValue("@old_level_step", request.old_level_step);
+                    command.Parameters.AddWithValue("@new_level_step", request.new_level_step);
+                    command.Parameters.AddWithValue("@log_date", request.log_date);
+                    command.Parameters.AddWithValue("@comment", request.comment);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Insert failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
     }
 }

@@ -143,15 +143,27 @@ namespace WebENG.Controllers
                 f.level = 3;
             });
 
-            string message = "";
-            message = Checker.Delete();
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
             {
-                if (message == "Success")
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
                 {
-                    message = Checker.Inserts(approver_checker);                   
+                    try
+                    {
+                        var checkerService = Checker;
+                        checkerService.Delete();
+                        checkerService.Inserts(approver_checker);
+                        tran.Commit();
+                        return Json("Success");
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
+                    }
                 }
             }
-            return Json(message);
         }
     }
 }

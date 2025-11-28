@@ -60,55 +60,79 @@ namespace WebENG.LeaveServices
 
         public string Insert(DepartmentApprovalRuleModel department)
         {
+            return Insert(department, null);
+        }
+        public string Insert(DepartmentApprovalRuleModel department, SqlTransaction tran)
+        {
+            if (department == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"INSERT INTO department_approval_rule(department_id,
+                string sql = string.Format($@"INSERT INTO department_approval_rule(department_id,
                                                     admin_id)
                                                 VALUES (@department_id,
                                                     @admin_id)");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@department_id", department.department_id);
-                command.Parameters.AddWithValue("@admin_id", department.admin_id);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@department_id", department.department_id);
+                    command.Parameters.AddWithValue("@admin_id", department.admin_id);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Insert failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
 
         public string Update(DepartmentApprovalRuleModel department)
         {
+            return Update(department, null);
+        }
+        public string Update(DepartmentApprovalRuleModel department, SqlTransaction tran)
+        {
+            if (department == null) return "Success";
+
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
             try
             {
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"UPDATE department_approval_rule SET
+                string sql = string.Format($@"UPDATE department_approval_rule SET
                                                     admin_id = @admin_id
                                                 WHERE department_id = @department_id");
-                SqlCommand command = new SqlCommand(strCmd, con);
-                command.Parameters.AddWithValue("@department_id", department.department_id);
-                command.Parameters.AddWithValue("@admin_id", department.admin_id);
-                command.ExecuteNonQuery();
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    command.Parameters.AddWithValue("@department_id", department.department_id);
+                    command.Parameters.AddWithValue("@admin_id", department.admin_id);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update failed: " + ex.Message, ex);
             }
             finally
             {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
             }
-            return "Success";
         }
     }
 }

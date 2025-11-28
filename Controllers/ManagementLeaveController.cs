@@ -53,14 +53,6 @@ namespace WebENG.Controllers
 
                 GetRequest();
 
-                string fileName = "J25-0203 AGC TANK MONITOR - AutoBackup.pdf";
-                var previewUrl = Url.Action(
-                "PreviewFile",
-                "ManagementLeave",
-                new { fileName },
-                Request.Scheme
-                );
-
                 return View(u);
             }
             else
