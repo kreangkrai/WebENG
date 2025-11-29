@@ -638,5 +638,200 @@ namespace WebENG.LeaveServices
                     localCon.Close();
             }          
         }
+
+        public string Inserts(List<RequestModel> requests)
+        {
+            return Inserts(requests, null);
+        }
+        public string Inserts(List<RequestModel> requests,SqlTransaction tran)
+        {
+            if (requests == null || !requests.Any()) return "Success";
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string sql = string.Format($@"INSERT INTO [dbo].[request]
+                                                   ([request_id]
+                                                   ,[emp_id]
+                                                   ,[leave_type_id]
+                                                   ,[is_full_day]
+                                                   ,[start_request_date]
+                                                   ,[end_request_date]
+                                                   ,[amount_leave_day]
+                                                   ,[start_request_time]
+                                                   ,[end_request_time]
+                                                   ,[amount_leave_hour]
+                                                   ,[path_file]
+                                                   ,[request_date]
+                                                   ,[description]
+                                                   ,[status_request]
+                                                   ,[is_two_step_approve]
+                                                   ,[level_step]
+                                                   ,[comment])
+                                             VALUES
+                                                   (@request_id
+                                                   ,@emp_id
+                                                   ,@leave_type_id
+                                                   ,@is_full_day
+                                                   ,@start_request_date
+                                                   ,@end_request_date
+                                                   ,@amount_leave_day
+                                                   ,@start_request_time
+                                                   ,@end_request_time
+                                                   ,@amount_leave_hour
+                                                   ,@path_file
+                                                   ,@request_date
+                                                   ,@description
+                                                   ,@status_request
+                                                   ,@is_two_step_approve
+                                                   ,@level_step
+                                                   ,@comment)");
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    var request_id = command.Parameters.Add("@request_id",SqlDbType.Text);
+                    var emp_id = command.Parameters.Add("@emp_id", SqlDbType.Text);
+                    var leave_type_id = command.Parameters.Add("@leave_type_id", SqlDbType.Text);
+                    var is_full_day = command.Parameters.Add("@is_full_day", SqlDbType.Bit);
+                    var start_request_date = command.Parameters.Add("@start_request_date", SqlDbType.DateTime);
+                    var end_request_date = command.Parameters.Add("@end_request_date", SqlDbType.DateTime);
+                    var amount_leave_day = command.Parameters.Add("@amount_leave_day", SqlDbType.Int);
+                    var start_request_time = command.Parameters.Add("@start_request_time", SqlDbType.Timestamp);
+                    var end_request_time = command.Parameters.Add("@end_request_time", SqlDbType.Timestamp);
+                    var amount_leave_hour = command.Parameters.Add("@amount_leave_hour", SqlDbType.Decimal);
+                    var path_file = command.Parameters.Add("@path_file", SqlDbType.Text);
+                    var request_date = command.Parameters.Add("@request_date", SqlDbType.DateTime);
+                    var description = command.Parameters.Add("@description", SqlDbType.Text);
+                    var status_request = command.Parameters.Add("@status_request", SqlDbType.Text);
+                    var is_two_step_approve = command.Parameters.Add("@is_two_step_approve", SqlDbType.Bit);
+                    var level_step = command.Parameters.Add("@level_step", SqlDbType.Int);
+                    var comment = command.Parameters.Add("@comment", SqlDbType.Text);
+
+                    foreach (var request in requests)
+                    {
+                        request_id.Value = request.request_id;
+                        emp_id.Value = request.emp_id;
+                        leave_type_id.Value = request.leave_type_id;
+                        is_full_day.Value = request.is_full_day;
+                        start_request_date.Value = request.start_request_date;
+                        end_request_date.Value = request.end_request_date;
+                        amount_leave_day.Value = request.amount_leave_day;
+                        start_request_time.Value = request.start_request_time;
+                        end_request_time.Value = request.end_request_time;
+                        amount_leave_hour.Value = request.amount_leave_hour;
+                        path_file.Value = request.path_file ?? (object)DBNull.Value;
+                        request_date.Value = request.request_date;
+                        description.Value = request.description ?? (object)DBNull.Value;
+                        status_request.Value = request.status_request ?? (object)DBNull.Value;
+                        is_two_step_approve.Value = request.is_two_step_approve;
+                        level_step.Value = request.level_step;
+                        comment.Value = request.comment ?? (object)DBNull.Value;
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Insert failed: " + ex.Message, ex);
+            }
+            finally
+            {
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
+            }
+        }
+
+        public string Updates(List<RequestModel> requests)
+        {
+            return Updates(requests, null);
+        }
+        public string Updates(List<RequestModel> requests,SqlTransaction tran)
+        {
+            if (requests == null || !requests.Any()) return "Success";
+            SqlConnection localCon = tran?.Connection ?? con;
+            bool shouldClose = tran == null && localCon.State == ConnectionState.Closed;
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string sql = string.Format($@"UPDATE [dbo].[request]
+                                                   SET [leave_type_id] = @leave_type_id
+                                                      ,[is_full_day] = @is_full_day
+                                                      ,[start_request_date] = @start_request_date
+                                                      ,[end_request_date] = @end_request_date
+                                                      ,[amount_leave_day] = @amount_leave_day
+                                                      ,[start_request_time] = @start_request_time
+                                                      ,[end_request_time] = @end_request_time
+                                                      ,[amount_leave_hour] = @amount_leave_hour
+                                                      ,[path_file] = @path_file
+                                                      ,[request_date] = @request_date
+                                                      ,[description] = @description
+                                                      ,[status_request] = @status_request
+                                                      ,[is_two_step_approve] = @is_two_step_approve
+                                                      ,[level_step] = @level_step
+                                                      ,[comment] = @comment
+                                                 WHERE [request_id] = @request_id AND  [emp_id] = @emp_id");
+                using (SqlCommand command = new SqlCommand(sql, localCon, tran))
+                {
+                    var request_id = command.Parameters.Add("@request_id", SqlDbType.Text);
+                    var emp_id = command.Parameters.Add("@emp_id", SqlDbType.Text);
+                    var leave_type_id = command.Parameters.Add("@leave_type_id", SqlDbType.Text);
+                    var is_full_day = command.Parameters.Add("@is_full_day", SqlDbType.Bit);
+                    var start_request_date = command.Parameters.Add("@start_request_date", SqlDbType.DateTime);
+                    var end_request_date = command.Parameters.Add("@end_request_date", SqlDbType.DateTime);
+                    var amount_leave_day = command.Parameters.Add("@amount_leave_day", SqlDbType.Int);
+                    var start_request_time = command.Parameters.Add("@start_request_time", SqlDbType.Timestamp);
+                    var end_request_time = command.Parameters.Add("@end_request_time", SqlDbType.Timestamp);
+                    var amount_leave_hour = command.Parameters.Add("@amount_leave_hour", SqlDbType.Decimal);
+                    var path_file = command.Parameters.Add("@path_file", SqlDbType.Text);
+                    var request_date = command.Parameters.Add("@request_date", SqlDbType.DateTime);
+                    var description = command.Parameters.Add("@description", SqlDbType.Text);
+                    var status_request = command.Parameters.Add("@status_request", SqlDbType.Text);
+                    var is_two_step_approve = command.Parameters.Add("@is_two_step_approve", SqlDbType.Bit);
+                    var level_step = command.Parameters.Add("@level_step", SqlDbType.Int);
+                    var comment = command.Parameters.Add("@comment", SqlDbType.Text);
+
+                    foreach (var request in requests)
+                    {
+                        request_id.Value = request.request_id;
+                        emp_id.Value = request.emp_id;
+                        leave_type_id.Value = request.leave_type_id;
+                        is_full_day.Value = request.is_full_day;
+                        start_request_date.Value = request.start_request_date;
+                        end_request_date.Value = request.end_request_date;
+                        amount_leave_day.Value = request.amount_leave_day;
+                        start_request_time.Value = request.start_request_time;
+                        end_request_time.Value = request.end_request_time;
+                        amount_leave_hour.Value = request.amount_leave_hour;
+                        path_file.Value = request.path_file ?? (object)DBNull.Value;
+                        request_date.Value = request.request_date;
+                        description.Value = request.description ?? (object)DBNull.Value;
+                        status_request.Value = request.status_request ?? (object)DBNull.Value;
+                        is_two_step_approve.Value = request.is_two_step_approve;
+                        level_step.Value = request.level_step;
+                        comment.Value = request.comment ?? (object)DBNull.Value;
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update failed: " + ex.Message, ex);
+            }
+            finally
+            {
+                if (shouldClose && localCon.State == ConnectionState.Open)
+                    localCon.Close();
+            }
+        }
     }
 }

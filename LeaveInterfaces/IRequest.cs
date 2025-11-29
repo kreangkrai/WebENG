@@ -16,5 +16,7 @@ namespace WebENG.LeaveInterfaces
         List<RequestModel> GetRequestByDurationDay(string start_day,string end_day);
         string Insert(RequestModel request);
         string Update(RequestModel request);
+        string Inserts(List<RequestModel> requests);
+        string Updates(List<RequestModel> requests);
     }
 }
