@@ -610,7 +610,7 @@
                     <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                         <div class="row">
                             <div class="col-4">
-                                <button id="btn_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success kanit-medium" style=" border-radius:8px; width:120px; letter-spacing:2px;" hidden>
+                                <button id="btn_all_approve_leave" data-target="#modal_approve" class="btn modern-btn btn-success kanit-medium" style=" border-radius:8px; width:120px; letter-spacing:2px;" hidden>
                                     อนุมัติ
                                 </button>
                             </div>
@@ -633,7 +633,7 @@
                 <!-- HEADER -->
                 <h4 class="kanit-medium mb-0 text-white d-flex align-items-center"
                     style="letter-spacing: 1px; font-size: 22px; gap: 12px;">
-                    ประวัติการอนุมัติ
+                    ประวัติการลา
                 </h4>
             </div>
 
@@ -669,6 +669,9 @@
         <div class="modal-content kanit-regular">
             <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
                 <h5 class="modal-title" id="modal_leave_title">อนุมัติการลา</h5>
+                <h5 class="modal-title">(</h5>
+                <h5 class="modal-title" id="modal_request_id"></h5>
+                <h5 class="modal-title">)</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true" style="color: white;">&times;</span>
                 </button>
@@ -697,7 +700,7 @@
                         </label>
                         <div class="card" style="border-radius: 10px; ">
                             <div class="list-group" id="fileListContainer">
-                               
+
                             </div>
                         </div>
                     </div>
@@ -707,29 +710,7 @@
                             <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
                         </label>
 
-                        <div class="timeline-container" style="position: relative; padding-left: 35px;">
-                            <div class="d-flex align-items-center mb-3 text-success">
-                                <i class="fas fa-check-circle fa-lg mr-3"></i>
-                                <div class="flex-grow-1">
-                                    <span class="kanit-medium" style="color:#555">Chakrit R.</span>
-                                    <span class="text-muted kanit-regular">(Manager)</span>
-                                    <div>
-                                        <span class="text-success kanit-medium">อนุมัติแล้ว</span>
-                                        <span class="text-muted kanit-medium"> • 26/11/25 14:32</span>
-                                    </div>
-                                </div>
-                                <hr />
-                            </div>
-                            <div class="d-flex align-items-center mb-3 text-warning">
-                                <i class="fas fa-clock fa-lg mr-3"></i>
-                                <div class="flex-grow-1">
-                                    <span class="kanit-medium" style="color:#555"> </span>
-                                    <span class="text-muted kanit-regular">(Checker)</span>
-                                    <div>
-                                        <span class="text-muted kanit-medium">รอตรวจสอบ</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="div_history_approved" class="timeline-container" style="position: relative; padding-left: 35px;">
                         </div>
                     </div>
                 </form>
@@ -737,7 +718,7 @@
             <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
             <div class="modal-footer d-flex">
                 <div class="input-group mb-2">
-                    <textarea id="leave_reason" type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" rows="2" ></textarea>
+                    <textarea id="leave_reason" type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" rows="2"></textarea>
                 </div>
                 <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                     <div class="row kanit-medium">
@@ -862,23 +843,91 @@
     </div>
 </div>
 <!------------------------------------------------------------------------------------------------>
+<div class="modal fade" id="modal_leave_history" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+        <div class="modal-content kanit-regular">
+            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                <h5 class="modal-title" id="modal_history_leave_title">ประวัติการลา</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" style="color: white;">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style=" color:#555555; overflow-y:auto">
+                <form>
+                    <!-- ข้อมูลการลา -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                                <i class="fas fa-info-circle mr-2"></i>ข้อมูลการลา
+                            </label>
+                            <div style="padding-left:20px;">
+                                <div>
+                                    <label id="leave_history_description" class="col-12 kanit-light" style="white-space:pre-line"></label>
+                                </div>
+                            </div>
+                            <hr />
+                        </div>
+                    </div>
 
+                    <!-- ส่วนแสดงรายการไฟล์ -->
+                    <div class="col-12 mb-4" id="div_history_fileList" hidden>
+                        <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                            <i class="fas fa-paperclip mr-2"></i>เอกสารที่แนบ
+                        </label>
+                        <div class="card" style="border-radius: 10px; ">
+                            <div class="list-group" id="fileListContainerHistory">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
+                            <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
+                        </label>
+
+                        <div id="div_history_request" class="timeline-container" style="position: relative; padding-left: 35px;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
+            <div class="modal-footer d-flex">
+                <div class="input-group mb-2">
+                    <label id="leave_history_reason" type="text" class="kanit-light"></label>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
+                    <div class="row kanit-medium">
+                        <div class="ml-2">
+                            <button class="btn modern-btn btn-danger"
+                                    style="border-radius:8px; width:90px; letter-spacing:1px" data-dismiss="modal">
+                                ปิด
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <partial name="ModalSpin" />
 
 @section Scripts
 {
     <script type="text/javascript">
         let table_approve= null;
-        let requests = [];
+        let requests_pending = [];
+        let requests_no_pending = [];
 
         const request_status = [
-            { status_en: "Pending", status: { status_th: "รออนุมัติ", class: "warning" } },
+            { status_en: "Created", status: { status_th: "สร้าง", class: "secondary" } },
+            { status_en: "Pending", status: { status_th: "อนุมัติ1", class: "warning" } },
             { status_en: "Resubmit", status: { status_th: "ส่งใหม่", class: "secondary" } },
-            { status_en: "Cancelled", status: { status_th: "ยกเลิก", class: "dark" } },
-            { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
+            { status_en: "Canceled", status: { status_th: "ยกเลิก", class: "dark" } },
+            { status_en: "Approved", status: { status_th: "อนุมัติ2", class: "success" } },
             { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
             { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
-            { status_en: "Completed", status: { status_th: "สำเร็จ", class: "primary" } },
+            { status_en: "Completed", status: { status_th: "สำเร็จ", class: "success" } },
         ];
 
         $(document).ready(function () {
@@ -941,9 +990,12 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: {},
                 success: function (response) {
-                    requests = response;
-                    let completes = requests.filter(f => f.status_request === "Completed").map(m => m);
-                    let uncompletes = requests.filter(f => f.status_request !== "Completed").map(m => m);
+                    requests_pending = response.pending;
+                    requests_no_pending = response.no_pending;
+
+                    let completes = requests_no_pending;
+                    let uncompletes = requests_pending;
+
                     renderRequestHistory(uncompletes);
                     renderRequestCompleteHistory(completes);
                     $('#request_amount').text(uncompletes.length);
@@ -1050,7 +1102,7 @@
                     </tr>
                 `);
 
-                tr.on('click', '.clickable-col', function (e) {
+                tr.on('click', '.clickable-col', async function (e) {
                     e.stopPropagation();
                     const $row = $(this).closest('tr');
                     $('#modal_leave').modal('show');
@@ -1082,12 +1134,18 @@
                     if (request.attachment_required) {
                         let year = new Date(request.start_request_date).getFullYear();
                         GetFiles(request.leave_type_id, request.request_id, year);
-
                         $('#div_fileList').attr('hidden', false);
+
                     } else {
                         $('#div_fileList').attr('hidden', true);
                     }
-                    console.log(request);
+
+                    // Request Title
+                    $('#modal_request_id').text(request.request_id);
+                   
+                    // Get Request Log
+                    let requests_log = await GetRequestLog(request.emp_id, request.request_id);
+                    GenerateHistoryApproveLog(requests_log);
                 });
 
                 tr.on('click', function (e) {
@@ -1099,6 +1157,93 @@
                 $tbody.append(tr);
             });
         }
+
+        function GenerateHistoryApproveLog(requests_log) {
+            var html = '';
+            let position = "";
+            let next_position = "Manager";
+            let status = "";
+            for (var i = 0; i < requests_log.length; i++) {
+                if (requests_log[i].level > 0) {
+                    status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
+                    if (requests_log[i].level === 1) {
+                        position = "Manager";
+                        next_position = "Director";
+                    }
+                    if (requests_log[i].level === 2) {
+                        position = "Director";
+                        next_position = "Checker";
+                    }
+
+                    html += `<div class="d-flex align-items-center mb-3 text-success">
+                                <i class="fas fa-check-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">${requests_log[i].emp_name}</span>
+                                    <span class="text-muted kanit-regular">(${position})</span>
+                                    <div>
+                                        <span class="text-success kanit-medium">${status.status_th}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')}</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>`;
+
+                }
+            }
+            html += `<div class="d-flex align-items-center mb-3 text-warning">
+                                <i class="fas fa-clock fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555"> </span>
+                                    <span class="text-muted kanit-regular">(${next_position})</span>
+                                    <div>
+                                        <span class="text-muted kanit-medium">รอตรวจสอบ</span>
+                                    </div>
+                                </div>
+                            </div>`;
+            $('#div_history_approved').empty();
+            $('#div_history_approved').append(html);
+
+        }
+        function GenerateHistoryRequestLog(requests_log) {
+            var html = '';
+            let position = "";
+            let status = "";
+            for (var i = 0; i < requests_log.length; i++) {
+                if (requests_log[i].level > 0) {
+                    status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
+                    if (requests_log[i].level === 0) {
+                        position = "Operation";
+                    }
+                    if (requests_log[i].level === 1) {
+                        position = "Manager";
+                    }
+                    if (requests_log[i].level === 2) {
+                        position = "Director";
+                    }
+                    if (requests_log[i].level === 3) {
+                        position = "Checker";
+                    }
+
+                    html += `<div class="d-flex align-items-center mb-3 text-success">
+                                <i class="fas fa-check-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">${requests_log[i].emp_name}</span>
+                                    <span class="text-muted kanit-regular">(${position})</span>
+                                    <div>
+                                        <span class="text-success kanit-medium">${status.status_th}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')}</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>`;
+
+                }
+            }
+            $('#div_history_request').empty();
+            $('#div_history_request').append(html);
+
+        }
+
         function renderRequestCompleteHistory(completes) {
             const $tbody = $('#table_complete tbody').empty();
             completes.forEach((row, index) => {
@@ -1148,7 +1293,7 @@
                 let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
                 const tr = $(`
                     <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
-                        data-toggle="modal" data-target="#modal_leave"
+                        data-toggle="modal" data-target="#modal_leave_history"
                         data-id="${row.request_id}" data-emp-id="${row.emp_id}"
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"
                         data-time="${row.start_request_time}" data-duration="${duration}"
@@ -1167,23 +1312,58 @@
                     </tr>
                 `);
 
-                tr.on('click', '.clickable-col', function (e) {
+                tr.on('click', async function (e) {
                     e.stopPropagation();
                     const $row = $(this).closest('tr');
-                    $('#modal_leave').modal('show');
-                    const data = $row.data();
-
-                    //$('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
-                    //$('#modal_leave_title').text('แก้ไขการลา');
-                });
-
-                tr.on('click', function (e) {
-                    if (!$(e.target).hasClass('clickable-col') &&
-                        !$(e.target).closest('.clickable-col').length) {
-                        e.stopPropagation();
+                    $('#modal_leave_history').modal('show');
+                    const requestId = $row.attr('data-id');
+                    const request = completes.filter(f => f.request_id === requestId).map(m => m)[0];
+                    let description = "";
+                    if (request.is_full_day) {
+                        if (request.amount_leave_day > 1) {
+                            description = `ชื่อ : ${request.emp_name_th}
+                                         ประเภทการลา : ${request.leave_name_th}
+                                         ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} -  ${new Date(request.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.end_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
+                                         รายละเอียด : ${request.description}`;
+                        } else {
+                            description = `ชื่อ : ${request.emp_name_th}
+                                         ประเภทการลา : ${request.leave_name_th}
+                                         ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
+                                         รายละเอียด : ${request.description}`;
+                        }
+                    } else {
+                        description = `ชื่อ : ${request.emp_name_th}
+                                         ประเภทการลา : ${request.leave_name_th}
+                                         ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')}
+                                         เวลา : ${request.start_request_time.split('.')[1].substring(0, 5)} - ${request.end_request_time.split('.')[1].substring(0, 5)}
+                                         รายละเอียด : ${request.description}`;
                     }
-                });
+                    $('#leave_history_description').text(description);
 
+                    //Check Attach File List
+                    if (request.attachment_required) {
+                        let year = new Date(request.start_request_date).getFullYear();
+                        GetHistoryFiles(request.leave_type_id, request.request_id, year);
+                        $('#div_history_fileList').attr('hidden', false);
+
+                    } else {
+                        $('#div_history_fileList').attr('hidden', true);
+                    }
+
+                    
+                    //Reason
+                    if (request.comment === "" || request.comment === null) {
+                        $('#leave_history_reason').attr('hidden', true);
+                        $('#leave_history_reason').text("");
+                    } else {
+                        $('#leave_history_reason').val(request.comment);
+                        $('#leave_history_reason').text('hidden', false);
+                    }
+
+                    // Get Request Log
+                    let requests_log = await GetRequestLog(request.emp_id, request.request_id);
+                    GenerateHistoryRequestLog(requests_log);
+                });
                 $tbody.append(tr);
             });
         }
@@ -1202,6 +1382,69 @@
             });
         });
 
+        $('#confirm_approve').on('click', async function () {
+            let comment = $('#leave_reason').val().trim();
+            let request_id = $('#modal_request_id').text();
+
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("Approved", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    request_id, comment
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+        $('#confirm_resubmit').on('click', async function () {
+            let comment = $('#leave_reason').val().trim();
+            let request_id = $('#modal_request_id').text();
+
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("Returned", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    request_id, comment
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+        $('#confirm_reject').on('click', async function () {
+            let comment = $('#leave_reason').val().trim();
+            let request_id = $('#modal_request_id').text();
+
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("Rejected", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    request_id, comment
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
+
+
         $(document).on('change', '#table_approve tbody .approve-checkbox', function () {
             const totalVisible = $('#table_approve tbody .approve-checkbox').not(':hidden').length;
             const totalChecked = $('#table_approve tbody .approve-checkbox:checked').not(':hidden').length;
@@ -1217,9 +1460,9 @@
 
             $(this).closest('tr').toggleClass('table-primary', this.checked);
             if (allChecked || someChecked) {
-                $('#btn_approve_leave').attr('hidden', false);
+                $('#btn_all_approve_leave').attr('hidden', false);
             } else {
-                $('#btn_approve_leave').attr('hidden', true);
+                $('#btn_all_approve_leave').attr('hidden', true);
             }
         });
 
@@ -1247,7 +1490,7 @@
             return selectedRows;
         }
 
-        $('#btn_approve_leave').on('click', function () {
+        $('#btn_all_approve_leave').on('click', function () {
             const selected = getSelectedRows();
 
             console.log('รายการที่เลือกทั้งหมด:', selected);
@@ -1264,13 +1507,43 @@
                 },
                 success: function (response) {
                     const myFiles = response;
-                    console.log(myFiles);
                     loadExistingFiles(myFiles);
                 }
             });
         }
 
-        
+        async function GetHistoryFiles(leave_type_id, request_id, year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetFiles", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    leave_type_id, request_id, year
+                },
+                success: function (response) {
+                    const myFiles = response;
+                    loadExistingHistoryFiles(myFiles);
+                }
+            });
+        }
+
+        async function GetRequestLog(emp_id, request_id) {
+            let requests_log = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetRequestLog", "ManagementLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                     emp_id,request_id
+                },
+                success: function (response) {
+                     requests_log = response;
+                }
+            });
+            return requests_log;
+        }
+
+
         function createFileItem(fileName, fileType, fileUrl) {
             const fileItem = document.createElement('div');
             fileItem.className = 'list-group-item d-flex align-items-center file-item added';
@@ -1298,6 +1571,32 @@
         function loadExistingFiles(fileArray) {
             $('#fileListContainer').empty();
             const container = document.getElementById('fileListContainer');
+
+            if (fileArray.length > 0) {
+                fileArray.forEach(file => {
+                    let fileType = file.type;
+                    if (!fileType && file.filename) {
+                        const ext = file.filename.split('.').pop().toLowerCase();
+                        if (['pdf'].includes(ext)) fileType = 'pdf';
+                        else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) fileType = 'image';
+                        else if (['doc', 'docx'].includes(ext)) fileType = 'word';
+                        else if (['xls', 'xlsx'].includes(ext)) fileType = 'excel';
+                        else fileType = 'file';
+                    }
+
+                    const item = createFileItem(file.filename, fileType, file.path);
+                    container.appendChild(item);
+                    $('#btn_approve_leave').attr('disabled', false);
+                });
+            } else {
+                container.appendChild(createTextMessage("ไม่มีเอกสาร", "text-danger"));
+                $('#btn_approve_leave').attr('disabled', true);
+            }
+        }
+
+        function loadExistingHistoryFiles(fileArray) {
+            $('#fileListContainerHistory').empty();
+            const container = document.getElementById('fileListContainerHistory');
 
             if (fileArray.length > 0) {
                 fileArray.forEach(file => {

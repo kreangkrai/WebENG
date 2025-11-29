@@ -189,6 +189,7 @@ namespace WebENG.Controllers
             request.request_date = now;
             request.request_id = request_id;
             request.status_request = "Created";
+            request.comment = "";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
 
             if (tempFileIds.Length > 0) // มีไฟล์แนบมา

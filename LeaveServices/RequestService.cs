@@ -48,6 +48,7 @@ namespace WebENG.LeaveServices
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                           ,[level_step]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] IS NOT NULL");
@@ -78,7 +79,8 @@ namespace WebENG.LeaveServices
                             status_request = dr["status_request"].ToString(),
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
-                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -123,6 +125,7 @@ namespace WebENG.LeaveServices
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                           ,[level_step]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [request_id] = @request_id");
@@ -155,6 +158,7 @@ namespace WebENG.LeaveServices
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
                             level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
                         };
                     }
                     dr.Close();
@@ -199,6 +203,7 @@ namespace WebENG.LeaveServices
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                           ,[level_step]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [emp_id] = @emp_id");
@@ -231,6 +236,7 @@ namespace WebENG.LeaveServices
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
                             level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -276,6 +282,7 @@ namespace WebENG.LeaveServices
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                           ,[level_step]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] = @start_request_date");
@@ -308,6 +315,7 @@ namespace WebENG.LeaveServices
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
                             level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -353,6 +361,7 @@ namespace WebENG.LeaveServices
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                           ,[level_step]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] LIKE '{month}%'");
@@ -384,6 +393,7 @@ namespace WebENG.LeaveServices
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
                             level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -429,6 +439,7 @@ namespace WebENG.LeaveServices
                                                           ,Leave_type.color_code
                                                           ,[request].[is_two_step_approve]
                                                           ,[level_step]
+                                                          ,[request].[comment]
                                                       FROM [dbo].[request] 
 													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
                                                       WHERE [start_request_date] BETWEEN '{start_day}' AND '{end_day}'");
@@ -460,6 +471,7 @@ namespace WebENG.LeaveServices
                             is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
                             color_code = dr["color_code"].ToString(),
                             level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
                         };
                         requests.Add(request);
                     }
@@ -507,7 +519,8 @@ namespace WebENG.LeaveServices
                                                    ,[description]
                                                    ,[status_request]
                                                    ,[is_two_step_approve]
-                                                   ,[level_step])
+                                                   ,[level_step]
+                                                   ,[comment])
                                              VALUES
                                                    (@request_id
                                                    ,@emp_id
@@ -524,7 +537,8 @@ namespace WebENG.LeaveServices
                                                    ,@description
                                                    ,@status_request
                                                    ,@is_two_step_approve
-                                                   ,@level_step)");
+                                                   ,@level_step
+                                                   ,@comment)");
                 using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
                     command.Parameters.AddWithValue("@request_id", request.request_id);
@@ -543,6 +557,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@status_request", request.status_request);
                     command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
                     command.Parameters.AddWithValue("@level_step", request.level_step);
+                    command.Parameters.AddWithValue("@comment", request.comment);
                     command.ExecuteNonQuery();
                 }
                 return "Success";
@@ -588,6 +603,7 @@ namespace WebENG.LeaveServices
                                                       ,[status_request] = @status_request
                                                       ,[is_two_step_approve] = @is_two_step_approve
                                                       ,[level_step] = @level_step
+                                                      ,[comment] = @comment
                                                  WHERE [request_id] = @request_id AND  [emp_id] = @emp_id");
                 using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
@@ -607,6 +623,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@status_request", request.status_request);
                     command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
                     command.Parameters.AddWithValue("@level_step", request.level_step);
+                    command.Parameters.AddWithValue("@comment", request.comment);
                     command.ExecuteNonQuery();
                 }
                 return "Success";

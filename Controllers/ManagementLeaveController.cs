@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace WebENG.Controllers
         readonly IEmployee Employee;
         readonly ILevel Level;
         readonly ILeaveType LeaveType;
+        private IRequestLog RequestLog;
         public ManagementLeaveController()
         {
             Accessory = new AccessoryService();
@@ -31,6 +33,7 @@ namespace WebENG.Controllers
             Employee = new EmployeeService();
             Level = new LevelService();
             LeaveType = new LeaveTypeService();
+            RequestLog = new RequestLogService();
         }
         public IActionResult Index()
         {
@@ -64,6 +67,14 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetRequest()
         {
+            List<string> status_pending = new List<string>()
+            {
+                "Created",
+                "Resubmit",
+                "Pending",
+                "Approved"
+            };
+
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
@@ -73,60 +84,63 @@ namespace WebENG.Controllers
             List<string> departments = levels.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
 
             List<RequestModel> requests = Requests.GetRequests();
+            List<RequestModel> requests_pending = requests.Where(w => status_pending.Contains(w.status_request)).ToList();
+
             List<RequestModel> _requests = new List<RequestModel>();
-            for (int i = 0; i < requests.Count; i++)
+            for (int i = 0; i < requests_pending.Count; i++)
             {              
                 if (level.Count > 0)
                 {
-                    if (requests[i].is_two_step_approve)
+                    if (requests_pending[i].is_two_step_approve)
                     {
-                        LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(requests[i].leave_type_id);
-                        if (requests[i].amount_leave_day >= leaveType.max_consecutive_days)
+                        LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(requests_pending[i].leave_type_id);
+                        if (requests_pending[i].amount_leave_day >= leaveType.max_consecutive_days)
                         {
                             // Two Step Approve
-                            bool chk_level = level.Any(a => a == requests[i].level_step + 1);
+                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
                             if (chk_level)
                             {
-                                string request_department = employees.Where(w => w.emp_id == requests[i].emp_id).Select(s => s.department).FirstOrDefault();
+                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
                                 bool chk_dep = departments.Contains(request_department);
                                 if (chk_dep)
                                 {
-                                    _requests.Add(requests[i]);
+                                    _requests.Add(requests_pending[i]);
                                 }
                             }
                         }
                         else
                         {
                             //One Step Approve
-                            bool chk_level = level.Any(a => a == requests[i].level_step + 1); //2
+                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1); //2
                             if (chk_level)
                             {
-                                string request_department = employees.Where(w => w.emp_id == requests[i].emp_id).Select(s => s.department).FirstOrDefault();
+                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
                                 bool chk_dep = departments.Contains(request_department);
                                 if (chk_dep)
                                 {
-                                    _requests.Add(requests[i]);
+                                    _requests.Add(requests_pending[i]);
                                 }
                             }
                         }                      
                     }
                     else
                     {
-                        bool chk_level = level.Any(a => a == requests[i].level_step + 1);
+                        bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
                         if (chk_level)
                         {
-                            string request_department = employees.Where(w => w.emp_id == requests[i].emp_id).Select(s => s.department).FirstOrDefault();
+                            string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
                             bool chk_dep = departments.Contains(request_department);
                             if (chk_dep)
                             {
-                                _requests.Add(requests[i]);
+                                _requests.Add(requests_pending[i]);
                             }
                         }
                     }
                 }                
             }
 
-            var data = _requests.Select(s => new
+            //Pending
+            var pending = _requests.Select(s => new
             {
                 request_id = s.request_id,
                 leave_type_id = s.leave_type_id,
@@ -146,8 +160,35 @@ namespace WebENG.Controllers
                 status_request = s.status_request,
                 attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
                 attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
+                comment = s.comment
             }).ToList();
 
+            // No Pending
+            List<RequestModel> requests_no_pending = requests.Where(w => !status_pending.Contains(w.status_request)).ToList();
+            var no_pending = requests_no_pending.Select(s => new
+            {
+                request_id = s.request_id,
+                leave_type_id = s.leave_type_id,
+                emp_id = s.emp_id,
+                emp_name_en = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
+                emp_name_th = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_th).FirstOrDefault(),
+                request_date = s.request_date,
+                start_request_date = s.start_request_date,
+                end_request_date = s.end_request_date,
+                start_request_time = s.start_request_time,
+                end_request_time = s.end_request_time,
+                amount_leave_day = s.amount_leave_day,
+                leave_name_th = s.leave_name_th,
+                description = s.description,
+                path_file = s.path_file,
+                is_full_day = s.is_full_day,
+                status_request = s.status_request,
+                attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
+                attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
+                comment = s.comment
+            }).ToList();
+
+            var data = new { pending = pending, no_pending = no_pending };
             return Json(data);
         }
 
@@ -158,6 +199,309 @@ namespace WebENG.Controllers
             List<EmpModel> emps = Employee.GetEmps();
             return Ok(emps);
         }
+
+        [HttpGet]
+        public IActionResult GetRequestLog(string emp_id, string request_id)
+        {
+            List<RequestLogModel> requests_log = RequestLog.GetLogByRequestId(request_id);
+            int current_action_level = requests_log.Max(m => m.action_by_level);
+
+            RequestModel request = Requests.GetRequestByID(request_id);
+            int current_level_step = request.level_step;
+            bool is_two_step_approve = request.is_two_step_approve;
+            requests_log = requests_log.Where(w=>w.new_level_step <= current_level_step).OrderBy(o => o.log_date).ToList();
+
+            List<LevelModel> hierarchies = Level.GetHierarchyByEmpID(emp_id);
+            int level = hierarchies.Min(m => m.level);
+
+            List<ApprovedModel> approveds = new List<ApprovedModel>();
+            for(int i=0;i< requests_log.Count; i++)
+            {
+                approveds.Add(new ApprovedModel()
+                {
+                    emp_id = requests_log[i].action_by,
+                    emp_name = requests_log[i].action_by_name,
+                    level = requests_log[i].action_by_level,
+                    date = requests_log[i].log_date,
+                    status = requests_log[i].new_status
+                });
+            }
+            return Json(approveds);
+        }
+
+        [HttpPost]
+        public IActionResult Rejected(string request_id, string comment)
+        {
+            string user = HttpContext.Session.GetString("userId");
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+
+            List<RequestLogModel> requests_log = RequestLog.GetLogByRequestId(request_id);
+            RequestLogModel last_request_log = requests_log.OrderByDescending(o => o.log_date).FirstOrDefault();
+
+            RequestModel request = Requests.GetRequestByID(request_id);
+
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var requestService = Requests;
+                        var requestLogService = RequestLog;
+
+                        //Update Old Request
+                        request.status_request = "Rejected";
+                        request.level_step = last_request_log.new_level_step;
+                        request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
+                        request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
+                        request.comment = comment;
+                        requestService.Update(request);
+
+                        // Insert Request Log
+                        RequestLogModel rsl = new RequestLogModel()
+                        {
+                            log_date = DateTime.Now,
+                            comment = comment,
+                            action_by = approver.emp_id,
+                            action_by_level = last_request_log.action_by_level,
+                            action_by_name = last_request_log.action_by_name,
+                            new_status = "Rejected",
+                            new_level_step = last_request_log.new_level_step,
+                            old_level_step = last_request_log.old_level_step,
+                            old_status = last_request_log.old_status,
+                            request_id = last_request_log.request_id,
+                    };
+
+                        requestLogService.Insert(rsl);
+
+                        tran.Commit();
+                        return Json("Success");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Returned(string request_id, string comment)
+        {
+            string user = HttpContext.Session.GetString("userId");
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+
+            List<RequestLogModel> requests_log = RequestLog.GetLogByRequestId(request_id);
+            RequestLogModel first_request_log = requests_log.OrderBy(o => o.log_date).FirstOrDefault();
+
+            RequestModel request = Requests.GetRequestByID(request_id);
+
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var requestService = Requests;
+                        var requestLogService = RequestLog;
+
+                        //Update Old Request
+                        request.status_request = "Returned";
+                        request.level_step = first_request_log.new_level_step;
+                        request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
+                        request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
+                        request.comment = comment;
+                        requestService.Update(request);
+
+                        // Insert Request Log
+                        RequestLogModel rsl = new RequestLogModel()
+                        {
+                            log_date = DateTime.Now,
+                            comment = comment,
+                            action_by = approver.emp_id,
+                            action_by_level = first_request_log.action_by_level,
+                            action_by_name = first_request_log.action_by_name,
+                            new_status = "Returned",
+                            new_level_step = first_request_log.new_level_step,
+                            old_level_step = first_request_log.old_level_step,
+                            old_status = first_request_log.old_status,
+                            request_id = first_request_log.request_id
+                        };
+
+                        requestLogService.Insert(rsl);
+
+                        tran.Commit();
+                        return Json("Success");
+
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Approved(string request_id, string comment)
+        {
+            if (comment == null)
+            {
+                comment = "";
+            }
+
+            string user = HttpContext.Session.GetString("userId");
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+
+            int approve_level = -1;
+
+            RequestModel request = Requests.GetRequestByID(request_id);
+            int current_level_step = request.level_step;
+            string request_emp_id = request.emp_id;
+            string current_status = request.status_request;
+            bool is_two_step_approve = request.is_two_step_approve;
+            int level_step = request.level_step;
+            string new_status = "";
+            if (level_step == 0) // Operation Only
+            {
+                if (is_two_step_approve)
+                {
+                    if (current_status == "Created")
+                    {
+                        new_status = "Pending";
+                        approve_level = 1;
+                    }
+                    if (current_status == "Pending")
+                    {
+                        new_status = "Approved";
+                        approve_level = 2;
+                    }
+                    if (current_status == "Approved")
+                    {
+                        new_status = "Completed";
+                        approve_level = 3;
+                    }
+                }
+                else
+                {
+                    if (current_status == "Created")
+                    {
+                        new_status = "Approved";
+                        approve_level = 1;
+                    }
+                    if (current_status == "Approved")
+                    {
+                        new_status = "Completed";
+                        approve_level = 3;
+                    }
+                }
+            }
+            else if (level_step == 1) // Manager
+            {
+                if (current_status == "Created")
+                {
+                    new_status = "Approved";
+                    approve_level = 2;
+                }
+                if (current_status == "Pending")
+                {
+                    new_status = "Approved";
+                    approve_level = 2;
+                }
+                if (current_status == "Approved")
+                {
+                    new_status = "Completed";
+                    approve_level = 3;
+                }
+            }
+            else if (level_step == 2) // Director
+            {
+                if (current_status == "Created")
+                {
+                    new_status = "Completed";
+                    approve_level = 3;
+                }
+                if (current_status == "Approved")
+                {
+                    new_status = "Completed";
+                    approve_level = 3;
+                }
+                
+            }
+
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var requestService = Requests;
+                        var requestLogService = RequestLog;
+
+                        //Update Request
+                        request.level_step = approve_level;
+                        request.status_request = new_status;
+                        request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
+                        request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
+                        request.comment = comment;
+                        requestService.Update(request);
+
+                        // Insert Request Log
+                        RequestLogModel rsl = new RequestLogModel()
+                        {
+                            log_date = DateTime.Now,
+                            comment = comment,
+                            action_by = approver.emp_id,
+                            action_by_level = approve_level,
+                            action_by_name = approver.name_en,
+                            new_status = new_status,
+                            new_level_step = approve_level,
+                            old_level_step = level_step,
+                            old_status = current_status,
+                            request_id = request_id
+                        };
+
+                        requestLogService.Insert(rsl);
+
+                        tran.Commit();
+                        return Json("Success");
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        return Json($"Error {ex.Message}");
+                    }
+                }
+            }
+
+            //            1 Step
+            //Returned = Wait Edit and Resubmit
+            //1.Created <==> Resubmit(ส่งใหม่)
+            //2.Approved , Canceled , Rejected , Returned
+            //3.Completed
+
+            //2 Step
+            //Returned = Wait Edit and Resubmit
+            //1.Created <==> Resubmit(ส่งใหม่)
+            //2.Pending , Canceled , Rejected , Returned
+            //3.Approved , Canceled , Rejected , Returned
+            //4.Completed
+            //
+
+        }
+
 
         [HttpGet]
         public IActionResult GetFiles(string leave_type_id, string request_id,int year)

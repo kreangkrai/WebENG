@@ -27,6 +27,7 @@ namespace WebENG.LeaveModels
         public bool is_two_step_approve { get; set; }
         public string color_code { get; set; }
         public int level_step { get; set; }
+        public string comment { get; set; }
 
     }
     public class GroupRequestAmountModel
