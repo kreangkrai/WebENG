@@ -126,12 +126,12 @@
     }
 
     /* input[type="checkbox"] {
-        transition: all 0.3s ease; 
+        transition: all 0.3s ease;
         transform: scale(1.5);
     }
 
         input[type="checkbox"]:checked {
-            transform: scale(1.75); 
+            transform: scale(1.75);
             background-color: #32a852;
         } */
     /* Checkbox สไตล์องค์กร - เล็ก เรียบ เท่ */
@@ -204,7 +204,7 @@
         #selectAllApprove:indeterminate {
             transform: scale(1.15) !important;
         }
-        /*//////////////*/
+    /*//////////////*/
 
 
     /* สไตล์สำหรับ input */
@@ -454,7 +454,7 @@
 
     #modal_leave .modal-body {
         height: auto !important; /* ลบ 600px ออก */
-        max-height: 70vh; 
+        max-height: 70vh;
     }
 
     .modal-footer {
@@ -533,7 +533,7 @@
         border: 2px solid #27ae60;
         color: white;
         background-size: 200% 200%;
-        transition: all 0.4s ease; 
+        transition: all 0.4s ease;
     }
 
         .btn-success.modern-btn:hover {
@@ -546,11 +546,10 @@
         margin-right: 6px;
         font-size: 1.1em;
     }
-
 </style>
 
 <div class="row" style="row-gap:15px">
-    
+
     <!-- HEADER -->
     <div class="col-12" style="padding:20px">
         <span class="kanit-bold d-flex justify-content-center " style="font-size:30px; color:#1C4698; text-align:center;">
@@ -561,7 +560,7 @@
     <!-- Table Leave Approve -->
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
-           
+
             <div class="card-header  d-flex justify-content-between align-items-center"
                  style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
                  border-radius: 20px 20px 0 0;">
@@ -576,7 +575,7 @@
                     </span>
                 </h4>
             </div>
-               
+
             <div class="freeze-pane">
                 <table id="table_approve" class="table table-sm table-hover text-center mb-0">
                     <thead style="font-size:18px; color:#555">
@@ -605,7 +604,7 @@
             </div>
 
             <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
-             <div class="modal-footer d-flex">
+            <div class="modal-footer d-flex">
                 <div class="container d-flex justify-content-end">
                     <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
                         <div class="row">
@@ -617,10 +616,10 @@
                         </div>
                     </div>
                 </div>
-            </div> 
+            </div>
         </div>
     </div>
-    
+
 
     <!-- Table Leave Log -->
     <div class="col-xl-12 col-md-12 col-sm-12">
@@ -654,102 +653,130 @@
                             <th>สถานะ</th>
                         </tr>
                     </thead>
-                    <tbody>                       
+                    <tbody>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-</div>
+    <div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-content kanit-regular">
+                <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
+                    <h5 class="modal-title" id="modal_leave_title">อนุมัติการลา</h5>
+                    <h5 class="modal-title">(</h5>
+                    <h5 class="modal-title" id="modal_request_id"></h5>
+                    <h5 class="modal-title">)</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="color: white;">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style=" color:#555555; overflow-y:auto">
+                    <form>
+                        <!-- ข้อมูลการลา -->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
+                                    <i class="fas fa-info-circle mr-2"></i>ข้อมูลการลา
+                                </label>
+                                <div style="padding-left:20px;">
+                                    <div>
+                                        <label id="leave_description" class="col-12 kanit-light" style="white-space:pre-line"></label>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>
+                        </div>
 
-<!------------------------------------------------------------------------------------------->
-<!-- Task Modal -->
-<div class="modal fade" id="modal_leave" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal modal-dialog modal-dialog-centered modal-md" role="document">
-        <div class="modal-content kanit-regular">
-            <div class="modal-header" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); color: white; border-bottom: none">
-                <h5 class="modal-title" id="modal_leave_title">อนุมัติการลา</h5>
-                <h5 class="modal-title">(</h5>
-                <h5 class="modal-title" id="modal_request_id"></h5>
-                <h5 class="modal-title">)</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="color: white;">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" style=" color:#555555; overflow-y:auto">
-                <form>
-                    <!-- ข้อมูลการลา -->
-                    <div class="col-12">
-                        <div class="form-group">
+                        <!-- ส่วนแสดงรายการไฟล์ -->
+                        <div class="col-12 mb-4" id="div_fileList" hidden>
                             <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
-                                <i class="fas fa-info-circle mr-2"></i>ข้อมูลการลา
+                                <i class="fas fa-paperclip mr-2"></i>เอกสารที่แนบ
                             </label>
-                            <div style="padding-left:20px;">
-                                <div>
-                                    <label id="leave_description" class="col-12 kanit-light" style="white-space:pre-line"></label>
+                            <div class="card" style="border-radius: 10px; ">
+                                <div class="list-group" id="fileListContainer">
+
                                 </div>
                             </div>
-                            <hr />
                         </div>
-                    </div>
 
-                    <!-- ส่วนแสดงรายการไฟล์ -->
-                    <div class="col-12 mb-4" id="div_fileList" hidden>
-                        <label class="kanit-medium" style="letter-spacing:1px; font-size:18px">
-                            <i class="fas fa-paperclip mr-2"></i>เอกสารที่แนบ
-                        </label>
-                        <div class="card" style="border-radius: 10px; ">
-                            <div class="list-group" id="fileListContainer">
+                        <div class="col-12">
+                            <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
+                                <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
+                            </label>
 
+                            <div id="div_history_approved" class="timeline-container" style="position: relative; padding-left: 35px;">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="col-12">
-                        <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
-                            <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
-                        </label>
-
-                        <div id="div_history_approved" class="timeline-container" style="position: relative; padding-left: 35px;">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
-            <div class="modal-footer d-flex">
-                <div class="input-group mb-2">
-                    <textarea id="leave_reason" type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" rows="2"></textarea>
+                    </form>
                 </div>
-                <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
-                    <div class="row kanit-medium">
-                        <div class="ml-2">
-                            <button id="btn_reject_leave"
-                                    class="btn modern-btn btn-outline-danger"
-                                    style="border-radius:8px; width:90px; letter-spacing:1px" onclick="RejectClicked()">
-                                ปฏิเสธ
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button id="btn_resubmit_leave"
-                                    class="btn modern-btn btn-outline-warning"
-                                    style="border-radius:8px; width:90px; letter-spacing:1px" onclick="ResubmitClicked()">
-                                ส่งกลับ
-                            </button>
-                        </div>
-                        <div class="ml-2">
-                            <button id="btn_approve_leave"
-                                    class="btn modern-btn btn-success"
-                                    style="border-radius:8px; width:90px; letter-spacing:1px" onclick="ApproveClicked()">
-                                อนุมัติ
-                            </button>
+                <!-- Footer Button : ปฏิเสธ, ส่งกลับ, อนุมัติ-->
+                <div class="modal-footer d-flex">
+                    <div class="input-group mb-2">
+                        <textarea id="leave_reason" type="text" class="form-control" placeholder="เหตุผลการดำเนินการ" rows="2"></textarea>
+                    </div>
+                    <div class="col-xl-12 col-md-12 col-sm-12 d-flex justify-content-end">
+                        <div class="row kanit-medium">
+                            <div class="ml-2">
+                                <button id="btn_reject_leave"
+                                        class="btn modern-btn btn-outline-danger"
+                                        style="border-radius:8px; width:90px; letter-spacing:1px" onclick="RejectClicked()">
+                                    ปฏิเสธ
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button id="btn_resubmit_leave"
+                                        class="btn modern-btn btn-outline-warning"
+                                        style="border-radius:8px; width:90px; letter-spacing:1px" onclick="ResubmitClicked()">
+                                    ส่งกลับ
+                                </button>
+                            </div>
+                            <div class="ml-2">
+                                <button id="btn_approve_leave"
+                                        class="btn modern-btn btn-success"
+                                        style="border-radius:8px; width:90px; letter-spacing:1px" onclick="ApproveClicked()">
+                                    อนุมัติ
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- ====================== Modal อนุมัติ ====================== -->
 </div>
 
+<div class="modal fade" id="modal_approves" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow-lg border-0" style="border-radius: 12px;">
+            <div class="modal-header bg-success text-white" style="border-radius: 12px 12px 0 0;">
+                <h5 class="modal-title kanit-semibold">
+                    <i class="fas fa-check-circle mr-2"></i> ยืนยันการอนุมัติ
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <i class="fas fa-check fa-4x text-success mb-3"></i>
+                <p class="kanit-medium mb-0" style="font-size: 1.1rem;">
+                    คุณต้องการ <strong class="text-success">อนุมัติ</strong> คำขอลานี้หรือไม่?
+                    <br><small class="text-muted">เมื่ออนุมัติแล้ว ระบบจะแจ้งเตือนพนักงานทันที</small>
+                </p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0">
+                <button type="button" class="btn btn-secondary kanit-medium px-4" data-dismiss="modal" style="border-radius: 8px;">
+                    ยกเลิก
+                </button>
+                <button type="button" id="confirm_approves" class="btn btn-success kanit-medium px-4" style="border-radius: 8px;">
+                    <i class="fas fa-check mr-1"></i> อนุมัติคำขอ
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!------------------------------------------------------------------------------------------->
 <!-- ====================== Modal ปฏิเสธ ====================== -->
 <div class="modal fade" id="modal_reject" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -842,6 +869,8 @@
         </div>
     </div>
 </div>
+
+
 <!------------------------------------------------------------------------------------------------>
 <div class="modal fade" id="modal_leave_history" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md" role="document">
@@ -910,6 +939,8 @@
         </div>
     </div>
 </div>
+
+
 <partial name="ModalSpin" />
 
 @section Scripts
@@ -1142,7 +1173,7 @@
 
                     // Request Title
                     $('#modal_request_id').text(request.request_id);
-                   
+
                     // Get Request Log
                     let requests_log = await GetRequestLog(request.emp_id, request.request_id);
                     GenerateHistoryApproveLog(requests_log);
@@ -1178,7 +1209,7 @@
                             position = "Manager";
                         }
                     }
-                    
+
                 } else {
                     if (requests_log[i].is_two_step_approve) {
                         status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
@@ -1290,7 +1321,7 @@
                                 <hr />
                             </div>`;
                 }
-                
+
             }
             $('#div_history_request').empty();
             $('#div_history_request').append(html);
@@ -1403,7 +1434,7 @@
                         $('#div_history_fileList').attr('hidden', true);
                     }
 
-                    
+
                     //Reason
                     if (request.comment === "" || request.comment === null) {
                         $('#leave_history_reason').attr('hidden', true);
@@ -1497,6 +1528,25 @@
             });
         });
 
+        $('#confirm_approves').on('click', async function () {
+            const selected = getSelectedRows();
+            let selects = selected.map(m => m.request_id);
+            await $.ajax({
+                type: "POST",
+                url: '@Url.Action("Approveds", "ManagementLeave")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    selects
+                },
+                success: function (response) {
+                    if (response === "Success") {
+                        location.reload();
+                    } else {
+                        alert(response);
+                    }
+                }
+            });
+        });
 
         $(document).on('change', '#table_approve tbody .approve-checkbox', function () {
             const totalVisible = $('#table_approve tbody .approve-checkbox').not(':hidden').length;
@@ -1544,9 +1594,7 @@
         }
 
         $('#btn_all_approve_leave').on('click', function () {
-            const selected = getSelectedRows();
-
-            console.log('รายการที่เลือกทั้งหมด:', selected);
+            $('#modal_approves').modal();
 
         });
 

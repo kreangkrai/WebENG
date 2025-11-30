@@ -16,6 +16,19 @@ using WebENG.LeaveServices;
 using WebENG.Models;
 using WebENG.Service;
 
+//            1 Step
+//Returned = Wait Edit and Resubmit
+//1.Created <==> Resubmit(ส่งใหม่)
+//2.Approved , Canceled , Rejected , Returned
+//3.Completed
+
+//2 Step
+//Returned = Wait Edit and Resubmit
+//1.Created <==> Resubmit(ส่งใหม่)
+//2.Pending , Canceled , Rejected , Returned
+//3.Approved , Canceled , Rejected , Returned
+//4.Completed
+//
 namespace WebENG.Controllers
 {
     public class ManagementLeaveController : Controller
@@ -60,6 +73,21 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        [HttpPost]
+        public IActionResult Approveds(string[] selects)
+        {
+            string message = "";
+            string user = HttpContext.Session.GetString("userId");
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+            for (int i = 0; i < selects.Length; i++)
+            {
+                message = Approver(selects[i], "", approver);
+            }
+
+            return Json(message);
         }
 
         [HttpGet]
@@ -532,8 +560,14 @@ namespace WebENG.Controllers
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
 
-            int approve_level = -1;
+            string message = Approver(request_id, comment , approver);
+            return Json(message);
+        }
 
+        public string Approver(string request_id,string comment , CTLModels.EmployeeModel approver)
+        {
+            string message = "";
+            int approve_level = -1;
             RequestModel request = Requests.GetRequestByID(request_id);
             int current_level_step = request.level_step;
             string request_emp_id = request.emp_id;
@@ -605,7 +639,7 @@ namespace WebENG.Controllers
                     new_status = "Completed";
                     approve_level = 3;
                 }
-                
+
             }
 
             var connect = new ConnectSQL();
@@ -646,32 +680,17 @@ namespace WebENG.Controllers
                         requestLogService.Insert(rsl);
 
                         tran.Commit();
-                        return Json("Success");
+                        message = "Success";
                     }
                     catch (Exception ex)
                     {
                         tran.Rollback();
-                        return Json($"Error {ex.Message}");
+                        message = $"Error {ex.Message}";
                     }
                 }
             }
-
-            //            1 Step
-            //Returned = Wait Edit and Resubmit
-            //1.Created <==> Resubmit(ส่งใหม่)
-            //2.Approved , Canceled , Rejected , Returned
-            //3.Completed
-
-            //2 Step
-            //Returned = Wait Edit and Resubmit
-            //1.Created <==> Resubmit(ส่งใหม่)
-            //2.Pending , Canceled , Rejected , Returned
-            //3.Approved , Canceled , Rejected , Returned
-            //4.Completed
-            //
-
+            return message;
         }
-
 
         [HttpGet]
         public IActionResult GetFiles(string leave_type_id, string request_id,int year)

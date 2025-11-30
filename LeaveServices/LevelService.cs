@@ -34,7 +34,10 @@ namespace WebENG.LeaveServices
                                                            name_en as emp_name,
                                                            position,
                                                            department,
-                                                           CASE WHEN position = 'Operation' OR position = '' THEN 0 ELSE 1 END as level 
+                                                           CASE WHEN position = 'Operation' OR position = '' THEN 0
+														   WHEN position LIKE '%Manager%' THEN 1
+														   WHEN position LIKE '%Director%' THEN 2
+														   ELSE 0 END as level 
                                                     FROM [CTL].dbo.Employees
                                                     WHERE emp_id = @emp_id
                                                 ),
@@ -117,20 +120,21 @@ namespace WebENG.LeaveServices
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"WITH l0 AS (
-                                                    SELECT [ELEAVE].dbo.departments.emp_id,
-                                                    name_en as emp_name,
-                                                    position,
-                                                    [ELEAVE].dbo.departments.department ,
-                                                    level
-                                                    FROM [ELEAVE].dbo.departments
-													LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.departments.emp_id = emp.emp_id
-                                                    WHERE [ELEAVE].dbo.departments.emp_id = @emp_id
+                string strCmd = string.Format($@"WITH l0 AS (SELECT emp_id,
+                                                           name_en as emp_name,
+                                                           position,
+                                                           department,
+                                                           CASE WHEN position = 'Operation' OR position = '' THEN 0
+														   WHEN position LIKE '%Manager%' THEN 1
+														   WHEN position LIKE '%Director%' THEN 2
+														   ELSE 0 END as level 
+                                                    FROM [CTL].dbo.Employees
+                                                    WHERE emp_id = @emp_id                                                    
                                                 ),
                                                 l1 AS (
                                                     SELECT [ELEAVE].dbo.departments.emp_id,
                                                            name_en as emp_name,
-                                                           position,
+                                                           'Manager' as position,
                                                            [ELEAVE].dbo.departments.department,
                                                            level
                                                     FROM [ELEAVE].dbo.departments 
@@ -157,7 +161,6 @@ namespace WebENG.LeaveServices
                                                            LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Checkers].emp_id = emp.emp_id
                                                 ),
                                                 m AS (
-
                                                 SELECT * FROM l0
                                                 UNION ALL
                                                 SELECT * FROM l1
