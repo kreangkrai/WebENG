@@ -18,6 +18,7 @@ namespace WebENG.LeaveModels
         public int new_level_step { get; set; }     
         public string comment { get; set; }
         public DateTime log_date { get; set; }
+        public bool is_two_step_approve { get; set; }
 
     }
 }

@@ -39,6 +39,7 @@ namespace WebENG.LeaveServices
                                                       ,[new_level_step]
                                                       ,[comment]
                                                       ,[log_date]
+                                                      ,[is_two_step_approve]
                                                   FROM [dbo].[request_log]
                                                   WHERE [action_by] = @action_by");
                 SqlCommand command = new SqlCommand(strCmd, con);
@@ -60,7 +61,8 @@ namespace WebENG.LeaveServices
                             new_level_step = dr["new_level_step"] != DBNull.Value ? Convert.ToInt32(dr["new_level_step"].ToString()) : -1,
                             comment = dr["comment"].ToString(),
                             log_id = Int32.Parse(dr["log_id"].ToString()),
-                            log_date = Convert.ToDateTime(dr["log_date"].ToString())
+                            log_date = Convert.ToDateTime(dr["log_date"].ToString()),
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) :false
                         };
                         requests.Add(request);
                     }
@@ -97,6 +99,7 @@ namespace WebENG.LeaveServices
                                                       ,[new_level_step]
                                                       ,[comment]
                                                       ,[log_date]
+                                                      ,[is_two_step_approve]
                                                   FROM [dbo].[request_log]
                                                   WHERE [request_id] = @request_id");
                 SqlCommand command = new SqlCommand(strCmd, con);
@@ -118,7 +121,8 @@ namespace WebENG.LeaveServices
                             new_level_step = dr["new_level_step"] != DBNull.Value ? Convert.ToInt32(dr["new_level_step"].ToString()) : -1,
                             comment = dr["comment"].ToString(),
                             log_id = Int32.Parse(dr["log_id"].ToString()),
-                            log_date = Convert.ToDateTime(dr["log_date"].ToString())
+                            log_date = Convert.ToDateTime(dr["log_date"].ToString()),
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false
                         };
                         requests.Add(request);
                     }
@@ -161,7 +165,8 @@ namespace WebENG.LeaveServices
                                                        ,[old_level_step]
                                                        ,[new_level_step]
                                                        ,[comment]
-                                                       ,[log_date])
+                                                       ,[log_date]
+                                                       ,[is_two_step_approve])
                                                  VALUES
                                                        (@request_id
                                                        ,@action_by
@@ -172,7 +177,8 @@ namespace WebENG.LeaveServices
                                                        ,@old_level_step
                                                        ,@new_level_step
                                                        ,@comment
-                                                       ,@log_date)");
+                                                       ,@log_date
+                                                       ,@is_two_step_approve)");
                 using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
                     command.Parameters.AddWithValue("@request_id", request.request_id);
@@ -185,6 +191,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@new_level_step", request.new_level_step);
                     command.Parameters.AddWithValue("@log_date", request.log_date);
                     command.Parameters.AddWithValue("@comment", request.comment);
+                    command.Parameters.AddWithValue("@is_two_step_approve", request.is_two_step_approve);
                     command.ExecuteNonQuery();
                 }
                 return "Success";
@@ -226,7 +233,8 @@ namespace WebENG.LeaveServices
                                                        ,[old_level_step]
                                                        ,[new_level_step]
                                                        ,[comment]
-                                                       ,[log_date])
+                                                       ,[log_date]
+                                                       ,[is_two_step_approve])
                                                  VALUES
                                                        (@request_id
                                                        ,@action_by
@@ -237,7 +245,8 @@ namespace WebENG.LeaveServices
                                                        ,@old_level_step
                                                        ,@new_level_step
                                                        ,@comment
-                                                       ,@log_date)");
+                                                       ,@log_date
+                                                       ,@is_two_step_approve)");
                 using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
                     var request_id = command.Parameters.Add("@request_id", SqlDbType.Text);
@@ -250,6 +259,7 @@ namespace WebENG.LeaveServices
                     var new_level_step = command.Parameters.Add("@new_level_step", SqlDbType.Int);
                     var log_date = command.Parameters.Add("@log_date", SqlDbType.DateTime);
                     var comment = command.Parameters.Add("@comment", SqlDbType.Text);
+                    var is_two_step_approve = command.Parameters.Add("@is_two_step_approve", SqlDbType.Bit);
                     foreach (var request in requests)
                     {
                         request_id.Value = request.request_id ?? (object)DBNull.Value;
@@ -262,6 +272,7 @@ namespace WebENG.LeaveServices
                         new_level_step.Value = request.new_level_step;
                         log_date.Value = request.log_date;
                         comment.Value = request.comment ?? (object)DBNull.Value;
+                        is_two_step_approve.Value = request.is_two_step_approve;
                         command.ExecuteNonQuery();
                     }
                 }

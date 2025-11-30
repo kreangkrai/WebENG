@@ -54,8 +54,6 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
 
-                GetRequest();
-
                 return View(u);
             }
             else
@@ -125,14 +123,30 @@ namespace WebENG.Controllers
                     }
                     else
                     {
-                        bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
-                        if (chk_level)
+                        if (requests_pending[i].level_step == 0)
                         {
-                            string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
-                            bool chk_dep = departments.Contains(request_department);
-                            if (chk_dep)
+                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
+                            if (chk_level)
                             {
-                                _requests.Add(requests_pending[i]);
+                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
+                                bool chk_dep = departments.Contains(request_department);
+                                if (chk_dep)
+                                {
+                                    _requests.Add(requests_pending[i]);
+                                }
+                            }
+                        }
+                        else if(requests_pending[i].level_step == 1)
+                        {
+                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 2);
+                            if (chk_level)
+                            {
+                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
+                                bool chk_dep = departments.Contains(request_department);
+                                if (chk_dep)
+                                {
+                                    _requests.Add(requests_pending[i]);
+                                }
                             }
                         }
                     }
@@ -160,7 +174,9 @@ namespace WebENG.Controllers
                 status_request = s.status_request,
                 attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
                 attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
-                comment = s.comment
+                comment = s.comment,
+                level_step = s.level_step,
+                is_two_step_approve = s.is_two_step_approve
             }).ToList();
 
             // No Pending
@@ -185,7 +201,9 @@ namespace WebENG.Controllers
                 status_request = s.status_request,
                 attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
                 attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
-                comment = s.comment
+                comment = s.comment,
+                level_step = s.level_step,
+                is_two_step_approve = s.is_two_step_approve
             }).ToList();
 
             var data = new { pending = pending, no_pending = no_pending };
@@ -215,16 +233,47 @@ namespace WebENG.Controllers
             int level = hierarchies.Min(m => m.level);
 
             List<ApprovedModel> approveds = new List<ApprovedModel>();
-            for(int i=0;i< requests_log.Count; i++)
+            for (int i = 0; i < requests_log.Count; i++)
             {
-                approveds.Add(new ApprovedModel()
+                if (requests_log[i].action_by_level > 0 && (requests_log[i].new_status == "Created" || requests_log[i].new_status == "Resubmit"))
                 {
-                    emp_id = requests_log[i].action_by,
-                    emp_name = requests_log[i].action_by_name,
-                    level = requests_log[i].action_by_level,
-                    date = requests_log[i].log_date,
-                    status = requests_log[i].new_status
-                });
+                    approveds.Add(new ApprovedModel()
+                    {
+                        emp_id = requests_log[i].action_by,
+                        emp_name = requests_log[i].action_by_name,
+                        current_level = requests_log[i].action_by_level,
+                        date = requests_log[i].log_date,
+                        status = requests_log[i].new_status,
+                        is_two_step_approve = requests_log[i].is_two_step_approve,
+                        next_level = requests_log[i].action_by_level + 1
+                    });
+                }
+                else if (requests_log[i].action_by_level > 0 && requests_log[i].new_status != "Created" && requests_log[i].new_status != "Resubmit")
+                {
+                    approveds.Add(new ApprovedModel()
+                    {
+                        emp_id = requests_log[i].action_by,
+                        emp_name = requests_log[i].action_by_name,
+                        current_level = requests_log[i].action_by_level,
+                        date = requests_log[i].log_date,
+                        status = requests_log[i].new_status,
+                        is_two_step_approve = requests_log[i].is_two_step_approve,
+                        next_level = 3
+                    });
+                }
+                else if (requests_log[i].action_by_level == 0)
+                {
+                    approveds.Add(new ApprovedModel()
+                    {
+                        emp_id = requests_log[i].action_by,
+                        emp_name = requests_log[i].action_by_name,
+                        current_level = requests_log[i].action_by_level,
+                        date = requests_log[i].log_date,
+                        status = requests_log[i].new_status,
+                        is_two_step_approve = requests_log[i].is_two_step_approve,
+                        next_level = requests_log[i].action_by_level + 1
+                    });
+                }
             }
             return Json(approveds);
         }
@@ -241,6 +290,65 @@ namespace WebENG.Controllers
 
             RequestModel request = Requests.GetRequestByID(request_id);
 
+            string new_status = "Rejected";
+            int rejected_level = 0;
+            if (request.level_step == 0) // Operation Only
+            {
+                if (request.is_two_step_approve)
+                {
+                    if (request.status_request == "Created" || request.status_request == "Resubmit")
+                    {
+                        rejected_level = 1;
+                    }
+                    if (request.status_request == "Pending")
+                    {
+                        rejected_level = 2;
+                    }
+                    if (request.status_request == "Approved")
+                    {
+                        rejected_level = 3;
+                    }
+                }
+                else
+                {
+                    if (request.status_request == "Created" || request.status_request == "Resubmit")
+                    {
+                        rejected_level = 1;
+                    }
+                    if (request.status_request == "Approved")
+                    {
+                        rejected_level = 3;
+                    }
+                }
+            }
+            else if (request.level_step == 1) // Manager
+            {
+                if (request.status_request == "Created" || request.status_request == "Resubmit")
+                {
+                    rejected_level = 2;
+                }
+                if (request.status_request == "Pending")
+                {
+                    rejected_level = 2;
+                }
+                if (request.status_request == "Approved")
+                {
+                    rejected_level = 3;
+                }
+            }
+            else if (request.level_step == 2) // Director
+            {
+                if (request.status_request == "Created")
+                {
+                    rejected_level = 3;
+                }
+                if (request.status_request == "Approved")
+                {
+                    rejected_level = 3;
+                }
+
+            }
+
             var connect = new ConnectSQL();
             using (SqlConnection con = connect.OpenLeaveConnect())
             {
@@ -253,8 +361,8 @@ namespace WebENG.Controllers
                         var requestLogService = RequestLog;
 
                         //Update Old Request
-                        request.status_request = "Rejected";
-                        request.level_step = last_request_log.new_level_step;
+                        request.status_request = new_status;
+                        request.level_step = rejected_level;
                         request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
                         request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
                         request.comment = comment;
@@ -266,14 +374,15 @@ namespace WebENG.Controllers
                             log_date = DateTime.Now,
                             comment = comment,
                             action_by = approver.emp_id,
-                            action_by_level = last_request_log.action_by_level,
-                            action_by_name = last_request_log.action_by_name,
-                            new_status = "Rejected",
-                            new_level_step = last_request_log.new_level_step,
-                            old_level_step = last_request_log.old_level_step,
-                            old_status = last_request_log.old_status,
+                            action_by_level = rejected_level,
+                            action_by_name = approver.name_en,
+                            new_status = new_status,
+                            new_level_step = rejected_level,
+                            old_level_step = last_request_log.new_level_step,
+                            old_status = last_request_log.new_status,
                             request_id = last_request_log.request_id,
-                    };
+                            is_two_step_approve = last_request_log.is_two_step_approve
+                        };
 
                         requestLogService.Insert(rsl);
 
@@ -298,9 +407,68 @@ namespace WebENG.Controllers
             CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
 
             List<RequestLogModel> requests_log = RequestLog.GetLogByRequestId(request_id);
-            RequestLogModel first_request_log = requests_log.OrderBy(o => o.log_date).FirstOrDefault();
+            RequestLogModel last_request_log = requests_log.OrderByDescending(o => o.log_date).FirstOrDefault();
 
             RequestModel request = Requests.GetRequestByID(request_id);
+
+            string new_status = "Returned";
+            int returned_level = 0;
+            if (request.level_step == 0) // Operation Only
+            {
+                if (request.is_two_step_approve)
+                {
+                    if (request.status_request == "Created" || request.status_request == "Resubmit")
+                    {
+                        returned_level = 1;
+                    }
+                    if (request.status_request == "Pending")
+                    {
+                        returned_level = 2;
+                    }
+                    if (request.status_request == "Approved")
+                    {
+                        returned_level = 3;
+                    }
+                }
+                else
+                {
+                    if (request.status_request == "Created" || request.status_request == "Resubmit")
+                    {
+                        returned_level = 1;
+                    }
+                    if (request.status_request == "Approved")
+                    {
+                        returned_level = 3;
+                    }
+                }
+            }
+            else if (request.level_step == 1) // Manager
+            {
+                if (request.status_request == "Created" || request.status_request == "Resubmit")
+                {
+                    returned_level = 2;
+                }
+                if (request.status_request == "Pending")
+                {
+                    returned_level = 2;
+                }
+                if (request.status_request == "Approved")
+                {
+                    returned_level = 3;
+                }
+            }
+            else if (request.level_step == 2) // Director
+            {
+                if (request.status_request == "Created" || request.status_request == "Resubmit")
+                {
+                    returned_level = 3;
+                }
+                if (request.status_request == "Approved")
+                {
+                    returned_level = 3;
+                }
+
+            }
 
             var connect = new ConnectSQL();
             using (SqlConnection con = connect.OpenLeaveConnect())
@@ -314,8 +482,8 @@ namespace WebENG.Controllers
                         var requestLogService = RequestLog;
 
                         //Update Old Request
-                        request.status_request = "Returned";
-                        request.level_step = first_request_log.new_level_step;
+                        request.status_request = new_status;
+                        request.level_step = returned_level;
                         request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
                         request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
                         request.comment = comment;
@@ -327,13 +495,14 @@ namespace WebENG.Controllers
                             log_date = DateTime.Now,
                             comment = comment,
                             action_by = approver.emp_id,
-                            action_by_level = first_request_log.action_by_level,
-                            action_by_name = first_request_log.action_by_name,
-                            new_status = "Returned",
-                            new_level_step = first_request_log.new_level_step,
-                            old_level_step = first_request_log.old_level_step,
-                            old_status = first_request_log.old_status,
-                            request_id = first_request_log.request_id
+                            action_by_level = returned_level,
+                            action_by_name = approver.name_en,
+                            new_status = new_status,
+                            new_level_step = returned_level,
+                            old_level_step = last_request_log.new_level_step,
+                            old_status = last_request_log.new_status,
+                            request_id = last_request_log.request_id,
+                            is_two_step_approve = last_request_log.is_two_step_approve
                         };
 
                         requestLogService.Insert(rsl);
@@ -376,7 +545,7 @@ namespace WebENG.Controllers
             {
                 if (is_two_step_approve)
                 {
-                    if (current_status == "Created")
+                    if (current_status == "Created" || current_status == "Resubmit")
                     {
                         new_status = "Pending";
                         approve_level = 1;
@@ -394,7 +563,7 @@ namespace WebENG.Controllers
                 }
                 else
                 {
-                    if (current_status == "Created")
+                    if (current_status == "Created" || current_status == "Resubmit")
                     {
                         new_status = "Approved";
                         approve_level = 1;
@@ -408,7 +577,7 @@ namespace WebENG.Controllers
             }
             else if (level_step == 1) // Manager
             {
-                if (current_status == "Created")
+                if (current_status == "Created" || current_status == "Resubmit")
                 {
                     new_status = "Approved";
                     approve_level = 2;
@@ -426,7 +595,7 @@ namespace WebENG.Controllers
             }
             else if (level_step == 2) // Director
             {
-                if (current_status == "Created")
+                if (current_status == "Created" || current_status == "Resubmit")
                 {
                     new_status = "Completed";
                     approve_level = 3;
@@ -470,7 +639,8 @@ namespace WebENG.Controllers
                             new_level_step = approve_level,
                             old_level_step = level_step,
                             old_status = current_status,
-                            request_id = request_id
+                            request_id = request_id,
+                            is_two_step_approve = is_two_step_approve
                         };
 
                         requestLogService.Insert(rsl);

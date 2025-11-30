@@ -117,31 +117,56 @@ namespace WebENG.LeaveServices
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"WITH main AS (
-                                                    SELECT emp_id,
+                string strCmd = string.Format($@"WITH l0 AS (
+                                                    SELECT [ELEAVE].dbo.departments.emp_id,
                                                     name_en as emp_name,
                                                     position,
-                                                    department ,
-                                                    CASE WHEN position = 'Operation' OR position = '' THEN 0 ELSE 1 END as level 
-                                                    FROM [CTL].dbo.Employees
-                                                    UNION ALL
+                                                    [ELEAVE].dbo.departments.department ,
+                                                    level
+                                                    FROM [ELEAVE].dbo.departments
+													LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.departments.emp_id = emp.emp_id
+                                                    WHERE [ELEAVE].dbo.departments.emp_id = @emp_id
+                                                ),
+                                                l1 AS (
+                                                    SELECT [ELEAVE].dbo.departments.emp_id,
+                                                           name_en as emp_name,
+                                                           position,
+                                                           [ELEAVE].dbo.departments.department,
+                                                           level
+                                                    FROM [ELEAVE].dbo.departments 
+	                                                LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.departments.emp_id = emp.emp_id
+                                                    WHERE [ELEAVE].dbo.departments.department = (SELECT department FROM l0)
+                                                ),
+                                                l2 AS (
                                                     SELECT [ELEAVE].dbo.[Approvers].emp_id,
-                                                    emp.name_en as emp_name,
-                                                    'Director' as position,
-                                                    [ELEAVE].dbo.[Approvers].department,
-                                                    level
-                                                    FROM [ELEAVE].dbo.[Approvers]
-                                                    LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Approvers].emp_id = emp.emp_id
-                                                    UNION ALL 
+                                                           emp.name_en as emp_name,
+                                                           'Director' as position,
+                                                            [ELEAVE].dbo.[Approvers].department,
+                                                            level
+                                                            FROM [ELEAVE].dbo.[Approvers]
+                                                            LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Approvers].emp_id = emp.emp_id
+			                                                WHERE [ELEAVE].dbo.[Approvers].department = (SELECT department FROM l0)
+                                                ),
+                                                l3 AS (
                                                     SELECT [ELEAVE].dbo.[Checkers].emp_id,
-                                                    emp.name_en as emp_name,
-                                                    'Checker' as position,
-                                                    emp.department,
-                                                    level
-                                                    FROM [ELEAVE].dbo.[Checkers]
-                                                    LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Checkers].emp_id = emp.emp_id
+                                                           emp.name_en as emp_name,
+                                                           'Checker' as position,
+                                                           emp.department,
+                                                           level
+                                                           FROM [ELEAVE].dbo.[Checkers]
+                                                           LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Checkers].emp_id = emp.emp_id
+                                                ),
+                                                m AS (
+
+                                                SELECT * FROM l0
+                                                UNION ALL
+                                                SELECT * FROM l1
+                                                UNION ALL
+                                                SELECT * FROM l2
+                                                UNION ALL
+                                                SELECT * FROM l3
                                                 )
-                                                SELECT * FROM main WHERE main.emp_id = @emp_id ORDER BY main.emp_name");
+                                                SELECT DISTINCT * FROM m ORDER BY m.level");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@emp_id", emp_id);
                 SqlDataReader dr = command.ExecuteReader();

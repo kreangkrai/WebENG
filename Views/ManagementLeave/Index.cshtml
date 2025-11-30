@@ -921,10 +921,10 @@
 
         const request_status = [
             { status_en: "Created", status: { status_th: "สร้าง", class: "secondary" } },
-            { status_en: "Pending", status: { status_th: "อนุมัติ1", class: "warning" } },
+            { status_en: "Pending", status: { status_th: "อนุมัติ", class: "warning" } },
             { status_en: "Resubmit", status: { status_th: "ส่งใหม่", class: "secondary" } },
             { status_en: "Canceled", status: { status_th: "ยกเลิก", class: "dark" } },
-            { status_en: "Approved", status: { status_th: "อนุมัติ2", class: "success" } },
+            { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
             { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
             { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
             { status_en: "Completed", status: { status_th: "สำเร็จ", class: "success" } },
@@ -1051,35 +1051,35 @@
 
                 let class_path_file = `<td></td>`;
                 let class_check = `<td></td>`;
-                if (row.attachment_required) {
-                    if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
-                        if (row.path_file === "" || row.path_file === null) {
-                            class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
-                            class_check = `<td>
-                            <div class="form-check form-check-inline mb-1">
-                                <input class="form-check-input approve-checkbox" type="checkbox" hidden>
-                                <label class="form-check-label"></label>
-                            </div>
-                        </td>`;
-                        } else {
-                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`;
-                            class_check = `<td>
-                            <div class="form-check form-check-inline mb-1">
-                                <input class="form-check-input approve-checkbox" type="checkbox">
-                                <label class="form-check-label"></label>
-                            </div>
-                        </td>`;
-                        }
-                    }
+
+                //Check Box Create For manager , Director Only
+                const canApprove = row.is_two_step_approve
+                    ? row.level_step < 2
+                    : row.level_step < 1;
+
+                let hasRequiredAttachment = true;
+                if (row.attachment_required && parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                    hasRequiredAttachment = !!(row.path_file && row.path_file !== "");
+                }
+
+                if (row.attachment_required && parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                    class_path_file = hasRequiredAttachment
+                        ? `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`
+                        : `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
                 } else {
                     class_path_file = `<td></td>`;
-                    class_check = `<td>
-                            <div class="form-check form-check-inline mb-1">
-                                <input class="form-check-input approve-checkbox" type="checkbox">
-                                <label class="form-check-label"></label>
-                            </div>
-                        </td>`;
                 }
+
+                const checkboxHidden = canApprove && hasRequiredAttachment ? '' : 'hidden';
+
+                class_check = `<td>
+                    <div class="form-check form-check-inline mb-1">
+                        <input class="form-check-input approve-checkbox" type="checkbox" ${checkboxHidden}>
+                        <label class="form-check-label"></label>
+                    </div>
+                </td>`;
+
+                ////
 
                 const tr = $(`
                     <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
@@ -1161,33 +1161,71 @@
         function GenerateHistoryApproveLog(requests_log) {
             var html = '';
             let position = "";
-            let next_position = "Manager";
+            let next_position = "";
             let status = "";
             for (var i = 0; i < requests_log.length; i++) {
                 if (requests_log[i].level > 0) {
-                    status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
-                    if (requests_log[i].level === 1) {
-                        position = "Manager";
-                        next_position = "Director";
+                    if (requests_log[i].is_two_step_approve) {
+                        if (requests_log[i].current_level === 1) {
+                            position = "Manager";
+                        }
+                        if (requests_log[i].current_level === 2) {
+                            position = "Director";
+                        }
+                    } else {
+                        status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
+                        if (requests_log[i].current_level === 1) {
+                            position = "Manager";
+                        }
                     }
-                    if (requests_log[i].level === 2) {
-                        position = "Director";
-                        next_position = "Checker";
+                    
+                } else {
+                    if (requests_log[i].is_two_step_approve) {
+                        status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
+                        if (requests_log[i].current_level === 0) {
+                            position = "Operation";
+                        }
+                        if (requests_log[i].current_level === 1) {
+                            position = "Manager";
+                        }
+                        if (requests_log[i].current_level === 2) {
+                            position = "Director";
+                        }
+                    } else {
+                        status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
+                        if (requests_log[i].current_level === 0) {
+                            position = "Operation";
+                        }
+                        if (requests_log[i].current_level === 1) {
+                            position = "Manager";
+                        }
                     }
-
-                    html += `<div class="d-flex align-items-center mb-3 text-success">
+                }
+                html += `<div class="d-flex align-items-center mb-3 text-success">
                                 <i class="fas fa-check-circle fa-lg mr-3"></i>
                                 <div class="flex-grow-1">
                                     <span class="kanit-medium" style="color:#555">${requests_log[i].emp_name}</span>
                                     <span class="text-muted kanit-regular">(${position})</span>
                                     <div>
                                         <span class="text-success kanit-medium">${status.status_th}</span>
-                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')} ${requests_log[i].date.split('T')[1]}</span>
                                     </div>
                                 </div>
                                 <hr />
                             </div>`;
 
+
+                if (requests_log[i].next_level === 0) {
+                    next_position = "Operation";
+                }
+                if (requests_log[i].next_level === 1) {
+                    next_position = "Manager";
+                }
+                if (requests_log[i].next_level === 2) {
+                    next_position = "Director";
+                }
+                if (requests_log[i].next_level === 3) {
+                    next_position = "Checker";
                 }
             }
             html += `<div class="d-flex align-items-center mb-3 text-warning">
@@ -1209,21 +1247,23 @@
             let position = "";
             let status = "";
             for (var i = 0; i < requests_log.length; i++) {
-                if (requests_log[i].level > 0) {
-                    status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
-                    if (requests_log[i].level === 0) {
-                        position = "Operation";
-                    }
-                    if (requests_log[i].level === 1) {
-                        position = "Manager";
-                    }
-                    if (requests_log[i].level === 2) {
-                        position = "Director";
-                    }
-                    if (requests_log[i].level === 3) {
-                        position = "Checker";
-                    }
 
+                status = request_status.filter(f => f.status_en === requests_log[i].status).map(m => m.status)[0];
+                if (requests_log[i].current_level === 0) {
+                    position = "Operation";
+                }
+                if (requests_log[i].current_level === 1) {
+                    position = "Manager";
+                }
+                if (requests_log[i].current_level === 2) {
+                    position = "Director";
+                }
+                if (requests_log[i].current_level === 3) {
+                    position = "Checker";
+                }
+
+
+                if (requests_log[i].status !== "Rejected" && requests_log[i].status !== "Canceled" && requests_log[i].status !== "Returned") {
                     html += `<div class="d-flex align-items-center mb-3 text-success">
                                 <i class="fas fa-check-circle fa-lg mr-3"></i>
                                 <div class="flex-grow-1">
@@ -1231,13 +1271,26 @@
                                     <span class="text-muted kanit-regular">(${position})</span>
                                     <div>
                                         <span class="text-success kanit-medium">${status.status_th}</span>
-                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')} ${requests_log[i].date.split('T')[1]}</span>
                                     </div>
                                 </div>
                                 <hr />
                             </div>`;
-
+                } else {
+                    html += `<div class="d-flex align-items-center mb-3 text-danger">
+                                <i class="fas fa-minus-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">${requests_log[i].emp_name}</span>
+                                    <span class="text-muted kanit-regular">(${position})</span>
+                                    <div>
+                                        <span class="text-danger kanit-medium">${status.status_th}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')} ${requests_log[i].date.split('T')[1]}</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>`;
                 }
+                
             }
             $('#div_history_request').empty();
             $('#div_history_request').append(html);
@@ -1356,8 +1409,8 @@
                         $('#leave_history_reason').attr('hidden', true);
                         $('#leave_history_reason').text("");
                     } else {
-                        $('#leave_history_reason').val(request.comment);
-                        $('#leave_history_reason').text('hidden', false);
+                        $('#leave_history_reason').text(request.comment);
+                        $('#leave_history_reason').attr('hidden', false);
                     }
 
                     // Get Request Log
