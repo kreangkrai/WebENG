@@ -222,6 +222,8 @@ namespace WebENG.Controllers
                 request.path_file = "";
             }
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            level = level.Where(w => w.emp_id == request.emp_id).ToList();
+
             request.level_step = level.FirstOrDefault().level;
 
             List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);

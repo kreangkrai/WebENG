@@ -954,7 +954,7 @@
             { status_en: "Created", status: { status_th: "สร้าง", class: "secondary" } },
             { status_en: "Pending", status: { status_th: "อนุมัติ", class: "warning" } },
             { status_en: "Resubmit", status: { status_th: "ส่งใหม่", class: "secondary" } },
-            { status_en: "Canceled", status: { status_th: "ยกเลิก", class: "dark" } },
+            { status_en: "Canceled", status: { status_th: "ยกเลิก", class: "danger" } },
             { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
             { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
             { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
@@ -1101,7 +1101,7 @@
                     class_path_file = `<td></td>`;
                 }
 
-                const checkboxHidden = canApprove && hasRequiredAttachment ? '' : 'hidden';
+                const checkboxHidden = canApprove || hasRequiredAttachment ? '' : 'hidden';
 
                 class_check = `<td>
                     <div class="form-check form-check-inline mb-1">
@@ -1232,7 +1232,9 @@
                         }
                     }
                 }
-                html += `<div class="d-flex align-items-center mb-3 text-success">
+
+                if (requests_log[i].status !== "Rejected" && requests_log[i].status !== "Canceled" && requests_log[i].status !== "Returned") {
+                    html += `<div class="d-flex align-items-center mb-3 text-success">
                                 <i class="fas fa-check-circle fa-lg mr-3"></i>
                                 <div class="flex-grow-1">
                                     <span class="kanit-medium" style="color:#555">${requests_log[i].emp_name}</span>
@@ -1244,7 +1246,20 @@
                                 </div>
                                 <hr />
                             </div>`;
-
+                } else {
+                    html += `<div class="d-flex align-items-center mb-3 text-danger">
+                                <i class="fas fa-minus-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">${requests_log[i].emp_name}</span>
+                                    <span class="text-muted kanit-regular">(${position})</span>
+                                    <div>
+                                        <span class="text-danger kanit-medium">${status.status_th}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].date).toLocaleDateString('en-GB')} ${requests_log[i].date.split('T')[1]}</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>`;
+                }
 
                 if (requests_log[i].next_level === 0) {
                     next_position = "Operation";

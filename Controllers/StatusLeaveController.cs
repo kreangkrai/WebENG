@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.CTLInterfaces;
@@ -18,19 +21,21 @@ namespace WebENG.Controllers
     public class StatusLeaveController : Controller
     {
         readonly IAccessory Accessory;
-        readonly CTLInterfaces.IEmployee Employees;
+        readonly IEmployee Employees;
         private ILeaveType LeaveType;
         private IRequest Requests;
         private ILeave Leave;
         private ILevel Level;
+        private IRequestLog RequestLog;
         public StatusLeaveController()
         {
             Accessory = new AccessoryService();
-            Employees = new CTLServices.EmployeeService();
+            Employees = new EmployeeService();
             LeaveType = new LeaveTypeService();
             Requests = new RequestService();
             Leave = new LeaveService();
             Level = new LevelService();
+            RequestLog = new RequestLogService();
         }
         public IActionResult Index()
         {
@@ -89,6 +94,7 @@ namespace WebENG.Controllers
             List<UsedLeaveModel> useds = new List<UsedLeaveModel>();
             List<string> status_pending = new List<string>()
             {
+                "Created",
                 "Pending",
                 "Resubmit",
                 "Approved",
@@ -171,6 +177,252 @@ namespace WebENG.Controllers
             requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
             requests = requests.OrderBy(o => o.start_request_date).ToList();
             return Json(requests);
+        }
+
+        [HttpGet]
+        public IActionResult GetRequestLog(string request_id)
+        {
+            List<RequestLogModel> requests = RequestLog.GetLogByRequestId(request_id);
+            return Json(requests);
+        }
+
+        [HttpPost]
+        public IActionResult EditRequest(string request_id, string str, string[] tempFileIds)
+        {
+            DateTime now = DateTime.Now;
+            RequestModel request = JsonConvert.DeserializeObject<RequestModel>(str);
+            request.request_date = now;
+            request.request_id = request_id;
+            request.status_request = "Resubmit";
+            request.comment = "";
+            request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours, 0);
+
+            // Check Two Step Approve
+            bool is_full_day = request.is_full_day;
+            if (is_full_day)
+            {
+                LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+                decimal over_consecutive_days_for_two_step = leaveType.over_consecutive_days_for_two_step;
+                double diff_day = request.amount_leave_day;
+                if (diff_day >= (double)over_consecutive_days_for_two_step)
+                {
+                    request.is_two_step_approve = true;
+                }
+                else
+                {
+                    request.is_two_step_approve = false;
+                }
+            }
+            else
+            {
+                request.is_two_step_approve = false;
+            }
+
+            if (tempFileIds.Length > 0) // มีไฟล์แนบมา
+            {
+                request.path_file = request_id;
+            }
+            else
+            {
+                request.path_file = "";
+            }
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            level = level.Where(w => w.emp_id == request.emp_id).ToList();
+
+            request.level_step = level.FirstOrDefault().level;
+
+            List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
+            string message = "";
+            //if (!requests.Any(a => a.start_request_date.Date == request.start_request_date.Date)) //  Check Date
+            {
+                var connect = new ConnectSQL();
+                using (SqlConnection con = connect.OpenLeaveConnect())
+                {
+                    con.Open();
+                    using (SqlTransaction tran = con.BeginTransaction())
+                    {
+                        try
+                        {
+                            var requestService = Requests;
+                            var requestLogService = RequestLog;
+                            requestService.Update(request);
+
+                            RequestLogModel last_request_log = RequestLog.GetLogByRequestId(request_id).LastOrDefault();
+
+                            RequestLogModel requestLog = new RequestLogModel()
+                            {
+                                action_by = request.emp_id,
+                                action_by_name = level.FirstOrDefault().emp_name,
+                                action_by_level = level.FirstOrDefault().level,
+                                old_status = last_request_log.new_status,
+                                new_status = "Canceled",
+                                comment = "",
+                                old_level_step = last_request_log.new_level_step,
+                                new_level_step = level.FirstOrDefault().level,
+                                request_id = request.request_id,
+                                log_date = DateTime.Now
+                            };
+                            requestLogService.Insert(requestLog);
+
+                            RequestLogModel requestLog_ = new RequestLogModel()
+                            {
+                                action_by = request.emp_id,
+                                action_by_name = level.FirstOrDefault().emp_name,
+                                action_by_level = level.FirstOrDefault().level,
+                                old_status = "Canceled",
+                                new_status = "Resubmit",
+                                comment = "",
+                                old_level_step = -1,
+                                new_level_step = level.FirstOrDefault().level,
+                                request_id = request.request_id,
+                                log_date = DateTime.Now
+                            };
+                            requestLogService.Insert(requestLog_);
+
+                            tran.Commit();
+                            message = "Success";
+                        }
+                        catch (Exception ex)
+                        {
+                            tran.Rollback();
+                            message = $"Error {ex.Message}";
+                        }
+                    }
+                }
+
+                if (message == "Success")
+                {
+                    //if (tempFileIds != null)
+                    //{
+                    //    foreach (var tempId in tempFileIds)
+                    //    {
+                    //        var tempFolder = Path.Combine("Uploads", "temp", tempId);
+                    //        var files = Directory.GetFiles(tempFolder);
+                    //        foreach (var oldFile in files)
+                    //        {
+                    //            var fileName = Path.GetFileName(oldFile);
+                    //            var newPath = Path.Combine(
+                    //                "Uploads", request.leave_type_id,
+                    //                now.Year.ToString(),
+                    //                request_id,
+                    //                fileName
+                    //            );
+                    //            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                    //            System.IO.File.Move(oldFile, newPath);
+                    //        }
+                    //        Directory.Delete(tempFolder, true);
+                    //    }
+                    //}
+
+                    ////Insert Leave Working Hours
+                    //List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
+                    //List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+                    //List<UserModel> users = Accessory.getAllUser();
+                    //for(DateTime date = request.start_request_date; date <= request.end_request_date; date = date.AddDays(1))
+                    //{
+                    //    if (holidays.Any(a => a.date.Date != date.Date) && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                    //    {
+                    //        if (request.is_full_day)
+                    //        {
+                    //            WorkingHoursModel wh = new WorkingHoursModel()
+                    //            {
+                    //                user_id = users.Where(w=>w.emp_id == request.emp_id).Select(s=>s.user_id).FirstOrDefault(),
+                    //                working_date = date.Date,
+                    //                job_id = "J999999",
+                    //                task_id = "T002",
+                    //                start_time = new TimeSpan(8, 30, 0),
+                    //                stop_time = new TimeSpan(17, 30, 0),
+                    //                lunch_full = false,
+                    //                lunch_half = false,
+                    //                dinner_full = false,
+                    //                dinner_half = false,
+                    //                note = "",
+                    //            };
+                    //            whs.Add(wh);
+                    //        }
+                    //        else
+                    //        {
+                    //            WorkingHoursModel wh = new WorkingHoursModel()
+                    //            {
+                    //                user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                    //                working_date = date.Date,
+                    //                job_id = "J999999",
+                    //                task_id = "T002",
+                    //                start_time = request.start_request_time,
+                    //                stop_time = request.end_request_time,
+                    //                lunch_full = false,
+                    //                lunch_half = false,
+                    //                dinner_full = false,
+                    //                dinner_half = false,
+                    //                note = "",
+                    //            };
+                    //            whs.Add(wh);
+                    //        }
+                    //    }
+                    //}
+                    //message = AddWorkingHours(whs);
+                }
+                return Json(message);
+            }
+            //else
+            //{
+            //    return Json("ใช้สิทธิ์วันลาไปแล้ว");
+            //}
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteRequest(string request_id, string emp_id)
+        {
+            List<LevelModel> level = Level.GetLevelByEmpID(emp_id);
+            level = level.Where(w => w.emp_id == emp_id).ToList();
+
+            RequestModel request = Requests.GetRequestByID(request_id);
+            request.status_request = "Canceled";
+            request.comment = "";
+            request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
+            request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
+            string message = "";
+
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var requestService = Requests;
+                        var requestLogService = RequestLog;
+                        requestService.Update(request);
+
+                        RequestLogModel last_request_log = RequestLog.GetLogByRequestId(request_id).LastOrDefault();
+
+                        RequestLogModel requestLog = new RequestLogModel()
+                        {
+                            action_by = request.emp_id,
+                            action_by_name = level.FirstOrDefault().emp_name,
+                            action_by_level = level.FirstOrDefault().level,
+                            old_status = last_request_log.new_status,
+                            new_status = "Canceled",
+                            comment = "",
+                            old_level_step = last_request_log.new_level_step,
+                            new_level_step = level.FirstOrDefault().level,
+                            request_id = request.request_id,
+                            log_date = DateTime.Now
+                        };
+                        requestLogService.Insert(requestLog);
+
+                        tran.Commit();
+                        message = "Success";
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        message = $"Error {ex.Message}";
+                    }
+                }
+            }
+            return Json(message);
         }
     }
 }
