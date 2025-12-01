@@ -164,9 +164,9 @@ namespace WebENG.Controllers
                                 }
                             }
                         }
-                        else if(requests_pending[i].level_step == 1)
+                        else
                         {
-                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 2);
+                            bool chk_level = level.Any(a => a == 3);
                             if (chk_level)
                             {
                                 string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
@@ -176,7 +176,7 @@ namespace WebENG.Controllers
                                     _requests.Add(requests_pending[i]);
                                 }
                             }
-                        }
+                        }                        
                     }
                 }                
             }
@@ -195,6 +195,7 @@ namespace WebENG.Controllers
                 start_request_time = s.start_request_time,
                 end_request_time = s.end_request_time,
                 amount_leave_day = s.amount_leave_day,
+                amount_leave_hour = s.amount_leave_hour,
                 leave_name_th = s.leave_name_th,
                 description = s.description,
                 path_file = s.path_file,
@@ -222,6 +223,7 @@ namespace WebENG.Controllers
                 start_request_time = s.start_request_time,
                 end_request_time = s.end_request_time,
                 amount_leave_day = s.amount_leave_day,
+                amount_leave_hour = s.amount_leave_hour,
                 leave_name_th = s.leave_name_th,
                 description = s.description,
                 path_file = s.path_file,

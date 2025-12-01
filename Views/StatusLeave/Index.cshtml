@@ -849,33 +849,7 @@
                         <label class="kanit-medium" style="letter-spacing:1px; font-size:16px; color:#555;">
                             ไทม์ไลน์การอนุมัติ
                         </label>
-
-                        <div class="timeline-container" style="position: relative; padding-left: 35px;">
-                            <!-- เส้นกลาง -->
-                            <div style="position: absolute; left: 15px; top: 15px; bottom: 10px; width: 3px; background: #e9ecef; border-radius: 3px;"></div>
-
-                            <div class="d-flex align-items-center mb-3 text-success">
-                                <i class="fas fa-check-circle fa-lg mr-3"></i>
-                                <div class="flex-grow-1">
-                                    <span class="kanit-medium" style="color:#555">Chakrit R.</span>
-                                    <span class="text-muted kanit-regular">(Manager)</span>
-                                    <div>
-                                        <span class="text-success kanit-medium">อนุมัติแล้ว</span>
-                                        <span class="text-muted kanit-medium"> • 26/11/25 14:32</span>
-                                    </div>
-                                </div>
-                                <hr />
-                            </div>
-                            <div class="d-flex align-items-center mb-3 text-warning">
-                                <i class="fas fa-clock fa-lg mr-3"></i>
-                                <div class="flex-grow-1">
-                                    <span class="kanit-medium" style="color:#555"> </span>
-                                    <span class="text-muted kanit-regular">(Checker)</span>
-                                    <div>
-                                        <span class="text-muted kanit-medium">รอตรวจสอบ</span>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="div_history_approved" class="timeline-container" style="position: relative; padding-left: 35px;">
                         </div>
                     </div>
                 </form>
@@ -1041,18 +1015,16 @@
             let emp_id = '@Html.Raw(Model.emp_id)';
             let leave;
             let year = new Date(request_date).getFullYear();
-            const result = await GetLeaveByID(leave_type_id, emp_id, year);
+            const result = await GetLeaveByID(leave_type_id, emp_id, year)
 
             let hire_date = new Date();
             $('#leave_stop_date').val(request_date);
             $('#amount_leave').val(1);
-
-           
+            
             leave = result.leave;
             balance_leave = result.balance_leave;
             gender = result.gender;
             hire_date = result.hire_date;
-
 
             //Check Request Timing
             let chk_request_timing = CheckRequestTiming(request_date);
@@ -1966,13 +1938,13 @@
             return useds;
         }
 
-        async function GetRequestLog(request_id) {
+        async function GetRequestLog(request_id,emp_id) {
             let requests = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetRequestLog", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { request_id},
+                data: { request_id, emp_id},
                 success: function (response) {
                     requests = response;
                 },
@@ -2250,9 +2222,9 @@
 
         $(document).on('click', '.clickable-row',async function () {
             const data = $(this).data();
+
             const requestid = data.request_id;
             request_id = requestid;
-            //const request_log = await GetRequestLog(request_id);
             const main_emp_id = '@Html.Raw(emp_id)';
 
             const request = requestHistory.filter(f => f.request_id === request_id).map(m => m)[0];
@@ -2260,80 +2232,144 @@
             $('#emp_id').val(data.empId);
             $('#emp_name').val($(this).find('td:eq(2)').text());
 
-            $('#select_leave_type').val(data.leave_type_id).change();
-            $('#leave_start_date').val(data.start_request_date.split('T')[0]);
-            $('#leave_stop_date').val(data.end_request_date.split('T')[0]);
+            try {
+                setTimeout(() => {
+                    $('#select_leave_type').val(data.leave_type_id).change();
+                }, 200);
+                $('#leave_start_date').val(data.start_request_date.split('T')[0]);
+                $('#leave_stop_date').val(data.end_request_date.split('T')[0]);
 
-            if (request.is_full_day) {
-                // Full day
-                resetButtonStyles();
-                leaveHalfBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true);
-                toggleGroupDisplay(timeGroup, false);
+                if (request.is_full_day) {
+                    // Full day
+                    resetButtonStyles();
+                    leaveHalfBtn.classList.add('active');
+                    toggleGroupDisplay(dateGroup, true);
+                    toggleGroupDisplay(timeGroup, false);
 
-                $('#amount_leave').val(data.duration);
+                    $('#amount_leave').val(data.duration);
 
-                stopDateInput.disabled = false;
-            } else {
-                resetButtonStyles();
-                leaveHalfBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true);
-                toggleGroupDisplay(timeGroup, true);
+                    stopDateInput.disabled = false;
+                } else {
+                    resetButtonStyles();
+                    leaveHalfBtn.classList.add('active');
+                    toggleGroupDisplay(dateGroup, true);
+                    toggleGroupDisplay(timeGroup, true);
 
-                const start_time = request.start_request_time.split('.')[1];
-                const end_time = request.end_request_time.split('.')[1];
+                    const start_time = request.start_request_time.split('.')[1];
+                    const end_time = request.end_request_time.split('.')[1];
 
-                const diff_time = parseInt(timeToMinutes(end_time)) - parseInt(timeToMinutes(start_time));
+                    const diff_time = parseInt(timeToMinutes(end_time)) - parseInt(timeToMinutes(start_time));
 
-                if (diff_time === 120) {
-                    setHourlyOptions();
-                    type_duration = "Hours";
-                    durationSelect.value = "2";
-                } else if (diff_time >= 210 && diff_time < 360) {
-
-                    if ((start_time === "08:30:00" || start_time === "13:00:00") && (end_time === "12:00:00" || end_time === "17:30:00")) {
-                        setHalfDayOptions();
-                        type_duration = "Half";
-                        if (start_time === "08:30:00" && end_time === "12:00:00") {
-                            durationSelect.value = "morning";
-
-                        } else if (start_time === "13:00:00" && end_time === "17:30:00") {
-                            durationSelect.value = "afternoon";
-                        }
-                    } else {
+                    if (diff_time === 120) {
                         setHourlyOptions();
                         type_duration = "Hours";
-                        durationSelect.value = "4";
+                        durationSelect.value = "2";
+                    } else if (diff_time >= 210 && diff_time < 360) {
+
+                        if ((start_time === "08:30:00" || start_time === "13:00:00") && (end_time === "12:00:00" || end_time === "17:30:00")) {
+                            setHalfDayOptions();
+                            type_duration = "Half";
+                            if (start_time === "08:30:00" && end_time === "12:00:00") {
+                                durationSelect.value = "morning";
+
+                            } else if (start_time === "13:00:00" && end_time === "17:30:00") {
+                                durationSelect.value = "afternoon";
+                            }
+                        } else {
+                            setHourlyOptions();
+                            type_duration = "Hours";
+                            durationSelect.value = "4";
+                        }
+
+
+                    } else if (diff_time === 360) {
+                        setHourlyOptions();
+                        type_duration = "Hours";
+                        durationSelect.value = "6";
                     }
 
+                    startHourTimeInput.value = start_time.split(':')[0];
+                    startMinuteTimeInput.value = start_time.split(':')[1];
+                    stopTimeInput.value = end_time;
 
-                } else if (diff_time === 360) {
-                    setHourlyOptions();
-                    type_duration = "Hours";
-                    durationSelect.value = "6";
+                    $('#amount_leave').val(0);
+                    CheckAttachFileRequire(type_duration);
+                    is_full_day = false;
                 }
 
-                startHourTimeInput.value = start_time.split(':')[0];
-                startMinuteTimeInput.value = start_time.split(':')[1];
-                stopTimeInput.value = end_time;
+                //Check Edit
+                if (main_emp_id === data.empId && (data.status === "Created" || data.status === "Returned" || data.status === "Resubmit")) {
+                    $('#btn_leave_send').attr('hidden', false);
+                    $('#btn_delete').attr('hidden', false);
+                } else {
+                    $('#btn_leave_send').attr('hidden', true);
+                    $('#btn_delete').attr('hidden', true);
+                }
 
-                $('#amount_leave').val(0);
-                CheckAttachFileRequire(type_duration);
-                is_full_day = false;
+                //Get Request Log
+                const request_log = await GetRequestLog(request_id);
+                GenerateHistoryApproveLog(request_log);
+
+                $('#modal_leave_title').text('แก้ไขการลา');
+                $('#modal_leave').modal('show');
+            } catch {
+
             }
-
-            //Check Edit
-            if (main_emp_id === data.empId && (data.status === "Created" || data.status === "Returned" || data.status === "Resubmit")) {
-                $('#btn_leave_send').attr('hidden', false);
-                $('#btn_delete').attr('hidden', false);
-            } else {
-                $('#btn_leave_send').attr('hidden', true);
-                $('#btn_delete').attr('hidden', true);
-            }
-
-            $('#modal_leave_title').text('แก้ไขการลา');
-            $('#modal_leave').modal('show');
         });
+
+        function GenerateHistoryApproveLog(requests_log) {
+            var html = '';
+            let position = "";
+            let status = "";
+            for (var i = 0; i < requests_log.length; i++) {
+
+                if (requests_log[i].action_by_level === 0) {
+                    position = "Operation";
+                }
+                if (requests_log[i].action_by_level === 1) {
+                    position = "Manager";
+                }
+                if (requests_log[i].action_by_level === 2) {
+                    position = "Director";
+                }
+                if (requests_log[i].action_by_level === 3) {
+                    position = "Checker";
+                }
+
+                status = request_status.filter(f => f.status_en === requests_log[i].new_status).map(m => m.status)[0];
+
+                if (requests_log[i].new_status !== "Rejected" && requests_log[i].new_status !== "Canceled" && requests_log[i].new_status !== "Returned") {
+                    html += `<div class="d-flex align-items-center mb-3 text-success">
+                                <i class="fas fa-check-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">${requests_log[i].action_by_name}</span>
+                                    <span class="text-muted kanit-regular">(${position})</span>
+                                    <div>
+                                        <span class="text-success kanit-medium">${status.status_th}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].log_date).toLocaleDateString('en-GB')} ${requests_log[i].log_date.split('T')[1]}</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>`;
+                } else {
+                    html += `<div class="d-flex align-items-center mb-3 text-danger">
+                                <i class="fas fa-minus-circle fa-lg mr-3"></i>
+                                <div class="flex-grow-1">
+                                    <span class="kanit-medium" style="color:#555">${requests_log[i].action_by_name}</span>
+                                    <span class="text-muted kanit-regular">(${position})</span>
+                                    <div>
+                                        <span class="text-danger kanit-medium">${status.status_th}</span>
+                                        <span class="text-muted kanit-medium"> • ${new Date(requests_log[i].log_date).toLocaleDateString('en-GB')} ${requests_log[i].log_date.split('T')[1]}</span>
+                                    </div>
+                                </div>
+                                <hr />
+                            </div>`;
+                }
+            }
+            
+            $('#div_history_approved').empty();
+            $('#div_history_approved').append(html);
+        }
 
         function clearLeaveHistory() {
             $('#table_leave tbody').empty();

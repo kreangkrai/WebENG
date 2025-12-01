@@ -704,7 +704,6 @@
                             <label class="kanit-medium" style="letter-spacing:1px; font-size:18px; color:#555;">
                                 <i class="fas fa-history mr-2"></i>ไทม์ไลน์การอนุมัติ
                             </label>
-
                             <div id="div_history_approved" class="timeline-container" style="position: relative; padding-left: 35px;">
                             </div>
                         </div>
@@ -1080,35 +1079,105 @@
                     end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
                 }
 
+                //Check Box Create For Check Attach File 
+
                 let class_path_file = `<td></td>`;
                 let class_check = `<td></td>`;
+                if (row.attachment_required) {
+                    if (row.is_full_day) {
+                        if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                            if (row.path_file === "" || row.path_file === null) {
+                                class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
+                                class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox" hidden>
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                            } else {
+                                class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`;
+                                class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                            }
+                        } else {
+                            class_path_file = `<td></i></td>`;
+                            class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                        }
+                    } else {
 
-                //Check Box Create For manager , Director Only
-                const canApprove = row.is_two_step_approve
-                    ? row.level_step < 2
-                    : row.level_step < 1;
-
-                let hasRequiredAttachment = true;
-                if (row.attachment_required && parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
-                    hasRequiredAttachment = !!(row.path_file && row.path_file !== "");
-                }
-
-                if (row.attachment_required && parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
-                    class_path_file = hasRequiredAttachment
-                        ? `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`
-                        : `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
+                        if (parseFloat(row.amount_leave_hour) / 8.0 >= parseFloat(row.attachment_threshold_days)) {
+                            if (row.path_file === "" || row.path_file === null) {
+                                class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
+                                class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox" hidden>
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                            } else {
+                                class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`;
+                                class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                            }
+                        } else {
+                            class_path_file = `<td></i></td>`;
+                            class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
+                        }
+                    }
                 } else {
                     class_path_file = `<td></td>`;
+                    class_check = `<td>
+                            <div class="form-check form-check-inline mb-1">
+                                <input class="form-check-input approve-checkbox" type="checkbox">
+                                <label class="form-check-label"></label>
+                            </div>
+                        </td>`;
                 }
 
-                const checkboxHidden = canApprove || hasRequiredAttachment ? '' : 'hidden';
+                ////Check Box Create For manager , Director Only
+                //const canApprove = row.is_two_step_approve
+                //    ? row.level_step < 2
+                //    : row.level_step < 1;
 
-                class_check = `<td>
-                    <div class="form-check form-check-inline mb-1">
-                        <input class="form-check-input approve-checkbox" type="checkbox" ${checkboxHidden}>
-                        <label class="form-check-label"></label>
-                    </div>
-                </td>`;
+                //let hasRequiredAttachment = true;
+                //if (row.attachment_required && parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                //    hasRequiredAttachment = !!(row.path_file && row.path_file !== "");
+                //}
+
+                //if (row.attachment_required && parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
+                //    class_path_file = hasRequiredAttachment
+                //        ? `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`
+                //        : `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
+                //} else {
+                //    class_path_file = `<td></td>`;
+                //}
+
+                //const checkboxHidden = (canApprove && hasRequiredAttachment) || row.is_two_step_approve ? '' : 'hidden';
+
+                //class_check = `<td>
+                //    <div class="form-check form-check-inline mb-1">
+                //        <input class="form-check-input approve-checkbox" type="checkbox" ${checkboxHidden}>
+                //        <label class="form-check-label"></label>
+                //    </div>
+                //</td>`;
 
                 ////
 
@@ -1164,11 +1233,22 @@
                     //Check Attach File List
                     if (request.attachment_required) {
                         let year = new Date(request.start_request_date).getFullYear();
-                        GetFiles(request.leave_type_id, request.request_id, year);
-                        $('#div_fileList').attr('hidden', false);
+                        if (request.is_full_day) {
+                            if (parseFloat(request.amount_leave_day) >= parseFloat(request.attachment_threshold_days)) {
+                                GetFiles(request.leave_type_id, request.request_id, year);
+                                $('#div_fileList').attr('hidden', false);
+                            }
+                        } else {
+
+                            if (parseFloat(request.amount_leave_hour) / 8.0 >= parseFloat(request.attachment_threshold_days)) {
+                                GetFiles(request.leave_type_id, request.request_id, year);
+                                $('#div_fileList').attr('hidden', false);
+                            }
+                        }
 
                     } else {
                         $('#div_fileList').attr('hidden', true);
+                        $('#btn_approve_leave').attr('disabled', false);
                     }
 
                     // Request Title
@@ -1687,7 +1767,7 @@
         function loadExistingFiles(fileArray) {
             $('#fileListContainer').empty();
             const container = document.getElementById('fileListContainer');
-
+           
             if (fileArray.length > 0) {
                 fileArray.forEach(file => {
                     let fileType = file.type;
