@@ -2317,6 +2317,88 @@
             }
         });
 
+        async function handleLeaveTypeChange(leave_type_id) {
+            let request_date = today.toISOString();
+            let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+            let description = leave_.description;
+            let emp_id = '@Html.Raw(Model.emp_id)';
+            let year = new Date(request_date).getFullYear();
+
+            const result = await GetLeaveByID(leave_type_id, emp_id, year);
+
+            let hire_date = new Date(result.hire_date); 
+            $('#leave_stop_date').val(request_date);
+            $('#amount_leave').val(1);
+
+            leave = result.leave;
+            balance_leave = result.balance_leave;
+            gender = result.gender;
+            //hire_date = result.hire_date;
+
+            //Check Request Timing
+            let chk_request_timing = CheckRequestTiming(request_date);
+            let amount_diff_day = diffDays(new Date(), hire_date);
+
+            if (amount_diff_day > leave.length_start_date) {
+                if (chk_request_timing) {
+                    let chk_gender_restriction = CheckGenderRestriction(gender);
+                    if (chk_gender_restriction) {
+                        $('#leave_description').text(description);
+                        $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
+                        $('#div_leave').prop('hidden', false);
+                        $('#div_main_leave').css('height', '500px');
+                        $('#div_main_leave').css('overflow-y', 'auto');
+                        $('#btn_leave_send').prop('disabled', false);
+
+                        resetButtonStyles();
+                        leaveFullBtn.classList.add('active');
+                        toggleGroupDisplay(dateGroup, true);
+                        toggleGroupDisplay(timeGroup, false);
+                        daysInput.value = 1;
+                        stopDateInput.value = startDateInput.value;
+                        stopDateInput.disabled = false;
+
+                        type_duration = "Day";
+                        CheckAttachFileRequire(type_duration);
+                        $('#leave_full').prop('disabled', false);
+                        $('#leave_half').prop('disabled', false);
+                        $('#leave_hours').prop('disabled', false);
+                        $('#leave_stop_date').prop('disabled', false);
+                    } else {
+                        alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
+                        $('#btn_leave_send').prop('disabled', true);
+                        $('#leave_full').prop('disabled', true);
+                        $('#leave_half').prop('disabled', true);
+                        $('#leave_hours').prop('disabled', true);
+                        $('#leave_stop_date').prop('disabled', true);
+                    }
+                } else {
+                    alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
+                    $('#btn_leave_send').prop('disabled', true);
+                    $('#leave_full').prop('disabled', true);
+                    $('#leave_half').prop('disabled', true);
+                    $('#leave_hours').prop('disabled', true);
+                    $('#leave_stop_date').prop('disabled', true);
+                }
+            } else {
+                alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
+                $('#btn_leave_send').prop('disabled', true);
+                $('#leave_full').prop('disabled', true);
+                $('#leave_half').prop('disabled', true);
+                $('#leave_hours').prop('disabled', true);
+                $('#leave_stop_date').prop('disabled', true);
+            }
+
+            is_full_day = true;
+            tigger_select = true;
+        }
+
+        $('#select_leave_type').on('change', function () {
+            let leave_type_id = $(this).val();
+            if (leave_type_id) {
+                handleLeaveTypeChange(leave_type_id);
+            }
+        });
         function GenerateHistoryApproveLog(requests_log) {
             var html = '';
             let position = "";
@@ -2366,7 +2448,7 @@
                             </div>`;
                 }
             }
-            
+
             $('#div_history_approved').empty();
             $('#div_history_approved').append(html);
         }
