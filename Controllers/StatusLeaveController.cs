@@ -74,6 +74,57 @@ namespace WebENG.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetLeaveById(string leave_type_id, string emp_id, int year)
+        {
+            List<string> status_pending = new List<string>()
+            {
+                "Pending",
+                "Resubmit",
+                "Approved",
+                "Returned",
+                "Completed",
+                "Created"
+            };
+            LeaveTypeModel leave = LeaveType.GetLeaveTypeByID(leave_type_id);
+            string leave_type_code = leave.leave_type_code;
+            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+            List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
+            requests = requests.Where(w => w.leave_type_code == leave_type_code &&
+            w.start_request_date.Year == year &&
+            status_pending.Contains(w.status_request)).ToList();
+
+            CTLModels.EmployeeModel emp = new CTLModels.EmployeeModel();
+            var em = emps.Where(w => w.emp_id == emp_id).FirstOrDefault();
+            emp = new CTLModels.EmployeeModel()
+            {
+                emp_id = emp_id,
+                position = em.position,
+                start_date = em.start_date,
+                promote_manager_date = em.promote_manager_date,
+                gender = em.gender
+            };
+            if (leave.calculate_auto == true)
+            {
+                double _leave = Leave.CalculateLeaveDays(emp, year, 6, 10, 10, 12);
+                leave.amount_entitlement = (decimal)_leave;
+            }
+            double used_leave = 0;
+            for (int i = 0; i < requests.Count; i++)
+            {
+                if (requests[i].is_full_day)
+                {
+                    used_leave += requests[i].amount_leave_day;
+                }
+                else
+                {
+                    used_leave += Math.Round(((double)requests[i].amount_leave_hour) / 8.0, 2);
+                }
+            }
+            double balance = (double)leave.amount_entitlement - used_leave;
+            var data = new { leave = leave, balance = balance, gender = em.gender, hire_date = em.start_date };
+            return Json(data);
+        }
 
         [HttpGet]
         public IActionResult GetEmployee(string start, string stop)
@@ -173,10 +224,38 @@ namespace WebENG.Controllers
         {
             DateTime _start = DateTime.Parse(start);
             DateTime _stop = DateTime.Parse(stop);
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
             requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
             requests = requests.OrderBy(o => o.start_request_date).ToList();
-            return Json(requests);
+          
+            var data = requests.Select(s => new
+            {
+                request_id = s.request_id,
+                leave_type_id = s.leave_type_id,
+                emp_id = s.emp_id,
+                emp_name_en = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
+                emp_name_th = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_th).FirstOrDefault(),
+                request_date = s.request_date,
+                start_request_date = s.start_request_date,
+                end_request_date = s.end_request_date,
+                start_request_time = s.start_request_time,
+                end_request_time = s.end_request_time,
+                amount_leave_day = s.amount_leave_day,
+                amount_leave_hour = s.amount_leave_hour,
+                leave_name_th = s.leave_name_th,
+                description = s.description,
+                path_file = s.path_file,
+                is_full_day = s.is_full_day,
+                status_request = s.status_request,
+                attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
+                attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
+                comment = s.comment,
+                level_step = s.level_step,
+                is_two_step_approve = s.is_two_step_approve
+            }).ToList();
+            return Json(data);
         }
 
         [HttpGet]
@@ -185,9 +264,92 @@ namespace WebENG.Controllers
             List<RequestLogModel> requests = RequestLog.GetLogByRequestId(request_id);
             return Json(requests);
         }
+        [HttpGet]
+        public IActionResult GetRequest(string request_id)
+        {
+            RequestModel request = Requests.GetRequestByID(request_id);
+            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            var data = new
+            {
+                request_id = request.request_id,
+                leave_type_id = request.leave_type_id,
+                emp_id = request.emp_id,
+                request_date = request.request_date,
+                start_request_date = request.start_request_date,
+                end_request_date = request.end_request_date,
+                start_request_time = request.start_request_time,
+                end_request_time = request.end_request_time,
+                amount_leave_day = request.amount_leave_day,
+                amount_leave_hour = request.amount_leave_hour,
+                leave_name_th = request.leave_name_th,
+                description = request.description,
+                path_file = request.path_file,
+                is_full_day = request.is_full_day,
+                status_request = request.status_request,
+                attachment_required = leaveType.attachment_required,
+                attachment_threshold_days = leaveType.attachment_threshold_days,
+                comment = request.comment,
+                level_step = request.level_step,
+                is_two_step_approve = request.is_two_step_approve
+            };
+            return Json(data);
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteTemp(string request_id)
+        {
+            var tempPath = Path.Combine("Uploads", "temp", request_id);
+            if (Directory.Exists(tempPath))
+                Directory.Delete(tempPath, true);
+            return Ok();
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteTempFile(string request_id, string filename)
+        {
+            if (string.IsNullOrWhiteSpace(request_id) ||
+                string.IsNullOrWhiteSpace(filename) ||
+                request_id.Contains("..") || request_id.Contains("/") || request_id.Contains("\\") ||
+                filename.Contains("..") || filename.Contains("/") || filename.Contains("\\"))
+            {
+                return BadRequest("Invalid characters in parameters");
+            }
+
+            var safeFileName = Path.GetFileName(filename);
+            if (string.IsNullOrWhiteSpace(safeFileName) || safeFileName != filename)
+            {
+                return BadRequest("Invalid filename");
+            }
+
+
+            var tempPath = Path.Combine("Uploads", "temp", request_id, safeFileName);
+            var fullPath = Path.GetFullPath(tempPath);
+            var allowedRoot = Path.GetFullPath("Uploads/temp");
+
+            if (!fullPath.StartsWith(allowedRoot + Path.DirectorySeparatorChar) &&
+                !fullPath.StartsWith(allowedRoot + Path.AltDirectorySeparatorChar))
+            {
+                return BadRequest("Access denied");
+            }
+
+            try
+            {
+                if (System.IO.File.Exists(fullPath))
+                {
+                    System.IO.File.Delete(fullPath);
+                    return Ok(new { success = true, deleted = fullPath });
+                }
+
+                return Ok(new { success = true, message = "File not found" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, error = ex.Message });
+            }
+        }
 
         [HttpPost]
-        public IActionResult EditRequest(string request_id, string str, string[] tempFileIds)
+        public IActionResult EditRequest(string request_id, string str,bool is_attach_file)
         {
             DateTime now = DateTime.Now;
             RequestModel request = JsonConvert.DeserializeObject<RequestModel>(str);
@@ -218,7 +380,7 @@ namespace WebENG.Controllers
                 request.is_two_step_approve = false;
             }
 
-            if (tempFileIds.Length > 0) // มีไฟล์แนบมา
+            if (is_attach_file) // มีไฟล์แนบมา
             {
                 request.path_file = request_id;
             }
@@ -233,6 +395,7 @@ namespace WebENG.Controllers
 
             List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
             string message = "";
+            int year = request.start_request_date.Year;
             //if (!requests.Any(a => a.start_request_date.Date == request.start_request_date.Date)) //  Check Date
             {
                 var connect = new ConnectSQL();
@@ -292,27 +455,33 @@ namespace WebENG.Controllers
 
                 if (message == "Success")
                 {
-                    //if (tempFileIds != null)
-                    //{
-                    //    foreach (var tempId in tempFileIds)
-                    //    {
-                    //        var tempFolder = Path.Combine("Uploads", "temp", tempId);
-                    //        var files = Directory.GetFiles(tempFolder);
-                    //        foreach (var oldFile in files)
-                    //        {
-                    //            var fileName = Path.GetFileName(oldFile);
-                    //            var newPath = Path.Combine(
-                    //                "Uploads", request.leave_type_id,
-                    //                now.Year.ToString(),
-                    //                request_id,
-                    //                fileName
-                    //            );
-                    //            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-                    //            System.IO.File.Move(oldFile, newPath);
-                    //        }
-                    //        Directory.Delete(tempFolder, true);
-                    //    }
-                    //}
+                    if (is_attach_file)
+                    {
+                        //Remove Uploads Request id
+                        RemoveTempFiles(request.request_id);
+                        RemoveUploadsFiles(request.leave_type_id, year, request_id);
+
+
+                        var tempFolder = Path.Combine("Uploads", "temp", request_id);
+                        var files = Directory.GetFiles(tempFolder);
+                        foreach (var oldFile in files)
+                        {
+                            var fileName = Path.GetFileName(oldFile);
+                            var newPath = Path.Combine(
+                                "Uploads", request.leave_type_id,
+                                now.Year.ToString(),
+                                request_id,
+                                fileName
+                            );
+                            Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                            System.IO.File.Move(oldFile, newPath);
+                        }
+                        Directory.Delete(tempFolder, true);
+                    }
+                    else
+                    {
+                        RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
+                    }
 
                     ////Insert Leave Working Hours
                     //List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
@@ -379,9 +548,11 @@ namespace WebENG.Controllers
             RequestModel request = Requests.GetRequestByID(request_id);
             request.status_request = "Canceled";
             request.comment = "";
+            request.path_file = "";
             request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
             request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
             string message = "";
+            int year = request.start_request_date.Year;
 
             var connect = new ConnectSQL();
             using (SqlConnection con = connect.OpenLeaveConnect())
@@ -414,6 +585,13 @@ namespace WebENG.Controllers
 
                         tran.Commit();
                         message = "Success";
+
+                        //Remove File Uploads
+                        if (request.path_file != "" && request.path_file != null)
+                        {
+                            RemoveTempFiles(request.request_id);
+                            RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -423,6 +601,357 @@ namespace WebENG.Controllers
                 }
             }
             return Json(message);
+        }
+
+        [HttpPost]
+        public IActionResult CopyUplodstoTempFile(string leave_type_id, int year, string request_id)
+        {
+            string sourceFolder = Path.Combine("Uploads", leave_type_id, year.ToString(), request_id);
+            string tempFolder = Path.Combine("Uploads", "temp", request_id);
+
+            if (!Directory.Exists(sourceFolder))
+            {
+                return Json("Error");
+            }
+
+            if (!Directory.Exists(tempFolder))
+                Directory.CreateDirectory(tempFolder);
+
+            var filePaths = Directory.GetFiles(sourceFolder);
+            var fileNames = filePaths.Select(Path.GetFileName);
+
+            foreach (var oldFilePath in filePaths)
+            {
+                string fileName = Path.GetFileName(oldFilePath);
+
+                string newFilePath = Path.Combine(tempFolder, fileName);
+
+                if (System.IO.File.Exists(newFilePath))
+                {
+                    continue;
+                }
+                try
+                {
+                    System.IO.File.Copy(oldFilePath, newFilePath);
+                }
+                catch
+                {
+                    return Json("Error");
+                }
+            }
+            return Json("Success");
+        }
+
+        [HttpPost]
+        public IActionResult MoveTempBackToRequest(string leaveId, int year, string requestId)
+        {
+            try
+            {
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+
+                string sourceFolder = Path.Combine(basePath, "temp", requestId);
+
+                string targetFolder = Path.Combine(basePath, leaveId, year.ToString(), requestId);
+
+                if (!Directory.Exists(sourceFolder))
+                {
+                    return Json("ไม่พบไฟล์ใน temp สำหรับ request นี้");
+                }
+
+                if (!Directory.Exists(targetFolder))
+                    Directory.CreateDirectory(targetFolder);
+
+
+                var oldFiles = Directory.GetFiles(targetFolder);
+                foreach (var file in oldFiles)
+                {
+                    System.IO.File.Delete(file);
+                }
+
+                var filesToMove = Directory.GetFiles(sourceFolder);
+                int movedCount = 0;
+
+                foreach (var tempFilePath in filesToMove)
+                {
+                    string fileName = Path.GetFileName(tempFilePath);
+                    string destPath = Path.Combine(targetFolder, fileName);
+
+                    System.IO.File.Move(tempFilePath, destPath);
+                    movedCount++;
+                }
+
+                if (Directory.Exists(sourceFolder) && !Directory.EnumerateFileSystemEntries(sourceFolder).Any())
+                {
+                    Directory.Delete(sourceFolder);
+                }
+
+                return Json("Success");
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RemoveTempFiles(string requestId)
+        {
+            try
+            {
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                var requestTempFolder = Path.Combine(basePath, "temp", requestId);
+
+                if (Directory.Exists(requestTempFolder))
+                {
+                    Directory.Delete(requestTempFolder, true);
+                }
+
+                return Json("Success");
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RemoveUploadsFiles(string leaveId, int year, string requestId)
+        {
+            try
+            {
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                string targetFolder = Path.Combine(basePath, leaveId, year.ToString(), requestId);
+                if (!Directory.Exists(targetFolder))
+                {
+                    return Json("ไม่พบโฟลเดอร์ หรือไม่มีไฟล์ให้ลบ");
+                }
+                var files = Directory.GetFiles(targetFolder);
+
+                foreach (var file in files)
+                {
+                    System.IO.File.Delete(file);
+                }
+
+                return Json("Success");
+            }
+            catch (Exception ex)
+            {
+                return Json(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadTempFile(IFormFile file,string request_id)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file");
+
+            var tempId = request_id;
+            var tempPath = Path.Combine("Uploads", "temp", tempId);
+            Directory.CreateDirectory(tempPath);
+
+            var fileName = Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(tempPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var previewUrl = Url.Action(
+                "PreviewTempFile",
+                "StatusLeave",
+                new { tempId, fileName },
+                Request.Scheme
+            );
+
+            return Json(new
+            {
+                tempId,
+                fileName,
+                fileType = GetFileType(fileName),
+                previewUrl
+            });
+        }
+        private string GetFileType(string fileName)
+        {
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+
+            switch (ext)
+            {
+                case ".png":
+                    return "image/png";
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+                case ".gif":
+                    return "image/gif";
+                case ".webp":
+                    return "image/webp";
+                default:
+                    return "application/octet-stream";
+            }
+        }
+        [HttpGet]
+        public IActionResult GetFiles(string leave_type_id, string request_id, int year)
+        {
+            List<FileModel> files = new List<FileModel>();
+            var tempFolder = Path.Combine("Uploads", leave_type_id, year.ToString(), request_id);
+
+            if (!Directory.Exists(tempFolder))
+                return Json(files);
+
+            try
+            {
+                foreach (var fullPath in Directory.GetFiles(tempFolder, "*.*", SearchOption.AllDirectories))
+                {
+                    var fileNameOnly = Path.GetFileName(fullPath);
+
+                    var relativePath = Path.GetRelativePath(
+                        Path.Combine(Directory.GetCurrentDirectory(), tempFolder),
+                        fullPath).Replace("\\", "/");
+                    string type = GetFileType(relativePath);
+                    var previewUrl = Url.Action(
+                        "PreviewFile",
+                        "StatusLeave",
+                        new { filename = relativePath, leave_type_id = leave_type_id, year = year, request_id = request_id },
+                        Request.Scheme);
+
+                    files.Add(new FileModel()
+                    {
+                        type = type,
+                        filename = fileNameOnly,
+                        path = previewUrl
+                    });
+                }
+            }
+            catch { }
+
+            return Json(files);
+
+        }
+
+        [HttpGet]
+        public IActionResult GetTempFileInfo(string leave_type_id, int year, string request_id)
+        {
+            // Copy Uploads to Temp
+            CopyUplodstoTempFile(leave_type_id, year, request_id);
+
+            var tempPath = Path.Combine("Uploads", "temp", request_id);
+
+
+            if (!Directory.Exists(tempPath))
+                return NotFound("ไม่พบโฟลเดอร์ temp ของ request_id นี้");
+
+           
+            var files = Directory.GetFiles(tempPath);
+
+            if (!files.Any())
+                return NotFound("ไม่พบไฟล์ในโฟลเดอร์ temp");
+
+            var fileInfos = files.Select(file =>
+            {
+                var fileName = Path.GetFileName(file);
+                var previewUrl = Url.Action(
+                    "PreviewTempFile",
+                    "StatusLeave",
+                    new { tempId = request_id, fileName },
+                    Request.Scheme
+                );
+
+                return new
+                {
+                    request_id,
+                    fileName,
+                    fileType = GetMimeType(fileName),
+                    previewUrl
+                };
+            }).ToList();
+
+            return Json(new
+            {
+                request_id,
+                files = fileInfos
+            });
+        }
+
+        [HttpGet]
+        public IActionResult PreviewTempFile(string tempId, string fileName)
+        {
+            if (string.IsNullOrEmpty(tempId) || string.IsNullOrEmpty(fileName))
+                return BadRequest();
+
+            if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+                return BadRequest("Invalid file name");
+
+            var filePath = Path.Combine("Uploads", "temp", tempId, fileName);
+
+            if (!System.IO.File.Exists(filePath))
+                return NotFound();
+
+            var mimeType = GetMimeType(fileName);
+            var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            Response.Headers.Add("Content-Disposition", "inline");
+
+            return new FileStreamResult(stream, mimeType);
+        }
+
+        [HttpGet]
+        public IActionResult PreviewFile(string fileName, string leave_type_id, int year, string request_id)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return BadRequest();
+
+            if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\") ||
+                fileName.Contains(":") || Path.IsPathRooted(fileName))
+                return BadRequest("Invalid file name");
+
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", leave_type_id, year.ToString(), request_id);
+
+            var fullPath = Path.GetFullPath(Path.Combine(basePath, fileName));
+
+            if (!fullPath.StartsWith(basePath + Path.DirectorySeparatorChar))
+                return BadRequest("Access denied");
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound();
+
+            var mimeType = GetMimeType(fileName);
+            var stream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            Response.Headers["Content-Disposition"] = "inline";
+            return new FileStreamResult(stream, mimeType);
+        }
+
+        private string GetMimeType(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return "application/octet-stream";
+
+            var extension = Path.GetExtension(fileName).ToLowerInvariant();
+
+            switch (extension)
+            {
+                case ".pdf":
+                    return "application/pdf";
+
+                case ".jpg":
+                case ".jpeg":
+                    return "image/jpeg";
+
+                case ".png":
+                    return "image/png";
+
+                case ".xls":
+                    return "application/vnd.ms-excel";
+
+                case ".xlsx":
+                    return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                default:
+                    return "application/octet-stream";
+            }
         }
     }
 }

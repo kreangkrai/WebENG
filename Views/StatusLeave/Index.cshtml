@@ -988,7 +988,7 @@
             try {
                 const response = await $.ajax({
                     type: "GET",
-                    url: '/Leave/GetLeaveByID',
+                    url: '/StatusLeave/GetLeaveByID',
                     contentType: 'application/x-www-form-urlencoded',
                     data: { leave_type_id, emp_id, year }
                 });
@@ -1397,10 +1397,11 @@
         }
 
         function clearAttachFile() {
-            ClearAttachFile();
+            ClearAttachFile(request_id);
             attachFileGroup.hidden = true;
-            loadExistingFiles([]);
+            //loadExistingFiles("","","");
             file_require = false;
+            is_attach_file = false;
         };
 
             function getDaysBetween(startDate, endDate, absolute = true) {
@@ -1554,9 +1555,9 @@
                 }
 
                 // อัปโหลดทันที
-                const tempId = await uploadFileToTemp(file);
+                const tempId = await uploadFileToTemp(file, request_id);
                 if (tempId) {
-                    tempFileIds.push(tempId.tempId);
+                    tempFileIds.push(file.name);
                     const fileItem = createFileItem(file.name, fileType, tempId.tempId, tempId.previewUrl);
                     fileListContainer.appendChild(fileItem);
                     setTimeout(() => fileItem.classList.add('show'), 10);
@@ -1565,12 +1566,13 @@
         }
 
         // === 4. อัปโหลดไป backend (temp) ===
-        async function uploadFileToTemp(file) {
+        async function uploadFileToTemp(file,request_id) {
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('request_id', request_id);
 
             try {
-                const response = await fetch('/Leave/UploadTempFile', {
+                const response = await fetch('/StatusLeave/UploadTempFile', {
                     method: 'POST',
                     body: formData
                 });
@@ -1590,10 +1592,10 @@
         }
 
         // === 5. สร้าง UI ไฟล์ ===
-        function createFileItem(fileName, fileType, tempId, fileUrl) {
+        function createFileItem(fileName, fileType, request_id, fileUrl) {
             const fileItem = document.createElement('div');
             fileItem.className = 'list-group-item d-flex align-items-center file-item added';
-            fileItem.dataset.tempId = tempId;
+            fileItem.dataset.tempId = request_id;
 
             const viewLink = document.createElement('a');
             viewLink.href = fileUrl;
@@ -1602,7 +1604,7 @@
             viewLink.className = 'text-decoration-none flex-grow-1 d-flex align-items-center';
             viewLink.style.cursor = 'pointer';
 
-            const iconClass = fileType === 'pdf'
+            const iconClass = fileType.includes('pdf')
                 ? 'fas fa-file-pdf text-danger'
                 : 'fas fa-file-image text-primary';
 
@@ -1613,7 +1615,8 @@
             const deleteBtn = document.createElement('button');
             deleteBtn.type = 'button';
             deleteBtn.className = 'btn btn-outline-danger btn-sm delete-btn ml-2';
-            deleteBtn.dataset.tempId = tempId;
+            deleteBtn.dataset.tempId = request_id;
+            deleteBtn.dataset.filename = fileName;
             deleteBtn.title = 'ลบ';
             deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
 
@@ -1629,51 +1632,50 @@
             if (!btn) return;
 
             const fileItem = btn.closest('.file-item');
-            const tempId = btn.dataset.tempId;
+            const request_id = btn.dataset.tempId;
+            const filename = btn.dataset.filename;
 
             // ลบจาก backend
             try {
-                await fetch(`/Leave/DeleteTemp?tempId=${tempId}`, { method: 'DELETE' });
+                await fetch(`/StatusLeave/DeleteTempFile?request_id=${request_id}&filename=${filename}`, { method: 'DELETE' });
             } catch (err) {
                 console.error('ลบไฟล์ล้มเหลว', err);
             }
 
             // ลบจาก UI
-            tempFileIds = tempFileIds.filter(id => id !== tempId);
+
+            tempFileIds = tempFileIds.filter(id => id !== filename);
             fileItem.classList.add('removing');
             setTimeout(() => fileItem.remove(), 300);
         });
 
         // === 7. โหลดไฟล์เก่า (ถ้ามี) ===
-        function loadExistingFiles(existingTempIds) {
+        async function loadExistingFiles(leave_type_id, year, request_id) {
+
             fileListContainer.innerHTML = '';
             tempFileIds = [];
 
-            if (!Array.isArray(existingTempIds)) return;
-
-            existingTempIds.forEach(async (tempId) => {
-
-                const response = await fetch(`/Leave/GetTempFileInfo?tempId=${tempId}`);
-                if (response.ok) {
-                    const info = await response.json();
-                    tempFileIds.push(tempId);
-                    const fileItem = createFileItem(info.fileName, info.fileType, tempId,"");
+            const response = await fetch(`/StatusLeave/GetTempFileInfo?leave_type_id=${leave_type_id}&year=${year}&request_id=${request_id}`);
+            if (response.ok) {
+                const info = await response.json();
+                info.files.forEach(async (file) => {
+                    tempFileIds.push(file.fileName);
+                    const fileItem = createFileItem(file.fileName, file.fileType, file.request_id, file.previewUrl);
                     fileListContainer.appendChild(fileItem);
                     fileItem.classList.add('show');
-                }
-            });
+                });
+            }
         }
 
         function ModalCloseClick() {
-            ClearAttachFile();
+            clearAttachFile();
         }
-        async function ClearAttachFile() {
-            for (let i = 0; i < tempFileIds.length; i++) {
-                try {
-                    await fetch(`/Leave/DeleteTemp?tempId=${tempFileIds[i]}`, { method: 'DELETE' });
-                } catch (err) {
-                    console.error('ลบไฟล์ล้มเหลว', err);
-                }
+        async function ClearAttachFile(request_id) {            
+            try {
+                await fetch(`/StatusLeave/DeleteTemp?request_id=${request_id}`, { method: 'DELETE' });
+            } catch (err) {
+                console.error('ลบไฟล์ล้มเหลว', err);
+
             }
             fileListContainer.innerHTML = '';
             tempFileIds = [];
@@ -1780,12 +1782,14 @@
                 "is_full_day": is_full_day,
                 "amount_leave_hour": 0,
             });
+
+            let is_attach_file = tempFileIds.length > 0;
             await $.ajax({
                 type: "POST",
                 url: '@Url.Action("EditRequest", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    request_id,str, tempFileIds
+                    request_id, str, is_attach_file
                 },
                 success: function (response) {
                     if (response === "Success") {
@@ -2229,6 +2233,11 @@
 
             const request = requestHistory.filter(f => f.request_id === request_id).map(m => m)[0];
 
+            const year = new Date(request.start_request_date).getFullYear();
+
+            loadExistingFiles(request.leave_type_id, year, request.request_id);
+            $('#div_fileList').attr('hidden', false);
+
             $('#emp_id').val(data.empId);
             $('#emp_name').val($(this).find('td:eq(2)').text());
 
@@ -2312,10 +2321,51 @@
 
                 $('#modal_leave_title').text('แก้ไขการลา');
                 $('#modal_leave').modal('show');
+
+                //Check Attach File List
+
+                
+                //if (request.attachment_required) {
+                //    let year = new Date(request.start_request_date).getFullYear();
+                //    if (request.is_full_day) {
+                //        if (parseFloat(request.amount_leave_day) >= parseFloat(request.attachment_threshold_days)) {
+                //            GetFiles(request.leave_type_id, request.request_id, year);
+                //            $('#div_fileList').attr('hidden', false);
+                //        }
+                //    } else {
+
+                //        if (parseFloat(request.amount_leave_hour) / 8.0 >= parseFloat(request.attachment_threshold_days)) {
+                //            GetFiles(request.leave_type_id, request.request_id, year);
+                //            $('#div_fileList').attr('hidden', false);
+                //        }
+                //    }
+
+                //} else {
+                //    $('#div_fileList').attr('hidden', true);
+                //    //$('#btn_approve_leave').attr('disabled', false);
+                //}
+
+
             } catch {
 
             }
         });
+
+        @*async function GetFiles(leave_type_id, request_id, year) {
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetFiles", "StatusLeave")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    leave_type_id, request_id, year
+                },
+                success: function (response) {
+                    const myFiles = response;
+                    console.log(myFiles);
+                    loadExistingFiles(myFiles);
+                }
+            });
+        }*@
 
         async function handleLeaveTypeChange(leave_type_id) {
             let request_date = today.toISOString();
@@ -2326,7 +2376,7 @@
 
             const result = await GetLeaveByID(leave_type_id, emp_id, year);
 
-            let hire_date = new Date(result.hire_date); 
+            let hire_date = new Date(result.hire_date);
             $('#leave_stop_date').val(request_date);
             $('#amount_leave').val(1);
 

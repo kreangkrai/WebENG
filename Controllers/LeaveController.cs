@@ -354,6 +354,7 @@ namespace WebENG.Controllers
                  /year
                      /request_id {emp_id_yyyyMMddHHmmss}
                           /xxxx.csv
+              /temp
          */
         [HttpPost]
         public async Task<IActionResult> UploadTempFile(IFormFile file)
@@ -455,25 +456,6 @@ namespace WebENG.Controllers
                 case ".xlsx":
                     return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-                default:
-                    return "application/octet-stream";
-            }
-        }
-        private string GetImageMimeType(string fileName)
-        {
-            var ext = Path.GetExtension(fileName).ToLowerInvariant();
-
-            switch (ext)
-            {
-                case ".png":
-                    return "image/png";
-                case ".jpg":
-                case ".jpeg":
-                    return "image/jpeg";
-                case ".gif":
-                    return "image/gif";
-                case ".webp":
-                    return "image/webp";
                 default:
                     return "application/octet-stream";
             }
