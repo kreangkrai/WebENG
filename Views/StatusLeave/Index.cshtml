@@ -1909,20 +1909,14 @@
             });
         }
 
-        async function GetRequestHistory(emp_id,start,stop) {
-            await $.ajax({
+        async function GetRequestHistory(emp_id, start, stop) {
+            const response = await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetRequestHistory", "StatusLeave")',
-                contentType: 'application/x-www-form-urlencoded',
                 data: { emp_id, start, stop },
-                success: function (response) {
-                    requestHistory = response;
-
-                },
-                error: function () {
-                    console.error('โหลดข้อมูลพนักงานล้มเหลว');
-                }
+                dataType: 'json'
             });
+            return response;
         }
 
         async function GetLeaveUsed(emp_id,year) {
@@ -2143,18 +2137,27 @@
             $('#employeeInfo').show();
             $('#noEmployee').hide();
             $('#employeeSelect').val(emp.emp_id);
-            loadLeaveUsedAndHistory(emp.emp_id, emp.name_th);
+
+            setTimeout(() => {
+                loadLeaveUsedAndHistory(emp.emp_id, emp.name_th);
+            }, 10);
+
         }
 
         async function loadLeaveUsedAndHistory(emp_id, emp_th_name) {
             let start = $('#date_start').val();
             let stop = $('#date_stop').val();
             let year = new Date(start).getFullYear();
-            GetRequestHistory(emp_id, start, stop);
-            const useds = await GetLeaveUsed(emp_id, year);
-            GenerateUsedLeave(emp_th_name, useds);
-            renderLeaveHistory(emp_id);
+            try {
+                requestHistory = await GetRequestHistory(emp_id, start, stop);
+                const useds = await GetLeaveUsed(emp_id, year);
+                GenerateUsedLeave(emp_th_name, useds);
+                renderLeaveHistory();
+            } catch (err) {
+                console.error("Error loading leave data:", err);
+            }
         }
+
         function GetDayOfWeekName(date) {
             const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
             return dayName;
@@ -2165,7 +2168,7 @@
             return h * 60 + m;
         }
 
-        function renderLeaveHistory(emp_id) {
+        function renderLeaveHistory() {
             const $tbody = $('#table_leave tbody').empty();
             requestHistory.forEach((row, index) => {
                 let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${new Date(row.request_date).toLocaleDateString('en-GB')}`;
@@ -2232,11 +2235,6 @@
             const main_emp_id = '@Html.Raw(emp_id)';
 
             const request = requestHistory.filter(f => f.request_id === request_id).map(m => m)[0];
-
-            const year = new Date(request.start_request_date).getFullYear();
-
-            loadExistingFiles(request.leave_type_id, year, request.request_id);
-            $('#div_fileList').attr('hidden', false);
 
             $('#emp_id').val(data.empId);
             $('#emp_name').val($(this).find('td:eq(2)').text());
@@ -2323,49 +2321,13 @@
                 $('#modal_leave').modal('show');
 
                 //Check Attach File List
+                const year = new Date(request.start_request_date).getFullYear();
 
-                
-                //if (request.attachment_required) {
-                //    let year = new Date(request.start_request_date).getFullYear();
-                //    if (request.is_full_day) {
-                //        if (parseFloat(request.amount_leave_day) >= parseFloat(request.attachment_threshold_days)) {
-                //            GetFiles(request.leave_type_id, request.request_id, year);
-                //            $('#div_fileList').attr('hidden', false);
-                //        }
-                //    } else {
-
-                //        if (parseFloat(request.amount_leave_hour) / 8.0 >= parseFloat(request.attachment_threshold_days)) {
-                //            GetFiles(request.leave_type_id, request.request_id, year);
-                //            $('#div_fileList').attr('hidden', false);
-                //        }
-                //    }
-
-                //} else {
-                //    $('#div_fileList').attr('hidden', true);
-                //    //$('#btn_approve_leave').attr('disabled', false);
-                //}
-
-
+                loadExistingFiles(request.leave_type_id, year, request.request_id);
             } catch {
 
             }
         });
-
-        @*async function GetFiles(leave_type_id, request_id, year) {
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetFiles", "StatusLeave")',
-	            contentType: 'application/x-www-form-urlencoded',
-                data: {
-                    leave_type_id, request_id, year
-                },
-                success: function (response) {
-                    const myFiles = response;
-                    console.log(myFiles);
-                    loadExistingFiles(myFiles);
-                }
-            });
-        }*@
 
         async function handleLeaveTypeChange(leave_type_id) {
             let request_date = today.toISOString();
@@ -2449,6 +2411,7 @@
                 handleLeaveTypeChange(leave_type_id);
             }
         });
+
         function GenerateHistoryApproveLog(requests_log) {
             var html = '';
             let position = "";
