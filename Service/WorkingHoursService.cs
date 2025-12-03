@@ -2274,7 +2274,7 @@ namespace WebENG.Service
             TimeSpan working_date = new TimeSpan(0, 0, 0);
             for (DateTime date = new DateTime(yy, mm, 1); date <= new DateTime(yy, mm, DateTime.DaysInMonth(yy, mm)); date = date.AddDays(1))
             {
-                if (date == new DateTime(2025, 10, 30))
+                //if (date == new DateTime(2025, 10, 30))
                 {
                     day = date.DayOfWeek.ToString();
                     List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date).ToList();

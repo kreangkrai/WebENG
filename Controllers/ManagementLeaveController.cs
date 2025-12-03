@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,9 @@ namespace WebENG.Controllers
         readonly ILevel Level;
         readonly ILeaveType LeaveType;
         private IRequestLog RequestLog;
-        public ManagementLeaveController()
+        private readonly IHostingEnvironment env;
+        private INotification Notification;
+        public ManagementLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
             Requests = new RequestService();
@@ -47,6 +50,8 @@ namespace WebENG.Controllers
             Level = new LevelService();
             LeaveType = new LeaveTypeService();
             RequestLog = new RequestLogService();
+            Notification = new NotificationService();
+            env = _env;
         }
         public IActionResult Index()
         {
@@ -71,7 +76,7 @@ namespace WebENG.Controllers
             }
             else
             {
-                return RedirectToAction("Index", "Account");
+                return RedirectToAction("Index", "LoginManagement");
             }
         }
 
@@ -259,7 +264,7 @@ namespace WebENG.Controllers
             bool is_two_step_approve = request.is_two_step_approve;
             requests_log = requests_log.Where(w=>w.new_level_step <= current_level_step).OrderBy(o => o.log_date).ToList();
 
-            List<LevelModel> hierarchies = Level.GetHierarchyByEmpID(emp_id);
+            List<LevelModel> hierarchies = Level.GetLevelByEmpID(emp_id);
             int level = hierarchies.Min(m => m.level);
 
             List<ApprovedModel> approveds = new List<ApprovedModel>();
@@ -319,6 +324,9 @@ namespace WebENG.Controllers
             RequestLogModel last_request_log = requests_log.OrderByDescending(o => o.log_date).FirstOrDefault();
 
             RequestModel request = Requests.GetRequestByID(request_id);
+
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            LevelModel current_level = level.Where(w=>w.emp_id == request.emp_id).FirstOrDefault();
 
             string new_status = "Rejected";
             int rejected_level = 0;
@@ -415,8 +423,25 @@ namespace WebENG.Controllers
                         };
 
                         requestLogService.Insert(rsl);
-
                         tran.Commit();
+
+                        // Notification
+
+                        NotificationModel notification = new NotificationModel()
+                        {
+                            emp_id = current_level.emp_id,
+                            notification_date = DateTime.Now,
+                            notification_description = "ปฏิเสธการลา",
+                            notification_path = "Status",
+                            notification_type = "Leave",
+                            notification_issue = "ปฏิเสธการลา",
+                            status = "Pending"
+                        };
+
+                        Notification.Insert(notification);
+
+
+
                         return Json("Success");
 
                     }
@@ -440,6 +465,9 @@ namespace WebENG.Controllers
             RequestLogModel last_request_log = requests_log.OrderByDescending(o => o.log_date).FirstOrDefault();
 
             RequestModel request = Requests.GetRequestByID(request_id);
+
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            LevelModel current_level = level.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
 
             string new_status = "Returned";
             int returned_level = 0;
@@ -538,6 +566,22 @@ namespace WebENG.Controllers
                         requestLogService.Insert(rsl);
 
                         tran.Commit();
+
+                        // Notification
+
+                        NotificationModel notification = new NotificationModel()
+                        {
+                            emp_id = current_level.emp_id,
+                            notification_date = DateTime.Now,
+                            notification_description = "ส่งกลับแก้ไขการลา",
+                            notification_path = "Status",
+                            notification_type = "Leave",
+                            notification_issue = "ส่งกลับแก้ไขการลา",
+                            status = "Pending"
+                        };
+
+                        Notification.Insert(notification);
+
                         return Json("Success");
 
                     }
@@ -577,6 +621,10 @@ namespace WebENG.Controllers
             bool is_two_step_approve = request.is_two_step_approve;
             int level_step = request.level_step;
             string new_status = "";
+
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            LevelModel current_level = level.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+
             if (level_step == 0) // Operation Only
             {
                 if (is_two_step_approve)
@@ -682,6 +730,21 @@ namespace WebENG.Controllers
                         requestLogService.Insert(rsl);
 
                         tran.Commit();
+
+                        // Notification
+
+                        NotificationModel notification = new NotificationModel()
+                        {
+                            emp_id = current_level.emp_id,
+                            notification_date = DateTime.Now,
+                            notification_description = "อนุมัติวันลา",
+                            notification_path = "Status",
+                            notification_type = "Leave",
+                            notification_issue = "อนุมัติวันลา",
+                            status = "Pending"
+                        };
+
+                        Notification.Insert(notification);
                         message = "Success";
                     }
                     catch (Exception ex)
@@ -698,7 +761,7 @@ namespace WebENG.Controllers
         public IActionResult GetFiles(string leave_type_id, string request_id,int year)
         {
             List<FileModel> files = new List<FileModel>();
-            var tempFolder = Path.Combine("Uploads", leave_type_id, year.ToString(), request_id);
+            var tempFolder = Path.Combine(env.WebRootPath, "Uploads", leave_type_id, year.ToString(), request_id);
 
             if (!Directory.Exists(tempFolder))
                 return Json(files);
@@ -743,7 +806,7 @@ namespace WebENG.Controllers
                 fileName.Contains(":") || Path.IsPathRooted(fileName))
                 return BadRequest("Invalid file name");
 
-            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", leave_type_id, year.ToString(), request_id);
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), env.WebRootPath, "Uploads", leave_type_id, year.ToString(), request_id);
 
             var fullPath = Path.GetFullPath(Path.Combine(basePath, fileName));
 

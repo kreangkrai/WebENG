@@ -6,7 +6,7 @@
 @{ 
     INotification Notification = new NotificationService();
     List<NotificationModel> notifications = Notification.GetNotificationsByEMPID(Model.emp_id);
-    notifications = notifications.Where(w => w.notification_date > DateTime.Now.AddDays(-30)).ToList();
+    notifications = notifications.Where(w => w.notification_date > DateTime.Now.AddDays(-30)).OrderByDescending(o=>o.notification_date).ToList();
 }
 <!DOCTYPE html>
 <html>
@@ -115,6 +115,7 @@
             font-weight: bold;
             font-family: Arial, sans-serif;
         }
+
         .notification-link {
             display: block;
             text-decoration: none;
@@ -157,28 +158,56 @@
                                     </li>
                                     @for (int i = 0; i < notifications.Count; i++)
                                     {
-                                        <a asp-controller="ManagementLeave" asp-action="Index" target="_blank" rel="noopener" class="notification-link">
-                                        <li class="notification-item">
-                                            <i class="fas fa-envelope"></i>
+                                        if (notifications[i].notification_path == "Management")
+                                        {
+                                            <a asp-controller="ManagementLeave" asp-action="Index" target="_blank" rel="noopener" class="notification-link">
+                                            <li class="notification-item">
+                                                <i class="fas fa-envelope"></i>
 
-                                            <div class="text">
-                                                <div class="notif-title"><strong>แจ้งเตือนระบบการลา</strong></div>
-                                                <div class="notif-content">@notifications[i].notification_issue</div>
-                                                @{double total_minute = (DateTime.Now - notifications[i].notification_date).TotalMinutes;}
-                                                @if (total_minute < 60.0)
-                                                {
-                                                    <div class="time">@Convert.ToInt32(total_minute) นาทีที่แล้ว</div> }
-                                                else if (total_minute >= 60 && total_minute < 1440)
-                                                {
-                                                    <div class="time">@Convert.ToInt32((total_minute / 60)) ชั่วโมงที่แล้ว</div> }
-                                                else if (total_minute >= 1440)
-                                                {
-                                                    <div class="time">@Convert.ToInt32((total_minute / 1440)) วันที่แล้ว</div>}
-                                            </div>
+                                                <div class="text">
+                                                    <div class="notif-title"><strong>แจ้งเตือนระบบการลา</strong></div>
+                                                    <div class="notif-content">@notifications[i].notification_issue</div>
+                                                    @{double total_minute = (DateTime.Now - notifications[i].notification_date).TotalMinutes;}
+                                                    @if (total_minute < 60.0)
+                                                    {
+                                                        <div class="time">@Convert.ToInt32(total_minute) นาทีที่แล้ว</div> }
+                                                    else if (total_minute >= 60 && total_minute < 1440)
+                                                    {
+                                                        <div class="time">@Convert.ToInt32((total_minute / 60)) ชั่วโมงที่แล้ว</div> }
+                                                    else if (total_minute >= 1440)
+                                                    {
+                                                        <div class="time">@Convert.ToInt32((total_minute / 1440)) วันที่แล้ว</div>}
+                                                </div>
 
-                                        </li>
+                                            </li>
 
-                                        </a>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="StatusLeave" asp-action="Index" target="_blank" rel="noopener" class="notification-link">
+                                            <li class="notification-item">
+                                                <i class="fas fa-envelope"></i>
+
+                                                <div class="text">
+                                                    <div class="notif-title"><strong>แจ้งเตือนระบบการลา</strong></div>
+                                                    <div class="notif-content">@notifications[i].notification_issue</div>
+                                                    @{double total_minute = (DateTime.Now - notifications[i].notification_date).TotalMinutes;}
+                                                    @if (total_minute < 60.0)
+                                                    {
+                                                        <div class="time">@Convert.ToInt32(total_minute) นาทีที่แล้ว</div> }
+                                                    else if (total_minute >= 60 && total_minute < 1440)
+                                                    {
+                                                        <div class="time">@Convert.ToInt32((total_minute / 60)) ชั่วโมงที่แล้ว</div> }
+                                                    else if (total_minute >= 1440)
+                                                    {
+                                                        <div class="time">@Convert.ToInt32((total_minute / 1440)) วันที่แล้ว</div>}
+                                                </div>
+
+                                            </li>
+
+                                            </a>
+                                        }
                                     }
                                 </ul>
 

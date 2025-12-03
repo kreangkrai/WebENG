@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -27,7 +28,10 @@ namespace WebENG.Controllers
         private ILeave Leave;
         private ILevel Level;
         private IRequestLog RequestLog;
-        public StatusLeaveController()
+        private readonly IHostingEnvironment env;
+        private IMail Mail;
+        private INotification Notification;
+        public StatusLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
             Employees = new EmployeeService();
@@ -36,6 +40,10 @@ namespace WebENG.Controllers
             Leave = new LeaveService();
             Level = new LevelService();
             RequestLog = new RequestLogService();
+            env = _env;
+            Mail = new MailService();
+            Notification = new NotificationService();
+
         }
         public IActionResult Index()
         {
@@ -66,6 +74,14 @@ namespace WebENG.Controllers
                 List<LevelModel> levels = Level.GetLevelByEmpID(u.emp_id);
                 ViewBag.levels = levels;
                 ViewBag.emp = u.emp_id;
+
+                List<string> to = new List<string>()
+                {
+                    "kriangkrai@contrologic.co.th","sarit_t@contrologic.co.th"
+                };
+                string m = Mail.SendCreate("kriangkrai", to, "XXXX");
+
+
                 return View(u);
             }
             else
@@ -255,6 +271,8 @@ namespace WebENG.Controllers
                 level_step = s.level_step,
                 is_two_step_approve = s.is_two_step_approve
             }).ToList();
+
+            data = data.OrderByDescending(o => o.start_request_date).ToList();
             return Json(data);
         }
 
@@ -262,6 +280,7 @@ namespace WebENG.Controllers
         public IActionResult GetRequestLog(string request_id)
         {
             List<RequestLogModel> requests = RequestLog.GetLogByRequestId(request_id);
+ 
             return Json(requests);
         }
         [HttpGet]
@@ -298,7 +317,7 @@ namespace WebENG.Controllers
         [HttpDelete]
         public IActionResult DeleteTemp(string request_id)
         {
-            var tempPath = Path.Combine("Uploads", "temp", request_id);
+            var tempPath = Path.Combine(env.WebRootPath,"Uploads", "temp", request_id);
             if (Directory.Exists(tempPath))
                 Directory.Delete(tempPath, true);
             return Ok();
@@ -322,9 +341,11 @@ namespace WebENG.Controllers
             }
 
 
-            var tempPath = Path.Combine("Uploads", "temp", request_id, safeFileName);
+            var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id, safeFileName);
             var fullPath = Path.GetFullPath(tempPath);
-            var allowedRoot = Path.GetFullPath("Uploads/temp");
+            var allowedRoot = Path.Combine(env.WebRootPath, "Uploads", "temp");
+            allowedRoot = Path.GetFullPath(allowedRoot);
+            //allowedRoot = allowedRoot.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 
             if (!fullPath.StartsWith(allowedRoot + Path.DirectorySeparatorChar) &&
                 !fullPath.StartsWith(allowedRoot + Path.AltDirectorySeparatorChar))
@@ -359,6 +380,10 @@ namespace WebENG.Controllers
             request.comment = "";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours, 0);
 
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            int current_level = level.Min(m => m.level);
+            List<LevelModel> next_level = level.Where(w => w.level == current_level + 1).ToList();
+
             // Check Two Step Approve
             bool is_full_day = request.is_full_day;
             if (is_full_day)
@@ -388,7 +413,7 @@ namespace WebENG.Controllers
             {
                 request.path_file = "";
             }
-            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+
             level = level.Where(w => w.emp_id == request.emp_id).ToList();
 
             request.level_step = level.FirstOrDefault().level;
@@ -458,16 +483,16 @@ namespace WebENG.Controllers
                     if (is_attach_file)
                     {
                         //Remove Uploads Request id
-                        RemoveTempFiles(request.request_id);
+                        
                         RemoveUploadsFiles(request.leave_type_id, year, request_id);
 
 
-                        var tempFolder = Path.Combine("Uploads", "temp", request_id);
+                        var tempFolder = Path.Combine(env.WebRootPath,"Uploads", "temp", request_id);
                         var files = Directory.GetFiles(tempFolder);
                         foreach (var oldFile in files)
                         {
                             var fileName = Path.GetFileName(oldFile);
-                            var newPath = Path.Combine(
+                            var newPath = Path.Combine(env.WebRootPath,
                                 "Uploads", request.leave_type_id,
                                 now.Year.ToString(),
                                 request_id,
@@ -482,6 +507,27 @@ namespace WebENG.Controllers
                     {
                         RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
                     }
+
+
+                    // Notification
+
+                    for (int i = 0; i < next_level.Count; i++)
+                    {
+                        NotificationModel notification = new NotificationModel()
+                        {
+                            emp_id = next_level[i].emp_id,
+                            notification_date = DateTime.Now,
+                            notification_description = "แแก้ไขใบลา",
+                            notification_path = "Management",
+                            notification_type = "Leave",
+                            notification_issue = "ใบลารอการอนุมัติ",
+                            status = "Pending"
+                        };
+
+                        Notification.Insert(notification);
+                    }
+
+
 
                     ////Insert Leave Working Hours
                     //List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
@@ -587,7 +633,7 @@ namespace WebENG.Controllers
                         message = "Success";
 
                         //Remove File Uploads
-                        if (request.path_file != "" && request.path_file != null)
+                        //if (request.path_file != "" && request.path_file != null)
                         {
                             RemoveTempFiles(request.request_id);
                             RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
@@ -606,8 +652,8 @@ namespace WebENG.Controllers
         [HttpPost]
         public IActionResult CopyUplodstoTempFile(string leave_type_id, int year, string request_id)
         {
-            string sourceFolder = Path.Combine("Uploads", leave_type_id, year.ToString(), request_id);
-            string tempFolder = Path.Combine("Uploads", "temp", request_id);
+            string sourceFolder = Path.Combine(env.WebRootPath, "Uploads", leave_type_id, year.ToString(), request_id);
+            string tempFolder = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
 
             if (!Directory.Exists(sourceFolder))
             {
@@ -647,7 +693,7 @@ namespace WebENG.Controllers
         {
             try
             {
-                var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(), env.WebRootPath, "Uploads");
 
                 string sourceFolder = Path.Combine(basePath, "temp", requestId);
 
@@ -698,7 +744,7 @@ namespace WebENG.Controllers
         {
             try
             {
-                var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(), env.WebRootPath, "Uploads");
                 var requestTempFolder = Path.Combine(basePath, "temp", requestId);
 
                 if (Directory.Exists(requestTempFolder))
@@ -719,7 +765,7 @@ namespace WebENG.Controllers
         {
             try
             {
-                var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                var basePath = Path.Combine(Directory.GetCurrentDirectory(), env.WebRootPath, "Uploads");
                 string targetFolder = Path.Combine(basePath, leaveId, year.ToString(), requestId);
                 if (!Directory.Exists(targetFolder))
                 {
@@ -747,7 +793,7 @@ namespace WebENG.Controllers
                 return BadRequest("No file");
 
             var tempId = request_id;
-            var tempPath = Path.Combine("Uploads", "temp", tempId);
+            var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", tempId);
             Directory.CreateDirectory(tempPath);
 
             var fileName = Path.GetFileName(file.FileName);
@@ -796,7 +842,7 @@ namespace WebENG.Controllers
         public IActionResult GetFiles(string leave_type_id, string request_id, int year)
         {
             List<FileModel> files = new List<FileModel>();
-            var tempFolder = Path.Combine("Uploads", leave_type_id, year.ToString(), request_id);
+            var tempFolder = Path.Combine(env.WebRootPath, "Uploads", leave_type_id, year.ToString(), request_id);
 
             if (!Directory.Exists(tempFolder))
                 return Json(files);
@@ -837,7 +883,7 @@ namespace WebENG.Controllers
             // Copy Uploads to Temp
             CopyUplodstoTempFile(leave_type_id, year, request_id);
 
-            var tempPath = Path.Combine("Uploads", "temp", request_id);
+            var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
 
 
             if (!Directory.Exists(tempPath))
@@ -884,7 +930,7 @@ namespace WebENG.Controllers
             if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
                 return BadRequest("Invalid file name");
 
-            var filePath = Path.Combine("Uploads", "temp", tempId, fileName);
+            var filePath = Path.Combine(env.WebRootPath, "Uploads", "temp", tempId, fileName);
 
             if (!System.IO.File.Exists(filePath))
                 return NotFound();
@@ -907,7 +953,7 @@ namespace WebENG.Controllers
                 fileName.Contains(":") || Path.IsPathRooted(fileName))
                 return BadRequest("Invalid file name");
 
-            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", leave_type_id, year.ToString(), request_id);
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), env.WebRootPath, "Uploads", leave_type_id, year.ToString(), request_id);
 
             var fullPath = Path.GetFullPath(Path.Combine(basePath, fileName));
 

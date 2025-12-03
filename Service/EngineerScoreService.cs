@@ -177,7 +177,7 @@ namespace WebENG.Service
 	                    t1.user_id AS user_id,
 	                    t1.job_id AS job_id,
 	                    Jobs.job_name AS job_name,
-                        Quotation.customer as customer,
+                        Jobs.customer_name as customer,
                         Jobs.status,
                         {cost},
 	                    md_rate AS md_rate,

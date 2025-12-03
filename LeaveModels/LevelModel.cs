@@ -12,5 +12,6 @@ namespace WebENG.LeaveModels
         public string position { get; set; }
         public string department { get; set; }
         public int level { get; set; }
+        public string email { get; set; }
     }
 }

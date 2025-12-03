@@ -35,6 +35,7 @@ namespace WebENG.LeaveServices
                                                           ,[notification_date]
                                                           ,[notification_description]
                                                           ,[status]
+                                                          ,[notification_path]
                                                       FROM [ELEAVE].[dbo].[Notification] WHERE [emp_id] = @emp_id", con);
                 cmd.Parameters.AddWithValue("@emp_id", emp_id);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -51,7 +52,8 @@ namespace WebENG.LeaveServices
                             notification_issue = dr["notification_issue"].ToString(),
                             notification_description = dr["notification_description"].ToString(),
                             notification_date = Convert.ToDateTime(dr["notification_date"].ToString()),
-                            status = dr["status"].ToString()
+                            status = dr["status"].ToString(),
+                            notification_path = dr["notification_path"].ToString()
                         };
                         notifications.Add(notification);
                     }
@@ -91,14 +93,16 @@ namespace WebENG.LeaveServices
                                                    ,[notification_issue]
                                                    ,[notification_date]
                                                    ,[notification_description]
-                                                   ,[status])
+                                                   ,[status]
+                                                   ,[notification_path])
                                              VALUES
                                                    (@notification_type
                                                    ,@emp_id
                                                    ,@notification_issue
                                                    ,@notification_date
                                                    ,@notification_description
-                                                   ,@status)");
+                                                   ,@status
+                                                   ,@notification_path)");
                 using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
                     command.CommandType = CommandType.Text;
@@ -108,6 +112,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@notification_date", notification.notification_date);
                     command.Parameters.AddWithValue("@notification_description", notification.notification_description);
                     command.Parameters.AddWithValue("@status", notification.status);
+                    command.Parameters.AddWithValue("@notification_path", notification.notification_path);
                     command.ExecuteNonQuery();
                 }
                 return "Success";
@@ -145,6 +150,7 @@ namespace WebENG.LeaveServices
                                                               ,[notification_date] = @notification_date
                                                               ,[notification_description] = @notification_description
                                                               ,[status] = @status
+                                                              ,[notification_path] = @notification_path
                                                          WHERE [notification_id] = @notification_id AND [emp_id] = @emp_id");
                 using (SqlCommand command = new SqlCommand(sql, localCon, tran))
                 {
@@ -155,6 +161,7 @@ namespace WebENG.LeaveServices
                     command.Parameters.AddWithValue("@notification_date", notification.notification_date);
                     command.Parameters.AddWithValue("@notification_description", notification.notification_description);
                     command.Parameters.AddWithValue("@status", notification.status);
+                    command.Parameters.AddWithValue("@notification_path", notification.notification_path);
                     command.ExecuteNonQuery();
                 }
                 return "Success";

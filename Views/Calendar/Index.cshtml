@@ -2661,7 +2661,7 @@
             formData.append('file', file);
 
             try {
-                const response = await fetch('/Leave/UploadTempFile', {
+                const response = await fetch('./Leave/UploadTempFile', {
                     method: 'POST',
                     body: formData
                 });
@@ -2724,7 +2724,7 @@
 
             // ลบจาก backend
             try {
-                await fetch(`/Leave/DeleteTemp?tempId=${tempId}`, { method: 'DELETE' });
+                await fetch(`./Leave/DeleteTemp?tempId=${tempId}`, { method: 'DELETE' });
             } catch (err) {
                 console.error('ลบไฟล์ล้มเหลว', err);
             }
@@ -2745,7 +2745,7 @@
 
             existingTempIds.forEach(async (tempId) => {
 
-                const response = await fetch(`/Leave/GetTempFileInfo?tempId=${tempId}`);
+                const response = await fetch(`./Leave/GetTempFileInfo?tempId=${tempId}`);
                 if (response.ok) {
                     const info = await response.json();
                     tempFileIds.push(tempId);
@@ -2762,7 +2762,7 @@
         async function ClearAttachFile() {
             for (let i = 0; i < tempFileIds.length; i++) {
                 try {
-                    await fetch(`/Leave/DeleteTemp?tempId=${tempFileIds[i]}`, { method: 'DELETE' });
+                    await fetch(`./Leave/DeleteTemp?tempId=${tempFileIds[i]}`, { method: 'DELETE' });
                 } catch (err) {
                     console.error('ลบไฟล์ล้มเหลว', err);
                 }

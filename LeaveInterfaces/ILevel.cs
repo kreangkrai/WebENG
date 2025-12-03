@@ -9,6 +9,6 @@ namespace WebENG.LeaveInterfaces
     public interface ILevel
     {
         List<LevelModel> GetLevelByEmpID(string emp_id);
-        List<LevelModel> GetHierarchyByEmpID(string emp_id);
+        //List<LevelModel> GetHierarchyByEmpID(string emp_id);
     }
 }

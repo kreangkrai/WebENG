@@ -13,6 +13,7 @@ namespace WebENG.LeaveModels
         public string notification_issue { get; set; }
         public DateTime notification_date { get; set; }
         public string notification_description { get; set; }
+        public string notification_path { get; set; }
         public string status { get; set; }
     }
 }

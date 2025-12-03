@@ -1572,7 +1572,7 @@
             formData.append('request_id', request_id);
 
             try {
-                const response = await fetch('/StatusLeave/UploadTempFile', {
+                const response = await fetch('./StatusLeave/UploadTempFile', {
                     method: 'POST',
                     body: formData
                 });
@@ -1637,7 +1637,7 @@
 
             // ลบจาก backend
             try {
-                await fetch(`/StatusLeave/DeleteTempFile?request_id=${request_id}&filename=${filename}`, { method: 'DELETE' });
+                await fetch(`./StatusLeave/DeleteTempFile?request_id=${request_id}&filename=${filename}`, { method: 'DELETE' });
             } catch (err) {
                 console.error('ลบไฟล์ล้มเหลว', err);
             }
@@ -1655,7 +1655,7 @@
             fileListContainer.innerHTML = '';
             tempFileIds = [];
 
-            const response = await fetch(`/StatusLeave/GetTempFileInfo?leave_type_id=${leave_type_id}&year=${year}&request_id=${request_id}`);
+            const response = await fetch(`./StatusLeave/GetTempFileInfo?leave_type_id=${leave_type_id}&year=${year}&request_id=${request_id}`);
             if (response.ok) {
                 const info = await response.json();
                 info.files.forEach(async (file) => {
@@ -1672,7 +1672,7 @@
         }
         async function ClearAttachFile(request_id) {            
             try {
-                await fetch(`/StatusLeave/DeleteTemp?request_id=${request_id}`, { method: 'DELETE' });
+                await fetch(`./StatusLeave/DeleteTemp?request_id=${request_id}`, { method: 'DELETE' });
             } catch (err) {
                 console.error('ลบไฟล์ล้มเหลว', err);
 
@@ -2168,9 +2168,9 @@
             return h * 60 + m;
         }
 
+        let dataTable;
         function renderLeaveHistory() {
-            const $tbody = $('#table_leave tbody').empty();
-            requestHistory.forEach((row, index) => {
+            const data = requestHistory.map((row, index) => {
                 let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${new Date(row.request_date).toLocaleDateString('en-GB')}`;
                 let start_request_date = "";
                 if (row.is_full_day) {
@@ -2197,35 +2197,143 @@
                         duration = 0.50;
                     }
 
-                    start_request_time = row.start_request_time.split('.')[1].substring(0,5);
+                    start_request_time = row.start_request_time.split('.')[1].substring(0, 5);
                     end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
                 }
                 let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
-                const tr = $(`
-                    <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
-                        data-toggle="modal" data-target="#modal_edit_leave"
-                        data-leave_type_id="${row.leave_type_id}"
-                        data-request_id="${row.request_id}" data-emp-id="${row.emp_id}"
-                        data-request-date="${request_date}" data-start_request_date="${row.start_request_date}"
-                        data-end_request_date="${row.end_request_date}"
-                        data-time="${row.start_request_time}" data-duration="${duration}"
-                        data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
-                        <td class="freeze-left-1">${index + 1}</td>
-                        <td class="freeze-left-2">${row.emp_id}</td>
-                        <td class="freeze-left-3">${selectedEmployee ? (selectedEmployee.name_en) : '-'}</td>
-                        <td>${request_date}</td>
-                        <td>${start_request_date}</td>
-                        <td>${start_request_time}-${end_request_time}</td>
-                        <td>${duration}</td>
-                        <td>${row.leave_name_th}</td>
-                        <td>${row.description}</td>
-                        <td><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
-                    </tr>
-                `);
-
-                $tbody.append(tr);
+                return {
+                    no: index + 1,
+                    emp_id: row.emp_id,
+                    name: selectedEmployee ? selectedEmployee.name_th || selectedEmployee.name_en : '-',
+                    request_date: request_date,
+                    leave_date: start_request_date,
+                    time: start_request_time + "-" + end_request_time,
+                    duration: duration,
+                    type: row.leave_name_th,
+                    note: row.description || '-',
+                    status: `<span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span>`,
+                    raw: row
+                };
             });
-        }
+
+            if (dataTable) {
+                dataTable.destroy();
+            }
+
+            dataTable = $('#table_leave').DataTable({
+                destroy: true,
+                data: data,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/th.json'
+                },
+                pageLength: 20,
+                scrollX: true,
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 3
+                },
+                order: [[4, 'desc']],
+                columnDefs: [
+                    { className: "freeze-left-1", targets: 0 },
+                    { className: "freeze-left-2", targets: 1 },
+                    { className: "freeze-left-3", targets: 2 }
+                ],
+                columns: [
+                    { data: 'no' },
+                    { data: 'emp_id' },
+                    { data: 'name' },
+                    { data: 'request_date' },
+                    { data: 'leave_date' },
+                    { data: 'time' },
+                    { data: 'duration' },
+                    { data: 'type' },
+                    { data: 'note' },
+                    { data: 'status'}
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    $(row).addClass('clickable-row kanit-regular')
+                        .css({ color: '#555', fontSize: '16px' })
+                        .attr({
+                            'data-toggle': 'modal',
+                            'data-target': '#modal_edit_leave',
+                            'data-request_id': data.raw.request_id,
+                            'data-leave_type_id': data.raw.leave_type_id,
+                            'data-emp-id': data.raw.emp_id,
+                            'data-request-date': data.raw.request_date,
+                            'data-start_request_date': data.raw.start_request_date,
+                            'data-end_request_date': data.raw.end_request_date,
+                            'data-time': data.raw.time_range,
+                            'data-duration': data.duration,
+                            'data-type': data.raw.leave_name_th,
+                            'data-note': data.raw.description || '',
+                            'data-status': data.raw.status_request
+                        })
+                        .css('cursor', 'pointer');
+                },
+                info: false,
+                searching: false,
+                paging:false
+            });
+        };
+
+        //function renderLeaveHistoryOLD() {
+        //    const $tbody = $('#table_leave tbody').empty();
+        //    requestHistory.forEach((row, index) => {
+        //        let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${new Date(row.request_date).toLocaleDateString('en-GB')}`;
+        //        let start_request_date = "";
+        //        if (row.is_full_day) {
+        //            if (row.amount_leave_day > 1) {
+        //                start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('en-GB')} - ${GetDayOfWeekName(new Date(row.end_request_date))} ${new Date(row.end_request_date).toLocaleDateString('en-GB')}`;
+        //            } else {
+        //                start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
+        //            }
+        //        } else {
+        //            start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
+        //        }
+
+        //        let duration = 0;
+        //        let start_request_time = "08:30";
+        //        let end_request_time = "17:30";
+        //        if (row.is_full_day) {
+        //            duration = row.amount_leave_day;
+        //        } else {
+        //            let start = timeToMinutes(row.start_request_time);
+        //            let end = timeToMinutes(row.end_request_time);
+        //            let diff = end - start;
+        //            duration = (diff / 480).toFixed(2);
+        //            if (duration > 0.3 && duration < 0.6) {
+        //                duration = 0.50;
+        //            }
+
+        //            start_request_time = row.start_request_time.split('.')[1].substring(0,5);
+        //            end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
+        //        }
+        //        let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
+        //        const tr = $(`
+        //            <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
+        //                data-toggle="modal" data-target="#modal_edit_leave"
+        //                data-leave_type_id="${row.leave_type_id}"
+        //                data-request_id="${row.request_id}" data-emp-id="${row.emp_id}"
+        //                data-request-date="${request_date}" data-start_request_date="${row.start_request_date}"
+        //                data-end_request_date="${row.end_request_date}"
+        //                data-time="${row.start_request_time}" data-duration="${duration}"
+        //                data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
+        //                <td class="freeze-left-1">${index + 1}</td>
+        //                <td class="freeze-left-2">${row.emp_id}</td>
+        //                <td class="freeze-left-3">${selectedEmployee ? (selectedEmployee.name_en) : '-'}</td>
+        //                <td>${request_date}</td>
+        //                <td>${start_request_date}</td>
+        //                <td>${start_request_time}-${end_request_time}</td>
+        //                <td>${duration}</td>
+        //                <td>${row.leave_name_th}</td>
+        //                <td>${row.description}</td>
+        //                <td><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
+        //            </tr>
+        //        `);
+
+        //        $tbody.append(tr);
+        //    });
+        //}
 
         $(document).on('click', '.clickable-row',async function () {
             const data = $(this).data();

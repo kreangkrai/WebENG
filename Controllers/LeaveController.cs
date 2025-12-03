@@ -16,6 +16,7 @@ using WebENG.Service;
 using Newtonsoft.Json;
 using System.IO;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Hosting;
 /*
 
 1 Step
@@ -45,7 +46,9 @@ namespace WebENG.Controllers
         private IWorkingHours WorkingHoursService;
         readonly CTLInterfaces.IHoliday Holiday;
         private ILevel Level;
-        public LeaveController()
+        private readonly IHostingEnvironment env;
+
+        public LeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
             RequestLog = new RequestLogService();
@@ -57,6 +60,7 @@ namespace WebENG.Controllers
             WorkingHoursService = new WorkingHoursService();
             Holiday = new CTLServices.HolidayService();
             Level = new LevelService();
+            env = _env;
 
         }
         public IActionResult Index()
@@ -77,6 +81,7 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
+               
 
                 return View(u);
             }
@@ -192,6 +197,10 @@ namespace WebENG.Controllers
             request.comment = "";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
 
+            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            int current_level = level.Min(m => m.level);
+            List<LevelModel> next_level = level.Where(w => w.level == current_level + 1).ToList();
+
             // Check Two Step Approve
             bool is_full_day = request.is_full_day;
             if (is_full_day)
@@ -221,7 +230,7 @@ namespace WebENG.Controllers
             {
                 request.path_file = "";
             }
-            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+           
             level = level.Where(w => w.emp_id == request.emp_id).ToList();
 
             request.level_step = level.FirstOrDefault().level;
@@ -274,12 +283,12 @@ namespace WebENG.Controllers
                     {
                         foreach (var tempId in tempFileIds)
                         {
-                            var tempFolder = Path.Combine("Uploads", "temp", tempId);
+                            var tempFolder = Path.Combine(env.WebRootPath,"Uploads", "temp", tempId);
                             var files = Directory.GetFiles(tempFolder);
                             foreach (var oldFile in files)
                             {
                                 var fileName = Path.GetFileName(oldFile);
-                                var newPath = Path.Combine(
+                                var newPath = Path.Combine(env.WebRootPath,
                                     "Uploads", request.leave_type_id,
                                     now.Year.ToString(),
                                     request_id,
@@ -291,6 +300,25 @@ namespace WebENG.Controllers
                             Directory.Delete(tempFolder, true);
                         }
                     }
+
+                    // Notification
+
+                    for (int i = 0; i < next_level.Count; i++)
+                    {
+                        NotificationModel notification = new NotificationModel()
+                        {
+                            emp_id = next_level[i].emp_id,
+                            notification_date = DateTime.Now,
+                            notification_description = "สร้างใบลา",
+                            notification_path = "Management",
+                            notification_type = "Leave",
+                            notification_issue = "ใบลารอการอนุมัติ",
+                            status = "Pending"
+                        };
+
+                        Notification.Insert(notification);
+                    }
+
 
                     ////Insert Leave Working Hours
                     //List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
@@ -363,10 +391,10 @@ namespace WebENG.Controllers
                 return BadRequest("No file");
 
             var tempId = Guid.NewGuid().ToString();
-            var tempPath = Path.Combine("Uploads", "temp", tempId);
+            var tempPath = Path.Combine(env.WebRootPath,"Uploads", "temp", tempId);
             Directory.CreateDirectory(tempPath);
 
-            var fileName = Path.GetFileName(file.FileName); // ป้องกัน path traversal
+            var fileName = Path.GetFileName(file.FileName);
             var filePath = Path.Combine(tempPath, fileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
@@ -418,7 +446,7 @@ namespace WebENG.Controllers
             if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
                 return BadRequest("Invalid file name");
 
-            var filePath = Path.Combine("Uploads", "temp", tempId, fileName);
+            var filePath = Path.Combine(env.WebRootPath, "Uploads", "temp", tempId, fileName);
 
             if (!System.IO.File.Exists(filePath))
                 return NotFound();
@@ -464,7 +492,7 @@ namespace WebENG.Controllers
         [HttpDelete]
         public IActionResult DeleteTemp(string tempId)
         {
-            var tempPath = Path.Combine("Uploads", "temp", tempId);
+            var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", tempId);
             if (Directory.Exists(tempPath))
                 Directory.Delete(tempPath, true);
             return Ok();
@@ -472,7 +500,7 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetTempFileInfo(string tempId)
         {
-            var tempPath = Path.Combine("Uploads", "temp", tempId);
+            var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", tempId);
             var file = Directory.GetFiles(tempPath).FirstOrDefault();
             if (file == null) return NotFound();
 

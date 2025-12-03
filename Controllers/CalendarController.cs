@@ -20,6 +20,7 @@ namespace WebENG.Controllers
         readonly IJobResponsible JobResponsibleService;
         readonly IJob Job;
         readonly IAuthen Authen;
+        readonly CTLInterfaces.IEmployee Employees;
         public CalendarController()
         {
             WorkingHoursService = new WorkingHoursService();
@@ -28,6 +29,7 @@ namespace WebENG.Controllers
             JobResponsibleService = new JobResponsibleService();
             Job = new JobService();
             Authen = new AuthenService();
+            Employees = new CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -58,8 +60,37 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetUsers()
         {
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
             List<AuthenModel> users = Authen.GetAuthens();
+
+            List<string> emps = employees.GroupBy(g => g.name_en).Select(s => s.FirstOrDefault().name_en).ToList();
+
+            List<string> not_emp = users.Where(w => !emps.Contains(w.name.ToLower())).Select(s=>s.name).ToList();
+
+            List<AuthenModel> authens = new List<AuthenModel>();
+            for (int i = 0; i < not_emp.Count; i++)
+            {
+                AuthenModel authen = new AuthenModel()
+                {
+                    levels = 1,
+                    user_id = ConvertUserID(not_emp[i]),
+                    department = employees.Where(w=>w.name_en.ToLower() == not_emp[i].ToLower()).Select(s=>s.department).FirstOrDefault(),
+                    name = not_emp[i],
+                    role = "User"
+                };
+                authens.Add(authen);
+            }
+            users.AddRange(authens);
             return Json(users);
+        }
+
+        public string ConvertUserID(string user)
+        {
+            string first = user.Split(' ')[0];
+            string last = user.Split(' ')[1];
+            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
+            string lastname = last.Substring(0, 1).ToUpper();
+            return name + "." + lastname;
         }
 
         [HttpGet]
