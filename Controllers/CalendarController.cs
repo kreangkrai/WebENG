@@ -37,15 +37,22 @@ namespace WebENG.Controllers
             if (HttpContext.Session.GetString("Login_ENG") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<UserModel> users = new List<UserModel>();
-                users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { 
-                    name = s.name, 
-                    department = s.department, 
-                    role = s.role,
-                    user_id = s.user_id,
-                    emp_id = s.emp_id
-                }).FirstOrDefault();
+                
+                List<UserModel> users = Accessory.getAllUser();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).FirstOrDefault();
+                if (u == null)
+                {
+                    List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+                    CTLModels.EmployeeModel employee = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+                    u = new UserModel()
+                    {
+                        emp_id = employee.emp_id,
+                        name = employee.name_en,
+                        role = "User",
+                        department = employee.department,
+                        user_id = ConvertUserID(employee.name_en)
+                    };
+                }
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);

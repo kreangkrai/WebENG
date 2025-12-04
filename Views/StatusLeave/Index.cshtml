@@ -1013,7 +1013,7 @@
 
             let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             let description = leave_.description;
-            let emp_id = $('#hidden_emp_id').val();
+            let emp_id = $('#emp_id').val();
             let leave;
             let year = new Date(request_date).getFullYear();
             const result = await GetLeaveByID(leave_type_id, emp_id, year)
@@ -1695,7 +1695,7 @@
 
 
         async function GetLeaveType() {
-            let emp_id = $('#hidden_emp_id').val();
+            let emp_id = $('#emp_id').val();
             let now = new Date();
             let year = now.getFullYear();
             await $.ajax({
@@ -1751,7 +1751,7 @@
         $('#confirm_ok').on('click', async function () {
             $('#confirm_ok').attr('disabled', true);
             $('#SpinModal').modal();
-            let emp_id = $('#hidden_emp_id').val();
+            let emp_id = $('#emp_id').val();
             let leave_type_id = $('#select_leave_type').val();
             let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             let leave_type_code = leave.leave_type_code;
@@ -2452,7 +2452,7 @@
                 resetButtonStyles();
 
                 let request_date = today.toISOString().split('T')[0];
-                let emp_id = $('#hidden_emp_id').val();
+                let emp_id = $('#emp_id').val();
 
 
                 const result = await GetLeaveByID(leave_type_id, emp_id, new Date().getFullYear());
