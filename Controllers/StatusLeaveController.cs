@@ -31,6 +31,7 @@ namespace WebENG.Controllers
         private readonly IHostingEnvironment env;
         private IMail Mail;
         private INotification Notification;
+
         public StatusLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
@@ -74,13 +75,6 @@ namespace WebENG.Controllers
                 List<LevelModel> levels = Level.GetLevelByEmpID(u.emp_id);
                 ViewBag.levels = levels;
                 ViewBag.emp = u.emp_id;
-
-                List<string> to = new List<string>()
-                {
-                    "kriangkrai@contrologic.co.th","sarit_t@contrologic.co.th"
-                };
-                string m = Mail.SendCreate("kriangkrai", to, "XXXX");
-
 
                 return View(u);
             }
@@ -145,12 +139,29 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetEmployee(string start, string stop)
         {
+            string user = HttpContext.Session.GetString("userId");
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
+            List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
+            int max_level = levels.Where(w=>w.emp_id== emp_id).Max(m => m.level);
+            List<string> departments = new List<string>();
+            if (max_level != 3)
+            {
+                departments = levels.Where(w=>w.emp_id == emp_id && w.level == max_level).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+            }            
+            else if (max_level == 3)
+            {
+                departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+            }
+
+
+            departments = departments.OrderBy(o => o).ToList();
+
             List<RequestModel> requests = Requests.GetRequestByDurationDay(start,stop);
             List<string> emps = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
 
-            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+
             employees = employees.Where(w => emps.Contains(w.emp_id)).OrderBy(o => o.name_en).ToList();
-            List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
             var data = new { employees = employees, departments = departments };
             return Json(data);
         }
@@ -384,11 +395,15 @@ namespace WebENG.Controllers
             int current_level = level.Min(m => m.level);
             List<LevelModel> next_level = level.Where(w => w.level == current_level + 1).ToList();
 
+            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            string leave_type_th = leaveType.leave_name_th;
+
+            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+
             // Check Two Step Approve
             bool is_full_day = request.is_full_day;
             if (is_full_day)
-            {
-                LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            {               
                 decimal over_consecutive_days_for_two_step = leaveType.over_consecutive_days_for_two_step;
                 double diff_day = request.amount_leave_day;
                 if (diff_day >= (double)over_consecutive_days_for_two_step)
@@ -468,6 +483,8 @@ namespace WebENG.Controllers
                             requestLogService.Insert(requestLog_);
 
                             tran.Commit();
+
+
                             message = "Success";
                         }
                         catch (Exception ex)
@@ -517,7 +534,7 @@ namespace WebENG.Controllers
                         {
                             emp_id = next_level[i].emp_id,
                             notification_date = DateTime.Now,
-                            notification_description = "แแก้ไขใบลา",
+                            notification_description = "แก้ไขใบลา",
                             notification_path = "Management",
                             notification_type = "Leave",
                             notification_issue = "ใบลารอการอนุมัติ",
@@ -527,6 +544,31 @@ namespace WebENG.Controllers
                         Notification.Insert(notification);
                     }
 
+                    // Send Mail
+                    List<string> email_approvers = next_level.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
+                    string status = "แก้ไขใบลา";
+                    string name = emps.Where(w => w.emp_id == request.emp_id).Select(s => s.name_th).FirstOrDefault();
+                    string leave_type = leave_type_th;
+                    string leave_date = "";
+                    string leave_time = "";
+                    if (request.is_full_day)
+                    {
+                        if (request.amount_leave_day > 1)
+                        {
+                            leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                        }
+                        else
+                        {
+                            leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                        }
+                        leave_time = "08:30-17:30";
+                    }
+                    else
+                    {
+                        leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                        leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                    }
+                    Mail.Requester(email_approvers, status, name, leave_type, leave_date, leave_time);
 
 
                     ////Insert Leave Working Hours

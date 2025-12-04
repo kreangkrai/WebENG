@@ -1,0 +1,32 @@
+﻿<div class="modal fade" id="SpinModal" tabindex="-1" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-body text-center py-5">
+                <div class="lds-dual-ring"></div>
+                <div class="mt-4">
+                    <h5 class="mb-1">ระบบกำลังดำเนินการ</h5>
+                    <small class="text-muted">กรุณารอสักครู่</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .lds-dual-ring {
+        display: inline-block;
+        width: 64px;
+        height: 64px;
+    }
+    .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        border: 5px solid #4e73df;
+        border-color: #4e73df transparent #4e73df transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+    }
+
+</style>

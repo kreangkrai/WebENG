@@ -42,6 +42,7 @@ namespace WebENG.Controllers
         private IRequestLog RequestLog;
         private readonly IHostingEnvironment env;
         private INotification Notification;
+        private IMail Mail;
         public ManagementLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
@@ -51,6 +52,7 @@ namespace WebENG.Controllers
             LeaveType = new LeaveTypeService();
             RequestLog = new RequestLogService();
             Notification = new NotificationService();
+            Mail = new MailService();
             env = _env;
         }
         public IActionResult Index()
@@ -156,7 +158,7 @@ namespace WebENG.Controllers
                     }
                     else
                     {
-                        if (requests_pending[i].level_step == 0)
+                        if (requests_pending[i].level_step < 3 )
                         {
                             bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
                             if (chk_level)
@@ -328,6 +330,9 @@ namespace WebENG.Controllers
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
             LevelModel current_level = level.Where(w=>w.emp_id == request.emp_id).FirstOrDefault();
 
+            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            string leave_type_th = leaveType.leave_name_th;
+
             string new_status = "Rejected";
             int rejected_level = 0;
             if (request.level_step == 0) // Operation Only
@@ -440,6 +445,31 @@ namespace WebENG.Controllers
 
                         Notification.Insert(notification);
 
+                        // Send Mail
+                        string email_request = employees.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string name_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
+                        string status = "ใบลาถูกปฏิเสธ";
+                        string leave_type = leave_type_th;
+                        string leave_date = "";
+                        string leave_time = "";
+                        if (request.is_full_day)
+                        {
+                            if (request.amount_leave_day > 1)
+                            {
+                                leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                            }
+                            else
+                            {
+                                leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            }
+                            leave_time = "08:30-17:30";
+                        }
+                        else
+                        {
+                            leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                        }
+                        Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
 
 
                         return Json("Success");
@@ -468,6 +498,9 @@ namespace WebENG.Controllers
 
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
             LevelModel current_level = level.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+
+            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            string leave_type_th = leaveType.leave_name_th;
 
             string new_status = "Returned";
             int returned_level = 0;
@@ -582,6 +615,32 @@ namespace WebENG.Controllers
 
                         Notification.Insert(notification);
 
+                        // Send Mail
+                        string email_request = employees.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string name_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
+                        string status = "ใบลาถูกส่งกลับแก้ไข";
+                        string leave_type = leave_type_th;
+                        string leave_date = "";
+                        string leave_time = "";
+                        if (request.is_full_day)
+                        {
+                            if (request.amount_leave_day > 1)
+                            {
+                                leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                            }
+                            else
+                            {
+                                leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            }
+                            leave_time = "08:30-17:30";
+                        }
+                        else
+                        {
+                            leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                        }
+                        Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
+
                         return Json("Success");
 
                     }
@@ -624,6 +683,10 @@ namespace WebENG.Controllers
 
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
             LevelModel current_level = level.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+
+            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            string leave_type_th = leaveType.leave_name_th;
+            List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
 
             if (level_step == 0) // Operation Only
             {
@@ -745,6 +808,33 @@ namespace WebENG.Controllers
                         };
 
                         Notification.Insert(notification);
+
+                        // Send Mail
+                        string email_request = emps.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string name_approver = emps.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
+                        string status = "ใบลาถูกอนุมัติ";
+                        string leave_type = leave_type_th;
+                        string leave_date = "";
+                        string leave_time = "";
+                        if (request.is_full_day)
+                        {
+                            if (request.amount_leave_day > 1)
+                            {
+                                leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                            }
+                            else
+                            {
+                                leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            }
+                            leave_time = "08:30-17:30";
+                        }
+                        else
+                        {
+                            leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                        }
+                        Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
+
                         message = "Success";
                     }
                     catch (Exception ex)

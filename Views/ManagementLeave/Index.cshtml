@@ -1103,13 +1103,13 @@
                 let class_path_file = `<td></td>`;
                 let class_check = `<td></td>`;
                 if (row.attachment_required) {
-                    if (row.is_full_day) {
+                    if (row.is_full_day) { /*hidden*/
                         if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
                             if (row.path_file === "" || row.path_file === null) {
                                 class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
                                 class_check = `<td>
                             <div class="form-check form-check-inline mb-1">
-                                <input class="form-check-input approve-checkbox" type="checkbox" hidden>
+                                <input class="form-check-input approve-checkbox" type="checkbox">
                                 <label class="form-check-label"></label>
                             </div>
                         </td>`;
@@ -1134,11 +1134,11 @@
                     } else {
 
                         if (parseFloat(row.amount_leave_hour) / 8.0 >= parseFloat(row.attachment_threshold_days)) {
-                            if (row.path_file === "" || row.path_file === null) {
+                            if (row.path_file === "" || row.path_file === null) {/*hidden*/
                                 class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
                                 class_check = `<td>
                             <div class="form-check form-check-inline mb-1">
-                                <input class="form-check-input approve-checkbox" type="checkbox" hidden>
+                                <input class="form-check-input approve-checkbox" type="checkbox" > 
                                 <label class="form-check-label"></label>
                             </div>
                         </td>`;
@@ -1267,7 +1267,7 @@
 
                     } else {
                         $('#div_fileList').attr('hidden', true);
-                        $('#btn_approve_leave').attr('disabled', false);
+                        //$('#btn_approve_leave').attr('disabled', false);
                     }
 
                     // Request Title
@@ -1760,6 +1760,8 @@
         });
 
         $('#confirm_approve').on('click', async function () {
+            $('#confirm_approve').attr('disabled', true);
+            $('#SpinModal').modal();
             let comment = $('#leave_reason').val().trim();
             let request_id = $('#modal_request_id').text();
 
@@ -1778,9 +1780,13 @@
                     }
                 }
             });
+            $('#SpinModal').modal('hide');
+            $('#confirm_approve').attr('disabled', false);
         });
 
         $('#confirm_resubmit').on('click', async function () {
+            $('#confirm_resubmit').attr('disabled', true);
+            $('#SpinModal').modal();
             let comment = $('#leave_reason').val().trim();
             let request_id = $('#modal_request_id').text();
 
@@ -1799,8 +1805,13 @@
                     }
                 }
             });
+            $('#SpinModal').modal('hide');
+            $('#confirm_resubmit').attr('disabled', false);
         });
+
         $('#confirm_reject').on('click', async function () {
+            $('#confirm_reject').attr('disabled', true);
+            $('#SpinModal').modal();
             let comment = $('#leave_reason').val().trim();
             let request_id = $('#modal_request_id').text();
 
@@ -1819,9 +1830,13 @@
                     }
                 }
             });
+            $('#SpinModal').modal('hide');
+            $('#confirm_reject').attr('disabled', false);
         });
 
         $('#confirm_approves').on('click', async function () {
+            $('#confirm_approves').attr('disabled', true);
+            $('#SpinModal').modal();
             const selected = getSelectedRows();
             let selects = selected.map(m => m.request_id);
             await $.ajax({
@@ -1839,6 +1854,8 @@
                     }
                 }
             });
+            $('#SpinModal').modal('hide');
+            $('#confirm_approves').attr('disabled', false);
         });
 
         $(document).on('change', '#table_approve tbody .approve-checkbox', function () {
@@ -1980,11 +1997,11 @@
 
                     const item = createFileItem(file.filename, fileType, file.path);
                     container.appendChild(item);
-                    $('#btn_approve_leave').attr('disabled', false);
+                    //$('#btn_approve_leave').attr('disabled', false);
                 });
             } else {
                 container.appendChild(createTextMessage("ไม่มีเอกสาร", "text-danger"));
-                $('#btn_approve_leave').attr('disabled', true);
+                //$('#btn_approve_leave').attr('disabled', true);
             }
         }
 

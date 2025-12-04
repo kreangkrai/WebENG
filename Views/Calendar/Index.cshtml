@@ -560,7 +560,7 @@
                     <div id="div_leave" hidden>
                         <div class="row">
                             <div div class="col-8">
-                                <label class="kanit-bold">สิทธิ์การลา</label>
+                                <label class="kanit-bold">สิทธิ์การลาคงเหลือ</label>
                             </div>
                             <div div class="col-4 d-flex justify-content-end">
                                 <span id="leave_balance" class="kanit-light"></span>
@@ -778,6 +778,7 @@
         </div>
     </div>
 </div>
+<partial name="ModalSpin" />
 @section Scripts
 {
     <script type="text/javascript">
@@ -2839,6 +2840,8 @@
         });
 
         $('#confirm_ok').on('click', async function () {
+            $('#confirm_ok').attr('disabled', true);
+            $('#SpinModal').modal();
             let emp_id = '@Html.Raw(Model.emp_id)';
             let leave_type_id = $('#select_leave_type').val();
             let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
@@ -2857,7 +2860,7 @@
                 start_request_time = hour + ":" + minute;
                 end_request_time = $('#leave_stop_time').val();
             }
-            //if (!file_require || (file_require && tempFileIds.length > 0 && tempFileIds !== null)) {
+
             let str = JSON.stringify({
                 "emp_id": emp_id,
                 "leave_type_id": leave_type_id,
@@ -2892,9 +2895,9 @@
                     }
                 }
             });
-            //} else {
-            //    alert('กรุณาแนบไฟล์');
-            //}
+
+            $('#SpinModal').modal('hide');
+            $('#confirm_ok').attr('disabled', false);
         });
         function formatDate(date) {
             const daysThai = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];

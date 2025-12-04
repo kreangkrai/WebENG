@@ -46,6 +46,7 @@ namespace WebENG.Controllers
         private IWorkingHours WorkingHoursService;
         readonly CTLInterfaces.IHoliday Holiday;
         private ILevel Level;
+        private IMail Mail;
         private readonly IHostingEnvironment env;
 
         public LeaveController(IHostingEnvironment _env)
@@ -60,6 +61,7 @@ namespace WebENG.Controllers
             WorkingHoursService = new WorkingHoursService();
             Holiday = new CTLServices.HolidayService();
             Level = new LevelService();
+            Mail = new MailService();
             env = _env;
 
         }
@@ -197,6 +199,10 @@ namespace WebENG.Controllers
             request.comment = "";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
 
+            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+            string leave_type_th = leaveType.leave_name_th;
+            List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
+
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
             int current_level = level.Min(m => m.level);
             List<LevelModel> next_level = level.Where(w => w.level == current_level + 1).ToList();
@@ -205,7 +211,7 @@ namespace WebENG.Controllers
             bool is_full_day = request.is_full_day;
             if (is_full_day)
             {
-                LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+                
                 decimal over_consecutive_days_for_two_step = leaveType.over_consecutive_days_for_two_step;
                 double diff_day = request.amount_leave_day;
                 if (diff_day >= (double)over_consecutive_days_for_two_step)
@@ -319,54 +325,80 @@ namespace WebENG.Controllers
                         Notification.Insert(notification);
                     }
 
+                    // Send Mail
+                    List<string> email_approvers = next_level.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
+                    string status = "สร้างใบลา";
+                    string name = emps.Where(w=>w.emp_id == request.emp_id).Select(s=>s.name_th).FirstOrDefault();
+                    string leave_type = leave_type_th;
+                    string leave_date = "";
+                    string leave_time = "";
+                    if (request.is_full_day)
+                    {
+                        if (request.amount_leave_day > 1)
+                        {
+                            leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                        }
+                        else
+                        {
+                            leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                        }
+                        leave_time = "08:30-17:30";
+                    }
+                    else
+                    {
+                        leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                        leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                    }
+                    Mail.Requester(email_approvers, status, name, leave_type, leave_date, leave_time);
 
-                    ////Insert Leave Working Hours
-                    //List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
-                    //List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
-                    //List<UserModel> users = Accessory.getAllUser();
-                    //for(DateTime date = request.start_request_date; date <= request.end_request_date; date = date.AddDays(1))
-                    //{
-                    //    if (holidays.Any(a => a.date.Date != date.Date) && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
-                    //    {
-                    //        if (request.is_full_day)
-                    //        {
-                    //            WorkingHoursModel wh = new WorkingHoursModel()
-                    //            {
-                    //                user_id = users.Where(w=>w.emp_id == request.emp_id).Select(s=>s.user_id).FirstOrDefault(),
-                    //                working_date = date.Date,
-                    //                job_id = "J999999",
-                    //                task_id = "T002",
-                    //                start_time = new TimeSpan(8, 30, 0),
-                    //                stop_time = new TimeSpan(17, 30, 0),
-                    //                lunch_full = false,
-                    //                lunch_half = false,
-                    //                dinner_full = false,
-                    //                dinner_half = false,
-                    //                note = "",
-                    //            };
-                    //            whs.Add(wh);
-                    //        }
-                    //        else
-                    //        {
-                    //            WorkingHoursModel wh = new WorkingHoursModel()
-                    //            {
-                    //                user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
-                    //                working_date = date.Date,
-                    //                job_id = "J999999",
-                    //                task_id = "T002",
-                    //                start_time = request.start_request_time,
-                    //                stop_time = request.end_request_time,
-                    //                lunch_full = false,
-                    //                lunch_half = false,
-                    //                dinner_full = false,
-                    //                dinner_half = false,
-                    //                note = "",
-                    //            };
-                    //            whs.Add(wh);
-                    //        }
-                    //    }
-                    //}
-                    //message = AddWorkingHours(whs);
+
+                    //Insert Leave Working Hours
+                    List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
+                    List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+                    List<UserModel> users = Accessory.getAllUser();
+                    for (DateTime date = request.start_request_date; date <= request.end_request_date; date = date.AddDays(1))
+                    {
+                        if (holidays.Any(a => a.date.Date != date.Date) && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                        {
+                            if (request.is_full_day)
+                            {
+                                WorkingHoursModel wh = new WorkingHoursModel()
+                                {
+                                    user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                                    working_date = date.Date,
+                                    job_id = "J999999",
+                                    task_id = "T002",
+                                    start_time = new TimeSpan(8, 30, 0),
+                                    stop_time = new TimeSpan(17, 30, 0),
+                                    lunch_full = false,
+                                    lunch_half = false,
+                                    dinner_full = false,
+                                    dinner_half = false,
+                                    note = "",
+                                };
+                                whs.Add(wh);
+                            }
+                            else
+                            {
+                                WorkingHoursModel wh = new WorkingHoursModel()
+                                {
+                                    user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                                    working_date = date.Date,
+                                    job_id = "J999999",
+                                    task_id = "T002",
+                                    start_time = request.start_request_time,
+                                    stop_time = request.end_request_time,
+                                    lunch_full = false,
+                                    lunch_half = false,
+                                    dinner_full = false,
+                                    dinner_half = false,
+                                    note = "",
+                                };
+                                whs.Add(wh);
+                            }
+                        }
+                    }
+                    message = AddWorkingHours(whs);
                 }
                 return Json(message);
             }
