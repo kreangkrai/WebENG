@@ -50,6 +50,8 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
 
+                List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(DateTime.Now.Year.ToString());
+                ViewBag.holiday = holidays;
 
                 return View(u);
             }
@@ -193,9 +195,7 @@ namespace WebENG.Controllers
                     var key = $"{emp.emp_id}|{day:yyyy-MM-dd}";
                     return leaveCoverage.TryGetValue(key, out var leave) ? leave : null;
                 }).ToArray()
-            }).ToArray();
-
-            //List<HolidayModel> holidays = Holiday.GetHolidays();
+            }).ToArray();            
             return Json(result);
         }
 

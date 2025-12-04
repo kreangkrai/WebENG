@@ -1,13 +1,14 @@
 ﻿@model WebENG.Models.UserModel;
 @{
     ViewData["Title"] = "Leave Summary";
+    List<WebENG.CTLModels.HolidayModel> holidays = ViewBag.holiday;
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
 <style>
 
     .today-highlight {
-        background: linear-gradient(135deg, #fff59d, #fff176) !important;
+        background: linear-gradient(135deg, #90A4AE, #90A4AE) !important;
         font-weight: bold;
         position: relative;
     }
@@ -25,12 +26,12 @@
         }
 
     .weekend-holiday {
-        background-color: #ffebee !important;
+        background-color: #e8a0b0 !important;
         color: #c62828;
     }
 
     .public-holiday {
-        background-color: #fff3e0 !important;
+        background-color: #e8a090 !important;
         color: #ef6c00;
         position: relative;
     }
@@ -704,6 +705,9 @@
         var table;
         let departments = [];
         let selectMonth = true;
+
+        const holidays = @Html.Raw(Json.Serialize(holidays));
+
         $(document).ready(async function () {
             await GetDepartments();
             const now = new Date();
@@ -1149,7 +1153,7 @@
                             const currentDay = colIndex;
                             const currentDate = new Date(start);
                             currentDate.setDate(currentDate.getDate() + (currentDay - 1));
-
+              
                             const dayOfWeek = currentDate.getDay();
                             const dateStr = currentDate.toISOString().split('T')[0];
 
@@ -1159,13 +1163,16 @@
                                 $(this).addClass('today-highlight');
                             }
 
+                            const is_holiday = holidays.filter(f => f.date.split('T')[0].includes(dateStr));
+
                             if (dayOfWeek === 0 || dayOfWeek === 6) {
                                 $(this).addClass('weekend-holiday');
                             }
 
-                            else if (typeof holidayDates !== 'undefined' && holidayDates.includes(dateStr)) {
+                            else if (is_holiday.length > 0) {
                                 $(this).addClass('public-holiday');
                             }
+
                         });
                     }
                 },
