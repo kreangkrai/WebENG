@@ -6,6 +6,46 @@
 
 <style>
 
+    .today-highlight {
+        background: linear-gradient(135deg, #fff59d, #fff176) !important;
+        font-weight: bold;
+        position: relative;
+    }
+
+        .today-highlight::after {
+            content: "วันนี้";
+            font-size: 9px;
+            background: #f57f17;
+            color: white;
+            padding: 1px 4px;
+            border-radius: 3px;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+        }
+
+    .weekend-holiday {
+        background-color: #ffebee !important;
+        color: #c62828;
+    }
+
+    .public-holiday {
+        background-color: #fff3e0 !important;
+        color: #ef6c00;
+        position: relative;
+    }
+
+        .public-holiday::after {
+            content: "หยุด";
+            font-size: 9px;
+            background: #ef6c00;
+            color: white;
+            padding: 1px 4px;
+            border-radius: 3px;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+        }
     .custom-control-input:not(:checked) ~ .custom-control-label::before {
         background-color: lightgray;
         border-color: lightgray;
@@ -921,6 +961,7 @@
                     }
                 });
         }
+
         function GenerateSummaryLeave(requests) {
             let amount_emp = requests.reduce((accumulator, currentValue) => accumulator + currentValue.amount_emp, 0);
             var html = `<div class="col-xl-2 col-md-2 col-sm-6">
@@ -1103,8 +1144,27 @@
                 rowCallback: function (row, data, index) {
                     if (is_this_month) {
                         $('td', row).each(function (colIndex) {
-                            if (colIndex === index_today) {
-                                $('td:eq(' + index_today + ')', row).addClass('leave-info');
+                            if (colIndex === 0) return;
+
+                            const currentDay = colIndex;
+                            const currentDate = new Date(start);
+                            currentDate.setDate(currentDate.getDate() + (currentDay - 1));
+
+                            const dayOfWeek = currentDate.getDay();
+                            const dateStr = currentDate.toISOString().split('T')[0];
+
+                            $(this).removeClass('today-highlight weekend-holiday public-holiday');
+
+                            if (index_today === colIndex) {
+                                $(this).addClass('today-highlight');
+                            }
+
+                            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                                $(this).addClass('weekend-holiday');
+                            }
+
+                            else if (typeof holidayDates !== 'undefined' && holidayDates.includes(dateStr)) {
+                                $(this).addClass('public-holiday');
                             }
                         });
                     }

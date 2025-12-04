@@ -22,12 +22,14 @@ namespace WebENG.Controllers
         readonly IEmployee Employee;
         readonly IRequest Requests;
         readonly ILeaveType LeaveType;
+        readonly CTLInterfaces.IHoliday Holiday;
         public SummaryLeaveController()
         {
             Accessory = new AccessoryService();
             Employee = new EmployeeService();
             Requests = new RequestService();
             LeaveType = new LeaveTypeService();
+            Holiday = new CTLServices.HolidayService();
         }
         public IActionResult Index()
         {
@@ -193,6 +195,7 @@ namespace WebENG.Controllers
                 }).ToArray()
             }).ToArray();
 
+            //List<HolidayModel> holidays = Holiday.GetHolidays();
             return Json(result);
         }
 
