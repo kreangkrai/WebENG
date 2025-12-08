@@ -4,13 +4,10 @@
     List<int> years = ViewBag.listYears;
     List<LevelModel> levels = ViewBag.levels;
     ViewData["Title"] = "Leave Status";
-    LevelModel operation_only = new LevelModel();
-    if (levels.Count == 1)
-    {
-        operation_only = levels.Where(w => w.level == 0).FirstOrDefault();
-    }
 
     string emp_id = ViewBag.emp;
+
+    string role = ViewBag.role;
 }
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
@@ -523,7 +520,7 @@
                             <input type="hidden" id="hidden_emp_id" value="@Model.emp_id" />
                         </div>
                     </div>
-                    @if (levels.Any(a => a.level > 0))
+                    @if (levels.Where(w=>w.emp_id == emp_id).Any(a => a.level > 0) || role == "Admin" || role == "Admin Leave")
                     {
                         <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
                             <div class="card-header text-white" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); padding: 12px 15px;">
@@ -1007,92 +1004,92 @@
             }
         }
 
-        $('#select_leave_type').on('change', async function () {
-            let leave_type_id = $('#select_leave_type').val();
-            let request_date = today.toISOString();
+        //$('#select_leave_type').on('change', async function () {
+        //    let leave_type_id = $('#select_leave_type').val();
+        //    let request_date = today.toISOString();
 
-            let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
-            let description = leave_.description;
-            let emp_id = $('#emp_id').val();
-            let leave;
-            let year = new Date(request_date).getFullYear();
-            const result = await GetLeaveByID(leave_type_id, emp_id, year)
+        //    let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+        //    let description = leave_.description;
+        //    let emp_id = $('#emp_id').val();
+        //    let leave;
+        //    let year = new Date(request_date).getFullYear();
+        //    const result = await GetLeaveByID(leave_type_id, emp_id, year)
 
-            let hire_date = new Date();
-            $('#leave_stop_date').val(request_date);
-            $('#amount_leave').val(1);
+        //    let hire_date = new Date();
+        //    $('#leave_stop_date').val(request_date);
+        //    $('#amount_leave').val(1);
 
-            leave = result.leave;
-            balance_leave = result.balance_leave;
-            gender = result.gender;
-            hire_date = result.hire_date;
+        //    leave = result.leave;
+        //    balance_leave = result.balance_leave;
+        //    gender = result.gender;
+        //    hire_date = result.hire_date;
 
-            //Check Request Timing
-            let chk_request_timing = CheckRequestTiming(request_date);
+        //    //Check Request Timing
+        //    let chk_request_timing = CheckRequestTiming(request_date);
 
-            let amount_diff_day = diffDays(new Date(), hire_date);
-            if (amount_diff_day > leave.length_start_date) {
-                if (chk_request_timing) {
-                    //Check Gender Restriction
-                    let chk_gender_restriction = CheckGenderRestriction(gender);
-                    if (chk_gender_restriction) {
+        //    let amount_diff_day = diffDays(new Date(), hire_date);
+        //    if (amount_diff_day > leave.length_start_date) {
+        //        if (chk_request_timing) {
+        //            //Check Gender Restriction
+        //            let chk_gender_restriction = CheckGenderRestriction(gender);
+        //            if (chk_gender_restriction) {
 
-                        //After Change Select Type
-                        if (tigger_select) {
-                            $('#leave_description').text(description);
-                            $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
-                            $('#div_leave').prop('hidden', false);
-                            $('#div_main_leave').css('height', '500px');
-                            $('#div_main_leave').css('overflow-y', 'auto');
-                            $('#btn_leave_send').prop('disabled', false);
+        //                //After Change Select Type
+        //                if (tigger_select) {
+        //                    $('#leave_description').text(description);
+        //                    $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
+        //                    $('#div_leave').prop('hidden', false);
+        //                    $('#div_main_leave').css('height', '500px');
+        //                    $('#div_main_leave').css('overflow-y', 'auto');
+        //                    $('#btn_leave_send').prop('disabled', false);
 
-                            //Reset Full day Click
-                            resetButtonStyles();
-                            leaveFullBtn.classList.add('active');
-                            toggleGroupDisplay(dateGroup, true);
-                            toggleGroupDisplay(timeGroup, false);
-                            //daysInput.disabled = false;
-                            daysInput.value = 1;
-                            stopDateInput.value = startDateInput.value;
-                            stopDateInput.disabled = false;
+        //                    //Reset Full day Click
+        //                    resetButtonStyles();
+        //                    leaveFullBtn.classList.add('active');
+        //                    toggleGroupDisplay(dateGroup, true);
+        //                    toggleGroupDisplay(timeGroup, false);
+        //                    //daysInput.disabled = false;
+        //                    daysInput.value = 1;
+        //                    stopDateInput.value = startDateInput.value;
+        //                    stopDateInput.disabled = false;
 
-                            //Check attachment_required
-                            type_duration = "Day";
-                            CheckAttachFileRequire(type_duration);
+        //                    //Check attachment_required
+        //                    type_duration = "Day";
+        //                    CheckAttachFileRequire(type_duration);
 
-                            $('#leave_full').prop('disabled', false);
-                            $('#leave_half').prop('disabled', false);
-                            $('#leave_hours').prop('disabled', false);
-                            $('#leave_stop_date').prop('disabled', false);
-                        }
+        //                    $('#leave_full').prop('disabled', false);
+        //                    $('#leave_half').prop('disabled', false);
+        //                    $('#leave_hours').prop('disabled', false);
+        //                    $('#leave_stop_date').prop('disabled', false);
+        //                }
 
-                    } else {
-                        alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
-                        $('#btn_leave_send').prop('disabled', true);
-                        $('#leave_full').prop('disabled', true);
-                        $('#leave_half').prop('disabled', true);
-                        $('#leave_hours').prop('disabled', true);
-                        $('#leave_stop_date').prop('disabled', true);
-                    }
-                } else {
-                    alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
-                    $('#btn_leave_send').prop('disabled', true);
-                    $('#leave_full').prop('disabled', true);
-                    $('#leave_half').prop('disabled', true);
-                    $('#leave_hours').prop('disabled', true);
-                    $('#leave_stop_date').prop('disabled', true);
-                }
-            } else {
-                alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
-                $('#btn_leave_send').prop('disabled', true);
-                $('#leave_full').prop('disabled', true);
-                $('#leave_half').prop('disabled', true);
-                $('#leave_hours').prop('disabled', true);
-                $('#leave_stop_date').prop('disabled', true);
-            }
-            is_full_day = true;
-            tigger_select = true;
-        });
+        //            } else {
+        //                alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
+        //                $('#btn_leave_send').prop('disabled', true);
+        //                $('#leave_full').prop('disabled', true);
+        //                $('#leave_half').prop('disabled', true);
+        //                $('#leave_hours').prop('disabled', true);
+        //                $('#leave_stop_date').prop('disabled', true);
+        //            }
+        //        } else {
+        //            alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
+        //            $('#btn_leave_send').prop('disabled', true);
+        //            $('#leave_full').prop('disabled', true);
+        //            $('#leave_half').prop('disabled', true);
+        //            $('#leave_hours').prop('disabled', true);
+        //            $('#leave_stop_date').prop('disabled', true);
+        //        }
+        //    } else {
+        //        alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
+        //        $('#btn_leave_send').prop('disabled', true);
+        //        $('#leave_full').prop('disabled', true);
+        //        $('#leave_half').prop('disabled', true);
+        //        $('#leave_hours').prop('disabled', true);
+        //        $('#leave_stop_date').prop('disabled', true);
+        //    }
+        //    is_full_day = true;
+        //    tigger_select = true;
+        //});
 
         function diffDays(date1, date2) {
             const d1 = new Date(date1);
@@ -1880,20 +1877,9 @@
             initSearchEvents();
             loadInitialLeaveHistory();
 
-            // Check Operation Only
-            let operation_only = @Html.Raw(Json.Serialize(operation_only));
-            if (operation_only.emp_id !== null) {
-                const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
-                if (emp !== undefined) {
-                    selectEmployee(emp);
-                }
-            } else {
-                let year = new Date(start).getFullYear();
-                let emp_id = $('#hidden_emp_id').val();
-                await GetLeaveUsed(emp_id, year);
-                await GetEmployee(start, today);
-            }
-
+            const emp_id = '@Html.Raw(emp_id)';
+            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
+            selectEmployee(emp);
         });
 
         async function GetEmployee(start,stop) {
@@ -1971,7 +1957,7 @@
             $select.empty().append(`<option value="ALL" selected disabled>ทุกคน</option>`);
             employeesList.forEach(emp => {
                 $select.append(`<option value="${emp.emp_id}">${emp.emp_id} : ${emp.name_en}</option>`);
-            });
+            });            
         }
 
         function GenerateUsedLeave(emp_th, useds) {
@@ -1992,25 +1978,19 @@
         }
 
         $('#date_stop').on('change', async function () {
+            //const role = '@Html.Raw(role)';
             $('#emp_th_used_leave').text("");
             $('#div_leaves_used').empty();
             $('#employeeInfo').hide();
             clearLeaveHistory();
 
-            let operation_only = @Html.Raw(Json.Serialize(operation_only));
             let start = $('#date_start').val();
-            let stop = $('#date_stop').val();
+            //let stop = $('#date_stop').val();
             let year = new Date(start).getFullYear();
-            if (operation_only.emp_id !== null) {
-                const emp = employees.filter(f => f.emp_id === operation_only.emp_id).map(m => m)[0];
-                if (emp !== undefined) {
-                    selectEmployee(emp);
-                }
-            } else {
-                let emp_id = $('#hidden_emp_id').val();
-                await GetLeaveUsed(emp_id, year);
-                await GetEmployee(start, stop);
-            }
+            const emp_id = '@Html.Raw(emp_id)';
+            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
+
+            selectEmployee(emp);
 
             $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
         });
@@ -2281,65 +2261,6 @@
             });
         };
 
-        //function renderLeaveHistoryOLD() {
-        //    const $tbody = $('#table_leave tbody').empty();
-        //    requestHistory.forEach((row, index) => {
-        //        let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${new Date(row.request_date).toLocaleDateString('en-GB')}`;
-        //        let start_request_date = "";
-        //        if (row.is_full_day) {
-        //            if (row.amount_leave_day > 1) {
-        //                start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('en-GB')} - ${GetDayOfWeekName(new Date(row.end_request_date))} ${new Date(row.end_request_date).toLocaleDateString('en-GB')}`;
-        //            } else {
-        //                start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
-        //            }
-        //        } else {
-        //            start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${new Date(row.start_request_date).toLocaleDateString('en-GB')}`;
-        //        }
-
-        //        let duration = 0;
-        //        let start_request_time = "08:30";
-        //        let end_request_time = "17:30";
-        //        if (row.is_full_day) {
-        //            duration = row.amount_leave_day;
-        //        } else {
-        //            let start = timeToMinutes(row.start_request_time);
-        //            let end = timeToMinutes(row.end_request_time);
-        //            let diff = end - start;
-        //            duration = (diff / 480).toFixed(2);
-        //            if (duration > 0.3 && duration < 0.6) {
-        //                duration = 0.50;
-        //            }
-
-        //            start_request_time = row.start_request_time.split('.')[1].substring(0,5);
-        //            end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
-        //        }
-        //        let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
-        //        const tr = $(`
-        //            <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
-        //                data-toggle="modal" data-target="#modal_edit_leave"
-        //                data-leave_type_id="${row.leave_type_id}"
-        //                data-request_id="${row.request_id}" data-emp-id="${row.emp_id}"
-        //                data-request-date="${request_date}" data-start_request_date="${row.start_request_date}"
-        //                data-end_request_date="${row.end_request_date}"
-        //                data-time="${row.start_request_time}" data-duration="${duration}"
-        //                data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
-        //                <td class="freeze-left-1">${index + 1}</td>
-        //                <td class="freeze-left-2">${row.emp_id}</td>
-        //                <td class="freeze-left-3">${selectedEmployee ? (selectedEmployee.name_en) : '-'}</td>
-        //                <td>${request_date}</td>
-        //                <td>${start_request_date}</td>
-        //                <td>${start_request_time}-${end_request_time}</td>
-        //                <td>${duration}</td>
-        //                <td>${row.leave_name_th}</td>
-        //                <td>${row.description}</td>
-        //                <td><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
-        //            </tr>
-        //        `);
-
-        //        $tbody.append(tr);
-        //    });
-        //}
-
         $(document).on('click', '.clickable-row',async function () {
             const data = $(this).data();
 
@@ -2447,80 +2368,88 @@
 
         async function handleLeaveTypeChange(leave_type_id) {
             try {
-                $('#div_leave').prop('hidden', true);
-                $('#btn_leave_send').prop('disabled', true);
-                resetButtonStyles();
+                let leave_type_id = $('#select_leave_type').val();
+                let request_date = today.toISOString();
 
-                let request_date = today.toISOString().split('T')[0];
-                let emp_id = $('#emp_id').val();
-
-
-                const result = await GetLeaveByID(leave_type_id, emp_id, new Date().getFullYear());
-
-                if (!result || !result.hire_date || !result.leave) {
-                    alert(result?.message || 'ไม่สามารถดึงข้อมูลการลาได้');
-                    return;
-                }
-
-                let leave_ = leaves.find(f => f.leave_type_id === leave_type_id);
-                if (!leave_) {
-                    alert('ไม่พบข้อมูลประเภทการลานี้');
-                    return;
-                }
-
+                let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
                 let description = leave_.description;
-                let hire_date = new Date(result.hire_date);
-                let balance_leave = result.balance_leave;
-                let leave = result.leave;
+                let emp_id = $('#emp_id').val();
+                let leave;
+                let year = new Date(request_date).getFullYear();
+                const result = await GetLeaveByID(leave_type_id, emp_id, year)
 
-
-                let chk_request_timing = CheckRequestTiming(request_date);
-                let amount_diff_day = diffDays(new Date(), hire_date);
-
-                if (amount_diff_day <= leave.length_start_date) {
-                    alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
-                    disableAllLeaveControls();
-                    return;
-                }
-
-                if (!chk_request_timing) {
-                    alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
-                    disableAllLeaveControls();
-                    return;
-                }
-
-                let chk_gender_restriction = CheckGenderRestriction(result.gender);
-                if (!chk_gender_restriction) {
-                    alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
-                    disableAllLeaveControls();
-                    return;
-                }
-
-                $('#leave_description').text(description);
-                $('#leave_balance').text(`${balance_leave}/${leave.amount_entitlement} วัน`);
-                $('#div_leave').prop('hidden', false);
-                $('#div_main_leave').css({ 'height': '500px', 'overflow-y': 'auto' });
-                $('#btn_leave_send').prop('disabled', false);
-
-
+                let hire_date = new Date();
                 $('#leave_stop_date').val(request_date);
                 $('#amount_leave').val(1);
 
-                leaveFullBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true);
-                toggleGroupDisplay(timeGroup, false);
-                daysInput.value = 1;
-                stopDateInput.value = startDateInput.value;
-                stopDateInput.disabled = false;
+                leave = result.leave;
+                balance_leave = result.balance_leave;
+                gender = result.gender;
+                hire_date = result.hire_date;
 
-                $('#leave_full').prop('disabled', false);
-                $('#leave_half').prop('disabled', false);
-                $('#leave_hours').prop('disabled', false);
-                $('#leave_stop_date').prop('disabled', false);
+                //Check Request Timing
+                let chk_request_timing = CheckRequestTiming(request_date);
 
-                type_duration = "Day";
-                CheckAttachFileRequire(type_duration);
+                let amount_diff_day = diffDays(new Date(), hire_date);
+                if (amount_diff_day > leave.length_start_date) {
+                    if (chk_request_timing) {
+                        //Check Gender Restriction
+                        let chk_gender_restriction = CheckGenderRestriction(gender);
+                        if (chk_gender_restriction) {
 
+                            //After Change Select Type
+                            if (tigger_select) {
+                                $('#leave_description').text(description);
+                                $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
+                                $('#div_leave').prop('hidden', false);
+                                $('#div_main_leave').css('height', '500px');
+                                $('#div_main_leave').css('overflow-y', 'auto');
+                                $('#btn_leave_send').prop('disabled', false);
+
+                                //Reset Full day Click
+                                resetButtonStyles();
+                                leaveFullBtn.classList.add('active');
+                                toggleGroupDisplay(dateGroup, true);
+                                toggleGroupDisplay(timeGroup, false);
+                                //daysInput.disabled = false;
+                                daysInput.value = 1;
+                                stopDateInput.value = startDateInput.value;
+                                stopDateInput.disabled = false;
+
+                                //Check attachment_required
+                                type_duration = "Day";
+                                CheckAttachFileRequire(type_duration);
+
+                                $('#leave_full').prop('disabled', false);
+                                $('#leave_half').prop('disabled', false);
+                                $('#leave_hours').prop('disabled', false);
+                                $('#leave_stop_date').prop('disabled', false);
+                            }
+
+                        } else {
+                            alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
+                            $('#btn_leave_send').prop('disabled', true);
+                            $('#leave_full').prop('disabled', true);
+                            $('#leave_half').prop('disabled', true);
+                            $('#leave_hours').prop('disabled', true);
+                            $('#leave_stop_date').prop('disabled', true);
+                        }
+                    } else {
+                        alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
+                        $('#btn_leave_send').prop('disabled', true);
+                        $('#leave_full').prop('disabled', true);
+                        $('#leave_half').prop('disabled', true);
+                        $('#leave_hours').prop('disabled', true);
+                        $('#leave_stop_date').prop('disabled', true);
+                    }
+                } else {
+                    alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
+                    $('#btn_leave_send').prop('disabled', true);
+                    $('#leave_full').prop('disabled', true);
+                    $('#leave_half').prop('disabled', true);
+                    $('#leave_hours').prop('disabled', true);
+                    $('#leave_stop_date').prop('disabled', true);
+                }
                 is_full_day = true;
                 tigger_select = true;
 
@@ -2538,11 +2467,13 @@
 
         $('#select_leave_type').on('change', async function () {
             const leave_type_id = $(this).val();
-            if (leave_type_id) {
-                await handleLeaveTypeChange(leave_type_id);
-            } else {
-                $('#div_leave').prop('hidden', true);
-                disableAllLeaveControls();
+            for (let i = 0; i < 2; i++) {
+                if (leave_type_id) {
+                    await handleLeaveTypeChange(leave_type_id);
+                } else {
+                    $('#div_leave').prop('hidden', true);
+                    disableAllLeaveControls();
+                }
             }
         });
 

@@ -20,6 +20,32 @@ namespace WebENG.LeaveServices
             con = connect.OpenLeaveConnect();
         }
 
+        public int CalcuLevelStep(List<LevelModel> levels, RequestModel request, LeaveTypeModel leave)
+        {
+
+            bool hasOperation = levels.Any(x => x.level == 0);
+
+            if (request.status_request == "Created" || request.status_request == "Resubmit")
+            {
+                return hasOperation ? 1 : levels.Min(x => x.level) + 1;
+            }
+
+            int current = request.level_step;
+            bool isLongLeave = request.is_full_day ? request.amount_leave_day >= leave.max_consecutive_days : (decimal)((double)request.amount_leave_hour / 8.0) >= leave.max_consecutive_days;
+
+            if (hasOperation)
+            {
+                if (!leave.is_two_step_approve || !isLongLeave)
+                    return current + 2;
+                else
+                    return current + 1;
+            }
+            else
+            {
+                return current + 1;
+            }
+        }
+
         //public List<LevelModel> GetHierarchyByEmpID(string emp_id)
         //{
         //    List<LevelModel> levels = new List<LevelModel>();
@@ -35,9 +61,9 @@ namespace WebENG.LeaveServices
         //                                                   position,
         //                                                   department,
         //                                                   CASE WHEN position = 'Operation' OR position = '' THEN 0
-								//						   WHEN position LIKE '%Manager%' THEN 1
-								//						   WHEN position LIKE '%Director%' THEN 2
-								//						   ELSE 0 END as level 
+        //						   WHEN position LIKE '%Manager%' THEN 1
+        //						   WHEN position LIKE '%Director%' THEN 2
+        //						   ELSE 0 END as level 
         //                                            FROM [CTL].dbo.Employees
         //                                            WHERE emp_id = @emp_id
         //                                        ),
@@ -48,7 +74,7 @@ namespace WebENG.LeaveServices
         //                                                   [ELEAVE].dbo.departments.department,
         //                                                   level
         //                                            FROM [ELEAVE].dbo.departments 
-	       //                                         LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.departments.emp_id = emp.emp_id
+        //                                         LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.departments.emp_id = emp.emp_id
         //                                            WHERE [ELEAVE].dbo.departments.department = (SELECT department FROM l0)
         //                                        ),
         //                                        l2 AS (
@@ -59,7 +85,7 @@ namespace WebENG.LeaveServices
         //                                                    level
         //                                                    FROM [ELEAVE].dbo.[Approvers]
         //                                                    LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Approvers].emp_id = emp.emp_id
-			     //                                           WHERE [ELEAVE].dbo.[Approvers].department = (SELECT department FROM l0)
+        //                                           WHERE [ELEAVE].dbo.[Approvers].department = (SELECT department FROM l0)
         //                                        ),
         //                                        l3 AS (
         //                                            SELECT [ELEAVE].dbo.[Checkers].emp_id,
@@ -130,7 +156,7 @@ namespace WebENG.LeaveServices
 														   ELSE 0 END as level ,
 														   [CTL].dbo.[Employees].email
                                                     FROM [CTL].dbo.Employees
-                                                    WHERE emp_id = @emp_id                                                    
+                                                    WHERE emp_id = @emp_id                                                   
                                                 ),
                                                 l1 AS (
                                                     SELECT [ELEAVE].dbo.departments.emp_id,
@@ -141,7 +167,7 @@ namespace WebENG.LeaveServices
 														   emp.email
                                                     FROM [ELEAVE].dbo.departments 
 	                                                LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.departments.emp_id = emp.emp_id
-                                                    WHERE [ELEAVE].dbo.departments.department = (SELECT department FROM l0)
+													WHERE [ELEAVE].dbo.departments.emp_id = @emp_id    
                                                 ),
                                                 l2 AS (
                                                     SELECT [ELEAVE].dbo.[Approvers].emp_id,
@@ -152,7 +178,7 @@ namespace WebENG.LeaveServices
 															emp.email
                                                             FROM [ELEAVE].dbo.[Approvers]
                                                             LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Approvers].emp_id = emp.emp_id
-			                                                WHERE [ELEAVE].dbo.[Approvers].department = (SELECT department FROM l0)
+															WHERE [ELEAVE].dbo.[Approvers].emp_id = @emp_id
                                                 ),
                                                 l3 AS (
                                                     SELECT [ELEAVE].dbo.[Checkers].emp_id,
@@ -173,7 +199,7 @@ namespace WebENG.LeaveServices
                                                 UNION ALL
                                                 SELECT * FROM l3
                                                 )
-                                                SELECT DISTINCT * FROM m ORDER BY m.level");
+                                                SELECT DISTINCT * FROM m  ORDER BY m.level ");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 command.Parameters.AddWithValue("@emp_id", emp_id);
                 SqlDataReader dr = command.ExecuteReader();

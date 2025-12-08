@@ -27,6 +27,11 @@ namespace WebENG.LeaveServices
                     mail.To.Add(to[i]);
                 }
 
+                if (status == "Rejected" || status == "Returned")
+                {
+                    mail.CC.Add("hrs@contrologic.co.th");
+                }
+
                 mail.Subject = "แจ้งเตือนระบบวันลา";
                 string body = $@"<!DOCTYPE html>
                 <html>
@@ -121,7 +126,11 @@ namespace WebENG.LeaveServices
                 string sender = "e-leave@contrologic.co.th";
                 mail.From = new MailAddress(sender);
                 mail.To.Add(to);
-                
+
+                if (status == "Rejected" || status == "Returned")
+                {
+                    mail.CC.Add("hrs@contrologic.co.th");
+                }
 
                 mail.Subject = "แจ้งเตือนระบบวันลา";
                 string body = $@"<!DOCTYPE html>

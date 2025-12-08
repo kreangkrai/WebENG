@@ -76,6 +76,7 @@ namespace WebENG.Controllers
                 ViewBag.levels = levels;
                 ViewBag.emp = u.emp_id;
 
+                ViewBag.role = u.role;
                 return View(u);
             }
             else
@@ -145,9 +146,13 @@ namespace WebENG.Controllers
             List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
             int max_level = levels.Where(w=>w.emp_id== emp_id).Max(m => m.level);
             List<string> departments = new List<string>();
-            if (max_level != 3)
+            if (max_level == 0)
             {
-                departments = levels.Where(w=>w.emp_id == emp_id && w.level == max_level).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+                departments = levels.Where(w => w.emp_id == emp_id && w.level == max_level).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+            }
+            if (max_level == 1 || max_level == 2)
+            {
+                departments = levels.Where(w=>w.emp_id == emp_id).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
             }            
             else if (max_level == 3)
             {
@@ -158,10 +163,17 @@ namespace WebENG.Controllers
             departments = departments.OrderBy(o => o).ToList();
 
             List<RequestModel> requests = Requests.GetRequestByDurationDay(start,stop);
-            List<string> emps = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
+            List<string> emps = new List<string>();
+            if (max_level == 0)
+            {
+                emps = requests.Where(g => g.emp_id == emp_id).Select(s => s.emp_id).ToList();
+            }
+            else
+            {
+                 emps = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
+            }
 
-
-            employees = employees.Where(w => emps.Contains(w.emp_id)).OrderBy(o => o.name_en).ToList();
+            employees = employees.Where(w => emps.Contains(w.emp_id) && departments.Contains(w.department)).OrderBy(o => o.name_en).ToList();
             var data = new { employees = employees, departments = departments };
             return Json(data);
         }

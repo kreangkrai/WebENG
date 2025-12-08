@@ -112,82 +112,32 @@ namespace WebENG.Controllers
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             
-            List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
-            List<int> level = levels.Where(w => w.emp_id == emp_id).Select(s => s.level).ToList();
-            List<string> departments = levels.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+            List<LevelModel> levels_approve = Level.GetLevelByEmpID(emp_id);
 
             List<RequestModel> requests = Requests.GetRequests();
             List<RequestModel> requests_pending = requests.Where(w => status_pending.Contains(w.status_request)).ToList();
 
             List<RequestModel> _requests = new List<RequestModel>();
             for (int i = 0; i < requests_pending.Count; i++)
-            {              
-                if (level.Count > 0)
-                {
-                    if (requests_pending[i].is_two_step_approve)
-                    {
-                        LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(requests_pending[i].leave_type_id);
-                        if (requests_pending[i].amount_leave_day >= leaveType.max_consecutive_days)
-                        {
-                            // Two Step Approve
-                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
-                            if (chk_level)
-                            {
-                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
-                                bool chk_dep = departments.Contains(request_department);
-                                if (chk_dep)
-                                {
-                                    _requests.Add(requests_pending[i]);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //One Step Approve
-                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1); //2
-                            if (chk_level)
-                            {
-                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
-                                bool chk_dep = departments.Contains(request_department);
-                                if (chk_dep)
-                                {
-                                    _requests.Add(requests_pending[i]);
-                                }
-                            }
-                        }                      
-                    }
-                    else
-                    {
-                        if (requests_pending[i].level_step < 3 )
-                        {
-                            bool chk_level = level.Any(a => a == requests_pending[i].level_step + 1);
-                            if (chk_level)
-                            {
-                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
-                                bool chk_dep = departments.Contains(request_department);
-                                if (chk_dep)
-                                {
-                                    _requests.Add(requests_pending[i]);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            bool chk_level = level.Any(a => a == 3);
-                            if (chk_level)
-                            {
-                                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
-                                bool chk_dep = departments.Contains(request_department);
-                                if (chk_dep)
-                                {
-                                    _requests.Add(requests_pending[i]);
-                                }
-                            }
-                        }                        
-                    }
-                }                
-            }
+            {
+                string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
+                LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(requests_pending[i].leave_type_id);
 
+                List<LevelModel> levels = Level.GetLevelByEmpID(requests_pending[i].emp_id);
+                int next_level = Level.CalcuLevelStep(levels, requests_pending[i], leaveType);
+
+                bool check_level_match = levels_approve.Any(a => a.level == next_level);
+                if (check_level_match)
+                {
+                    bool check_department_match = levels_approve.Where(a => a.level == next_level).Any(w=>w.department == request_department);
+                    if (check_department_match)
+                    {
+                        _requests.Add(requests_pending[i]);
+                    }
+                }
+                
+            }              
+            
             //Pending
             var pending = _requests.Select(s => new
             {

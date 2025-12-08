@@ -1102,6 +1102,7 @@
                     }
                 },
                 eventClick: async function (info) {
+                    console.log(info);
                     let title = info.event.title;
                     if (title.includes("Leave")) {
                         window.open('/ManagementLeave/Index', '_blank', 'noopener');
