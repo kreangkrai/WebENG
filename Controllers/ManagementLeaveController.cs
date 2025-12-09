@@ -43,6 +43,7 @@ namespace WebENG.Controllers
         private readonly IHostingEnvironment env;
         private INotification Notification;
         private IMail Mail;
+        private IWorkingHours WorkingHours;
         public ManagementLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
@@ -53,6 +54,7 @@ namespace WebENG.Controllers
             RequestLog = new RequestLogService();
             Notification = new NotificationService();
             Mail = new MailService();
+            WorkingHours = new WorkingHoursService();
             env = _env;
         }
         public IActionResult Index()
@@ -113,11 +115,13 @@ namespace WebENG.Controllers
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             
             List<LevelModel> levels_approve = Level.GetLevelByEmpID(emp_id);
+            List<string> departments = levels_approve.Where(w => w.emp_id == emp_id).Select(s => s.department).ToList();
+            List<string> emps_id = employees.Where(w => departments.Contains(w.department)).Select(s => s.emp_id).ToList();
 
             List<RequestModel> requests = Requests.GetRequests();
             List<RequestModel> requests_pending = requests.Where(w => status_pending.Contains(w.status_request)).ToList();
 
-            List<RequestModel> _requests = new List<RequestModel>();
+            List<RequestModel> _requests_pending = new List<RequestModel>();
             for (int i = 0; i < requests_pending.Count; i++)
             {
                 string request_department = employees.Where(w => w.emp_id == requests_pending[i].emp_id).Select(s => s.department).FirstOrDefault();
@@ -132,14 +136,14 @@ namespace WebENG.Controllers
                     bool check_department_match = levels_approve.Where(a => a.level == next_level).Any(w=>w.department == request_department);
                     if (check_department_match)
                     {
-                        _requests.Add(requests_pending[i]);
+                        _requests_pending.Add(requests_pending[i]);
                     }
                 }
                 
-            }              
+            }
             
             //Pending
-            var pending = _requests.Select(s => new
+            var pending = _requests_pending.Select(s => new
             {
                 request_id = s.request_id,
                 leave_type_id = s.leave_type_id,
@@ -166,7 +170,17 @@ namespace WebENG.Controllers
             }).ToList();
 
             // No Pending
-            List<RequestModel> requests_no_pending = requests.Where(w => !status_pending.Contains(w.status_request)).ToList();
+            List<RequestModel> requests_no_pending = new List<RequestModel>();
+            bool check_checker = levels_approve.Where(w => w.emp_id == emp_id).Any(a => a.level == 3);
+            if (check_checker)
+            {
+                requests_no_pending = requests;
+            }
+            else
+            {
+                requests_no_pending = requests.Where(w => emps_id.Contains(w.emp_id)).ToList();
+            }
+            
             var no_pending = requests_no_pending.Select(s => new
             {
                 request_id = s.request_id,
@@ -421,7 +435,6 @@ namespace WebENG.Controllers
                         }
                         Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
 
-
                         return Json("Success");
 
                     }
@@ -429,6 +442,16 @@ namespace WebENG.Controllers
                     {
                         tran.Rollback();
                         return Json($"Error {ex.Message}");
+                    }
+                    finally
+                    {
+
+                        //Delete Working Hours
+                        List<UserModel> users = Accessory.getAllUser();
+                        UserModel user_ = users.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+                        WorkingHoursModel wh = WorkingHours.GetWorkingHourByLeave(user_.user_id, request.start_request_date.ToString("yyyy-MM-dd"));
+
+                        WorkingHours.DeleteWorkingHours(wh);
                     }
                 }
             }

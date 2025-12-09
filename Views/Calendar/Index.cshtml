@@ -1105,7 +1105,7 @@
                     console.log(info);
                     let title = info.event.title;
                     if (title.includes("Leave")) {
-                        window.open('/ManagementLeave/Index', '_blank', 'noopener');
+                        window.open('./StatusLeave/Index', '_blank', 'noopener');
                     } else {
                         EditTask(info.event);
                     }
@@ -2890,13 +2890,13 @@
                         alert("ส่งวันลาเรียบร้อย");
                         $('#modal_confirm').modal('hide');
                         $('#modal_leave').modal('hide');
-                        location.reload();
+                        
                     } else {
                         alert(response);
                     }
                 }
             });
-
+            location.reload();
             $('#SpinModal').modal('hide');
             $('#confirm_ok').attr('disabled', false);
         });

@@ -31,6 +31,7 @@ namespace WebENG.Controllers
         private readonly IHostingEnvironment env;
         private IMail Mail;
         private INotification Notification;
+        private IWorkingHours WorkingHours;
 
         public StatusLeaveController(IHostingEnvironment _env)
         {
@@ -44,7 +45,7 @@ namespace WebENG.Controllers
             env = _env;
             Mail = new MailService();
             Notification = new NotificationService();
-
+            WorkingHours = new WorkingHoursService();
         }
         public IActionResult Index()
         {
@@ -687,16 +688,27 @@ namespace WebENG.Controllers
                         message = "Success";
 
                         //Remove File Uploads
-                        //if (request.path_file != "" && request.path_file != null)
-                        {
-                            RemoveTempFiles(request.request_id);
-                            RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
-                        }
+
+                        RemoveTempFiles(request.request_id);
+                        RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
+
                     }
                     catch (Exception ex)
                     {
                         tran.Rollback();
                         message = $"Error {ex.Message}";
+                    }
+                    finally
+                    {
+                        if (message == "Success")
+                        {
+                            //Delete Working Hours
+                            List<UserModel> users = Accessory.getAllUser();
+                            UserModel user_ = users.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+                            WorkingHoursModel wh = WorkingHours.GetWorkingHourByLeave(user_.user_id, request.start_request_date.ToString("yyyy-MM-dd"));
+
+                            WorkingHours.DeleteWorkingHours(wh);
+                        }
                     }
                 }
             }

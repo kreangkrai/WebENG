@@ -2796,5 +2796,45 @@ namespace WebENG.Service
             }
             return whs;
         }
+
+        public WorkingHoursModel GetWorkingHourByLeave(string user_id, string working_date)
+        {
+            WorkingHoursModel wh = new WorkingHoursModel();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string string_command = string.Format($@"SELECT * FROM WorkingHours WHERE user_id = @user_id AND working_date = @working_date AND job_id = 'J999999'");
+                SqlCommand cmd = new SqlCommand(string_command, con);
+                cmd.Parameters.AddWithValue("@user_id", user_id);
+                cmd.Parameters.AddWithValue("@working_date", working_date);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        wh = new WorkingHoursModel()
+                        {
+                            index = dr["ind"].ToString(),
+                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
+                            week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                        };
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return wh;
+        }
     }
 }

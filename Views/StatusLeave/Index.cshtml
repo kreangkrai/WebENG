@@ -637,16 +637,19 @@
                 </h4>
 
                 <!-- ขวา: ปุ่ม Export ชิดขวา -->
-                <div class="ml-auto">
-                    <button class="btn btn-light mr-2 kanit-regular" data-toggle="modal" data-target="#sendModal"
-                            style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
-                        <i class="fas fa-file-alt mr-2"></i>Export to Text
-                    </button>
-                    <button class="btn btn-success  kanit-regular" data-toggle="modal" data-target="#sendModal"
-                            style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
-                        <i class="fas fa-file-excel mr-1"></i> Export to Excel
-                    </button>
-                </div>
+                @if (levels.Where(w => w.emp_id == emp_id).Any(a => a.level > 0) || role == "Admin" || role == "Admin Leave")
+                {
+                    <div class="ml-auto">
+                        <button class="btn btn-light mr-2 kanit-regular" data-toggle="modal" data-target="#sendModal"
+                                style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
+                            <i class="fas fa-file-alt mr-2"></i>Export to Text
+                        </button>
+                        <button class="btn btn-success  kanit-regular" data-toggle="modal" data-target="#sendModal"
+                                style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
+                            <i class="fas fa-file-excel mr-1"></i> Export to Excel
+                        </button>
+                    </div>
+                }
             </div>
 
             <div class="freeze-pane">
@@ -853,7 +856,7 @@
             </div>
             <div class="modal-footer d-flex">
                 <button id="btn_delete" type="button" class="btn modern-btn btn-danger mr-auto elevation-1" data-toggle="modal" data-target="#confirmDeleteModal">
-                    <i class="mr-1 fas fa-trash-alt"></i> ลบการลา
+                    <i class="mr-1 fas fa-trash-alt"></i> ยกเลิกการลา
                 </button>
                 <button type="button" class="btn btn-secondary elevation-1" data-dismiss="modal" onclick="ModalCloseClick()">
                     <i class="fas fa-times"></i> ปิด
@@ -1796,12 +1799,12 @@
                         alert("แก้ไขวันลาเรียบร้อย");
                         $('#modal_confirm').modal('hide');
                         $('#modal_leave').modal('hide');
-                        location.reload();
                     } else {
                         alert(response);
                     }
                 }
             });
+            location.reload();
             $('#SpinModal').modal('hide');
             $('#confirm_ok').attr('disabled', false);
         });
@@ -1873,7 +1876,7 @@
             document.getElementById('date_start').value = start;
             document.getElementById('date_stop').value = today;
 
-            await GetEmployee(start, today);
+            employees = await GetEmployee(start, today);
             initSearchEvents();
             loadInitialLeaveHistory();
 
@@ -1882,7 +1885,8 @@
             selectEmployee(emp);
         });
 
-        async function GetEmployee(start,stop) {
+        async function GetEmployee(start, stop) {
+            let emps = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetEmployee", "StatusLeave")',
@@ -1890,14 +1894,15 @@
                 data: { start, stop },
                 success: function (response) {
                     departments = response.departments;
-                    employees = response.employees;
+                    emps = response.employees;
                     GenerateDepartmentOption(departments);
-                    GenerateUserOption(employees);
+                    GenerateUserOption(emps);
                 },
                 error: function () {
                     console.error('โหลดข้อมูลพนักงานล้มเหลว');
                 }
             });
+            return emps;
         }
 
         async function GetRequestHistory(emp_id, start, stop) {
@@ -1957,7 +1962,7 @@
             $select.empty().append(`<option value="ALL" selected disabled>ทุกคน</option>`);
             employeesList.forEach(emp => {
                 $select.append(`<option value="${emp.emp_id}">${emp.emp_id} : ${emp.name_en}</option>`);
-            });            
+            });
         }
 
         function GenerateUsedLeave(emp_th, useds) {
@@ -1978,18 +1983,18 @@
         }
 
         $('#date_stop').on('change', async function () {
-            //const role = '@Html.Raw(role)';
+
             $('#emp_th_used_leave').text("");
             $('#div_leaves_used').empty();
             $('#employeeInfo').hide();
             clearLeaveHistory();
 
             let start = $('#date_start').val();
-            //let stop = $('#date_stop').val();
+            let stop = $('#date_stop').val();
             let year = new Date(start).getFullYear();
+            employees = await GetEmployee(start, stop);
             const emp_id = '@Html.Raw(emp_id)';
-            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
-
+            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];                  
             selectEmployee(emp);
 
             $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
@@ -2109,24 +2114,25 @@
             $results.show();
         }
 
-        function selectEmployee(emp) {
-            selectedEmployee = emp;
+        async function selectEmployee(emp) {          
 
-            $('#EmpId').text(emp.emp_id);
-            $('#EmpName').text(emp.name_en);
-            $('#department').text(emp.department || '-');
-            $('#position').text(emp.position || '-');
-            $('#phone').text(emp.phone || '-');
-            $('#startDate').text(emp.start_date ? new Date(emp.start_date).toLocaleDateString('th-TH') : '-');
+            if (emp !== undefined) {
+                selectedEmployee = emp;
+                $('#EmpId').text(emp.emp_id);
+                $('#EmpName').text(emp.name_en);
+                $('#department').text(emp.department || '-');
+                $('#position').text(emp.position || '-');
+                $('#phone').text(emp.phone || '-');
+                $('#startDate').text(emp.start_date ? new Date(emp.start_date).toLocaleDateString('th-TH') : '-');
 
-            $('#employeeInfo').show();
-            $('#noEmployee').hide();
-            $('#employeeSelect').val(emp.emp_id);
+                $('#employeeInfo').show();
+                $('#noEmployee').hide();
+                $('#employeeSelect').val(emp.emp_id);
 
-            setTimeout(() => {
-                loadLeaveUsedAndHistory(emp.emp_id, emp.name_th);
-            }, 10);
-
+                setTimeout(() => {
+                    loadLeaveUsedAndHistory(emp.emp_id, emp.name_th);
+                }, 10);
+            }
         }
 
         async function loadLeaveUsedAndHistory(emp_id, emp_th_name) {

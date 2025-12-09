@@ -13,6 +13,7 @@ namespace WebENG.Interface
         List<WorkingDayModel> GetWorkingHours(string year, string month, string user_name);
         List<WorkingDayModel> GetAllWorkingHours();
         List<WorkingHoursModel> GetWorkingHours(string user_name, DateTime working_date);
+        WorkingHoursModel GetWorkingHourByLeave(string user_id, string working_date);
         string AddWorkingHours(WorkingHoursModel wh);
         string UpdateWorkingHours(WorkingHoursModel wh);
         string UpdateRestTime(WorkingHoursModel wh);
