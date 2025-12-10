@@ -468,7 +468,7 @@ namespace WebENG.Controllers
                             RequestLogModel requestLog = new RequestLogModel()
                             {
                                 action_by = request.emp_id,
-                                action_by_name = level.FirstOrDefault().emp_name,
+                                action_by_name = level.FirstOrDefault().emp_name_th,
                                 action_by_level = level.FirstOrDefault().level,
                                 old_status = last_request_log.new_status,
                                 new_status = "Canceled",
@@ -483,7 +483,7 @@ namespace WebENG.Controllers
                             RequestLogModel requestLog_ = new RequestLogModel()
                             {
                                 action_by = request.emp_id,
-                                action_by_name = level.FirstOrDefault().emp_name,
+                                action_by_name = level.FirstOrDefault().emp_name_th,
                                 action_by_level = level.FirstOrDefault().level,
                                 old_status = "Canceled",
                                 new_status = "Resubmit",
@@ -641,7 +641,7 @@ namespace WebENG.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteRequest(string request_id, string emp_id)
+        public IActionResult DeleteRequest(string request_id, string emp_id )
         {
             List<LevelModel> level = Level.GetLevelByEmpID(emp_id);
             level = level.Where(w => w.emp_id == emp_id).ToList();
@@ -666,19 +666,20 @@ namespace WebENG.Controllers
                         var requestService = Requests;
                         var requestLogService = RequestLog;
                         requestService.Update(request);
-
-                        RequestLogModel last_request_log = RequestLog.GetLogByRequestId(request_id).LastOrDefault();
+                        List<RequestLogModel> requests_log = RequestLog.GetLogByRequestId(request_id);
+                        RequestLogModel first_request_log = requests_log.FirstOrDefault();
+                        RequestLogModel last_request_log = requests_log.LastOrDefault();
 
                         RequestLogModel requestLog = new RequestLogModel()
                         {
                             action_by = request.emp_id,
-                            action_by_name = level.FirstOrDefault().emp_name,
+                            action_by_name = level.FirstOrDefault().emp_name_th,
                             action_by_level = level.FirstOrDefault().level,
                             old_status = last_request_log.new_status,
                             new_status = "Canceled",
                             comment = "",
                             old_level_step = last_request_log.new_level_step,
-                            new_level_step = level.FirstOrDefault().level,
+                            new_level_step = first_request_log.new_level_step,
                             request_id = request.request_id,
                             log_date = DateTime.Now
                         };
@@ -715,6 +716,81 @@ namespace WebENG.Controllers
             return Json(message);
         }
 
+        [HttpDelete]
+        public IActionResult CheckerDeleteRequest(string request_id, string emp_id)
+        {
+            List<LevelModel> level = Level.GetLevelByEmpID(emp_id);
+            level = level.Where(w => w.emp_id == emp_id).ToList();
+
+            RequestModel request = Requests.GetRequestByID(request_id);
+            request.status_request = "Canceled";
+            request.comment = "";
+            request.path_file = "";
+            request.end_request_time = new TimeSpan(request.end_request_time.Hours, request.end_request_time.Minutes, request.end_request_time.Seconds);
+            request.start_request_time = new TimeSpan(request.start_request_time.Hours, request.start_request_time.Minutes, request.start_request_time.Seconds);
+            string message = "";
+            int year = request.start_request_date.Year;
+
+            var connect = new ConnectSQL();
+            using (SqlConnection con = connect.OpenLeaveConnect())
+            {
+                con.Open();
+                using (SqlTransaction tran = con.BeginTransaction())
+                {
+                    try
+                    {
+                        var requestService = Requests;
+                        var requestLogService = RequestLog;
+                        requestService.Update(request);
+                        List<RequestLogModel> requests_log = RequestLog.GetLogByRequestId(request_id);
+                        RequestLogModel first_request_log = requests_log.FirstOrDefault();
+                        RequestLogModel last_request_log = requests_log.LastOrDefault();
+
+                        RequestLogModel requestLog = new RequestLogModel()
+                        {
+                            action_by = request.emp_id,
+                            action_by_name = level.FirstOrDefault().emp_name_th,
+                            action_by_level = level.LastOrDefault().level,
+                            old_status = last_request_log.new_status,
+                            new_status = "Canceled",
+                            comment = "",
+                            old_level_step = last_request_log.new_level_step,
+                            new_level_step = first_request_log.new_level_step,
+                            request_id = request.request_id,
+                            log_date = DateTime.Now
+                        };
+                        requestLogService.Insert(requestLog);
+
+                        tran.Commit();
+                        message = "Success";
+
+                        //Remove File Uploads
+
+                        RemoveTempFiles(request.request_id);
+                        RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        tran.Rollback();
+                        message = $"Error {ex.Message}";
+                    }
+                    finally
+                    {
+                        if (message == "Success")
+                        {
+                            //Delete Working Hours
+                            List<UserModel> users = Accessory.getAllUser();
+                            UserModel user_ = users.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+                            WorkingHoursModel wh = WorkingHours.GetWorkingHourByLeave(user_.user_id, request.start_request_date.ToString("yyyy-MM-dd"));
+
+                            WorkingHours.DeleteWorkingHours(wh);
+                        }
+                    }
+                }
+            }
+            return Json(message);
+        }
         [HttpPost]
         public IActionResult CopyUplodstoTempFile(string leave_type_id, int year, string request_id)
         {

@@ -133,7 +133,16 @@ namespace WebENG.Controllers
                 bool check_level_match = levels_approve.Any(a => a.level == next_level);
                 if (check_level_match)
                 {
-                    bool check_department_match = levels_approve.Where(a => a.level == next_level).Any(w=>w.department == request_department);
+                    bool check_department_match = false;
+                    if (next_level == 3)
+                    {
+                        check_department_match = levels_approve.Where(w=>w.emp_id == emp_id).Any(a => a.level == next_level);
+                    }
+                    else
+                    {
+                        check_department_match = levels_approve.Where(a => a.emp_id == emp_id && a.level == next_level).Any(w => w.department == request_department);
+                    }
+                    
                     if (check_department_match)
                     {
                         _requests_pending.Add(requests_pending[i]);
@@ -382,7 +391,7 @@ namespace WebENG.Controllers
                             comment = comment,
                             action_by = approver.emp_id,
                             action_by_level = rejected_level,
-                            action_by_name = approver.name_en,
+                            action_by_name = approver.name_th,
                             new_status = new_status,
                             new_level_step = rejected_level,
                             old_level_step = last_request_log.new_level_step,
@@ -560,7 +569,7 @@ namespace WebENG.Controllers
                             comment = comment,
                             action_by = approver.emp_id,
                             action_by_level = returned_level,
-                            action_by_name = approver.name_en,
+                            action_by_name = approver.name_th,
                             new_status = new_status,
                             new_level_step = returned_level,
                             old_level_step = last_request_log.new_level_step,
@@ -754,7 +763,7 @@ namespace WebENG.Controllers
                             comment = comment,
                             action_by = approver.emp_id,
                             action_by_level = approve_level,
-                            action_by_name = approver.name_en,
+                            action_by_name = approver.name_th,
                             new_status = new_status,
                             new_level_step = approve_level,
                             old_level_step = level_step,

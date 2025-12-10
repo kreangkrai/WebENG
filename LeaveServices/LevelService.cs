@@ -147,7 +147,8 @@ namespace WebENG.LeaveServices
                     con.Open();
                 }
                 string strCmd = string.Format($@"WITH l0 AS (SELECT emp_id,
-                                                           name_en as emp_name,
+                                                           name_en as emp_name_en,
+														   name_th as emp_name_th,
                                                            position,
                                                            department,
                                                            CASE WHEN position = 'Operation' OR position = '' THEN 0
@@ -160,7 +161,8 @@ namespace WebENG.LeaveServices
                                                 ),
                                                 l1 AS (
                                                     SELECT [ELEAVE].dbo.departments.emp_id,
-                                                           name_en as emp_name,
+                                                           emp.name_en as emp_name_en,
+														   emp.name_th as emp_name_th,
                                                            'Manager' as position,
                                                            [ELEAVE].dbo.departments.department,
                                                            level,
@@ -171,18 +173,20 @@ namespace WebENG.LeaveServices
                                                 ),
                                                 l2 AS (
                                                     SELECT [ELEAVE].dbo.[Approvers].emp_id,
-                                                           emp.name_en as emp_name,
+                                                           emp.name_en as emp_name_en,
+														   emp.name_th as emp_name_th,
                                                            'Director' as position,
                                                             [ELEAVE].dbo.[Approvers].department,
                                                             level,
 															emp.email
                                                             FROM [ELEAVE].dbo.[Approvers]
                                                             LEFT JOIN [CTL].dbo.[Employees] emp ON [ELEAVE].dbo.[Approvers].emp_id = emp.emp_id
-															WHERE [ELEAVE].dbo.[Approvers].emp_id = @emp_id
+															WHERE [ELEAVE].dbo.[Approvers].emp_id = @emp_id 
                                                 ),
                                                 l3 AS (
                                                     SELECT [ELEAVE].dbo.[Checkers].emp_id,
-                                                           emp.name_en as emp_name,
+                                                           emp.name_en as emp_name_en,
+														   emp.name_th as emp_name_th,
                                                            'Checker' as position,
                                                            emp.department,
                                                            level,
@@ -212,7 +216,8 @@ namespace WebENG.LeaveServices
                             position = dr["position"].ToString(),
                             department = dr["department"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            emp_name = dr["emp_name"].ToString(),
+                            emp_name_en = dr["emp_name_en"].ToString(),
+                            emp_name_th = dr["emp_name_th"].ToString(),
                             level = dr["level"] != DBNull.Value ? Convert.ToInt32(dr["level"].ToString()) : 0,
                             email = dr["email"].ToString()
                         };

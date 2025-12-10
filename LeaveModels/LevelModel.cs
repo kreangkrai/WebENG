@@ -8,7 +8,8 @@ namespace WebENG.LeaveModels
     public class LevelModel
     {
         public string emp_id { get; set; }
-        public string emp_name { get; set; }
+        public string emp_name_en { get; set; }
+        public string emp_name_th { get; set; }
         public string position { get; set; }
         public string department { get; set; }
         public int level { get; set; }

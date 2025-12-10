@@ -146,6 +146,21 @@ namespace WebENG.Controllers
         public JsonResult GetEngineerUser(string user_name)
         {
             EngUserModel eng = EngineerService.GetEngineerUser(user_name);
+            if (eng == null)
+            {
+                List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+                CTLModels.EmployeeModel emp = employees.Where(w => w.name_en.ToLower() == user_name.ToLower()).FirstOrDefault();
+                eng = new EngUserModel()
+                {
+                    role = "User",
+                    department = emp.department,
+                    active = emp.active,
+                    allow_edit = true,
+                    group = emp.group,
+                    user_id = ConvertUserID(emp.name_en),
+                    user_name =emp.name_en
+                };
+            }
             return Json(eng);
         }
 

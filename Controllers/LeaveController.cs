@@ -260,7 +260,7 @@ namespace WebENG.Controllers
                             RequestLogModel requestLog = new RequestLogModel()
                             {
                                 action_by = request.emp_id,
-                                action_by_name = level.FirstOrDefault().emp_name,
+                                action_by_name = level.FirstOrDefault().emp_name_th,
                                 action_by_level = level.FirstOrDefault().level,
                                 old_status = "",
                                 new_status = "Created",
