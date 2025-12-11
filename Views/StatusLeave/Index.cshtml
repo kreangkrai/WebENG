@@ -503,13 +503,13 @@
         <!-- Top Left Side: Employee Info -->
         <div class=" mb-3">
             <form>
-                <div class="col-12">          
+                <div class="col-12">
                     <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
                         <div class="card-header text-white p-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); padding: 12px 15px;">
                             <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ตัวกรองวันที่</h5>
                             <div class="ml-auto">
                                 <input type="button" class="btn kanit-medium" onclick="CreateLeave()"
-                                        style="border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;background-color:rgb(5 213 242 / 0.73); color:white; letter-spacing:1px" value="สร้างวันลา"/>                                    
+                                       style="border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;background-color:rgb(5 213 242 / 0.73); color:white; letter-spacing:1px" value="สร้างวันลา" />
                             </div>
                         </div>
                         <div class="card-body p-3">
@@ -958,14 +958,13 @@
             </div>
             <div class="modal-footer justify-content-center">
                 <button type="button" class="btn modern-btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
-                <button type="button" id="btn_confirm_date_create" class="btn modern-btn btn-primary">สร้าง</button>
+                <button type="button" id="btn_confirm_date_create" class="btn modern-btn btn-primary" disabled>สร้าง</button>
             </div>
         </div>
     </div>
 </div>
 <partial name="ModalSpin" />
-<partial name="Create"/>
-<partial name="_LeaveModal" model="@Model.emp_id" />
+<partial name="Create" />
 @section Scripts
 {
     <script type="text/javascript">
@@ -1051,93 +1050,6 @@
                 throw error;
             }
         }
-
-        //$('#select_leave_type').on('change', async function () {
-        //    let leave_type_id = $('#select_leave_type').val();
-        //    let request_date = today.toISOString();
-
-        //    let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
-        //    let description = leave_.description;
-        //    let emp_id = $('#emp_id').val();
-        //    let leave;
-        //    let year = new Date(request_date).getFullYear();
-        //    const result = await GetLeaveByID(leave_type_id, emp_id, year)
-
-        //    let hire_date = new Date();
-        //    $('#leave_stop_date').val(request_date);
-        //    $('#amount_leave').val(1);
-
-        //    leave = result.leave;
-        //    balance_leave = result.balance_leave;
-        //    gender = result.gender;
-        //    hire_date = result.hire_date;
-
-        //    //Check Request Timing
-        //    let chk_request_timing = CheckRequestTiming(request_date);
-
-        //    let amount_diff_day = diffDays(new Date(), hire_date);
-        //    if (amount_diff_day > leave.length_start_date) {
-        //        if (chk_request_timing) {
-        //            //Check Gender Restriction
-        //            let chk_gender_restriction = CheckGenderRestriction(gender);
-        //            if (chk_gender_restriction) {
-
-        //                //After Change Select Type
-        //                if (tigger_select) {
-        //                    $('#leave_description').text(description);
-        //                    $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
-        //                    $('#div_leave').prop('hidden', false);
-        //                    $('#div_main_leave').css('height', '500px');
-        //                    $('#div_main_leave').css('overflow-y', 'auto');
-        //                    $('#btn_leave_send').prop('disabled', false);
-
-        //                    //Reset Full day Click
-        //                    resetButtonStyles();
-        //                    leaveFullBtn.classList.add('active');
-        //                    toggleGroupDisplay(dateGroup, true);
-        //                    toggleGroupDisplay(timeGroup, false);
-        //                    //daysInput.disabled = false;
-        //                    daysInput.value = 1;
-        //                    stopDateInput.value = startDateInput.value;
-        //                    stopDateInput.disabled = false;
-
-        //                    //Check attachment_required
-        //                    type_duration = "Day";
-        //                    CheckAttachFileRequire(type_duration);
-
-        //                    $('#leave_full').prop('disabled', false);
-        //                    $('#leave_half').prop('disabled', false);
-        //                    $('#leave_hours').prop('disabled', false);
-        //                    $('#leave_stop_date').prop('disabled', false);
-        //                }
-
-        //            } else {
-        //                alert('ไม่สามารถลาได้เนื่องจากเพศสภาพไม่ตรงกับการลา');
-        //                $('#btn_leave_send').prop('disabled', true);
-        //                $('#leave_full').prop('disabled', true);
-        //                $('#leave_half').prop('disabled', true);
-        //                $('#leave_hours').prop('disabled', true);
-        //                $('#leave_stop_date').prop('disabled', true);
-        //            }
-        //        } else {
-        //            alert('ไม่สามารถลาได้เนื่องจากช่วงเวลาการลาไม่ถูกต้อง');
-        //            $('#btn_leave_send').prop('disabled', true);
-        //            $('#leave_full').prop('disabled', true);
-        //            $('#leave_half').prop('disabled', true);
-        //            $('#leave_hours').prop('disabled', true);
-        //            $('#leave_stop_date').prop('disabled', true);
-        //        }
-        //    } else {
-        //        alert('ไม่สามารถลาได้เนื่องจากวันทำงานยังไม่ครบกำหนด');
-        //        $('#btn_leave_send').prop('disabled', true);
-        //        $('#leave_full').prop('disabled', true);
-        //        $('#leave_half').prop('disabled', true);
-        //        $('#leave_hours').prop('disabled', true);
-        //        $('#leave_stop_date').prop('disabled', true);
-        //    }
-        //    is_full_day = true;
-        //    tigger_select = true;
-        //});
 
         function diffDays(date1, date2) {
             const d1 = new Date(date1);
@@ -1942,8 +1854,7 @@
             start = start.toISOString().split('T')[0];
             document.getElementById('date_start').value = start;
             document.getElementById('date_stop').value = today;
-            document.getElementById('date_create_leave').value = today;
-            
+
             employees = await GetEmployee(start, today);
             initSearchEvents();
             loadInitialLeaveHistory();
@@ -2062,7 +1973,7 @@
             let year = new Date(start).getFullYear();
             employees = await GetEmployee(start, stop);
             const emp_id = '@Html.Raw(emp_id)';
-            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];                  
+            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
             selectEmployee(emp);
 
             $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
@@ -2182,7 +2093,7 @@
             $results.show();
         }
 
-        async function selectEmployee(emp) {          
+        async function selectEmployee(emp) {
 
             if (emp !== undefined) {
                 selectedEmployee = emp;
@@ -2422,7 +2333,7 @@
                     $('#btn_delete').attr('hidden', true);
                 }
 
-                //Check Admin Leave for Cancle 
+                //Check Admin Leave for Cancle
                 if (data.status === "Completed" && role === "Admin_Leave") {
                     $('#btn_checker_delete').attr('hidden', false);
                 } else {
@@ -2682,7 +2593,7 @@
         });
     </script>
 
-    <script>
+    <script type="text/javascript">
 
         let create_leaves = [];
         let create_balance_leave = 0;
@@ -2699,21 +2610,20 @@
         const create_dateGroup = document.getElementById('create_leave_date_group');
         const create_attachFileGroup = document.getElementById('create_leave_attach_file_group');
         const create_timeGroup = document.getElementById('create_leave_time_group');
-        const create_durationSelect = timeGroup.querySelector('select');
+    const create_durationSelect = create_timeGroup.querySelector('select');
         const create_startHourTimeInput = document.getElementById('create_leave_start_hour');
         const create_startMinuteTimeInput = document.getElementById('create_leave_start_minute');
         const create_startDateInput = document.getElementById('create_leave_start_date');
         const create_stopTimeInput = document.getElementById('create_leave_stop_time');
         const create_stopDateInput = document.getElementById('create_leave_stop_date');
-        const create_daysInput = dateGroup.querySelector('input[type="number"]'); // ช่องลาจำนวน
+    const create_daysInput = create_dateGroup.querySelector('input[type="number"]'); // ช่องลาจำนวน
 
         const create_fileInput = document.getElementById('create_leave_fileInput');
         const create_selectFileBtn = document.getElementById('create_selectFileBtn');
         const create_uploadForm = document.getElementById('create_uploadForm');
         const create_fileListContainer = document.getElementById('create_leave_fileListContainer');
 
-        $(document).ready(async function () {
-        });
+
 
         // 08-15
         for (let h = 8; h <= 15; h++) {
@@ -2742,6 +2652,24 @@
             $('#modal_create_leave').modal();
         });
 
+        $('#date_create_leave').on('change', function () {
+            const date = new Date($('#date_create_leave').val());
+
+            const isHoliday = holidays.some(holiday =>
+                new Date(holiday.date).getFullYear() === date.getFullYear() &&
+                new Date(holiday.date).getMonth() === date.getMonth() &&
+                new Date(holiday.date).getDate() === date.getDate()
+            );
+            const dayOfWeek = date.getDay();
+
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            if (isWeekend || isHoliday) {
+                alert('วันหยุด');
+                $('#btn_confirm_date_create').attr('disabled', true);
+            } else {
+                $('#btn_confirm_date_create').attr('disabled', false);
+            }
+        });
 
         $('#create_select_leave_type').on('change', async function () {
             let date_create = $('#date_create_leave').val();
@@ -2765,40 +2693,41 @@
                 success: function (response) {
                     leave = response.leave;
                     create_balance_leave = response.balance;
-                    gender = response.gender;
+                    create_gender = response.gender;
                     hire_date = response.hire_date;
                 }
             });
 
             //Check Request Timing
-            let chk_request_timing = CheckRequestTiming(request_date);
+            let chk_request_timing = CheckCreateRequestTiming(request_date);
             let amount_diff_day = diffDays(new Date(), hire_date);
             if (amount_diff_day > leave.length_start_date) {
                 if (chk_request_timing) {
                     //Check Gender Restriction
-                    let chk_gender_restriction = CheckGenderRestriction(gender);
+                    let chk_gender_restriction = CheckCreateGenderRestriction(create_gender);
+
                     if (chk_gender_restriction) {
 
                         $('#create_leave_description').text(description);
-                        $('#create_leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
+                        $('#create_leave_balance').text(create_balance_leave + '/' + leave.amount_entitlement + ' วัน');
                         $('#create_div_leave').prop('hidden', false);
                         $('#create_div_main_leave').css('height', '500px');
                         $('#create_div_main_leave').css('overflow-y', 'auto');
                         $('#create_btn_leave_send').prop('disabled', false);
 
                         //Reset Full day Click
-                        resetButtonStyles();
+                        resetCreateButtonStyles();
                         create_leaveFullBtn.classList.add('active');
-                        create_toggleGroupDisplay(dateGroup, true);
-                        create_toggleGroupDisplay(timeGroup, false);
+                        create_toggleGroupDisplay(create_dateGroup, true);
+                        create_toggleGroupDisplay(create_timeGroup, false);
                         //daysInput.disabled = false;
                         create_daysInput.value = 1;
-                        create_stopDateInput.value = startDateInput.value;
+                        create_stopDateInput.value = create_startDateInput.value;
                         create_stopDateInput.disabled = false;
 
                         //Check attachment_required
                         create_type_duration = "Day";
-                        CheckAttachFileRequire(type_duration);
+                        CheckCreateAttachFileRequire(create_type_duration);
 
                         $('#create_leave_full').prop('disabled', false);
                         $('#create_leave_half').prop('disabled', false);
@@ -2831,111 +2760,99 @@
             create_is_full_day = true;
         });
 
-        function diffDays(date1, date2) {
-            const d1 = new Date(date1);
-            const d2 = new Date(date2);
 
-            d1.setHours(0, 0, 0, 0);
-            d2.setHours(0, 0, 0, 0);
-
-            const diffTime = Math.abs(d2 - d1);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            return diffDays;
+        function resetCreateButtonStyles() {
+            create_leaveFullBtn.classList.remove('active');
+            create_leaveHalfBtn.classList.remove('active');
+            create_leaveHoursBtn.classList.remove('active');
         }
 
-            function resetButtonStyles() {
-                leaveFullBtn.classList.remove('active');
-                leaveHalfBtn.classList.remove('active');
-                leaveHoursBtn.classList.remove('active');
-            }
-
-            function setHalfDayOptions() {
-                durationSelect.innerHTML = `
+            function create_setHalfDayOptions() {
+                create_durationSelect.innerHTML = `
                         <option value=""selected disabled>Select</option>
                         <option value="morning">ครึ่งวันเช้า</option>
                         <option value="afternoon">ครึ่งวันบ่าย</option>
                     `;
-                startHourTimeInput.value = '08';
-                startMinuteTimeInput.value = '00';
-                stopTimeInput.value = '';
-                startHourTimeInput.disabled = false;
-                startMinuteTimeInput.disabled = false;
-                daysInput.value = 0;
-                stopDateInput.value = startDateInput.value;
-                stopDateInput.disabled = true;
+                create_startHourTimeInput.value = '08';
+                create_startMinuteTimeInput.value = '00';
+                create_stopTimeInput.value = '';
+                create_startHourTimeInput.disabled = false;
+                create_startMinuteTimeInput.disabled = false;
+                create_daysInput.value = 0;
+                create_stopDateInput.value = create_startDateInput.value;
+                create_stopDateInput.disabled = true;
                 // เพิ่ม event listener สำหรับการเปลี่ยนแปลงใน select
-                durationSelect.onchange = function () {
+                create_durationSelect.onchange = function () {
                     if (this.value === 'morning') {
-                        startHourTimeInput.value = '08';
-                        startMinuteTimeInput.value = '30';
-                        stopTimeInput.value = '12:00';
-                        startHourTimeInput.disabled = true;
-                        startMinuteTimeInput.disabled = true;
+                        create_startHourTimeInput.value = '08';
+                        create_startMinuteTimeInput.value = '30';
+                        create_stopTimeInput.value = '12:00';
+                        create_startHourTimeInput.disabled = true;
+                        create_startMinuteTimeInput.disabled = true;
                     } else if (this.value === 'afternoon') {
-                        startHourTimeInput.value = '13';
-                        startMinuteTimeInput.value = '00';
-                        stopTimeInput.value = '17:30';
-                        startHourTimeInput.disabled = true;
-                        startMinuteTimeInput.disabled = true;
+                        create_startHourTimeInput.value = '13';
+                        create_startMinuteTimeInput.value = '00';
+                        create_stopTimeInput.value = '17:30';
+                        create_startHourTimeInput.disabled = true;
+                        create_startMinuteTimeInput.disabled = true;
                     } else {
-                        startHourTimeInput.value = '08';
-                        startMinuteTimeInput.value = '30';
-                        stopTimeInput.value = '';
-                        startHourTimeInput.disabled = false;
-                        startMinuteTimeInput.disabled = false;
+                        create_startHourTimeInput.value = '08';
+                        create_startMinuteTimeInput.value = '30';
+                        create_stopTimeInput.value = '';
+                        create_startHourTimeInput.disabled = false;
+                        create_startMinuteTimeInput.disabled = false;
                     }
 
                     // Check balance
-                    if (balance_leave < 0.5) {
+                    if (create_balance_leave < 0.5) {
                         alert('วันลาไม่เพียงพอ');
-                        $('#btn_leave_send').prop('disabled', true);
+                        $('#create_btn_leave_send').prop('disabled', true);
                     } else {
-                        $('#btn_leave_send').prop('disabled', false);
+                        $('#create_btn_leave_send').prop('disabled', false);
                     }
                 };
             }
             // ฟังก์ชันจัดการตัวเลือกใน select สำหรับ leave_hours
-            function setHourlyOptions() {
-                durationSelect.innerHTML = `
+        function create_setHourlyOptions() {
+            create_durationSelect.innerHTML = `
                         <option value="" selected disabled>Select</option>
                         <option value="2">2 ชั่วโมง</option>
                         <option value="4">4 ชั่วโมง</option>
                         <option value="6">6 ชั่วโมง</option>
                     `;
-                startHourTimeInput.value = '08';
-                startMinuteTimeInput.value = '30';
-                stopTimeInput.value = '';
-                startHourTimeInput.disabled = false;
-                startMinuteTimeInput.disabled = false;
-                daysInput.value = 0;
-                stopDateInput.value = startDateInput.value;
-                stopDateInput.disabled = true;
-                // รีเซ็ตค่าเวลาและ enable start_time เมื่อเปลี่ยนเป็นรายชั่วโมง
-                durationSelect.onchange = function () {
+            create_startHourTimeInput.value = '08';
+            create_startMinuteTimeInput.value = '30';
+            create_stopTimeInput.value = '';
+            create_startHourTimeInput.disabled = false;
+            create_startMinuteTimeInput.disabled = false;
+            create_daysInput.value = 0;
+            create_stopDateInput.value = create_startDateInput.value;
+            create_stopDateInput.disabled = true;
+            // รีเซ็ตค่าเวลาและ enable start_time เมื่อเปลี่ยนเป็นรายชั่วโมง
+            create_durationSelect.onchange = function () {
 
-                    calculateTime();
-                    startHourTimeInput.disabled = false;
-                    startMinuteTimeInput.disabled = false;
-                    // Check Balance
-                    let duration = parseInt(durationSelect.value);
-                    let hour = (duration / 8);
-                    if (balance_leave < hour) {
-                        alert('วันลาไม่เพียงพอ');
-                        $('#btn_leave_send').prop('disabled', true);
-                    } else {
-                        $('#btn_leave_send').prop('disabled', false);
-                    }
-                };
+                calculateCreateTime();
+                create_startHourTimeInput.disabled = false;
+                create_startMinuteTimeInput.disabled = false;
+                // Check Balance
+                let duration = parseInt(create_durationSelect.value);
+                let hour = (duration / 8);
+                if (create_balance_leave < hour) {
+                    alert('วันลาไม่เพียงพอ');
+                    $('#create_btn_leave_send').prop('disabled', true);
+                } else {
+                    $('#create_btn_leave_send').prop('disabled', false);
+                }
+            };
 
-                startHourTimeInput.onchange = function () {
-                    calculateTime();
-                };
+            create_startHourTimeInput.onchange = function () {
+                calculateCreateTime();
+            };
 
-                startMinuteTimeInput.onchange = function () {
-                    calculateTime();
-                };
-            }
+            create_startMinuteTimeInput.onchange = function () {
+                calculateCreateTime();
+            };
+        }
             // ฟังก์ชันจัดการ animation เมื่อแสดงหรือซ่อน
             function create_toggleGroupDisplay(group, show) {
                 if (show) {
@@ -2964,25 +2881,25 @@
             }
             // เมื่อกดปุ่ม "ทั้งวัน"
             create_leaveFullBtn.addEventListener('click', function () {
-                resetButtonStyles();
+                resetCreateButtonStyles();
                 create_leaveFullBtn.classList.add('active');
                 create_toggleGroupDisplay(create_dateGroup, true);
                 create_toggleGroupDisplay(create_timeGroup, false);
                 //daysInput.disabled = false;
                 create_daysInput.value = 1;
-                create_stopDateInput.value = startDateInput.value;
+                create_stopDateInput.value = create_startDateInput.value;
                 create_stopDateInput.disabled = false;
 
                 //Check attachment_required
                 create_type_duration = "Day";
-                CheckAttachFileRequire(create_type_duration);
+                CheckCreateAttachFileRequire(create_type_duration);
 
                 create_is_full_day = true;
 
             });
             // เมื่อกดปุ่ม "ครึ่งวัน"
             create_leaveHalfBtn.addEventListener('click', function () {
-                resetButtonStyles();
+                resetCreateButtonStyles();
                 create_leaveHalfBtn.classList.add('active');
                 create_toggleGroupDisplay(create_dateGroup, true); // แสดง date_group
                 create_toggleGroupDisplay(create_timeGroup, true); // แสดง time_group
@@ -2991,13 +2908,13 @@
 
                 //Check attachment_required
                 create_type_duration = "Half";
-                CheckAttachFileRequire(type_duration);
+                CheckCreateAttachFileRequire(create_type_duration);
 
                 create_is_full_day = false;
             });
             // เมื่อกดปุ่ม "รายชั่วโมง"
             create_leaveHoursBtn.addEventListener('click', function () {
-                resetButtonStyles();
+                resetCreateButtonStyles();
                 create_leaveHoursBtn.classList.add('active');
                 create_toggleGroupDisplay(create_dateGroup, true); // แสดง date_group
                 create_toggleGroupDisplay(create_timeGroup, true); // แสดง time_group
@@ -3006,7 +2923,7 @@
 
                 //Check attachment_required
                 create_type_duration = "Hours";
-                CheckAttachFileRequire(create_type_duration);
+                CheckCreateAttachFileRequire(create_type_duration);
 
                 create_is_full_day = false;
             });
@@ -3015,17 +2932,17 @@
             create_stopDateInput.addEventListener('change', function () {
                 //Check attachment_required
                 create_type_duration = "Day";
-                CheckAttachFileRequire(create_type_duration);
+                CheckCreateAttachFileRequire(create_type_duration);
             });
 
-        function CheckAttachFileRequire(type_duration) {
-            $('#btn_leave_send').prop('disabled', true);
-            let leave_type_id = $('#select_leave_type').val();
-            let _leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+        function CheckCreateAttachFileRequire(type_duration) {
+            $('#create_btn_leave_send').prop('disabled', true);
+            let leave_type_id = $('#create_select_leave_type').val();
+            let _leave = create_leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             if (type_duration == "Day") {
-                if (startDateInput.value !== "" && stopDateInput.value !== "") {
-                    let start = new Date(startDateInput.value);
-                    let stop = new Date(stopDateInput.value);
+                if (create_startDateInput.value !== "" && create_stopDateInput.value !== "") {
+                    let start = new Date(create_startDateInput.value);
+                    let stop = new Date(create_stopDateInput.value);
                     let diffInDays = 0;
                     if (stop >= start) {
                         if (_leave.count_holidays_as_leave === true) {
@@ -3033,69 +2950,69 @@
                         } else {
                             diffInDays = getBusinessDays(start, stop, holidays);
                         }
-                        if (balance_leave >= diffInDays) {
+                        if (create_balance_leave >= diffInDays) {
                             if (_leave.is_consecutive === true) {
                                 if (_leave.max_consecutive_days >= diffInDays) {
-                                    daysInput.value = diffInDays;
+                                    create_daysInput.value = diffInDays;
                                 } else {
                                     alert(`ไม่สามารถลาเกิน ${_leave.max_consecutive_days} วัน`);
-                                    daysInput.value = 1;
-                                    stopDateInput.value = $('#working_date').val();
+                                    create_daysInput.value = 1;
+                                    create_stopDateInput.value = create_startDateInput.value;
                                 }
                             } else {
-                                daysInput.value = diffInDays;
+                                create_daysInput.value = diffInDays;
                             }
-                            $('#btn_leave_send').prop('disabled', false);
+                            $('#create_btn_leave_send').prop('disabled', false);
                         } else {
                             alert('วันลาไม่เพียงพอ');
-                            daysInput.value = 1;
-                            stopDateInput.value = $('#working_date').val();
-                            $('#btn_leave_send').prop('disabled', true);
+                            create_daysInput.value = 1;
+                            create_stopDateInput.value = create_startDateInput.value;
+                            $('#create_btn_leave_send').prop('disabled', true);
                         }
                     } else {
                         alert('ใส่วันผิด');
-                        daysInput.value = 1;
-                        stopDateInput.value = $('#working_date').val();
+                        create_daysInput.value = 1;
+                        create_stopDateInput.value = create_startDateInput.value;
                     }
                     //Check attachment_required
                     if (_leave.attachment_required === true) {
                         if (diffInDays >= Number(_leave.attachment_threshold_days)) {
-                            attachFileGroup.hidden = false;
-                            file_require = true;
+                            create_attachFileGroup.hidden = false;
+                            create_file_require = true;
                         } else {
-                            clearAttachFile();
+                            clearCreateAttachFile();
                         }
                     } else {
-                        clearAttachFile();
+                        clearCreateAttachFile();
                     }
                 }
             } else if (type_duration === "Half") {
                 //Check attachment_required
                 if (_leave.attachment_required === true) {
                     if (Number(_leave.attachment_threshold_days) === 0) {
-                        attachFileGroup.hidden = false;
-                        file_require = true;
+                        create_attachFileGroup.hidden = false;
+                        create_file_require = true;
                     } else {
-                        clearAttachFile();
+                        clearCreateAttachFile();
                     }
                 } else {
-                    clearAttachFile();
+                    clearCreateAttachFile();
                 }
             } else if (type_duration === "Hours") {
                 //Check attachment_required
                 if (_leave.attachment_required === true) {
                     if (Number(_leave.attachment_threshold_days) === 0) {
-                        attachFileGroup.hidden = false;
-                        file_require = true;
+                        create_attachFileGroup.hidden = false;
+                        create_file_require = true;
                     } else {
-                        clearAttachFile();
+                        clearCreateAttachFile();
                     }
                 } else {
-                    clearAttachFile();
+                    clearCreateAttachFile();
                 }
             }
         }
-        function CheckRequestTiming(request_date) {
+        function CheckCreateRequestTiming(request_date) {
             let leave_type_id = $('#create_select_leave_type').val();
             let leave = create_leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             let date_now = new Date();
@@ -3119,13 +3036,13 @@
                 }
             }
         }
-        function CheckGenderRestriction(gender) {
+        function CheckCreateGenderRestriction(gender) {
             let leave_type_id = $('#create_select_leave_type').val();
             let leave = create_leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             if (leave.gender_restriction === "Both") {
                 return true;
             } else {
-                if (leave.gender_restriction === gender) {
+                if (leave.gender_restriction === create_gender) {
                     return true;
                 } else {
                     return false;
@@ -3133,12 +3050,24 @@
             }
         }
 
-        function clearAttachFile() {
-            ClearAttachFile();
-            attachFileGroup.hidden = true;
-            loadExistingFiles([]);
-            file_require = false;
+        function clearCreateAttachFile() {
+            ClearCreateAttachFile();
+            create_attachFileGroup.hidden = true;
+            loadCreateExistingFiles([]);
+            create_file_require = false;
+
         };
+        async function ClearCreateAttachFile() {
+            for (let i = 0; i < create_tempFileIds.length; i++) {
+                try {
+                    await fetch(`./Leave/DeleteTemp?tempId=${create_tempFileIds[i]}`, { method: 'DELETE' });
+                } catch (err) {
+                    console.error('ลบไฟล์ล้มเหลว', err);
+                }
+            }
+            create_fileListContainer.innerHTML = '';
+            create_tempFileIds = [];
+        }
 
             function getDaysBetween(startDate, endDate, absolute = true) {
                 const start = new Date(startDate);
@@ -3151,8 +3080,6 @@
             function getBusinessDays(startDate, endDate, holidays = []) {
                 const start = new Date(startDate);
                 const end = new Date(endDate);
-
-                //if (start > end) [start, end] = [end, start];
 
                 let count = 0;
                 const current = new Date(start);
@@ -3180,14 +3107,14 @@
                 return hours * 60 + minutes;
             }
 
-            function calculateTime() {
+            function calculateCreateTime() {
                 let first = timeToMinutes("08:30");
                 let last = timeToMinutes("17:30");
-                let duration = parseInt(durationSelect.value);
-                let start = startHourTimeInput.value + ':' + startMinuteTimeInput.value;
+                let duration = parseInt(create_durationSelect.value);
+                let start = create_startHourTimeInput.value + ':' + create_startMinuteTimeInput.value;
                 if (timeToMinutes(start) >= first && timeToMinutes(start) <= last) {
                     let [hours, minutes] = start.split(':').map(Number);
-                    let date = new Date(startDateInput.value);
+                    let date = new Date(create_startDateInput.value);
                     date.setHours(hours);
                     date.setMinutes(minutes);
                     date.setSeconds(0);
@@ -3195,85 +3122,85 @@
                     date.setHours(date.getHours() + duration);
 
                     if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
-                        if (parseInt(startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0) || (date.getHours() > 12 )) {
+                        if (parseInt(create_startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0) || (date.getHours() > 12 )) {
                             date.setHours(date.getHours() + 1);
                         }
                         if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
                             let stopHours = String(date.getHours()).padStart(2, '0');
                             let stopMinutes = String(date.getMinutes()).padStart(2, '0');
                             let stopTime = `${stopHours}:${stopMinutes}`;
-                            stopTimeInput.value = stopTime;
+                            create_stopTimeInput.value = stopTime;
                         } else {
                             alert('ใส่เวลาผิด');
-                            startHourTimeInput.value = '08';
-                            startMinuteTimeInput.value = '30';
+                            create_startHourTimeInput.value = '08';
+                            create_startMinuteTimeInput.value = '30';
                             date.setHours(8);
                             date.setMinutes(30);
                             date.setHours(date.getHours() + duration);
                             let stopHours = String(date.getHours()).padStart(2, '0');
                             let stopMinutes = String(date.getMinutes()).padStart(2, '0');
                             let stopTime = `${stopHours}:${stopMinutes}`;
-                            stopTimeInput.value = stopTime;
+                            create_stopTimeInput.value = stopTime;
                         }
                     } else {
                         alert('ใส่เวลาผิด');
-                        startHourTimeInput.value = '08';
-                        startMinuteTimeInput.value = '30';
+                        create_startHourTimeInput.value = '08';
+                        create_startMinuteTimeInput.value = '30';
                         date.setHours(8);
                         date.setMinutes(30);
                         date.setHours(date.getHours() + duration);
                         let stopHours = String(date.getHours()).padStart(2, '0');
                         let stopMinutes = String(date.getMinutes()).padStart(2, '0');
                         let stopTime = `${stopHours}:${stopMinutes}`;
-                        stopTimeInput.value = stopTime;
+                        create_stopTimeInput.value = stopTime;
                     }
                 } else {
                     alert('ใส่เวลาผิด');
-                    startHourTimeInput.value = '08';
-                    startMinuteTimeInput.value = '30';
+                    create_startHourTimeInput.value = '08';
+                    create_startMinuteTimeInput.value = '30';
                     let stopHours = String('08:30');
                     let stopMinutes = String('17:30');
                     let stopTime = `${stopHours}:${stopMinutes}`;
-                    stopTimeInput.value = "";
+                    create_stopTimeInput.value = "";
                 }
             }
-            leaveFullBtn.click();
+            create_leaveFullBtn.click();
 
 
-        if (!fileInput || !selectFileBtn || !uploadForm || !fileListContainer) {
+    if (!create_fileInput || !create_selectFileBtn || !create_uploadForm || !create_fileListContainer) {
             console.error('ไม่พบ element');
         }
 
         // === 1. เลือกไฟล์ ===
-        selectFileBtn.addEventListener('click', (e) => {
+        create_selectFileBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            fileInput.click();
+            create_fileInput.click();
         });
 
         // === 2. Drag & Drop ===
         ['dragenter', 'dragover'].forEach(event => {
-            uploadForm.addEventListener(event, (e) => {
+            create_uploadForm.addEventListener(event, (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                uploadForm.classList.add('dragover');
+                create_uploadForm.classList.add('dragover');
             });
         });
         ['dragleave', 'drop'].forEach(event => {
-            uploadForm.addEventListener(event, (e) => {
+            create_uploadForm.addEventListener(event, (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                uploadForm.classList.remove('dragover');
-                if (event === 'drop') handleFiles(e.dataTransfer.files);
+                create_uploadForm.classList.remove('dragover');
+                if (event === 'drop') handleCreateFiles(e.dataTransfer.files);
             });
         });
 
         // === 3. เมื่อเลือกไฟล์ ===
-        fileInput.addEventListener('change', () => {
-            handleFiles(fileInput.files);
-            fileInput.value = '';
+        create_fileInput.addEventListener('change', () => {
+            handleCreateFiles(create_fileInput.files);
+             create_fileInput.value = '';
         });
 
-        async function handleFiles(files) {
+        async function handleCreateFiles(files) {
             if (!files || files.length === 0) return;
 
             for (let file of files) {
@@ -3291,18 +3218,18 @@
                 }
 
                 // อัปโหลดทันที
-                const tempId = await uploadFileToTemp(file);
+                const tempId = await uploadCreateFileToTemp(file);
                 if (tempId) {
-                    tempFileIds.push(tempId.tempId);
-                    const fileItem = createFileItem(file.name, fileType, tempId.tempId, tempId.previewUrl);
-                    fileListContainer.appendChild(fileItem);
+                    create_tempFileIds.push(tempId.tempId);
+                    const fileItem = createCreateFileItem(file.name, fileType, tempId.tempId, tempId.previewUrl);
+                    create_fileListContainer.appendChild(fileItem);
                     setTimeout(() => fileItem.classList.add('show'), 10);
                 }
             }
         }
 
         // === 4. อัปโหลดไป backend (temp) ===
-        async function uploadFileToTemp(file) {
+        async function uploadCreateFileToTemp(file) {
             const formData = new FormData();
             formData.append('file', file);
 
@@ -3327,7 +3254,7 @@
         }
 
         // === 5. สร้าง UI ไฟล์ ===
-        function createFileItem(fileName, fileType, tempId, fileUrl) {
+        function createCreateFileItem(fileName, fileType, tempId, fileUrl) {
             const fileItem = document.createElement('div');
             fileItem.className = 'list-group-item d-flex align-items-center file-item added';
             fileItem.dataset.tempId = tempId;
@@ -3361,7 +3288,7 @@
         }
 
         // === 6. ลบไฟล์ ===
-        fileListContainer.addEventListener('click', async (e) => {
+        create_fileListContainer.addEventListener('click', async (e) => {
             const btn = e.target.closest('.delete-btn');
             if (!btn) return;
 
@@ -3376,16 +3303,16 @@
             }
 
             // ลบจาก UI
-            tempFileIds = tempFileIds.filter(id => id !== tempId);
+            create_tempFileIds = create_tempFileIds.filter(id => id !== tempId);
             fileItem.classList.add('removing');
             setTimeout(() => fileItem.remove(), 300);
         });
 
         // === 7. โหลดไฟล์เก่า (ถ้ามี) ===
-        function loadExistingFiles(existingTempIds) {
+        function loadCreateExistingFiles(existingTempIds) {
 
-            fileListContainer.innerHTML = '';
-            tempFileIds = [];
+            create_fileListContainer.innerHTML = '';
+            create_tempFileIds = [];
 
             if (!Array.isArray(existingTempIds)) return;
 
@@ -3394,28 +3321,18 @@
                 const response = await fetch(`./Leave/GetTempFileInfo?tempId=${tempId}`);
                 if (response.ok) {
                     const info = await response.json();
-                    tempFileIds.push(tempId);
-                    const fileItem = createFileItem(info.fileName, info.fileType, tempId,"");
-                    fileListContainer.appendChild(fileItem);
+                    create_tempFileIds.push(tempId);
+                    const fileItem = createCreateFileItem(info.fileName, info.fileType, tempId,"");
+                    create_fileListContainer.appendChild(fileItem);
                     fileItem.classList.add('show');
                 }
             });
         }
 
         function ModalCreateCloseClick() {
-            ClearAttachFile();
+            clearCreateAttachFile();
         }
-        async function ClearAttachFile() {
-            for (let i = 0; i < tempFileIds.length; i++) {
-                try {
-                    await fetch(`./Leave/DeleteTemp?tempId=${tempFileIds[i]}`, { method: 'DELETE' });
-                } catch (err) {
-                    console.error('ลบไฟล์ล้มเหลว', err);
-                }
-            }
-            fileListContainer.innerHTML = '';
-            tempFileIds = [];
-        }
+
             //Alert
         function showAlert(message) {
             const modalAlert = document.getElementById('modal_alert');
@@ -3477,32 +3394,32 @@
                 }
 
                 $('#create_confirm_description').text(message);
-                $('#modal_confirm').modal();
+                $('#modal_create_confirm').modal();
             } else {
                 alert('ไม่สามารถลาข้ามปีได้');
             }
         });
 
-        $('#confirm_ok').on('click', async function () {
-            $('#confirm_ok').attr('disabled', true);
+        $('#create_confirm_ok').on('click', async function () {
+            $('#create_confirm_ok').attr('disabled', true);
             $('#SpinModal').modal();
             let emp_id = '@Html.Raw(Model.emp_id)';
-            let leave_type_id = $('#select_leave_type').val();
-            let leave = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+            let leave_type_id = $('#create_select_leave_type').val();
+            let leave = create_leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
             let leave_type_code = leave.leave_type_code;
             let is_two_step_approve = leave.is_two_step_approve;
-            let start_request_date = $('#leave_start_date').val();
-            let end_request_date = $('#leave_stop_date').val();
-            let description = $('#leave_note').val();
-            let amount_leave_day = $('#amount_leave').val();
+            let start_request_date = $('#create_leave_start_date').val();
+            let end_request_date = $('#create_leave_stop_date').val();
+            let description = $('#create_leave_note').val();
+            let amount_leave_day = $('#create_amount_leave').val();
 
             let start_request_time = "00:00:00";
             let end_request_time = "00:00:00";
             if (!is_full_day) {
-                let hour = $('#leave_start_hour').val();
-                let minute = $('#leave_start_minute').val();
+                let hour = $('#create_leave_start_hour').val();
+                let minute = $('#create_leave_start_minute').val();
                 start_request_time = hour + ":" + minute;
-                end_request_time = $('#leave_stop_time').val();
+                end_request_time = $('#create_leave_stop_time').val();
             }
 
             let str = JSON.stringify({
@@ -3552,4 +3469,5 @@
             return `${dayOfWeek} ${day}/${month}/${year}`;
         }
     </script>
+   
 }
