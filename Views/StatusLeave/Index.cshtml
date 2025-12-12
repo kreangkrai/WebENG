@@ -644,14 +644,14 @@
                 @if (levels.Where(w => w.emp_id == emp_id).Any(a => a.level > 0) || role == "Admin" || role == "Admin Leave")
                 {
                     <div class="ml-auto">
-                        <button class="btn btn-light mr-2 kanit-regular" data-toggle="modal" data-target="#sendModal"
+                        <button class="btn btn-light mr-2 kanit-regular" onclick="ExportToText()"
                                 style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
                             <i class="fas fa-file-alt mr-2"></i>Export to Text
                         </button>
-                        <button class="btn btn-success  kanit-regular" data-toggle="modal" data-target="#sendModal"
+                        @*<button class="btn btn-success  kanit-regular" data-toggle="modal" data-target="#sendModal"
                                 style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
                             <i class="fas fa-file-excel mr-1"></i> Export to Excel
-                        </button>
+                        </button>*@
                     </div>
                 }
             </div>
@@ -3467,6 +3467,13 @@
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             return `${dayOfWeek} ${day}/${month}/${year}`;
+        }
+
+
+        function ExportToText() {
+            const start = $('#date_start').val();
+            const stop = $('#date_stop').val();
+            location.href = '@Url.Action("ExportToText", "StatusLeave")?start='+ start + '&stop=' + stop;
         }
     </script>
    

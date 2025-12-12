@@ -534,93 +534,54 @@
         @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
     </div>
 
-    <div class="col-xl-2 col-sm-12">
-        <!-- Top Left Side: Filter -->
-        <div class=" mb-3">
-            <form>
-                <div class="col-12">
-                    <div class="card shadow-sm modern-card" style="border-radius: 12px; overflow: hidden;">
-                        <div class="card-header text-white" style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%); padding: 12px 15px;">
-                            <h5 class="kanit-medium mb-0" style="font-size: 20px; letter-spacing: 2px;">ตัวกรอง</h5>
-                        </div>
-                        <div class="card-body p-3">
-                            <!-- Dropdown กรองแผนก -->
-                            <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">แผนก</label>
-                                <select id="departmentSelect" class="form-control kanit-regular" style="font-size: 16px;">
+    <!-- Right Side : Table Leave History-->
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
+            <div class="card-header p-3"
+                 style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
+            border-radius: 20px 20px 0 0; min-height: 60px;">
+
+                <div class="row align-items-center g-2 g-md-4">
+                    <!-- Title Column -->
+                    <div class="col-12 col-md-4 col-lg-3 mb-2 mb-md-0">
+                        <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
+                            style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
+                            สถิติการลา
+                        </h4>
+                    </div>
+                    <div class="col-12 col-md-8 col-lg-9">
+                        <div class="row align-items-center g-2 g-md-3">
+                            <div class="col-4 col-sm-4 col-md-5 col-xl-4">
+                                <select id="select_department" class="form-control kanit-regular w-100"
+                                        style="font-size: 16px;">
                                 </select>
                             </div>
-                            <!-- วันที่เริ่มต้น -->
-                            <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">วันที่เริ่มต้น</label>
-                                <input type="date" class="form-control kanit-regular" id="date_start">
+
+                            <div class="col-4 col-sm-4 col-md-4 col-xl-4">
+                                <select id="select_year" class="form-control kanit-regular w-100"
+                                        style="font-size: 16px;">
+                                </select>
                             </div>
-                            <!-- วันที่สิ้นสุด -->
-                            <div class="form-group mb-3">
-                                <label class="kanit-regular text-muted" style="font-size: 18px;">วันที่สิ้นสุด</label>
-                                <input type="date" class="form-control kanit-regular" id="date_end">
+                            <div class="col-4 col-sm-4 col-md-3 col-xl-4 text-md-right">
+                                <button class="btn btn-success kanit-regular w-100 w-md-auto px-3"
+                                        style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap; font-size: 14px;"
+                                        type="button">
+                                    <i class="fas fa-file-excel"></i> Export
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Right Side : Table Leave History-->
-    <div class="col-xl-10 col-md-9 col-sm-12">
-        <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
-            <div class="card-header p-3 d-flex justify-content-between align-items-center"
-                 style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
-                 border-radius: 20px 20px 0 0; min-height: 60px;">
-
-                <!-- ซ้าย: หัวข้อ -->
-                <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
-                    style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
-                    สถิติการลา
-                </h4>
-
-                <!-- ขวา: ปุ่ม Export ชิดขวา -->
-                <button class="btn btn-success ml-auto kanit-regular" data-toggle="modal" data-target="#sendModal"
-                        style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap;">
-                    <i class="fas fa-file-excel"></i> Export to Excel
-                </button>
             </div>
 
             <div class="freeze-pane">
-                <table id="table_approve" class="table table-sm table-hover text-center mb-0 overflow-auto">
-                    <thead style="font-size:18px; color:#555">
-                        @* <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
-                        <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
-                        <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                        <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th> *@
-                        <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
-                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
-                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
-                            <th>แผนก</th>
-                            <th>สิทธิ์การลาพักร้อน</th>
-                            <th>พักร้อนคงเหลือ</th>
-                            <th>รวมวันลาทั้งหมด</th>
-                            <th>ลาป่วย</th>
-                            <th>ไม่รับค่าจ้าง</th>
-                            <th>พักร้อน</th>
-                            <th>ลาบวช</th>
-                            <th>ลาคลอด</th>
-                            <th>ลาสมรส</th>
-                            <th>ลาฌาปนกิจ</th>
-                            <th>ลากิจ(ราชการ)</th>
-                            <th>สาย(ครั้ง)</th>
-                            <th>สาย(นาที)</th>
-                            <th>ลืมสแกนหน้า(ครั้ง)</th>
-                            <th>แผนกเดิมปี 2024</th>
-                            <th>แผนกใหม่ปี 2025</th>
-                            
+                <table id="table_approve" class="table table-sm table-hover text-center mb-0 overflow-auto" style="width:100%;">
+                    <thead style="font-size: 16px; color: #555; border-width: 2px; border: solid;border-color:black">
+                        <tr id="LeaveTypeRow" class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
                         </tr>
                     </thead>
-
                     <tbody>
-                        <tr class="clickable-row kanit-regular"
+                        @*<tr class="clickable-row kanit-regular"
                             style="color:#555;">
                             <td class="freeze-left-1" style="width:70px;">1</td>
                             <td class ="freeze-left-2" style="width:100px;">066403</td>
@@ -666,7 +627,7 @@
                             <td>-</td>
                             <td>ENG</td>
                             <td>CES</td>
-                        </tr>
+                        </tr>*@
 
                     </tbody>
                 </table>
@@ -676,493 +637,83 @@
 
 </div>
 
-<button id="btn_delete" type="button" class="btn modern-btn btn-outline-primary mr-auto elevation-1 kanit-regular" data-toggle="modal" data-target="#NotiLeavePendingApproval">
-    แจ้งเตือนใบลารออนุมัติ
-</button>
-<button id="btn_delete" type="button" class="btn modern-btn btn-outline-warning mr-auto elevation-1 kanit-regular" data-toggle="modal" data-target="#NotiLeaveReturned">
-    ใบลาของท่านถูกส่งกลับ
-</button>
-
-<!-- Modal แจ้งเตือนใบลารออนุมัติ -->
-<div class="modal fade  bg-white" id="NotiLeavePendingApproval" tabindex="-1" style="height:800px">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="email-wrapper kanit-regular">
-
-            <!-- Header -->
-            <div class="header" style="background: linear-gradient(135deg,#1e88e5,#1565c0);">
-                <h1><i class="fas fa-calendar-check fa-fw"></i> แจ้งเตือนใบลารออนุมัติ</h1>
-            </div>
-
-            <!-- Content -->
-            <div class="content">
-
-                <p>มีพนักงานยื่นคำขอลาใหม่ รอการพิจารณาจากท่าน</p>
-
-                <div class="info-card">
-                    <table class="table table-borderless mb-0">
-                        <tr><th width="140"><i class="fas fa-user text-primary mr-1"></i> ผู้ยื่นคำขอ</th><td>นายสมชาย ใจดี (E12345)</td></tr>
-                        <tr><th><i class="fas fa-building text-primary mr-1"></i> แผนก</th><td>ฝ่ายเทคโนโลยีสารสนเทศ</td></tr>
-                        <tr><th><i class="fas fa-calendar-alt text-primary mr-1"></i> ประเภทการลา</th><td>ลาป่วย</td></tr>
-                        <tr><th><i class="fas fa-clock text-primary mr-1"></i> วันที่ลา</th><td>3 ธันวาคม 2568 – 5 ธันวาคม 2025</td></tr>
-                        <tr><th><i class="fas fa-hourglass-half text-primary mr-1"></i> จำนวนวัน</th><td>3 วัน</td></tr>
-                        <tr><th><i class="fas fa-comment-dots text-primary mr-1"></i> เหตุผล</th><td>มีอาการไข้สูงและปวดศีรษะ ต้องพักรักษาตัวตามคำแนะนำแพทย์</td></tr>
-                    </table>
-                </div>
-
-                <!-- ปุ่มเดียวขนาดใหญ่ -->
-                <div class="text-center">
-                    <a href="https://yourcompany.com/Leave/Detail/12345?token=abc123xyz"
-                       class="btn-single" style="letter-spacing:1px">
-                        ไปยังหน้าอนุมัติ LEAVE : CUP
-                    </a>
-                </div>
-
-                <div class="alert alert-info text-center mt-4">
-                    <i class="fas fa-info-circle"></i>
-                    คลิกปุ่มด้านบนเพื่อไปยังหน้าระบบลาโดยตรง<br>
-                    <small>
-                        (ท่านสามารถเลือก อนุมัติ หรือ ไม่อนุมัติ พร้อมพิมพ์เหตุผลได้ในหน้าเว็บ)<br>
-                    </small>
-                </div>
-
-            </div>
-
-            <!-- Footer -->
-            <div class="footer">
-                <p>ระบบการลาออนไลน์ • บริษัท คอนโทรลอจิค จำกัด</p>
-                <p>หากมีข้อสงสัยกรุณาติดต่อฝ่ายบุคคล โทร. 02-xxx-xxxx ต่อ 888 </p>
-                <small>© 2025 บริษัท คอนโทรลอจิค จำกัด สงวนลิขสิทธิ์</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal ใบลาของท่านถูกส่งกลับ -->
-<div class="modal fade  bg-white" id="NotiLeaveReturned" tabindex="-1" style="height:800px">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="email-wrapper kanit-regular">
-
-            <!-- Header (สีส้มเตือน) -->
-            <div class="header" style="background-color:darkorange">
-                <h1><i class="fas fa-exclamation-triangle fa-fw"></i> ใบลาของท่านถูกส่งกลับ</h1>
-            </div>
-
-            <!-- Content -->
-            <div class="content">
-
-                <p>มีพนักงานยื่นคำขอลาใหม่ รอการพิจารณาจากท่าน</p>
-
-                <div class="alert-box mb-2">
-                    <strong><i class="fas fa-info-circle mr-1"></i> สถานะใบลาของท่าน:</strong><br>
-                    ผู้อนุมัติได้พิจารณาแล้ว และ <span style="color:#e65100;font-weight:600;">ส่งกลับเพื่อแก้ไขข้อมูลเพิ่มเติม</span>
-                </div>
-
-                <div class="info-card" style="background:#f8f9fa;border-radius:12px;padding:25px;border-left:5px solid #fb8c00;">
-                    <table class="table table-borderless mb-0">
-                        <tr><th width="140"><i class="fas fa-calendar-alt text-warning mr-1"></i> ประเภทการลา</th><td>ลากิจส่วนตัว</td></tr>
-                        <tr><th><i class="fas fa-clock text-warning mr-1"></i> วันที่ลา</th><td>10 ธันวาคม 2568 – 12 ธันวาคม 2025</td></tr>
-                        <tr><th><i class="fas fa-user-tie text-warning mr-1"></i> ผู้พิจารณา</th><td>นางสาวสมหญิง ดีมาก</td></tr>
-                    </table>
-                </div>
-
-                <!-- ความเห็นจากผู้อนุมัติ -->
-                <div class="comment-box mb-4">
-                    <strong><i class="fas fa-comment-dots mr-1"></i> ความเห็นจากผู้อนุมัติ:</strong><br><br>
-                    “กรุณาแนบใบรับรองแพทย์ตัวจริงเพิ่มเติม และระบุรายละเอียดอาการให้ชัดเจนกว่านี้ค่ะ
-                    เนื่องจากเป็นการลาป่วยเกิน 3 วัน ต้องมีเอกสารรับรองจากโรงพยาบาลนะคะ ขอบคุณค่ะ”
-                </div>
-
-                <!-- ปุ่มเดียวขนาดใหญ่ -->
-                <div class="text-center">
-                    <a href="https://yourcompany.com/Leave/Detail/12345?token=abc123xyz"
-                       class="btn-single" style="letter-spacing:1px">
-                        <i class="fas fa-edit fa-fw"></i> แก้ไขใบลาเดี๋ยวนี้
-                    </a>
-                </div>
-
-                <div class="alert alert-info text-center mt-4">
-                    <i class="fas fa-info-circle"></i>
-                    คลิกปุ่มด้านบนเพื่อไปยังหน้าระบบลาโดยตรง<br>
-                    <small>
-                        หลังจากแก้ไขเรียบร้อยแล้ว กรุณากด “ส่งอนุมัติใหม่”<br>
-                    </small>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="footer">
-                <p>ระบบการลาออนไลน์ • บริษัท คอนโทรลอจิค จำกัด</p>
-                <p>หากมีข้อสงสัยกรุณาติดต่อฝ่ายบุคคล โทร. 02-xxx-xxxx ต่อ 888 </p>
-                <small>© 2025 บริษัท คอนโทรลอจิค จำกัด สงวนลิขสิทธิ์</small>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts
 {
     <script type="text/javascript">
-        let table_leave = null;
-        let leaves = [];
-        let departments = [];
-        let employees = [];
-        let selectedEmployee = null;
-        let requestHistory = [];
-
-        const request_status = [
-            { status_en: "Pending", status: { status_th: "รออนุมัติ", class: "warning" } },
-            { status_en: "Resubmit", status: { status_th: "ส่งใหม่", class: "secondary" } },
-            { status_en: "Cancelled", status: { status_th: "ยกเลิก", class: "dark" } },
-            { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
-            { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
-            { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
-            { status_en: "Success", status: { status_th: "สำเร็จ", class: "primary" } },
-        ];
-
         $(document).ready(async function () {
-            await GetEmployee();
-            initSearchEvents();
-            loadInitialLeaveHistory();
+            const leaves_type = await GetLeaveType();
+            generateLeaveTypeHeaders(leaves_type);
+            const departments = await GetDepartments();
+            GenerateDepartments(departments);
+            GenerateYears();
         });
 
-        async function GetEmployee() {
+        async function GetLeaveType() {
+            let leaves = [];
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetEmployee", "StatusLeave")',
+                url: '@Url.Action("GetLeaveType", "TimeAttendance")',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {  },
+                success: function (response) {
+                    leaves = response;
+                }
+            });
+            return leaves;
+        }
+
+        function generateLeaveTypeHeaders(leaves_type) {
+            const LeaveTypeRow = $('#LeaveTypeRow');
+            LeaveTypeRow.empty();
+
+
+            LeaveTypeRow.append(`<th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
+                                 <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
+                                 <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                                 <th class="freeze-left-4" style="width:180px;">สิทธิการลาพักร้อน</th>
+                                 <th class="freeze-left-5" style="width:180px;">พักร้อนคงเหลือ</th>
+                                 <th class="freeze-left-6" style="width:180px;">รวมวันลาทั้งหมด</th>`);
+            for (let i = 0; i < leaves_type.length; i++) {
+                LeaveTypeRow.append(`<th style="width:100px;">${leaves_type[i].leave_name_th}</th>`);
+            }
+            LeaveTypeRow.append(`<th style="width:100px;">สาย (ครั้ง)</th>`);
+            LeaveTypeRow.append(`<th style="width:100px;">สาย (นาที)</th>`);
+            LeaveTypeRow.append(`<th style="width:100px;">ลืมสแกนหน้า (ครั้ง)</th>`);
+        }
+        async function GetDepartments() {
+            let departments = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDapartments", "TimeAttendance")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {},
                 success: function (response) {
-                    departments = response.departments;
-                    employees = response.employees;
-                    GenerateDepartmentOption(departments);
-                    GenerateUserOption(employees);
-                },
-                error: function () {
-                    console.error('โหลดข้อมูลพนักงานล้มเหลว');
+                    departments = response;                   
                 }
             });
+            return departments;
         }
 
-        async function GetRequestHistory(emp_id, year, month) {
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetRequestHistory", "StatusLeave")',
-                contentType: 'application/x-www-form-urlencoded',
-                data: { emp_id, year, month },
-                success: function (response) {
-                    requestHistory = response;
-
-                },
-                error: function () {
-                    console.error('โหลดข้อมูลพนักงานล้มเหลว');
-                }
-            });
-        }
-
-        async function GetLeaveBalance(emp_id, year) {
-            let balances = [];
-            await $.ajax({
-                type: "GET",
-                url: '@Url.Action("GetLeaveBalanceByEmpID", "StatusLeave")',
-                contentType: 'application/x-www-form-urlencoded',
-                data: { emp_id, year },
-                success: function (response) {
-                    balances = response;
-                },
-                error: function () {
-                    console.error('โหลดสิทธิ์ลาล้มเหลว');
-                }
-            });
-            return balances;
-        }
-
-        function GenerateDepartmentOption(departments) {
-            const $select = $('#departmentSelect');
-            $select.empty().append(`<option value="ALL" selected disabled>ทุกแผนก</option>`);
-            departments.forEach(dept => {
-                $select.append(`<option value="${dept}">${dept}</option>`);
-            });
-        }
-
-        function GenerateUserOption(employeesList) {
-            const $select = $('#employeeSelect');
-            $select.empty().append(`<option value="ALL" selected disabled>ทุกคน</option>`);
-            employeesList.forEach(emp => {
-                $select.append(`<option value="${emp.emp_id}">${emp.emp_id} : ${emp.name_en}</option>`);
-            });
-        }
-
-        function GenerateBalanceLeave(emp_th, balances) {
-            const $div = $('#div_leaves_balance').empty();
-            let str = '';
-            balances.forEach(b => {
-                str += `
-                            <div class="row mb-1">
-                                <div class="col-8 kanit-light" style="text-align:start">${b.leave_name_th}</div>
-                                <div class="col-4 kanit-light" style="text-align:end">
-                                    <strong>${b.balance}</strong> / <strong>${b.amount_entitlement}</strong>
-                                </div>
-                            </div>`;
-            });
-            $div.append(str);
-            $('#emp_th_balance_leave').text(emp_th);
-        }
-
-        // ===== AUTO-COMPLETE CUSTOM (หลัก) =====
-        function initSearchEvents() {
-            const $search = $('#employeeSearch');
-            const $results = $('#searchResults');
-            const $clearBtn = $('#clearSearch');
-            const $select = $('#employeeSelect');
-            let timeout = null;
-            let currentResults = [];
-
-            // แสดง/ซ่อนปุ่มล้าง
-            $search.on('input', function () {
-                $clearBtn.toggle($search.val().length > 0);
-            });
-
-            // ล้างการค้นหา
-            $clearBtn.on('click', function () {
-                $search.val('').trigger('input');
-                $select.val('ALL').trigger('change');
-                $results.hide().empty();
-                $('#employeeInfo').hide();
-                $('#noEmployee').show();
-                selectedEmployee = null;
-                clearLeaveHistory(); // ล้างตาราง
-            });
-
-            // ค้นหาแบบ debounce (หน่วง 300ms)
-            $search.on('input', function () {
-                clearTimeout(timeout);
-                const query = $search.val().trim().toLowerCase();
-                timeout = setTimeout(() => filterEmployees(query, $results), 300);
-            });
-
-            // คลิกเลือกจากผลลัพธ์
-            $results.on('click', '.search-item', function () {
-                const emp_id = $(this).data('emp-id');
-                const emp = employees.find(e => e.emp_id === emp_id);
-                if (emp) {
-                    selectEmployee(emp);
-                    $search.val(`${emp.emp_id} - ${emp.name_en}`);
-                }
-                $results.hide().empty();
-            });
-
-            // Keyboard navigation (ลูกศร + Enter)
-            $search.on('keydown', function (e) {
-                const $active = $results.find('.active');
-                if (e.key === 'Enter' && $active.length) {
-                    e.preventDefault();
-                    $active.click();
-                } else if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    let $next = $active.removeClass('active').next('.search-item');
-                    if (!$next.length) $next = $results.find('.search-item').first();
-                    $next.addClass('active');
-                } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    let $prev = $active.removeClass('active').prev('.search-item');
-                    if (!$prev.length) $prev = $results.find('.search-item').last();
-                    $prev.addClass('active');
-                } else if (e.key === 'Escape') {
-                    $results.hide().empty();
-                }
-            });
-
-            // ซ่อนผลลัพธ์เมื่อคลิกนอก
-            $(document).on('click', function (e) {
-                if (!$search.is(e.target) && !$results.is(e.target) && $results.has(e.target).length === 0) {
-                    $results.hide().empty();
-                }
-            });
-
-            // เริ่มต้นซ่อน
-            $clearBtn.hide();
-            $results.hide();
-            $('#employeeInfo').hide();
-            $('#noEmployee').show();
-        }
-
-        function filterEmployees(query, $results) {
-            if (query.length < 2) {
-                $results.hide().empty();
-                return;
-            }
-
-            const filtered = employees.filter(emp =>
-                emp.emp_id.toLowerCase().includes(query) ||
-                (emp.name_en && emp.name_en.toLowerCase().includes(query)) ||
-                (emp.name_th && emp.name_th.toLowerCase().includes(query))
-            ).slice(0, 10);
-
-            $results.empty();
-            if (filtered.length === 0) {
-                $results.append('<div class="list-group-item text-muted text-center p-3">ไม่พบพนักงาน</div>').show();
-                return;
-            }
-
-            filtered.forEach((emp, idx) => {
-                const item = $(`
-                            <div class="list-group-item search-item kanit-light p-3 border-bottom"
-                                 data-emp-id="${emp.emp_id}"
-                                 style="cursor: pointer; transition: background 0.2s;">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <strong>${emp.emp_id}</strong>
-                                    <small class="text-muted">${emp.name_th || emp.name_en}</small>
-                                </div>
-                                <small class="text-muted d-block">${emp.department || ''}</small>
-                            </div>
-                        `);
-                if (idx === 0) item.addClass('active bg-light');
-                $results.append(item);
-            });
-            $results.show();
-        }
-
-        function selectEmployee(emp) {
-            selectedEmployee = emp;
-
-            $('#EmpId').text(emp.emp_id);
-            $('#EmpName').text(emp.name_en);
-            $('#department').text(emp.department || '-');
-            $('#position').text(emp.position || '-');
-            $('#phone').text(emp.phone || '-');
-            $('#startDate').text(emp.start_date ? new Date(emp.start_date).toLocaleDateString('th-TH') : '-');
-
-            $('#employeeInfo').show();
-            $('#noEmployee').hide();
-            $('#employeeSelect').val(emp.emp_id);
-
-            loadLeaveBalanceAndHistory(emp.emp_id, emp.name_th);
-        }
-
-        async function loadLeaveBalanceAndHistory(emp_id, emp_th_name) {
-            const year = new Date().getFullYear();
-            const month = new Date().getMonth() + 1;
-            GetRequestHistory(emp_id, year, month);
-            const balances = await GetLeaveBalance(emp_id, year);
-            GenerateBalanceLeave(emp_th_name, balances);
-            renderLeaveHistory(emp_id);
-        }
-        function GetDayOfWeekName(date) {
-            const dayName = date.toLocaleDateString('th-TH', { weekday: 'short' });
-            return dayName;
-        }
-        function timeToMinutes(timeStr) {
-            const timePart = timeStr.split('.').pop();
-            const [h, m] = timePart.split(':').map(Number);
-            return h * 60 + m;
-        }
-
-        function renderLeaveHistory(emp_id) {
-            const $tbody = $('#table_leave tbody').empty();
-            requestHistory.forEach((row, index) => {
-                let request_date = `${GetDayOfWeekName(new Date(row.request_date))} ${row.request_date.split('T')[0]}`;
-                let start_request_date = `${GetDayOfWeekName(new Date(row.start_request_date))} ${row.start_request_date.split('T')[0]}`;
-                let duration = 0;
-                let start_request_time = "08:30";
-                let end_request_time = "17:30";
-                if (row.is_full_day) {
-                    duration = row.amount_leave_day;
+        function GenerateDepartments(departments) {
+            let select = $('#select_department');
+            select.empty();
+            select.append(`<option value="ALL" selected>ทุกแผนก</option>`);
+            for (let i = 0; i < departments.length; i++) {
+                if (i === 0) {
+                    select.append(`<option value="${departments[i]}">${departments[i]}</option>`);
                 } else {
-                    let start = timeToMinutes(row.start_request_time);
-                    let end = timeToMinutes(row.end_request_time);
-                    let diff = end - start;
-                    duration = (diff / 480).toFixed(2);
-                    if (duration > 0.3 && duration < 0.6) {
-                        duration = 0.50;
-                    }
-
-                    start_request_time = row.start_request_time.split('.')[1].substring(0, 5);
-                    end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
-                }
-
-                let status = request_status.filter(f => f.status_en === row.status_request).map(m => m.status)[0];
-                const tr = $(`
-                            <tr class="clickable-row kanit-regular" style="color:#555; font-size: 14px;"
-                                data-toggle="modal" data-target="#modal_leave"
-                                data-id="${row.request_id}" data-emp-id="${row.emp_id}"
-                                data-request-date="${request_date}" data-leave-date="${start_request_date}"
-                                data-time="${row.start_request_time}" data-duration="${duration}"
-                                data-type="${row.leave_name_th}" data-note="${row.decsription}" data-status="${row.status_request}">
-                                <td class="freeze-left-1">${index + 1}</td>
-                                <td class="freeze-left-2">${row.emp_id}</td>
-                                <td class="freeze-left-3">${selectedEmployee ? (selectedEmployee.name_en) : '-'}</td>
-                                <td>${request_date}</td>
-                                <td>${start_request_date}</td>
-                                <td>${start_request_time}-${end_request_time}</td>
-                                <td>${duration}</td>
-                                <td>${row.leave_name_th}</td>
-                                <td>${row.decsription}</td>
-                                <td><span class="badge badge-${status.class} p-2 kanit-light" style="font-size:16px; border-radius:20px;">${status.status_th}</span></td>
-                            </tr>
-                        `);
-
-                // คลิกแถว → เปิด Modal + เติม emp_id, emp_name
-                tr.on('click', function () {
-                    $('#emp_id').val(emp_id);
-                    $('#emp_name').val(selectedEmployee ? (selectedEmployee.name_en) : '');
-                    $('#modal_leave_title').text('แก้ไขการลา'); // ถ้าต้องการ
-                    $('#modal_leave').modal('show');
-                });
-
-                $tbody.append(tr);
-            });
-        }
-
-        function clearLeaveHistory() {
-            $('#table_leave tbody').empty();
-        }
-
-        function loadInitialLeaveHistory() {
-            renderLeaveHistory('ALL');
-        }
-
-        $('#departmentSelect').on('change', function () {
-            const department = $(this).val();
-            const filteredEmps = department === "ALL" ? employees : employees.filter(e => e.department === department);
-            GenerateUserOption(filteredEmps);
-            selectedEmployee = null;
-            $('#employeeInfo').hide();
-            $('#noEmployee').show();
-            clearLeaveHistory();
-        });
-
-        $('#employeeSelect').on('change', function () {
-            const emp_id = $(this).val();
-            if (emp_id === 'ALL') {
-                $('#employeeSearch').val('');
-                $('#searchResults').hide();
-                $('#employeeInfo').hide();
-                $('#noEmployee').show();
-                selectedEmployee = null;
-                clearLeaveHistory();
-            } else {
-                const emp = employees.find(e => e.emp_id === emp_id);
-                if (emp) {
-                    const selectedText = `${emp.emp_id} : ${emp.name_en}`;
-                    $('#employeeSearch').val(selectedText);
-                    $('#searchResults').hide();
-                    selectEmployee(emp);
+                    select.append(`<option value="${departments[i]}">${departments[i]}</option>`);
                 }
             }
-        });
+        }
 
-        $('#modal_leave').on('show.bs.modal', function (e) {
-            if (selectedEmployee) {
-                $('#emp_id').val(selectedEmployee.emp_id);
-                $('#emp_name').val(selectedEmployee.name_en);
+        function GenerateYears() {
+            let select = $('#select_year');
+            select.empty();
+            let year = new Date().getFullYear();
+            for (let i = year; i >= year - 5; i--) {
+                select.append(`<option value="${i}">${i}</option>`);
             }
-        });
-
-
-        $('#yearFilter, #monthFilter').on('change', function () {
-            if (selectedEmployee) {
-                renderLeaveHistory(selectedEmployee.emp_id);
-            }
-        });
+        }
     </script>
 }

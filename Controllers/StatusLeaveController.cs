@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using WebENG.CTLInterfaces;
 using WebENG.CTLServices;
@@ -32,7 +33,7 @@ namespace WebENG.Controllers
         private IMail Mail;
         private INotification Notification;
         private IWorkingHours WorkingHours;
-
+        private CTLInterfaces.IHoliday Holiday;
         public StatusLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
@@ -46,6 +47,7 @@ namespace WebENG.Controllers
             Mail = new MailService();
             Notification = new NotificationService();
             WorkingHours = new WorkingHoursService();
+            Holiday = new CTLServices.HolidayService();
         }
         public IActionResult Index()
         {
@@ -1140,6 +1142,89 @@ namespace WebENG.Controllers
                 default:
                     return "application/octet-stream";
             }
+        }
+
+        public async Task ExportToText(string start, string stop)
+        {
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(Convert.ToDateTime(start).Year.ToString());
+            List<RequestModel> requests = Requests.GetRequestByDurationDay(start, stop);
+            requests = requests.Where(w => w.status_request == "Completed").OrderBy(o=>o.emp_id).ToList();
+            StringBuilder sb = new StringBuilder();
+            string headers = string.Empty;
+            headers += "รหัสพนักงาน    วันที่ลา ตามวันลาจริง    รหัสกะ   รหัสผลข้อตกลงเงินหัก    รหัสลักษณะการรูดบัตร    วิธีลา    จำนวนที่ลา" + Environment.NewLine;
+            sb.Append(headers);
+
+            List<RequestModel> new_requests = new List<RequestModel>();
+            for (int i = 0; i < requests.Count; i++)
+            {
+                if (requests[i].is_full_day)
+                {
+                    if (requests[i].amount_leave_day > 1)
+                    {
+                        for (DateTime date = requests[i].start_request_date; date <= requests[i].end_request_date; date = date.AddDays(1))
+                        {
+                            if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday && !holidays.Any(a => a.date.Date == date.Date))
+                            {
+                                RequestModel request = new RequestModel()
+                                {
+                                    emp_id = requests[i].emp_id,
+                                    leave_name_th = requests[i].leave_name_th,
+                                    start_request_date = date,
+                                    end_request_date = date,
+                                    amount_leave_day = 1,
+                                    start_request_time = new TimeSpan(8, 30, 0),
+                                    end_request_time = new TimeSpan(17, 30, 0),
+                                };
+
+                                new_requests.Add(request);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RequestModel request = new RequestModel()
+                        {
+                            emp_id = requests[i].emp_id,
+                            leave_name_th = requests[i].leave_name_th,
+                            start_request_date = requests[i].start_request_date,
+                            end_request_date = requests[i].end_request_date,
+                            amount_leave_day = 1,
+                            start_request_time = new TimeSpan(8, 30, 0),
+                            end_request_time = new TimeSpan(17, 30, 0),
+                        };
+
+                        new_requests.Add(request);
+                    }
+                }
+                else
+                {
+                    new_requests.Add(requests[i]);
+                }
+            }
+
+            requests = new_requests;
+
+            foreach (var request in requests)
+            {
+                string row = string.Empty;
+                row += string.Format($"{request.emp_id}    {request.start_request_date.ToString("yyyyMMdd")}    00    {request.leave_type_code}    0    1    {request.amount_leave_day}") + Environment.NewLine;
+                
+                sb.Append(row);
+            }
+            byte[] byteArray = Encoding.UTF8.GetBytes(sb.ToString());
+
+            byte[] bom = new byte[] { 0xEF, 0xBB, 0xBF };
+            byte[] finalBytes = bom.Concat(byteArray).ToArray();
+
+            string fileName = $"LeaveExport_{DateTime.Now:yyyyMMddHHmmss}.txt";
+
+            Response.Clear();
+            Response.Headers.Clear();
+
+            Response.ContentType = "text/plain; charset=utf-8";
+            Response.Headers["Content-Disposition"] = $"attachment; filename=\"{fileName}\"";
+            await Response.Body.WriteAsync(finalBytes);
+            await Response.Body.FlushAsync();
         }
     }
 }
