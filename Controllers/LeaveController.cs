@@ -242,6 +242,7 @@ namespace WebENG.Controllers
             request.level_step = level.FirstOrDefault().level;
 
             List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
+            requests = requests.Where(w => w.status_request != "Canceled" && w.status_request != "Rejected").ToList();
             string message = "";
             if (!requests.Any(a=>a.start_request_date.Date == request.start_request_date.Date)) //  Check Date
             {

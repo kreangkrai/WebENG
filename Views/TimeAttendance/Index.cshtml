@@ -313,7 +313,7 @@
     }
 
     /* ตารางมีมุมโค้งมน */
-    #table_approve {
+    #table_time {
         border-collapse: separate !important;
         border-spacing: 0;
         table-layout: fixed !important; /* สำคัญที่สุด! */
@@ -324,30 +324,30 @@
     }
 
         /* เส้นขอบแนวนอนใน tbody */
-        #table_approve tbody td {
-            border-top: 1px solid #dee2e6 !important;
-            border-bottom: none !important;
-        }
+    #table_time tbody td {
+        border-top: 1px solid #dee2e6 !important;
+        border-bottom: none !important;
+    }
 
         /* ลบเส้นแนวตั้งทั้งหมด (ถ้าต้องการ) */
-        #table_approve th,
-        #table_approve td {
+        #table_time th,
+        #table_time td {
             border-left: none !important;
             border-right: none !important;
             padding: 10px 10px !important; /* ทำให้เซลล์สูงขึ้น */
             vertical-align: middle !important; /* สำรองถ้า Bootstrap ไม่ทำงาน */
         }
 
-        #table_approve th {
+        #table_time th {
             padding: 3px 10px !important; /* ทำให้เซลล์สูงขึ้น */
         }
 
-        #table_approve td {
+        #table_time td {
             padding: 10px 10px !important; /* ทำให้เซลล์สูงขึ้น */
         }
 
         /* Badge โค้งมน */
-        #table_approve .badge {
+        #table_time .badge {
             border-radius: 20px;
             padding: 6px 12px;
             font-size: 14px;
@@ -385,41 +385,16 @@
     /* 1. header sticky เท่านั้นที่เป็นสีเทา */
     .freeze-head.freeze-left-1,
     .freeze-head.freeze-left-2,
-    .freeze-head.freeze-left-3 {
+    .freeze-head.freeze-left-3,
+    .freeze-head.freeze-left-4 {
         background: #EEE !important;
         z-index: 15 !important;
     }
 
-    /* 2. body sticky (td) เป็นสีขาว */
-    #table_approve tbody td.freeze-left-1,
-    #table_approve tbody td.freeze-left-2,
-    #table_approve tbody td.freeze-left-3 {
-        background: white !important;
-        z-index: 10;
-    }
-
-    /* 3. ป้องกันทับกันตอนเลื่อน */
-    .freeze-head {
-        background: #EEE !important;
-        z-index: 10;
-    }
-
-    /* sticky styles */
-    .freeze-pane {
-        overflow: auto;
-        height: auto;
-        max-height: 500px;
+    #table_time {
+        border-collapse: separate !important;
+        border-spacing: 0;
         width: 100%;
-        position: relative;
-        display: block;
-    }
-
-    .freeze-head {
-        position: sticky;
-        top: 0;
-        background: #EEE;
-        z-index: 10;
-        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
     }
 
     /* คอลัมน์ 1: ติดซ้ายสุด */
@@ -446,9 +421,44 @@
         z-index: 8;
         box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3);
     }
+    .freeze-left-4 {
+        position: sticky;
+        left: 260px;
+        background: #EEE;
+        z-index: 7;
+        box-shadow: 2px 0 5px -2px rgba(0,0,0,0.3);
+    }
+ 
 
+    .freeze-pane {
+        overflow: auto;
+        height: 600px; /* หรือ calc(100vh - 200px) ตามพื้นที่หน้าจอ */
+        max-height: 80vh;
+        position: relative;
+    }
+
+    /* Header sticky ด้านบน */
+    .freeze-head {
+        position: sticky !important;
+        top: 0 !important;
+        background: #EEE !important;
+        z-index: 10 !important;
+        box-shadow: 0 3px 5px -2px rgba(0,0,0,0.3);
+    }
+
+    /* Corner (header + left column) ชัดเจนที่สุด */
     .freeze-corner {
         z-index: 15 !important;
+        background: #EEE !important;
+    }
+
+    /* Body sticky ซ้ายเป็นสีขาว */
+    #table_time tbody td.freeze-left-1,
+    #table_time tbody td.freeze-left-2,
+    #table_time tbody td.freeze-left-3,
+    #table_time tbody td.freeze-left-4 {
+        background: white !important;
+        z-index: 11 !important; /* สูงกว่า header ปกติเล็กน้อย เพื่อไม่ให้ header ทับ */
     }
 
     .email-wrapper {
@@ -524,47 +534,43 @@
 
 </style>
 
-<div class="row" style="row-gap:15px">
-
-    <!-- HEADER -->
-    <div class="col-12" style="padding:20px">
+<div class="row" style="row-gap:5px;">
+    <div class="col-12" style="padding:10px">
         <span class="kanit-bold d-flex justify-content-center " style="font-size:30px; color:#1C4698; text-align:center;">
             สถิติการลา & การบันทึกเวลาเข้าออก
         </span>
-        @* <hr style="border:solid; color:#1C4698; border-width:1px" /> *@
     </div>
 
-    <!-- Right Side : Table Leave History-->
     <div class="col-xl-12 col-md-12 col-sm-12">
         <div class="card card-dark" style="border-top-right-radius:20px; border-top-left-radius:20px;">
             <div class="card-header p-3"
                  style="background: linear-gradient(90deg, rgba(33, 120, 190, 1) 0%, rgba(40, 71, 95, 1) 100%);
             border-radius: 20px 20px 0 0; min-height: 60px;">
 
-                <div class="row align-items-center g-2 g-md-4">
+                <div class="row align-items-center g-2 g-md-4 d-flex justify-content-between">
                     <!-- Title Column -->
-                    <div class="col-12 col-md-4 col-lg-3 mb-2 mb-md-0">
+                    <div class="col-md-4 col-xl-3 mb-2 mb-md-0">
                         <h4 class="kanit-medium mb-0 text-white d-flex align-items-center flex-nowrap"
                             style="letter-spacing: 2px; font-size: 22px; gap: 8px; white-space: nowrap;">
                             สถิติการลา
                         </h4>
                     </div>
-                    <div class="col-12 col-md-8 col-lg-9">
+                    <div class="col-md-5 col-xl-5 col-12">
                         <div class="row align-items-center g-2 g-md-3">
-                            <div class="col-4 col-sm-4 col-md-5 col-xl-4">
+                            <div class="col-4">
                                 <select id="select_department" class="form-control kanit-regular w-100"
                                         style="font-size: 16px;">
                                 </select>
                             </div>
 
-                            <div class="col-4 col-sm-4 col-md-4 col-xl-4">
+                            <div class="col-4">
                                 <select id="select_year" class="form-control kanit-regular w-100"
                                         style="font-size: 16px;">
                                 </select>
                             </div>
-                            <div class="col-4 col-sm-4 col-md-3 col-xl-4 text-md-right">
-                                <button class="btn btn-success kanit-regular w-100 w-md-auto px-3"
-                                        style="border-radius:8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap; font-size: 14px;"
+                            <div class="col-4">
+                                <button class="btn btn-success kanit-regular w-100 w-md-auto px-3" onclick="ExportTimeAttendance()"
+                                        style="border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap; font-size: 14px;"
                                         type="button">
                                     <i class="fas fa-file-excel"></i> Export
                                 </button>
@@ -575,60 +581,12 @@
             </div>
 
             <div class="freeze-pane">
-                <table id="table_approve" class="table table-sm table-hover text-center mb-0 overflow-auto" style="width:100%;">
-                    <thead style="font-size: 16px; color: #555; border-width: 2px; border: solid;border-color:black">
+                <table id="table_time" class="table table-sm table-hover text-center mb-0 overflow-auto" style="width:100%;">
+                    <thead style="font-size: 16px; color: #555; border-width: 2px; border: solid;border-color:black;">
                         <tr id="LeaveTypeRow" class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
                         </tr>
                     </thead>
                     <tbody>
-                        @*<tr class="clickable-row kanit-regular"
-                            style="color:#555;">
-                            <td class="freeze-left-1" style="width:70px;">1</td>
-                            <td class ="freeze-left-2" style="width:100px;">066403</td>
-                            <td class="freeze-left-3" style="width:180px;">นายสาริศ ตรีปทุมรัตน์</td>
-                            <td>CES-RD</td>
-                            <td>7</td>
-                            <td>0</td>
-                            <td>8</td>
-                            <td>-</td>
-                            <td>1</td>
-                            <td>7</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>52</td>
-                            <td>377</td>
-                            <td>2</td>
-                            <td>ENG</td>
-                            <td>CES</td>
-                        </tr>
-
-                        <tr class="clickable-row kanit-regular"
-                            style="color:#555;">
-                            <td class="freeze-left-1" style="width:70px;">1</td>
-                            <td class="freeze-left-2" style="width:100px;">059197</td>
-                            <td class="freeze-left-3" style="width:180px;">นายเกรียงไกร รัตนวัน</td>
-                            <td>CES-RD</td>
-                            <td>10</td>
-                            <td>7</td>
-                            <td>4</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>3</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>1</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>ENG</td>
-                            <td>CES</td>
-                        </tr>*@
-
                     </tbody>
                 </table>
             </div>
@@ -640,12 +598,16 @@
 @section Scripts
 {
     <script type="text/javascript">
+
+        let table_time;
+        let leaves_type;
         $(document).ready(async function () {
-            const leaves_type = await GetLeaveType();
+            leaves_type = await GetLeaveType();
             generateLeaveTypeHeaders(leaves_type);
             const departments = await GetDepartments();
             GenerateDepartments(departments);
             GenerateYears();
+            GetTimeAttendance();
         });
 
         async function GetLeaveType() {
@@ -666,13 +628,13 @@
             const LeaveTypeRow = $('#LeaveTypeRow');
             LeaveTypeRow.empty();
 
-
             LeaveTypeRow.append(`<th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
                                  <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
                                  <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
-                                 <th class="freeze-left-4" style="width:180px;">สิทธิการลาพักร้อน</th>
-                                 <th class="freeze-left-5" style="width:180px;">พักร้อนคงเหลือ</th>
-                                 <th class="freeze-left-6" style="width:180px;">รวมวันลาทั้งหมด</th>`);
+                                 <th class="freeze-left-4" style="width:70px;">แผนก</th>
+                                 <th class="freeze-left-5" style="width:100px;">สิทธิการลาพักร้อน</th>
+                                 <th class="freeze-left-6" style="width:100px;">พักร้อนคงเหลือ</th>
+                                 <th class="freeze-left-7" style="width:100px;">รวมวันลาทั้งหมด</th>`);
             for (let i = 0; i < leaves_type.length; i++) {
                 LeaveTypeRow.append(`<th style="width:100px;">${leaves_type[i].leave_name_th}</th>`);
             }
@@ -688,7 +650,7 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: {},
                 success: function (response) {
-                    departments = response;                   
+                    departments = response;
                 }
             });
             return departments;
@@ -715,5 +677,130 @@
                 select.append(`<option value="${i}">${i}</option>`);
             }
         }
+
+        async function GetTimeAttendance() {
+            const department = $('#select_department').val();
+            const year = $('#select_year').val();
+
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetTimeAttendance", "TimeAttendance")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    department,year
+                },
+                success: function (response) {
+                    const data = response;
+                    renderTimeAttendance(data);                    
+                }
+            });
+        }
+        function ExportTimeAttendance() {
+            const department = $('#select_department').val();
+            const year = $('#select_year').val();
+            location.href = '@Url.Action("GetTimeAttendance", "TimeAttendance")?department=' + department + '&year=' + year;
+        }
+
+        $('#select_department').on('change', async function () {
+            await GetTimeAttendance();
+        });
+        $('#select_year').on('change', async function () {
+            await GetTimeAttendance();
+        });
+
+        
+        function renderTimeAttendance(data) {
+            if (table_time) {
+                table_time.destroy();
+            }
+            let datas = [];
+            for (let i = 0; i < data.length; i++) {
+                let used_al = 0;
+                let sum_all_leave = 0;
+                let sum_by_leave = Array(leaves_type.length).fill(0);
+                if (data[i].requests.length > 0) {
+                    const code_al = data[i].requests.filter(f => f.leave_name_th === "ลาพักร้อน").map(m => m)[0];
+                    if (code_al !== undefined) {
+                        used_al = code_al.monthlyAccumulated.reduce((accumulator, currentValue) => {
+                            return accumulator + parseFloat(currentValue.monthlyAmount);
+                        },0);
+                    }
+
+                    for (let j = 0; j < data[i].requests.length; j++) {
+                        sum_all_leave += data[i].requests[j].monthlyAccumulated.reduce((acc, current) => {
+                            return acc + current.monthlyAmount;
+                        }, 0);
+                    }
+
+                    
+                    for (let k = 0; k < leaves_type.length; k++) {
+                        let leave_type = data[i].requests.filter(f => f.leave_type_code === leaves_type[k].leave_type_code).map(m => m)[0];
+                        
+                        if (leave_type !== undefined) {
+                            const used_leave = leave_type.monthlyAccumulated.reduce((accumulator, currentValue) => {
+                                return accumulator + parseFloat(currentValue.monthlyAmount);
+                            }, 0);
+                            sum_by_leave[k] = used_leave;
+                        }
+                    }
+                }
+                
+                const balance_al = parseFloat(data[i].entitlement_al) - parseFloat(used_al);
+
+                datas.push([(i + 1),
+                data[i].emp_id,
+                data[i].name_th,
+                data[i].department,
+                data[i].entitlement_al,
+                    balance_al,
+                    sum_all_leave,
+                ...sum_by_leave,
+                    0,
+                    0,
+                    0]);
+            }
+            table_time = $('#table_time').DataTable({
+                destroy: true,
+                data: datas,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/2.1.8/i18n/th.json'
+                },
+                pageLength: 20,
+                scrollX: true,
+                fixedHeader: true,
+                fixedColumns: {
+                    left: 4
+                },
+                columnDefs: [
+                    {
+                        className: 'dt-body-left',
+                        targets: [2]
+                    },
+                    {
+                        className: 'dt-head-center',
+                        targets: [2]
+                    },
+                ],
+                order: [[3, 'asc']],
+                info: false,
+                searching: false,
+                paging: false,
+                ordering:true,
+                rowCallback: function (row, data, index) {
+                    for (let col = 4; col < data.length; col++) {
+                        if (col === 5) {
+                            $(`td:eq(${col})`, row).css("color", "red");
+                            $(`td:eq(${col})`, row).css("font-weight", "600");
+                        }
+                        if (data[col] === 0) {
+                            $(`td:eq(${col})`, row).text("-");
+                            $(`td:eq(${col})`, row).css("color", "red");
+                            $(`td:eq(${col})`, row).css("font-size", "26px");
+                        }
+                    }
+                },
+                
+            });
+        };
     </script>
 }

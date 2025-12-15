@@ -1396,12 +1396,6 @@
                 }
                 return count;
             }
-
-            function timeToMinutes(timeStr) {
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                return hours * 60 + minutes;
-            }
-
             function calculateTime() {
                 let first = timeToMinutes("08:30");
                 let last = timeToMinutes("17:30");
@@ -1822,11 +1816,6 @@
             return `${dayOfWeek} ${day}/${month}/${year}`;
         }
 
-        function timeToMinutes(timeStr) {
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            return hours * 60 + minutes;
-        }
-
     </script>
 
     <script type="text/javascript">
@@ -2166,7 +2155,8 @@
                     if (duration > 0.3 && duration < 0.6) {
                         duration = 0.50;
                     }
-
+                    //console.log(row.start_request_time);
+                    //console.log(row.end_request_time);
                     start_request_time = row.start_request_time.split('.')[1].substring(0, 5);
                     end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
                 }
@@ -3101,11 +3091,7 @@
                 }
                 return count;
             }
-
-            function timeToMinutes(timeStr) {
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                return hours * 60 + minutes;
-            }
+ 
 
             function calculateCreateTime() {
                 let first = timeToMinutes("08:30");
@@ -3384,7 +3370,7 @@
             let year_start = new Date($('#create_leave_start_date').val()).getFullYear();
             let year_stop = new Date($('#create_leave_stop_date').val()).getFullYear();
             if (year_start === year_stop) {
-                if (is_full_day) {
+                if (create_is_full_day) {
                     message = `${leave_type}
                         ลาตั้งแต่วันที่ ${date_start} - ${date_stop}`;
                 } else {
@@ -3415,7 +3401,7 @@
 
             let start_request_time = "00:00:00";
             let end_request_time = "00:00:00";
-            if (!is_full_day) {
+            if (!create_is_full_day) {
                 let hour = $('#create_leave_start_hour').val();
                 let minute = $('#create_leave_start_minute').val();
                 start_request_time = hour + ":" + minute;
@@ -3435,7 +3421,7 @@
                 "end_request_time": end_request_time,
                 "amount_leave_day": amount_leave_day,
                 "is_two_step_approve": is_two_step_approve,
-                "is_full_day": is_full_day,
+                "is_full_day": create_is_full_day,
                 "amount_leave_hour": 0,
             });
             await $.ajax({
