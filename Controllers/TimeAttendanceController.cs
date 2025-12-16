@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using WebENG.CTLInterfaces;
 using WebENG.CTLServices;
@@ -22,7 +25,9 @@ namespace WebENG.Controllers
         private readonly IRequest Requests;
         private readonly ILevel Level;
         private readonly ILeave Leave;
-        public TimeAttendanceController()
+        private ILeaveExport LeaveExport;
+        private IHostingEnvironment _hostingEnvironment;
+        public TimeAttendanceController(IHostingEnvironment hostingEnvironment)
         {
             Accessory = new AccessoryService();
             LeaveType = new LeaveTypeService();
@@ -30,6 +35,8 @@ namespace WebENG.Controllers
             Requests = new RequestService();
             Level = new LevelService();
             Leave = new LeaveService();
+            LeaveExport = new LeaveExportService();
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IActionResult Index()
@@ -79,15 +86,21 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetTimeAttendance(string department, int year)
         {
+            List<TimeAttendanceModel> objs = CalcilateTimeAttendance(department, year);
 
+            return Json(objs);
+        }
+
+        List<TimeAttendanceModel> CalcilateTimeAttendance(string department, int year)
+        {
+            List<TimeAttendanceModel> objs = new List<TimeAttendanceModel>();
             List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
-            employees = employees.Where(w=>w.active).OrderBy(o => o.department).ThenBy(t => t.emp_id).ToList();
+            employees = employees.Where(w => w.active).OrderBy(o => o.department).ThenBy(t => t.emp_id).ToList();
             if (department != "ALL")
             {
                 employees = employees.Where(w => w.department == department).OrderBy(o => o.emp_id).ToList();
             }
 
-            List<object> objs = new List<object>();
             for (int i = 0; i < employees.Count; i++)
             {
                 double entitlement_al = Leave.CalculateLeaveDays(employees[i], year, 6, 10, 10, 12);
@@ -104,10 +117,10 @@ namespace WebENG.Controllers
                         MonthlyAmount = g.Sum(x => x.amount_leave_day) + g.Sum(x => x.amount_leave_hour) / 8.0M,
                         leave_name_en = g.FirstOrDefault().leave_name_en,
                         leave_name_th = g.FirstOrDefault().leave_name_th,
-                       
+
                     }).ToList();
 
-                var accumulatedByType = monthlyGroups
+                List<LeaveTimeAttendanceModel> accumulatedByType = monthlyGroups
                     .GroupBy(g => g.leave_type_code)
                     .Select(typeGroup =>
                     {
@@ -118,13 +131,13 @@ namespace WebENG.Controllers
                                             .ToList();
 
                         decimal cum = 0;
-                        var accumList = new List<object>();
+                        var accumList = new List<MonthlyAccumulatedModel>();
                         for (int month = 1; month <= 12; month++)
                         {
                             var inc = monthlyData.FirstOrDefault(d => d.Month == month)?.MonthlyAmount ?? 0;
                             cum += inc;
 
-                            accumList.Add(new
+                            accumList.Add(new MonthlyAccumulatedModel()
                             {
                                 Month = month,
                                 MonthlyAmount = Math.Round(inc, 2),
@@ -132,7 +145,7 @@ namespace WebENG.Controllers
                             });
                         }
 
-                        return new
+                        return new LeaveTimeAttendanceModel()
                         {
                             leave_type_code = typeGroup.Key,
                             leave_name_en = first.leave_name_en ?? typeGroup.Key + "-",
@@ -142,15 +155,27 @@ namespace WebENG.Controllers
                         };
                     }).ToList();
 
-                objs.Add(new { emp_id = employees[i].emp_id,
+                objs.Add(new TimeAttendanceModel()
+                {
+                    emp_id = employees[i].emp_id,
                     name_en = employees[i].name_en,
                     name_th = employees[i].name_th,
                     department = employees[i].department,
                     entitlement_al = entitlement_al,
-                    requests = accumulatedByType });               
+                    leaves = accumulatedByType
+                });
             }
-            
-            return Json(objs);
+            return objs;
+        }
+        public IActionResult ExportTimeAttendance(string department , int year)
+        {
+            List<TimeAttendanceModel> objs = CalcilateTimeAttendance(department, year);
+            List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
+            leaves = leaves.OrderBy(o => o.priority).ToList();
+
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/Template", "TimeAttendance.xlsx"));
+            var stream = LeaveExport.ExportData(templateFileInfo, objs, leaves,year);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TimeAttendance_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx");
         }
     }
 }
