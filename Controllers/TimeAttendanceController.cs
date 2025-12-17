@@ -162,7 +162,8 @@ namespace WebENG.Controllers
                     name_th = employees[i].name_th,
                     department = employees[i].department,
                     entitlement_al = entitlement_al,
-                    leaves = accumulatedByType
+                    leaves = accumulatedByType,
+                    position = employees[i].position
                 });
             }
             return objs;
@@ -170,6 +171,8 @@ namespace WebENG.Controllers
         public IActionResult ExportTimeAttendance(string department , int year)
         {
             List<TimeAttendanceModel> objs = CalcilateTimeAttendance(department, year);
+            objs = objs.OrderBy(o => o.department).ThenBy(t => t.position).ToList();
+
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             leaves = leaves.OrderBy(o => o.priority).ToList();
 

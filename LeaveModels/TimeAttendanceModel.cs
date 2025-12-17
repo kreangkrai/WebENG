@@ -12,6 +12,7 @@ namespace WebENG.LeaveModels
         public double entitlement_al { get; set; }
         public string name_en { get; set; }
         public string name_th { get; set; }
+        public string position { get; set; }
         public List<LeaveTimeAttendanceModel> leaves { get; set; }
     }
 

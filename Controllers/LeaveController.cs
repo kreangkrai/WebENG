@@ -124,7 +124,7 @@ namespace WebENG.Controllers
         public IActionResult GetLeaves()
         {
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            
+            leaves = leaves.OrderBy(o => o.priority).ToList();
             var data = new { leaves = leaves };
             return Json(data);
         }

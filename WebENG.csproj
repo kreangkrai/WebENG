@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="HRService\" />
     <Folder Include="Views\Analysis\" />
     <Folder Include="wwwroot\backup\" />
   </ItemGroup>
