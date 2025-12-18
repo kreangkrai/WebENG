@@ -8,7 +8,6 @@ namespace HRManagement.Interface
 {
     public interface IHr
     {
-        List<DataModel> GetDataByDate(string user,DateTime start , DateTime stop, bool check_dectect_scan);
-        
+        List<DataModel> GetDataByDate(DateTime start , DateTime stop);
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using HRManagement.Interface;
+using HRManagement.Service;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -8,12 +10,17 @@ using System.IO;
 using System.Linq;
 using WebENG.CTLInterfaces;
 using WebENG.CTLServices;
+using WebENG.HRInterface;
+using WebENG.HRModel;
+using WebENG.HRService;
 using WebENG.Interface;
 using WebENG.LeaveInterfaces;
 using WebENG.LeaveModels;
 using WebENG.LeaveServices;
 using WebENG.Models;
 using WebENG.Service;
+using WebENG.TripInterface;
+using WebENG.TripModels;
 
 namespace WebENG.Controllers
 {
@@ -26,6 +33,10 @@ namespace WebENG.Controllers
         private readonly ILevel Level;
         private readonly ILeave Leave;
         private ILeaveExport LeaveExport;
+        private IDeviceGroup DeviceGroup;
+        private ITripExpense TripExpense;
+        private IHr Hr;
+        private CTLInterfaces.IHoliday Holiday;
         private IHostingEnvironment _hostingEnvironment;
         public TimeAttendanceController(IHostingEnvironment hostingEnvironment)
         {
@@ -36,6 +47,10 @@ namespace WebENG.Controllers
             Level = new LevelService();
             Leave = new LeaveService();
             LeaveExport = new LeaveExportService();
+            DeviceGroup = new DeviceGroupService();
+            TripExpense = new TripExpenseService();
+            Hr = new HrService();
+            Holiday = new CTLServices.HolidayService();
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -86,9 +101,10 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetTimeAttendance(string department, int year)
         {
-            List<TimeAttendanceModel> objs = CalcilateTimeAttendance(department, year);
-
-            return Json(objs);
+            List<TimeAttendanceModel> timeAttendances = CalcilateTimeAttendance(department, year);
+            List<TimeInOutModel> calLatetimes = CalLateTime(year);
+            var data = new { timeAttendances = timeAttendances, calLatetimes = calLatetimes };
+            return Json(data);
         }
 
         List<TimeAttendanceModel> CalcilateTimeAttendance(string department, int year)
@@ -168,17 +184,270 @@ namespace WebENG.Controllers
             }
             return objs;
         }
-        public IActionResult ExportTimeAttendance(string department , int year)
+        public IActionResult ExportTimeAttendance(string department, int year)
         {
             List<TimeAttendanceModel> objs = CalcilateTimeAttendance(department, year);
             objs = objs.OrderBy(o => o.department).ThenBy(t => t.position).ToList();
+            List<TimeInOutModel> calLatetimes = CalLateTime(year);
 
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             leaves = leaves.OrderBy(o => o.priority).ToList();
 
             var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/Template", "TimeAttendance.xlsx"));
-            var stream = LeaveExport.ExportData(templateFileInfo, objs, leaves,year);
+            var stream = LeaveExport.ExportData(templateFileInfo, objs, calLatetimes,leaves, year);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TimeAttendance_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx");
+        }
+
+        public List<TimeInOutModel> CalLateTime(int year)
+        {
+            DateTime start = new DateTime(year, 1, 1);
+            DateTime stop = new DateTime(year, 12, 31);
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(year.ToString());
+
+            List<EmployeeWorkModel> dailyRecords = CalData(start, stop);
+            List<TimeInOutModel> summary = dailyRecords
+                .GroupBy(g => g.emp_id)
+                .Select(g =>
+                {
+                    var records = g.ToList();
+
+                    int count_late = 0;
+                    int total_minute_late = 0;
+                    int count_forgot_scan = 0;
+
+                    foreach (var rec in records)
+                    {
+                        DateTime date = rec.date;
+                        bool isHoliday = holidays.Any(a => a.date.Date == date.Date);
+                        bool isWeekend = date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+                        bool isNonWorking = isHoliday || isWeekend;
+                        if (!isNonWorking)
+                        {
+                            if (rec.start_time_trip_expense == TimeSpan.Zero)
+                            {
+                                if (rec.start_time_face_scan != TimeSpan.Zero) // Face Scan
+                                {
+                                    if (rec.start_time_face_scan > TimeSpan.Parse(rec.shift_time)) // Late
+                                    {
+
+                                        var lateMinutes = (int)(rec.start_time_face_scan - TimeSpan.Parse(rec.shift_time)).TotalMinutes;
+
+                                        if (lateMinutes > 0)
+                                        {
+                                            if (rec.start_time_face_scan > new TimeSpan(13, 0, 0))
+                                            {
+                                                lateMinutes -= 60;
+                                            }
+                                            if (lateMinutes > 480)
+                                            {
+                                                lateMinutes = 480;
+                                            }
+                                            total_minute_late += lateMinutes;
+                                            count_late++;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    List<RequestModel> request_leave = Requests.GetRequestByEmpID(rec.emp_id);
+                                    request_leave = request_leave.Where(w => w.status_request != "Canceled" && w.status_request != "Rejected").ToList();
+                                    bool check_leave = false;
+                                    check_leave = request_leave.Any(w => w.start_request_date.Date == date);
+
+                                    if (!check_leave)
+                                    {
+                                        count_forgot_scan++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return new TimeInOutModel
+                    {
+                        emp_id = g.Key,
+                        count_late = count_late,
+                        minute_late = total_minute_late,
+                        count_forgot_scan = count_forgot_scan
+                    };
+                })
+                .OrderBy(x => x.emp_id)
+                .ToList();
+            return summary;
+        }
+
+        public List<EmployeeWorkModel> CalData(DateTime start, DateTime stop)
+        {
+            if (stop > DateTime.Now)
+            {
+                stop = DateTime.Now;
+            }
+
+            //Get Employee ID
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            employees = employees.GroupBy(g => new { g.emp_id, g.name_en, g.department }).Select(s => new CTLModels.EmployeeModel()
+            {
+                emp_id = s.Key.emp_id,
+                name_en = s.Key.name_en,
+                department = s.Key.department
+            }).ToList();
+
+            //Data Trip Expense
+            List<TripExpenseModel> trips = TripExpense.GetData(start, stop);
+            List<EmployeeTimesModel> all = trips
+            .GroupBy(g => new { g.date, g.emp_id })
+            .AsParallel()
+            .Select(group =>
+            {
+                var sortedTrips = group.OrderBy(t => t.date).ToList();
+
+                var workTrips = sortedTrips
+                    .Where(t => t.location.ToLower().Contains("customer") ||
+                                t.location.ToLower().Contains("hotel") ||
+                                t.location.ToLower().Contains("โรงแรม"))
+                    .ToList();
+
+                bool hasWorkLocation = workTrips.Any();
+
+                var firstTrip = sortedTrips.First();
+                var lastTrip = sortedTrips.Last();
+
+                var firstWork = hasWorkLocation ? workTrips.First() : firstTrip;
+                var lastWork = hasWorkLocation ? workTrips.Last() : lastTrip;
+
+                return new EmployeeTimesModel
+                {
+                    date = group.Key.date,
+                    emp_id = group.Key.emp_id,
+                    type = "Trip Expense",
+                    location = string.Join(",", sortedTrips.Select(x => x.location)),
+
+                    actual_start_time = new TimeSpan(firstTrip.date.TimeOfDay.Ticks),
+                    actual_last_time = new TimeSpan(lastTrip.date.TimeOfDay.Ticks),
+
+                    start_time = new TimeSpan(firstWork.date.TimeOfDay.Ticks),
+                    last_time = new TimeSpan(lastWork.date.TimeOfDay.Ticks),
+
+                    start = new TimeSpan(8, 30, 0),
+                    stop = new TimeSpan(17, 30, 0)
+                };
+            }).ToList();
+
+            List<DataModel> hrs = Hr.GetDataByDate(start, stop);
+            hrs = hrs.Where(w => employees.Any(a => a.emp_id == w.cn)).ToList();
+
+            List<EmployeeTimesModel> _all = hrs
+                .GroupBy(g => new { date = g.date.Date, g.cn })
+                .Select(group =>
+                {
+                    var sorted = group.OrderBy(x => x.date).ToList();
+
+                    if (!sorted.Any())
+                        return null;
+
+                    var firstRecord = sorted.First();
+                    var lastRecord = sorted.Last();
+
+                    return new EmployeeTimesModel
+                    {
+                        date = group.Key.date,
+                        emp_id = group.Key.cn,
+                        type = "Face Scan",
+                        start_time = firstRecord.time_in,
+                        last_time = lastRecord.time_out,
+                        name = firstRecord.personname,
+                        location = firstRecord.device_in,
+                        start = firstRecord.start,
+                        stop = firstRecord.stop,
+                        personal_group = firstRecord.persongroup,
+                        sn = firstRecord.sn
+                    };
+                })
+                .Where(x => x != null)
+                .ToList();
+
+
+
+            all.AddRange(_all);
+
+            var allDict = all
+                .GroupBy(x => new { x.date.Date, x.emp_id, x.type })
+                .ToDictionary(
+                    g => new { g.Key.Date, g.Key.emp_id, g.Key.type },
+                    g => g.OrderBy(x => x.date).ToList()  // เรียงเวลาไว้เลย เผื่อใช้ First/Last
+                );
+
+            var tripExpenseGroups = allDict
+                .Where(kv => kv.Key.type == "Trip Expense")
+                .ToDictionary(kv => new { kv.Key.Date, kv.Key.emp_id }, kv => kv.Value);
+
+            var faceScanGroups = allDict
+                .Where(kv => kv.Key.type == "Face Scan")
+                .ToDictionary(kv => new { kv.Key.Date, kv.Key.emp_id }, kv => kv.Value);
+
+            // Employee lookup
+            var employeeDict = employees
+                .ToDictionary(e => e.emp_id, e => new { e.department, e.name_en });
+
+
+            var deviceGroupDict = DeviceGroup.GetDevicesGroup()
+    .GroupBy(d => new { d.device, d.groupname })
+    .ToDictionary(
+        g => g.Key,
+        g => g.First().starttime.ToString(@"hh\:mm"));
+
+            var allGroups = all
+                .GroupBy(g => new { Date = g.date.Date, g.emp_id })
+                .ToList();
+
+            List<EmployeeWorkModel> employees_ = allGroups.Select(g =>
+            {
+                var key = new { Date = g.Key.Date, emp_id = g.Key.emp_id };
+
+                // Trip Expense data
+                tripExpenseGroups.TryGetValue(key, out var tripList);
+                var tripFirst = tripList?.FirstOrDefault();
+                var tripLast = tripList?.LastOrDefault();
+
+                // Face Scan data
+                faceScanGroups.TryGetValue(key, out var faceList);
+                var faceFirst = faceList?.FirstOrDefault();
+                var faceLast = faceList?.LastOrDefault();
+
+                var anyRecord = g.FirstOrDefault();
+                string shift_time = null;
+                if (faceFirst != null)
+                {
+                    var dgKey = new { device = faceFirst.sn, groupname = faceFirst.personal_group };
+                    deviceGroupDict.TryGetValue(dgKey, out shift_time);
+                }
+                employeeDict.TryGetValue(g.Key.emp_id, out var empInfo);
+
+                return new EmployeeWorkModel
+                {
+                    date = g.Key.Date,
+                    emp_id = g.Key.emp_id,
+
+                    start_time_trip_expense = tripFirst?.start_time ?? TimeSpan.Zero,
+                    actual_start_time_trip_expense = tripFirst?.actual_start_time ?? TimeSpan.Zero,
+                    last_time_trip_expense = tripLast?.last_time ?? TimeSpan.Zero,
+                    actual_last_time_trip_expense = tripLast?.actual_last_time ?? TimeSpan.Zero,
+                    location_trip_expense = tripLast?.location ?? tripFirst?.location,
+
+                    start_time_face_scan = faceFirst?.start_time ?? TimeSpan.Zero,
+                    last_time_face_scan = faceLast?.last_time ?? TimeSpan.Zero,
+                    location_face_scan = faceFirst?.location,
+
+                    department = empInfo?.department,
+                    name = empInfo?.name_en,
+
+                    start = anyRecord?.start ?? new TimeSpan(8, 30, 0),
+                    stop = anyRecord?.stop ?? new TimeSpan(17, 30, 0),
+
+                    shift_time = shift_time ?? ""
+                };
+            }).ToList();            
+            return employees_;
         }
     }
 }

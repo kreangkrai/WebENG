@@ -2238,7 +2238,7 @@
 
         $(document).on('click', '.clickable-row',async function () {
             const data = $(this).data();
-
+            
             const requestid = data.request_id;
             request_id = requestid;
             let main_emp_id = $('#hidden_emp_id').val();
@@ -2259,7 +2259,7 @@
                 if (request.is_full_day) {
                     // Full day
                     resetButtonStyles();
-                    leaveHalfBtn.classList.add('active');
+                    leaveFullBtn.classList.add('active');
                     toggleGroupDisplay(dateGroup, true);
                     toggleGroupDisplay(timeGroup, false);
 

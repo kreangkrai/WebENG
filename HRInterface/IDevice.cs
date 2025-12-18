@@ -6,9 +6,8 @@ using WebENG.HRModel;
 
 namespace WebENG.HRInterface
 {
-    public interface IDeviceGroup
+    public interface IDevice
     {
-        List<DeviceGroupModel> GetDevicesGroup();
-        DeviceGroupModel GetDataByDevice(string device, string groupname);
+        List<DeviceModel> GetDevices();
     }
 }

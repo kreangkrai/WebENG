@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using WebENG.HRModel;
 using WebENG.LeaveInterfaces;
 using WebENG.LeaveModels;
 
@@ -13,7 +14,7 @@ namespace WebENG.LeaveServices
 {
     public class LeaveExportService : ILeaveExport
     {
-        public Stream ExportData(FileInfo path, List<TimeAttendanceModel> datas , List<LeaveTypeModel> leaves,int year)
+        public Stream ExportData(FileInfo path, List<TimeAttendanceModel> datas , List<TimeInOutModel> calLatetimes, List<LeaveTypeModel> leaves,int year)
         {
             Stream stream = new MemoryStream();
             if (path.Exists)
@@ -145,8 +146,8 @@ namespace WebENG.LeaveServices
                                 decimal balance_al = 0;
                                 if (m != months.Count - 1)
                                 {
-                                    sum_leaves = datas[i].leaves.Sum(s => s.MonthlyAccumulated.Where(w=>w.Month == m + 1).Select(x => x.AccumulatedAmount).FirstOrDefault());
-                                    sum_al = datas[i].leaves.Where(w => w.leave_name_th == "ลาพักร้อน").Sum(s => s.MonthlyAccumulated.Where(a=>a.Month == m+1).Select(x => x.AccumulatedAmount).FirstOrDefault());
+                                    sum_leaves = datas[i].leaves.Sum(s => s.MonthlyAccumulated.Where(w => w.Month == m + 1).Select(x => x.AccumulatedAmount).FirstOrDefault());
+                                    sum_al = datas[i].leaves.Where(w => w.leave_name_th == "ลาพักร้อน").Sum(s => s.MonthlyAccumulated.Where(a => a.Month == m + 1).Select(x => x.AccumulatedAmount).FirstOrDefault());
                                     balance_al = (decimal)datas[i].entitlement_al - sum_al;
                                 }
                                 else
@@ -159,7 +160,7 @@ namespace WebENG.LeaveServices
                                 {
                                     cellRange.Value = datas[i].emp_id;
                                     cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                                    
+
                                     if (datas[i].position != "Operation")
                                     {
                                         cellRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -216,7 +217,7 @@ namespace WebENG.LeaveServices
                                         decimal sum = 0;
                                         if (m != months.Count - 1)
                                         {
-                                            sum = leaves_.MonthlyAccumulated.Where(w => w.Month == m + 1).Select(s => s.AccumulatedAmount).FirstOrDefault();                                      
+                                            sum = leaves_.MonthlyAccumulated.Where(w => w.Month == m + 1).Select(s => s.AccumulatedAmount).FirstOrDefault();
                                         }
                                         else
                                         {
@@ -234,7 +235,26 @@ namespace WebENG.LeaveServices
                                 }
                                 else // For Face Scan
                                 {
-
+                                    TimeInOutModel timeInOut = calLatetimes.Where(w => w.emp_id == datas[i].emp_id).FirstOrDefault();
+                                    if (col == startHeaderCols + headerCount - 3)
+                                    {
+                                        cellRange.Value = timeInOut.count_late;
+                                        cellRange.Formula = $"IF({timeInOut.count_late}<>0, {timeInOut.count_late}, \"-\")";
+                                        cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                    }
+                                    if (col == startHeaderCols + headerCount - 2)
+                                    {
+                                        cellRange.Value = timeInOut.minute_late;
+                                        cellRange.Formula = $"IF({timeInOut.minute_late}<>0, {timeInOut.minute_late}, \"-\")";
+                                        cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                    }
+                                    if (col == startHeaderCols + headerCount - 1)
+                                    {
+                                        cellRange.Value = timeInOut.count_forgot_scan;
+                                        cellRange.Formula = $"IF({timeInOut.count_forgot_scan}<>0, {timeInOut.count_forgot_scan}, \"-\")";
+                                        cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                    }
+                                    
                                 }
                                 cellRange.AutoFitColumns();
                             }
