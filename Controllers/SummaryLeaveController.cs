@@ -74,11 +74,14 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetDataByMonth(string department, string start, string end)
         {
-            var startDate = DateTime.Parse(start);
+            var _startDate = DateTime.Parse(start);
+            var startDate = new DateTime(_startDate.Year, _startDate.Month, 1);
             var endDate = DateTime.Parse(end).AddDays(1).AddTicks(-1);
 
             var allEmps = Employee.GetEmps();
             var allEmployees = Employee.GetEmployees();
+
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(startDate.Year.ToString());
 
             Dictionary<string, string> positionDict = new Dictionary<string, string>();
             if (department == "ALL")
@@ -101,10 +104,88 @@ namespace WebENG.Controllers
             if (!empsInDept.Any())
                 return Json(new object[0]);
 
-            var allRequests = Requests.GetRequestByDurationDay(start,end)
+            var allRequests = Requests.GetRequestByDurationDay(startDate.ToString("yyyy-MM-dd"), end);               
+
+            List<RequestModel> new_requests = new List<RequestModel>();
+            for (int i = 0; i < allRequests.Count; i++)
+            {
+                if (allRequests[i].is_full_day)
+                {
+                    if (allRequests[i].amount_leave_day > 1)
+                    {
+                        for (DateTime date = allRequests[i].start_request_date; date <= allRequests[i].end_request_date; date = date.AddDays(1))
+                        {
+                            if (date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday && !holidays.Any(a => a.date.Date == date.Date))
+                            {
+                                RequestModel request = new RequestModel()
+                                {
+                                    emp_id = allRequests[i].emp_id,
+                                    leave_name_th = allRequests[i].leave_name_th,
+                                    start_request_date = date,
+                                    end_request_date = date,
+                                    amount_leave_day = 1,
+                                    start_request_time = new TimeSpan(8, 30, 0),
+                                    end_request_time = new TimeSpan(17, 30, 0),
+                                    is_full_day = allRequests[i].is_full_day,
+                                    description = allRequests[i].description,
+                                    request_date = allRequests[i].request_date,
+                                    path_file = allRequests[i].path_file,
+                                    amount_leave_hour = allRequests[i].amount_leave_hour,
+                                    color_code = allRequests[i].color_code,
+                                    status_request = allRequests[i].status_request,
+                                    comment = allRequests[i].comment,
+                                    is_two_step_approve = allRequests[i].is_two_step_approve,
+                                    leave_name_en = allRequests[i].leave_name_en,
+                                    leave_type_code = allRequests[i].leave_type_code,
+                                    leave_type_id = allRequests[i].leave_type_id,
+                                    level_step = allRequests[i].level_step,
+                                    request_id = allRequests[i].request_id
+                                };
+
+                                new_requests.Add(request);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RequestModel request = new RequestModel()
+                        {
+                            emp_id = allRequests[i].emp_id,
+                            leave_name_th = allRequests[i].leave_name_th,
+                            start_request_date = allRequests[i].start_request_date,
+                            end_request_date = allRequests[i].end_request_date,
+                            amount_leave_day = 1,
+                            start_request_time = new TimeSpan(8, 30, 0),
+                            end_request_time = new TimeSpan(17, 30, 0),
+                            is_full_day = allRequests[i].is_full_day,
+                            description = allRequests[i].description,
+                            request_date = allRequests[i].request_date,
+                            path_file = allRequests[i].path_file,
+                            amount_leave_hour = allRequests[i].amount_leave_hour,
+                            color_code = allRequests[i].color_code,
+                            status_request = allRequests[i].status_request,
+                            comment = allRequests[i].comment,
+                            is_two_step_approve = allRequests[i].is_two_step_approve,
+                            leave_name_en = allRequests[i].leave_name_en,
+                            leave_type_code = allRequests[i].leave_type_code,
+                            leave_type_id = allRequests[i].leave_type_id,
+                            level_step = allRequests[i].level_step,
+                            request_id = allRequests[i].request_id
+                        };
+
+                        new_requests.Add(request);
+                    }
+                }
+                else
+                {
+                    new_requests.Add(allRequests[i]);
+                }
+            }
+            allRequests = new_requests;
+            allRequests = allRequests
                 .Where(r => deptEmpIds.Contains(r.emp_id))
                 .Where(r => r.status_request != "Rejected" && r.status_request != "Canceled")
-                .Where(r => r.end_request_date >= startDate && r.start_request_date <= endDate)
+                //.Where(r => r.end_request_date >= startDate && r.start_request_date <= endDate)
                 .ToList();
 
             if (!allRequests.Any())
@@ -116,8 +197,8 @@ namespace WebENG.Controllers
                 .Where(e => empIdsWithLeave.Contains(e.emp_id))
                 .ToList();
 
-            var dateRange = Enumerable.Range(0, (endDate.Date - startDate.Date).Days + 1)
-                                      .Select(i => startDate.Date.AddDays(i))
+            var dateRange = Enumerable.Range(0, (endDate.Date - _startDate.Date).Days + 1)
+                                      .Select(i => _startDate.Date.AddDays(i))
                                       .ToList();
 
             var leaveCoverage = new Dictionary<string, object>();
@@ -127,57 +208,62 @@ namespace WebENG.Controllers
                 var current = req.start_request_date.Date;
                 while (current <= req.end_request_date.Date && current <= endDate.Date)
                 {
-                    if (current >= startDate.Date)
+                    if (current >= _startDate.Date)
                     {
-                        var key = $"{req.emp_id}|{current:yyyy-MM-dd}";
-
-                        if (req.is_full_day)
+                        bool IsWeekend = current.DayOfWeek == DayOfWeek.Saturday || current.DayOfWeek == DayOfWeek.Sunday;
+                        bool IsHoliday = holidays.Any(a => a.date.Date == current.Date);
+                        if (!IsHoliday && !IsWeekend)
                         {
-                            leaveCoverage[key] = new
+                            var key = $"{req.emp_id}|{current:yyyy-MM-dd}";
+
+                            if (req.is_full_day)
                             {
-                                date = current.ToString("yyyy-MM-dd"),
-                                type = req.leave_name_th,
-                                duration = "full",
-                                time = "08:30 - 17:30",
-                                color_code = req.color_code,
-                                status = req.status_request
-                            };
-                        }
-                        else if (!leaveCoverage.ContainsKey(key))
-                        {
-                            string duration = "";
-                            string time = $"{req.start_request_time:hh\\:mm} - {req.end_request_time:hh\\:mm}";
-
-                            var startTs = new TimeSpan(req.start_request_time.Hours, req.start_request_time.Minutes, 0);
-                            var endTs = new TimeSpan(req.end_request_time.Hours, req.end_request_time.Minutes, 0);
-                            var diff = endTs - startTs;
-
-                            var t0830 = new TimeSpan(8, 30, 0);
-                            var t1200 = new TimeSpan(12, 0, 0);
-                            var t1300 = new TimeSpan(13, 0, 0);
-                            var t1730 = new TimeSpan(17, 30, 0);
-
-                            if (startTs == t0830 && endTs == t1200) duration = "half-left";
-                            else if (startTs == t1300 && endTs == t1730) duration = "half-right";
-                            else if (diff == TimeSpan.FromHours(2))
-                            {
-                                if (startTs >= t0830 && endTs <= new TimeSpan(10, 30, 0)) duration = "quarter-top-left";
-                                else if (startTs >= t0830 && endTs <= t1200) duration = "quarter-bottom-left";
-                                else if (startTs >= t1300 && endTs <= new TimeSpan(15, 0, 0)) duration = "quarter-top-right";
-                                else if (startTs >= new TimeSpan(15, 0, 0) && endTs <= t1730) duration = "quarter-bottom-right";
+                                leaveCoverage[key] = new
+                                {
+                                    date = current.ToString("yyyy-MM-dd"),
+                                    type = req.leave_name_th,
+                                    duration = "full",
+                                    time = "08:30 - 17:30",
+                                    color_code = req.color_code,
+                                    status = req.status_request
+                                };
                             }
-                            else if (diff >= TimeSpan.FromHours(6))
-                                duration = "three-quarter-left";
-
-                            leaveCoverage[key] = new
+                            else if (!leaveCoverage.ContainsKey(key))
                             {
-                                date = current.ToString("yyyy-MM-dd"),
-                                type = req.leave_name_th,
-                                duration,
-                                time,
-                                color_code = req.color_code,
-                                status = req.status_request
-                            };
+                                string duration = "";
+                                string time = $"{req.start_request_time:hh\\:mm} - {req.end_request_time:hh\\:mm}";
+
+                                var startTs = new TimeSpan(req.start_request_time.Hours, req.start_request_time.Minutes, 0);
+                                var endTs = new TimeSpan(req.end_request_time.Hours, req.end_request_time.Minutes, 0);
+                                var diff = endTs - startTs;
+
+                                var t0830 = new TimeSpan(8, 30, 0);
+                                var t1200 = new TimeSpan(12, 0, 0);
+                                var t1300 = new TimeSpan(13, 0, 0);
+                                var t1730 = new TimeSpan(17, 30, 0);
+
+                                if (startTs == t0830 && endTs == t1200) duration = "half-left";
+                                else if (startTs == t1300 && endTs == t1730) duration = "half-right";
+                                else if (diff == TimeSpan.FromHours(2))
+                                {
+                                    if (startTs >= t0830 && endTs <= new TimeSpan(10, 30, 0)) duration = "quarter-top-left";
+                                    else if (startTs >= t0830 && endTs <= t1200) duration = "quarter-bottom-left";
+                                    else if (startTs >= t1300 && endTs <= new TimeSpan(15, 0, 0)) duration = "quarter-top-right";
+                                    else if (startTs >= new TimeSpan(15, 0, 0) && endTs <= t1730) duration = "quarter-bottom-right";
+                                }
+                                else if (diff >= TimeSpan.FromHours(6))
+                                    duration = "three-quarter-left";
+
+                                leaveCoverage[key] = new
+                                {
+                                    date = current.ToString("yyyy-MM-dd"),
+                                    type = req.leave_name_th,
+                                    duration,
+                                    time,
+                                    color_code = req.color_code,
+                                    status = req.status_request
+                                };
+                            }
                         }
                     }
                     current = current.AddDays(1);

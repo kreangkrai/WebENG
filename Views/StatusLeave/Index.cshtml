@@ -2245,14 +2245,20 @@
             let role = '@Html.Raw(role)';
 
             const request = requestHistory.filter(f => f.request_id === request_id).map(m => m)[0];
-
             $('#emp_id').val(data.empId);
             $('#emp_name').val($(this).find('td:eq(2)').text());
 
             try {
-                setTimeout(() => {
-                    $('#select_leave_type').val(data.leave_type_id).change();
-                }, 200);
+                let emp_id = $('#emp_id').val();
+                let year = new Date(request.start_request_date).getFullYear();
+                const result = await GetLeaveByID(request.leave_type_id, emp_id, year)
+                const leave = result.leave;
+                let description = leave.description;
+                balance_leave = result.balance_leave;
+                $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
+                $('#leave_description').text(description);
+
+                $('#select_leave_type').val(data.leave_type_id);                
                 $('#leave_start_date').val(data.start_request_date.split('T')[0]);
                 $('#leave_stop_date').val(data.end_request_date.split('T')[0]);
 
@@ -2267,8 +2273,7 @@
 
                     stopDateInput.disabled = false;
                 } else {
-                    resetButtonStyles();
-                    leaveHalfBtn.classList.add('active');
+                    resetButtonStyles();                  
                     toggleGroupDisplay(dateGroup, true);
                     toggleGroupDisplay(timeGroup, true);
 
@@ -2276,11 +2281,12 @@
                     const end_time = request.end_request_time.split('.')[1];
 
                     const diff_time = parseInt(timeToMinutes(end_time)) - parseInt(timeToMinutes(start_time));
-
                     if (diff_time === 120) {
                         setHourlyOptions();
                         type_duration = "Hours";
                         durationSelect.value = "2";
+                        leaveHoursBtn.classList.add('active');
+                        
                     } else if (diff_time >= 210 && diff_time < 360) {
 
                         if ((start_time === "08:30:00" || start_time === "13:00:00") && (end_time === "12:00:00" || end_time === "17:30:00")) {
@@ -2292,10 +2298,12 @@
                             } else if (start_time === "13:00:00" && end_time === "17:30:00") {
                                 durationSelect.value = "afternoon";
                             }
+                            leaveHalfBtn.classList.add('active');
                         } else {
                             setHourlyOptions();
                             type_duration = "Hours";
                             durationSelect.value = "4";
+                            leaveHoursBtn.classList.add('active');
                         }
 
 
@@ -2303,6 +2311,7 @@
                         setHourlyOptions();
                         type_duration = "Hours";
                         durationSelect.value = "6";
+                        leaveHoursBtn.classList.add('active');
                     }
 
                     startHourTimeInput.value = start_time.split(':')[0];
@@ -2344,21 +2353,21 @@
 
                     loadExistingFiles(request.leave_type_id, year, request.request_id);
                 }
-            } catch {
-
+            } catch (error) {
+                console.log(error);
             }
         });
 
         async function handleLeaveTypeChange(leave_type_id) {
             try {
-                let leave_type_id = $('#select_leave_type').val();
+                //let leave_type_id = $('#select_leave_type').val();
                 let request_date = today.toISOString();
-
+                let start_request_date = $('#start_request_date').val();
                 let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
                 let description = leave_.description;
                 let emp_id = $('#emp_id').val();
                 let leave;
-                let year = new Date(request_date).getFullYear();
+                let year = new Date(start_request_date).getFullYear();
                 const result = await GetLeaveByID(leave_type_id, emp_id, year)
 
                 let hire_date = new Date();
@@ -2929,6 +2938,7 @@
             $('#create_btn_leave_send').prop('disabled', true);
             let leave_type_id = $('#create_select_leave_type').val();
             let _leave = create_leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
+        
             if (type_duration == "Day") {
                 if (create_startDateInput.value !== "" && create_stopDateInput.value !== "") {
                     let start = new Date(create_startDateInput.value);

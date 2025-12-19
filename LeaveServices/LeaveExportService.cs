@@ -196,7 +196,7 @@ namespace WebENG.LeaveServices
                                 {
                                     cellRange.Value = balance_al;
                                     cellRange.Formula = $"IF({balance_al}<>0, {balance_al}, \"-\")";
-                                    cellRange.Style.Font.Color.SetColor(System.Drawing.Color.Red);
+                                    cellRange.Style.Font.Color.SetColor(Color.Red);
                                     cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                                     cellRange.Style.Font.Bold = true;
                                 }
@@ -235,26 +235,54 @@ namespace WebENG.LeaveServices
                                 }
                                 else // For Face Scan
                                 {
-                                    TimeInOutModel timeInOut = calLatetimes.Where(w => w.emp_id == datas[i].emp_id).FirstOrDefault();
-                                    if (col == startHeaderCols + headerCount - 3)
+                                    if (months[m] == "สรุป")
                                     {
-                                        cellRange.Value = timeInOut.count_late;
-                                        cellRange.Formula = $"IF({timeInOut.count_late}<>0, {timeInOut.count_late}, \"-\")";
-                                        cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                        TimeInOutModel timeInOut = calLatetimes.Where(w => w.emp_id == datas[i].emp_id).FirstOrDefault();
+                                        if (col == startHeaderCols + headerCount - 3)
+                                        {
+                                            cellRange.Value = timeInOut.TotalCountLate;
+                                            cellRange.Formula = $"IF({timeInOut.TotalCountLate}<>0, {timeInOut.TotalCountLate}, \"-\")";
+                                            cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                        }
+                                        if (col == startHeaderCols + headerCount - 2)
+                                        {
+                                            cellRange.Value = timeInOut.TotalMinuteLate;
+                                            cellRange.Formula = $"IF({timeInOut.TotalMinuteLate}<>0, {timeInOut.TotalMinuteLate}, \"-\")";
+                                            cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                        }
+                                        if (col == startHeaderCols + headerCount - 1)
+                                        {
+                                            cellRange.Value = timeInOut.TotalCountForgotScan;
+                                            cellRange.Formula = $"IF({timeInOut.TotalCountForgotScan}<>0, {timeInOut.TotalCountForgotScan}, \"-\")";
+                                            cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                        }
                                     }
-                                    if (col == startHeaderCols + headerCount - 2)
+                                    else
                                     {
-                                        cellRange.Value = timeInOut.minute_late;
-                                        cellRange.Formula = $"IF({timeInOut.minute_late}<>0, {timeInOut.minute_late}, \"-\")";
-                                        cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                        TimeInOutModel timeInOut = calLatetimes.Where(w => w.emp_id == datas[i].emp_id).FirstOrDefault();
+                                        var time_InOut = timeInOut.months.Where(w => w.month == m + 1).FirstOrDefault();
+                                        if (time_InOut != null)
+                                        {
+                                            if (col == startHeaderCols + headerCount - 3)
+                                            {
+                                                cellRange.Value = time_InOut.count_late;
+                                                cellRange.Formula = $"IF({time_InOut.count_late}<>0, {time_InOut.count_late}, \"-\")";
+                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            }
+                                            if (col == startHeaderCols + headerCount - 2)
+                                            {
+                                                cellRange.Value = time_InOut.minute_late;
+                                                cellRange.Formula = $"IF({time_InOut.minute_late}<>0, {time_InOut.minute_late}, \"-\")";
+                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            }
+                                            if (col == startHeaderCols + headerCount - 1)
+                                            {
+                                                cellRange.Value = time_InOut.count_forgot_scan;
+                                                cellRange.Formula = $"IF({time_InOut.count_forgot_scan}<>0, {time_InOut.count_forgot_scan}, \"-\")";
+                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            }
+                                        }
                                     }
-                                    if (col == startHeaderCols + headerCount - 1)
-                                    {
-                                        cellRange.Value = timeInOut.count_forgot_scan;
-                                        cellRange.Formula = $"IF({timeInOut.count_forgot_scan}<>0, {timeInOut.count_forgot_scan}, \"-\")";
-                                        cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                                    }
-                                    
                                 }
                                 cellRange.AutoFitColumns();
                             }

@@ -203,76 +203,80 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(year, 1, 1);
             DateTime stop = new DateTime(year, 12, 31);
             List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(year.ToString());
-
+            var holidayDates = new HashSet<DateTime>(holidays.Select(h => h.date.Date)); // Optimize เช็คเร็ว
             List<EmployeeWorkModel> dailyRecords = CalData(start, stop);
-            List<TimeInOutModel> summary = dailyRecords
-                .GroupBy(g => g.emp_id)
-                .Select(g =>
+
+            var groupedByEmp = dailyRecords.GroupBy(g => g.emp_id);
+
+            var summary = groupedByEmp.Select(g =>
+            {
+                var records = g.ToList();
+                var monthlyDict = new Dictionary<int, MonthlyTimeInOutModel>();
+
+                List<RequestModel> request_leave = Requests.GetRequestByEmpID(g.Key)
+                    .Where(w => w.status_request != "Canceled" && w.status_request != "Rejected")
+                    .ToList();
+
+                foreach (var rec in records)
                 {
-                    var records = g.ToList();
+                    DateTime date = rec.date;
+                    int month = date.Month;
+                    bool isHoliday = holidayDates.Contains(date);
+                    bool isWeekend = date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+                    bool isNonWorking = isHoliday || isWeekend;
 
-                    int count_late = 0;
-                    int total_minute_late = 0;
-                    int count_forgot_scan = 0;
+                    if (isNonWorking) continue;
 
-                    foreach (var rec in records)
+                    if (!monthlyDict.TryGetValue(month, out var monthly))
                     {
-                        DateTime date = rec.date;
-                        bool isHoliday = holidays.Any(a => a.date.Date == date.Date);
-                        bool isWeekend = date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
-                        bool isNonWorking = isHoliday || isWeekend;
-                        if (!isNonWorking)
+                        monthly = new MonthlyTimeInOutModel { month = month };
+                        monthlyDict[month] = monthly;
+                    }
+
+                    if (rec.start_time_trip_expense == TimeSpan.Zero)
+                    {
+                        if (rec.start_time_face_scan != TimeSpan.Zero) // Face Scan
                         {
-                            if (rec.start_time_trip_expense == TimeSpan.Zero)
+                            if (rec.start_time_face_scan > TimeSpan.Parse(rec.shift_time)) // Late
                             {
-                                if (rec.start_time_face_scan != TimeSpan.Zero) // Face Scan
+                                var lateMinutes = (int)(rec.start_time_face_scan - TimeSpan.Parse(rec.shift_time)).TotalMinutes;
+                                if (lateMinutes > 0)
                                 {
-                                    if (rec.start_time_face_scan > TimeSpan.Parse(rec.shift_time)) // Late
+                                    if (rec.start_time_face_scan > new TimeSpan(13, 0, 0))
                                     {
-
-                                        var lateMinutes = (int)(rec.start_time_face_scan - TimeSpan.Parse(rec.shift_time)).TotalMinutes;
-
-                                        if (lateMinutes > 0)
-                                        {
-                                            if (rec.start_time_face_scan > new TimeSpan(13, 0, 0))
-                                            {
-                                                lateMinutes -= 60;
-                                            }
-                                            if (lateMinutes > 480)
-                                            {
-                                                lateMinutes = 480;
-                                            }
-                                            total_minute_late += lateMinutes;
-                                            count_late++;
-                                        }
+                                        lateMinutes -= 60;
                                     }
-                                }
-                                else
-                                {
-                                    List<RequestModel> request_leave = Requests.GetRequestByEmpID(rec.emp_id);
-                                    request_leave = request_leave.Where(w => w.status_request != "Canceled" && w.status_request != "Rejected").ToList();
-                                    bool check_leave = false;
-                                    check_leave = request_leave.Any(w => w.start_request_date.Date == date);
-
-                                    if (!check_leave)
+                                    if (lateMinutes > 480)
                                     {
-                                        count_forgot_scan++;
+                                        lateMinutes = 480;
                                     }
+                                    monthly.minute_late += lateMinutes;
+                                    monthly.count_late++;
                                 }
                             }
                         }
+                        else
+                        {
+                            bool check_leave = request_leave.Any(w => w.start_request_date.Date == date);
+                            if (!check_leave)
+                            {
+                                monthly.count_forgot_scan++;
+                            }
+                        }
                     }
+                }
 
-                    return new TimeInOutModel
-                    {
-                        emp_id = g.Key,
-                        count_late = count_late,
-                        minute_late = total_minute_late,
-                        count_forgot_scan = count_forgot_scan
-                    };
-                })
-                .OrderBy(x => x.emp_id)
-                .ToList();
+                var monthsList = monthlyDict.Values.ToList();
+
+                return new TimeInOutModel
+                {
+                    emp_id = g.Key,
+                    months = monthsList
+                };
+            })
+            .OrderBy(x => x.emp_id)
+            .ToList();
+
             return summary;
         }
 

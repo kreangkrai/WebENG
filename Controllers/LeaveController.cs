@@ -203,9 +203,11 @@ namespace WebENG.Controllers
             string leave_type_th = leaveType.leave_name_th;
             List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
 
+            
             List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+            level = level.Where(w => w.emp_id == request.emp_id).ToList();
             int current_level = level.Min(m => m.level);
-            List<LevelModel> next_level = level.Where(w => w.level == current_level + 1).ToList();
+            int next_level = current_level + 1;
 
             // Check Two Step Approve
             bool is_full_day = request.is_full_day;
@@ -236,9 +238,8 @@ namespace WebENG.Controllers
             {
                 request.path_file = "";
             }
-           
-            level = level.Where(w => w.emp_id == request.emp_id).ToList();
 
+  
             request.level_step = level.FirstOrDefault().level;
 
             List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
@@ -310,11 +311,14 @@ namespace WebENG.Controllers
 
                     // Notification
 
-                    for (int i = 0; i < next_level.Count; i++)
+                    List<LevelModel> level_approves = Level.GetLevelByDepartment(level.FirstOrDefault().department);
+                    level_approves = level_approves.Where(w => w.level == next_level).ToList();
+
+                    for (int i = 0; i < level_approves.Count; i++)
                     {
                         NotificationModel notification = new NotificationModel()
                         {
-                            emp_id = next_level[i].emp_id,
+                            emp_id = level_approves[i].emp_id,
                             notification_date = DateTime.Now,
                             notification_description = "สร้างใบลา",
                             notification_path = "Management",
@@ -327,7 +331,7 @@ namespace WebENG.Controllers
                     }
 
                     // Send Mail
-                    List<string> email_approvers = next_level.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
+                    List<string> email_approvers = level_approves.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
                     string status = "สร้างใบลา";
                     string name = emps.Where(w=>w.emp_id == request.emp_id).Select(s=>s.name_th).FirstOrDefault();
                     string leave_type = leave_type_th;

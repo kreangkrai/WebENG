@@ -2421,7 +2421,7 @@
             if (leave.request_timing === "Both") {
                 return true;
             } else if (leave.request_timing === "Future") {
-                if (date_request > date_now) {
+                if (date_request >= date_now) {
                     return true;
                 } else {
                     return false;

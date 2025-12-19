@@ -435,7 +435,7 @@
             if (table_time) {
                 table_time.destroy();
             }
-
+            console.log(late_times);
             let datas = [];
             for (let i = 0; i < data.length; i++) {
                 let used_al = 0;
@@ -470,9 +470,9 @@
                 
                 const balance_al = parseFloat(data[i].entitlement_al) - parseFloat(used_al);
                 const late_time = late_times.filter(f => f.emp_id === data[i].emp_id).map(m => m)[0];
-                const count_late = late_time.count_late;
-                const minute_late = late_time.minute_late;
-                const count_forgot_scan = late_time.count_forgot_scan;
+                const count_late = late_time.totalCountLate;
+                const minute_late = late_time.totalMinuteLate;
+                const count_forgot_scan = late_time.totalCountForgotScan;
                 datas.push([(i + 1),
                 data[i].emp_id,
                 data[i].name_th,
