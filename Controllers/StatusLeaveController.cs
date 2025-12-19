@@ -586,54 +586,59 @@ namespace WebENG.Controllers
                     }
                     Mail.Requester(email_approvers, status, name, leave_type, leave_date, leave_time);
 
+                    //Delete Working Hours
+                    List<UserModel> users = Accessory.getAllUser();
+                    UserModel user_ = users.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+                    WorkingHoursModel _wh = WorkingHours.GetWorkingHourByLeave(user_.user_id, request.start_request_date.ToString("yyyy-MM-dd"));
 
-                    ////Insert Leave Working Hours
-                    //List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
-                    //List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
-                    //List<UserModel> users = Accessory.getAllUser();
-                    //for(DateTime date = request.start_request_date; date <= request.end_request_date; date = date.AddDays(1))
-                    //{
-                    //    if (holidays.Any(a => a.date.Date != date.Date) && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
-                    //    {
-                    //        if (request.is_full_day)
-                    //        {
-                    //            WorkingHoursModel wh = new WorkingHoursModel()
-                    //            {
-                    //                user_id = users.Where(w=>w.emp_id == request.emp_id).Select(s=>s.user_id).FirstOrDefault(),
-                    //                working_date = date.Date,
-                    //                job_id = "J999999",
-                    //                task_id = "T002",
-                    //                start_time = new TimeSpan(8, 30, 0),
-                    //                stop_time = new TimeSpan(17, 30, 0),
-                    //                lunch_full = false,
-                    //                lunch_half = false,
-                    //                dinner_full = false,
-                    //                dinner_half = false,
-                    //                note = "",
-                    //            };
-                    //            whs.Add(wh);
-                    //        }
-                    //        else
-                    //        {
-                    //            WorkingHoursModel wh = new WorkingHoursModel()
-                    //            {
-                    //                user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
-                    //                working_date = date.Date,
-                    //                job_id = "J999999",
-                    //                task_id = "T002",
-                    //                start_time = request.start_request_time,
-                    //                stop_time = request.end_request_time,
-                    //                lunch_full = false,
-                    //                lunch_half = false,
-                    //                dinner_full = false,
-                    //                dinner_half = false,
-                    //                note = "",
-                    //            };
-                    //            whs.Add(wh);
-                    //        }
-                    //    }
-                    //}
-                    //message = AddWorkingHours(whs);
+                    WorkingHours.DeleteWorkingHours(_wh);
+
+                    //Insert Leave Working Hours
+                    List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
+                    List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+                    for (DateTime date = request.start_request_date; date <= request.end_request_date; date = date.AddDays(1))
+                    {
+                        if (holidays.Any(a => a.date.Date != date.Date) && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
+                        {
+                            if (request.is_full_day)
+                            {
+                                WorkingHoursModel wh = new WorkingHoursModel()
+                                {
+                                    user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                                    working_date = date.Date,
+                                    job_id = "J999999",
+                                    task_id = "T002",
+                                    start_time = new TimeSpan(8, 30, 0),
+                                    stop_time = new TimeSpan(17, 30, 0),
+                                    lunch_full = false,
+                                    lunch_half = false,
+                                    dinner_full = false,
+                                    dinner_half = false,
+                                    note = "",
+                                };
+                                whs.Add(wh);
+                            }
+                            else
+                            {
+                                WorkingHoursModel wh = new WorkingHoursModel()
+                                {
+                                    user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                                    working_date = date.Date,
+                                    job_id = "J999999",
+                                    task_id = "T002",
+                                    start_time = request.start_request_time,
+                                    stop_time = request.end_request_time,
+                                    lunch_full = false,
+                                    lunch_half = false,
+                                    dinner_full = false,
+                                    dinner_half = false,
+                                    note = "",
+                                };
+                                whs.Add(wh);
+                            }
+                        }
+                    }
+                    message = AddWorkingHours(whs);
                 }
                 return Json(message);
             }
@@ -642,7 +647,25 @@ namespace WebENG.Controllers
             //    return Json("ใช้สิทธิ์วันลาไปแล้ว");
             //}
         }
+        public string AddWorkingHours(List<WorkingHoursModel> whs)
+        {
+            try
+            {
+                for (int i = 0; i < whs.Count; i++)
+                {
+                    int id = WorkingHours.GetLastWorkingHoursID() + 1;
+                    string wh_id = "WH" + id.ToString().PadLeft(6, '0');
 
+                    whs[i].index = wh_id;
+                    var result = WorkingHours.AddWorkingHours(whs[i]);
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
         [HttpDelete]
         public IActionResult DeleteRequest(string request_id, string emp_id )
         {
