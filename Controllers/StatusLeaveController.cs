@@ -711,7 +711,8 @@ namespace WebENG.Controllers
                     Directory.Delete(tempFolder, true);
 
                     //Update File Path
-                    Requests.UpdateFilePath(request.request_id, request.path_file);
+                    string path_file = request.request_id;
+                    Requests.UpdateFilePath(request.request_id, path_file);
                 }
                 else
                 {
