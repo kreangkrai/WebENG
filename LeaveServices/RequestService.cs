@@ -833,5 +833,116 @@ namespace WebENG.LeaveServices
                     localCon.Close();
             }
         }
+
+        public List<RequestModel> GetRequestByDepartment(string department)
+        {
+            List<RequestModel> requests = new List<RequestModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"SELECT [request_id]
+                                                          ,[dbo].[request].[emp_id]
+                                                          ,[request].[leave_type_id]
+														  ,Leave_type.leave_type_code
+                                                          ,[is_full_day]
+                                                          ,[start_request_date]
+                                                          ,[end_request_date]
+                                                          ,[amount_leave_day]
+                                                          ,[start_request_time]
+                                                          ,[end_request_time]
+                                                          ,[amount_leave_hour]
+                                                          ,[path_file]
+                                                          ,[request_date]
+                                                          ,[request].[description]
+                                                          ,[status_request]
+														  ,Leave_type.leave_name_th
+														  ,Leave_type.leave_name_en
+                                                          ,Leave_type.color_code
+                                                          ,[request].[is_two_step_approve]
+                                                          ,[level_step]
+                                                          ,[request].[comment]
+														  ,emp.department
+                                                      FROM [dbo].[request] 
+													  LEFT JOIN Leave_type ON [request].leave_type_id = Leave_type.leave_type_id
+													   LEFT JOIN [CTL].dbo.Employees emp ON [request].emp_id = emp.emp_id
+                                                      WHERE emp.department = @department");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                command.Parameters.AddWithValue("@department", department);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        RequestModel request = new RequestModel()
+                        {
+                            request_id = dr["request_id"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
+                            leave_type_id = dr["leave_type_id"].ToString(),
+                            leave_type_code = dr["leave_type_code"].ToString(),
+                            leave_name_th = dr["leave_name_th"].ToString(),
+                            leave_name_en = dr["leave_name_en"].ToString(),
+                            is_full_day = dr["is_full_day"] != DBNull.Value ? Convert.ToBoolean(dr["is_full_day"].ToString()) : false,
+                            start_request_date = dr["start_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["start_request_date"].ToString()) : DateTime.MinValue,
+                            end_request_date = dr["end_request_date"] != DBNull.Value ? Convert.ToDateTime(dr["end_request_date"].ToString()) : DateTime.MinValue,
+                            amount_leave_day = dr["amount_leave_day"] != DBNull.Value ? Convert.ToInt32(dr["amount_leave_day"].ToString()) : 0,
+                            start_request_time = dr["start_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["start_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            end_request_time = dr["end_request_time"] != DBNull.Value ? new TimeSpan(Convert.ToDateTime(dr["end_request_time"].ToString()).Ticks) : new TimeSpan(0, 0, 0),
+                            amount_leave_hour = dr["amount_leave_hour"] != DBNull.Value ? Convert.ToDecimal(dr["amount_leave_hour"].ToString()) : 1,
+                            path_file = dr["path_file"].ToString(),
+                            request_date = dr["request_date"] != DBNull.Value ? Convert.ToDateTime(dr["request_date"].ToString()) : DateTime.MinValue,
+                            description = dr["description"].ToString(),
+                            status_request = dr["status_request"].ToString(),
+                            is_two_step_approve = dr["is_two_step_approve"] != DBNull.Value ? Convert.ToBoolean(dr["is_two_step_approve"].ToString()) : false,
+                            color_code = dr["color_code"].ToString(),
+                            level_step = dr["level_step"] != DBNull.Value ? Convert.ToInt32(dr["level_step"].ToString()) : -1,
+                            comment = dr["comment"].ToString()
+                        };
+                        requests.Add(request);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return requests;
+        }
+
+        public string UpdateFilePath(string request_id, string path_file)
+        {
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string sql = string.Format($@"UPDATE [dbo].[request]
+                                                   SET [path_file] = @path_file
+                                                 WHERE [request_id] = @request_id");
+                using (SqlCommand command = new SqlCommand(sql, con))
+                {
+                    command.Parameters.AddWithValue("@request_id", request_id);
+                    command.Parameters.AddWithValue("@path_file", path_file);
+                    command.ExecuteNonQuery();
+                }
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Update failed: " + ex.Message, ex);
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                    con.Close();
+            }
+        }
     }
 }

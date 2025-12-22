@@ -993,7 +993,7 @@
         const startDateInput = document.getElementById('leave_start_date');
         const stopTimeInput = document.getElementById('leave_stop_time');
         const stopDateInput = document.getElementById('leave_stop_date');
-        const daysInput = dateGroup.querySelector('input[type="number"]'); // ช่องลาจำนวน
+        const daysInput = dateGroup.querySelector('input[type="number"]');
 
         const fileInput = document.getElementById('leave_fileInput');
         const selectFileBtn = document.getElementById('selectFileBtn');
@@ -1157,86 +1157,86 @@
                 };
             }
             // ฟังก์ชันจัดการ animation เมื่อแสดงหรือซ่อน
-            function toggleGroupDisplay(group, show) {
-                if (show) {
-                    group.style.display = 'flex';
-                    group.style.opacity = '0';
-                    group.style.transition = 'opacity 0.3s ease-in-out';
-                    setTimeout(() => {
-                        group.style.opacity = '1';
-                    }, 10);
-                } else {
-                    group.style.opacity = '0';
-                    group.style.transition = 'opacity 0.3s ease-in-out';
-                    setTimeout(() => {
-                        group.style.display = 'none';
-                        // รีเซ็ตค่าใน time_group เมื่อซ่อน
-                        if (group === timeGroup) {
-                            startHourTimeInput.value = '';
-                            startMinuteTimeInput.value = '';
-                            stopTimeInput.value = '';
-                            durationSelect.value = '';
-                            startHourTimeInput.disabled = false; // Enable start_time
-                            startMinuteTimeInput.disabled = false; // Enable start_time
-                        }
-                    }, 300);
-                }
+        function toggleGroupDisplay(group, show) {
+            if (show) {
+                group.style.display = 'flex';
+                group.style.opacity = '0';
+                group.style.transition = 'opacity 0.3s ease-in-out';
+                setTimeout(() => {
+                    group.style.opacity = '1';
+                }, 10);
+            } else {
+                group.style.opacity = '0';
+                group.style.transition = 'opacity 0.3s ease-in-out';
+                setTimeout(() => {
+                    group.style.display = 'none';
+                    // รีเซ็ตค่าใน time_group เมื่อซ่อน
+                    if (group === timeGroup) {
+                        startHourTimeInput.value = '';
+                        startMinuteTimeInput.value = '';
+                        stopTimeInput.value = '';
+                        durationSelect.value = '';
+                        startHourTimeInput.disabled = false; // Enable start_time
+                        startMinuteTimeInput.disabled = false; // Enable start_time
+                    }
+                }, 300);
             }
+        }
             // เมื่อกดปุ่ม "ทั้งวัน"
-            leaveFullBtn.addEventListener('click', function () {
-                resetButtonStyles();
-                leaveFullBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true);
-                toggleGroupDisplay(timeGroup, false);
-                //daysInput.disabled = false;
-                daysInput.value = 1;
-                stopDateInput.value = startDateInput.value;
-                stopDateInput.disabled = false;
+        leaveFullBtn.addEventListener('click', function () {
+            resetButtonStyles();
+            leaveFullBtn.classList.add('active');
+            toggleGroupDisplay(dateGroup, true);
+            toggleGroupDisplay(timeGroup, false);
+            //daysInput.disabled = false;
+            daysInput.value = 1;
+            stopDateInput.value = startDateInput.value;
+            stopDateInput.disabled = false;
 
-                //Check attachment_required
-                type_duration = "Day";
-                CheckAttachFileRequire(type_duration);
+            //Check attachment_required
+            type_duration = "Day";
+            CheckAttachFileRequire(type_duration);
 
-                is_full_day = true;
+            is_full_day = true;
 
-            });
+        });
             // เมื่อกดปุ่ม "ครึ่งวัน"
-            leaveHalfBtn.addEventListener('click', function () {
-                resetButtonStyles();
-                leaveHalfBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true); // แสดง date_group
-                toggleGroupDisplay(timeGroup, true); // แสดง time_group
-                setHalfDayOptions(); // เปลี่ยนตัวเลือกเป็นครึ่งวันเช้า/บ่าย
-                //daysInput.disabled = true; // DISABLE ลาจำนวน
+        leaveHalfBtn.addEventListener('click', function () {
+            resetButtonStyles();
+            leaveHalfBtn.classList.add('active');
+            toggleGroupDisplay(dateGroup, true); // แสดง date_group
+            toggleGroupDisplay(timeGroup, true); // แสดง time_group
+            setHalfDayOptions(); // เปลี่ยนตัวเลือกเป็นครึ่งวันเช้า/บ่าย
+            //daysInput.disabled = true; // DISABLE ลาจำนวน
 
-                //Check attachment_required
-                type_duration = "Half";
-                CheckAttachFileRequire(type_duration);
+            //Check attachment_required
+            type_duration = "Half";
+            CheckAttachFileRequire(type_duration);
 
-                is_full_day = false;
-            });
+            is_full_day = false;
+        });
             // เมื่อกดปุ่ม "รายชั่วโมง"
-            leaveHoursBtn.addEventListener('click', function () {
-                resetButtonStyles();
-                leaveHoursBtn.classList.add('active');
-                toggleGroupDisplay(dateGroup, true); // แสดง date_group
-                toggleGroupDisplay(timeGroup, true); // แสดง time_group
-                setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
-                //daysInput.disabled = true; // DISABLE ลาจำนวน
+        leaveHoursBtn.addEventListener('click', function () {
+            resetButtonStyles();
+            leaveHoursBtn.classList.add('active');
+            toggleGroupDisplay(dateGroup, true); // แสดง date_group
+            toggleGroupDisplay(timeGroup, true); // แสดง time_group
+            setHourlyOptions(); // เปลี่ยนตัวเลือกเป็นรายชั่วโมง
+            //daysInput.disabled = true; // DISABLE ลาจำนวน
 
-                //Check attachment_required
-                type_duration = "Hours";
-                CheckAttachFileRequire(type_duration);
+            //Check attachment_required
+            type_duration = "Hours";
+            CheckAttachFileRequire(type_duration);
 
-                is_full_day = false;
-            });
+            is_full_day = false;
+        });
 
             //Stop date Change
-            stopDateInput.addEventListener('change', function () {
-                //Check attachment_required
-                type_duration = "Day";
-                CheckAttachFileRequire(type_duration);
-            });
+        stopDateInput.addEventListener('change', function () {
+            //Check attachment_required
+            type_duration = "Day";
+            CheckAttachFileRequire(type_duration);
+        });
 
         function CheckAttachFileRequire(type_duration) {
             $('#btn_leave_send').prop('disabled', true);
@@ -1603,7 +1603,6 @@
 
         // === 7. โหลดไฟล์เก่า (ถ้ามี) ===
         async function loadExistingFiles(leave_type_id, year, request_id) {
-
             fileListContainer.innerHTML = '';
             tempFileIds = [];
 
@@ -1693,7 +1692,13 @@
                 }
 
                 $('#confirm_description').text(message);
-                $('#modal_confirm').modal();
+                const text_btn_send = $('#btn_leave_send').text();
+                const is_attach_file = tempFileIds.length > 0;
+                if (text_btn_send === "แนบไฟล์ย้อนหลัง" && !is_attach_file) {
+                    alert("กรุณาแนบไฟล์");
+                } else {
+                    $('#modal_confirm').modal();
+                }
             } else {
                 alert('ไม่สามารถลาข้ามปีได้');
             }
@@ -1737,13 +1742,16 @@
                 "amount_leave_hour": 0,
             });
 
+            const text_btn_send = $('#btn_leave_send').text();
+
             let is_attach_file = tempFileIds.length > 0;
+
             await $.ajax({
                 type: "POST",
                 url: '@Url.Action("EditRequest", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    request_id, str, is_attach_file
+                    request_id, str, is_attach_file, text_btn_send
                 },
                 success: function (response) {
                     if (response === "Success") {
@@ -1755,6 +1763,7 @@
                     }
                 }
             });
+ 
             location.reload();
             $('#SpinModal').modal('hide');
             $('#confirm_ok').attr('disabled', false);
@@ -1837,20 +1846,27 @@
         ];
 
         $(document).ready(async function () {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date();
             let start = new Date(today);
             start.setDate(1);
             start = start.toISOString().split('T')[0];
-            document.getElementById('date_start').value = start;
-            document.getElementById('date_stop').value = today;
 
-            employees = await GetEmployee(start, today);
+            today.setMonth(today.getMonth() + 1);
+            const to_day = today.toISOString().split('T')[0];
+
+            document.getElementById('date_start').value = start;
+            document.getElementById('date_stop').value = to_day;
+
+            employees = await GetEmployee(start, to_day);
             initSearchEvents();
             loadInitialLeaveHistory();
 
             const emp_id = '@Html.Raw(emp_id)';
             const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
             selectEmployee(emp);
+
+            let year = new Date(start).getFullYear();
+            $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
         });
 
         async function GetEmployee(start, stop) {
@@ -1871,6 +1887,16 @@
                 }
             });
             return emps;
+        }
+
+        async function GetDepartmentRequestHistory(department, start, stop) {
+            const response = await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetDepartmentRequestHistory", "StatusLeave")',
+                data: { department, start, stop },
+                dataType: 'json'
+            });
+            return response;
         }
 
         async function GetRequestHistory(emp_id, start, stop) {
@@ -1919,7 +1945,7 @@
 
         function GenerateDepartmentOption(departments) {
             const $select = $('#departmentSelect');
-            $select.empty().append(`<option value="ALL" selected disabled>ทุกแผนก</option>`);
+            $select.empty().append(`<option value="ALL" selected disabled>เลือกแผนก</option>`);
             departments.forEach(dept => {
                 $select.append(`<option value="${dept}">${dept}</option>`);
             });
@@ -1963,10 +1989,27 @@
             employees = await GetEmployee(start, stop);
             const emp_id = '@Html.Raw(emp_id)';
             const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
-            selectEmployee(emp);
 
+            selectEmployee(emp);
             $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
         });
+
+         $('#date_start').on('change', async function () {
+            $('#emp_th_used_leave').text("");
+            $('#div_leaves_used').empty();
+            $('#employeeInfo').hide();
+            clearLeaveHistory();
+
+            let start = $('#date_start').val();
+            let stop = $('#date_stop').val();
+            let year = new Date(start).getFullYear();
+            employees = await GetEmployee(start, stop);
+            const emp_id = '@Html.Raw(emp_id)';
+            const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
+
+            selectEmployee(emp);
+            $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
+         });
 
         // ===== AUTO-COMPLETE CUSTOM (หลัก) =====
         function initSearchEvents() {
@@ -2103,6 +2146,17 @@
             }
         }
 
+        async function loadLeaveDepartmentAndHistory(department) {
+            let start = $('#date_start').val();
+            let stop = $('#date_stop').val();
+            try {
+                requestHistory = await GetDepartmentRequestHistory(department, start, stop);
+                renderLeaveHistory();
+            } catch (err) {
+                console.error("Error loading leave data:", err);
+            }
+        }
+
         async function loadLeaveUsedAndHistory(emp_id, emp_th_name) {
             let start = $('#date_start').val();
             let stop = $('#date_stop').val();
@@ -2155,8 +2209,7 @@
                     if (duration > 0.3 && duration < 0.6) {
                         duration = 0.50;
                     }
-                    //console.log(row.start_request_time);
-                    //console.log(row.end_request_time);
+
                     start_request_time = row.start_request_time.split('.')[1].substring(0, 5);
                     end_request_time = row.end_request_time.split('.')[1].substring(0, 5);
                 }
@@ -2164,7 +2217,7 @@
                 return {
                     no: index + 1,
                     emp_id: row.emp_id,
-                    name: selectedEmployee ? selectedEmployee.name_th || selectedEmployee.name_en : '-',
+                    name: row.emp_name_th || "", //selectedEmployee ? selectedEmployee.name_th || selectedEmployee.name_en : '-',
                     request_date: request_date,
                     leave_date: start_request_date,
                     time: start_request_time + "-" + end_request_time,
@@ -2238,7 +2291,7 @@
 
         $(document).on('click', '.clickable-row',async function () {
             const data = $(this).data();
-            
+
             const requestid = data.request_id;
             request_id = requestid;
             let main_emp_id = $('#hidden_emp_id').val();
@@ -2258,7 +2311,7 @@
                 $('#leave_balance').text(balance_leave + '/' + leave.amount_entitlement + ' วัน');
                 $('#leave_description').text(description);
 
-                $('#select_leave_type').val(data.leave_type_id);                
+                $('#select_leave_type').val(data.leave_type_id);
                 $('#leave_start_date').val(data.start_request_date.split('T')[0]);
                 $('#leave_stop_date').val(data.end_request_date.split('T')[0]);
 
@@ -2270,10 +2323,10 @@
                     toggleGroupDisplay(timeGroup, false);
 
                     $('#amount_leave').val(data.duration);
-
+                    type_duration = "Day";
                     stopDateInput.disabled = false;
                 } else {
-                    resetButtonStyles();                  
+                    resetButtonStyles();
                     toggleGroupDisplay(dateGroup, true);
                     toggleGroupDisplay(timeGroup, true);
 
@@ -2286,7 +2339,7 @@
                         type_duration = "Hours";
                         durationSelect.value = "2";
                         leaveHoursBtn.classList.add('active');
-                        
+
                     } else if (diff_time >= 210 && diff_time < 360) {
 
                         if ((start_time === "08:30:00" || start_time === "13:00:00") && (end_time === "12:00:00" || end_time === "17:30:00")) {
@@ -2319,17 +2372,56 @@
                     stopTimeInput.value = end_time;
 
                     $('#amount_leave').val(0);
-                    CheckAttachFileRequire(type_duration);
                     is_full_day = false;
                 }
 
+                CheckAttachFileRequire(type_duration);
                 //Check Edit
-                if (main_emp_id === data.empId && (data.status === "Created" || data.status === "Returned" || data.status === "Resubmit")) {
-                    $('#btn_leave_send').attr('hidden', false);
-                    $('#btn_delete').attr('hidden', false);
+                if (main_emp_id === data.empId) {
+                    if (data.status === "Created" || data.status === "Returned" || data.status === "Resubmit") {
+                        $('#btn_leave_send').attr('disabled', false);
+                        $('#btn_delete').attr('hidden', false);
+
+                        $('#select_leave_type').attr('disabled', false);
+                        $('#leave_full').attr('disabled', false);
+                        $('#leave_half').attr('disabled', false);
+                        $('#leave_hours').attr('disabled', false);
+                        $('#leave_stop_date').attr('disabled', false);
+                        $('#btn_leave_send').text("แก้ไขวันลา");
+                        $('#btn_leave_send').attr('hidden', false);
+                    } else if (data.status === "Approved") {
+
+                        $('#btn_delete').attr('hidden', true);
+                        $('#select_leave_type').attr('disabled', true);
+                        $('#leave_full').attr('disabled', true);
+                        $('#leave_half').attr('disabled', true);
+                        $('#leave_hours').attr('disabled', true);
+                        $('#leave_stop_date').attr('disabled', true);
+
+                        if (request.attachment_required) {
+                            $('#btn_leave_send').text("แนบไฟล์ย้อนหลัง");
+                            $('#btn_leave_send').attr('disabled', false);
+                            $('#btn_leave_send').attr('hidden', false);
+                        } else {
+                            $('#btn_leave_send').attr('hidden', true);
+                            $('#btn_leave_send').attr('disabled', true);
+                        }
+                        $('#btn_leave_send').attr('hidden', false);
+                    } else {
+                        $('#btn_delete').attr('hidden', true);
+                        $('#btn_leave_send').attr('hidden', true);
+                    }
+
                 } else {
                     $('#btn_leave_send').attr('hidden', true);
+                    $('#btn_leave_send').attr('disabled', true);
                     $('#btn_delete').attr('hidden', true);
+
+                    $('#select_leave_type').attr('disabled', true);
+                    $('#leave_full').attr('disabled', true);
+                    $('#leave_half').attr('disabled', true);
+                    $('#leave_hours').attr('disabled', true);
+                    $('#leave_stop_date').attr('disabled', true);
                 }
 
                 //Check Admin Leave for Cancle
@@ -2348,9 +2440,9 @@
                 $('#modal_leave').modal('show');
 
                 //Check Attach File List
+
                 if (request.attachment_required) {
                     const year = new Date(request.start_request_date).getFullYear();
-
                     loadExistingFiles(request.leave_type_id, year, request.request_id);
                 }
             } catch (error) {
@@ -2539,6 +2631,7 @@
             $('#employeeInfo').hide();
             $('#noEmployee').show();
             clearLeaveHistory();
+            loadLeaveDepartmentAndHistory(department);
         });
 
         $('#employeeSelect').on('change', function () {

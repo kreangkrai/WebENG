@@ -199,6 +199,8 @@ namespace WebENG.Controllers
             request.comment = "";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours,0);
 
+            int year = request.start_request_date.Year;
+
             LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
             string leave_type_th = leaveType.leave_name_th;
             List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
@@ -298,7 +300,7 @@ namespace WebENG.Controllers
                                 var fileName = Path.GetFileName(oldFile);
                                 var newPath = Path.Combine(env.WebRootPath,
                                     "Uploads", request.leave_type_id,
-                                    now.Year.ToString(),
+                                    year.ToString(),
                                     request_id,
                                     fileName
                                 );
@@ -333,7 +335,7 @@ namespace WebENG.Controllers
                     // Send Mail
                     List<string> email_approvers = level_approves.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
                     string status = "สร้างใบลา";
-                    string name = emps.Where(w=>w.emp_id == request.emp_id).Select(s=>s.name_th).FirstOrDefault();
+                    CTLModels.EmployeeModel name = emps.Where(w=>w.emp_id == request.emp_id).FirstOrDefault();
                     string leave_type = leave_type_th;
                     string leave_date = "";
                     string leave_time = "";

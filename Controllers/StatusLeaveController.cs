@@ -262,6 +262,47 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
+        public IActionResult GetDepartmentRequestHistory(string department, string start, string stop)
+        {
+            DateTime _start = DateTime.Parse(start);
+            DateTime _stop = DateTime.Parse(stop);
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+
+            List<RequestModel> requests = Requests.GetRequestByDepartment(department);
+            requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
+            requests = requests.OrderBy(o => o.start_request_date).ToList();
+
+            var data = requests.Select(s => new
+            {
+                request_id = s.request_id,
+                leave_type_id = s.leave_type_id,
+                emp_id = s.emp_id,
+                emp_name_en = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
+                emp_name_th = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_th).FirstOrDefault(),
+                request_date = s.request_date,
+                start_request_date = s.start_request_date,
+                end_request_date = s.end_request_date,
+                start_request_time = s.start_request_time,
+                end_request_time = s.end_request_time,
+                amount_leave_day = s.amount_leave_day,
+                amount_leave_hour = s.amount_leave_hour,
+                leave_name_th = s.leave_name_th,
+                description = s.description,
+                path_file = s.path_file,
+                is_full_day = s.is_full_day,
+                status_request = s.status_request,
+                attachment_required = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_required,
+                attachment_threshold_days = LeaveType.GetLeaveTypeByID(s.leave_type_id).attachment_threshold_days,
+                comment = s.comment,
+                level_step = s.level_step,
+                is_two_step_approve = s.is_two_step_approve
+            }).ToList();
+
+            data = data.OrderByDescending(o => o.start_request_date).ToList();
+            return Json(data);
+        }
+
+        [HttpGet]
         public IActionResult GetRequestHistory(string emp_id,string start , string stop)
         {
             DateTime _start = DateTime.Parse(start);
@@ -396,7 +437,7 @@ namespace WebENG.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditRequest(string request_id, string str,bool is_attach_file)
+        public IActionResult EditRequest(string request_id, string str,bool is_attach_file , string text_btn_send)
         {
             DateTime now = DateTime.Now;
             RequestModel request = JsonConvert.DeserializeObject<RequestModel>(str);
@@ -406,53 +447,56 @@ namespace WebENG.Controllers
             request.comment = "";
             request.amount_leave_hour = Math.Round((decimal)(request.end_request_time - request.start_request_time).TotalHours, 0);
 
-            List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
-            int current_level = level.Min(m => m.level);
-            int next_level = current_level + 1;
+            int year = request.start_request_date.Year;
 
-            LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
-            string leave_type_th = leaveType.leave_name_th;
+            if (text_btn_send == "แก้ไขวันลา")
+            {
+                List<LevelModel> level = Level.GetLevelByEmpID(request.emp_id);
+                int current_level = level.Min(m => m.level);
+                int next_level = current_level + 1;
 
-            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+                string leave_type_th = leaveType.leave_name_th;
 
-            // Check Two Step Approve
-            bool is_full_day = request.is_full_day;
-            if (is_full_day)
-            {               
-                decimal over_consecutive_days_for_two_step = leaveType.over_consecutive_days_for_two_step;
-                double diff_day = request.amount_leave_day;
-                if (diff_day >= (double)over_consecutive_days_for_two_step)
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+
+                // Check Two Step Approve
+                bool is_full_day = request.is_full_day;
+                if (is_full_day)
                 {
-                    request.is_two_step_approve = true;
+                    decimal over_consecutive_days_for_two_step = leaveType.over_consecutive_days_for_two_step;
+                    double diff_day = request.amount_leave_day;
+                    if (diff_day >= (double)over_consecutive_days_for_two_step)
+                    {
+                        request.is_two_step_approve = true;
+                    }
+                    else
+                    {
+                        request.is_two_step_approve = false;
+                    }
                 }
                 else
                 {
                     request.is_two_step_approve = false;
                 }
-            }
-            else
-            {
-                request.is_two_step_approve = false;
-            }
 
-            if (is_attach_file) // มีไฟล์แนบมา
-            {
-                request.path_file = request_id;
-            }
-            else
-            {
-                request.path_file = "";
-            }
+                if (is_attach_file) // มีไฟล์แนบมา
+                {
+                    request.path_file = request_id;
+                }
+                else
+                {
+                    request.path_file = "";
+                }
 
-            level = level.Where(w => w.emp_id == request.emp_id).ToList();
+                level = level.Where(w => w.emp_id == request.emp_id).ToList();
 
-            request.level_step = level.FirstOrDefault().level;
+                request.level_step = level.FirstOrDefault().level;
 
-            List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
-            string message = "";
-            int year = request.start_request_date.Year;
-            //if (!requests.Any(a => a.start_request_date.Date == request.start_request_date.Date)) //  Check Date
-            {
+                List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
+                string message = "";
+                
+
                 var connect = new ConnectSQL();
                 using (SqlConnection con = connect.OpenLeaveConnect())
                 {
@@ -515,18 +559,18 @@ namespace WebENG.Controllers
                     if (is_attach_file)
                     {
                         //Remove Uploads Request id
-                        
+
                         RemoveUploadsFiles(request.leave_type_id, year, request_id);
 
 
-                        var tempFolder = Path.Combine(env.WebRootPath,"Uploads", "temp", request_id);
+                        var tempFolder = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
                         var files = Directory.GetFiles(tempFolder);
                         foreach (var oldFile in files)
                         {
                             var fileName = Path.GetFileName(oldFile);
                             var newPath = Path.Combine(env.WebRootPath,
                                 "Uploads", request.leave_type_id,
-                                now.Year.ToString(),
+                                year.ToString(),
                                 request_id,
                                 fileName
                             );
@@ -563,7 +607,7 @@ namespace WebENG.Controllers
                     // Send Mail
                     List<string> email_approvers = level_approves.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
                     string status = "แก้ไขใบลา";
-                    string name = emps.Where(w => w.emp_id == request.emp_id).Select(s => s.name_th).FirstOrDefault();
+                    CTLModels.EmployeeModel name = emps.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
                     string leave_type = leave_type_th;
                     string leave_date = "";
                     string leave_time = "";
@@ -642,10 +686,39 @@ namespace WebENG.Controllers
                 }
                 return Json(message);
             }
-            //else
-            //{
-            //    return Json("ใช้สิทธิ์วันลาไปแล้ว");
-            //}
+            else
+            {
+                if (is_attach_file)
+                {
+                    //Remove Uploads Request id
+
+                    RemoveUploadsFiles(request.leave_type_id, year, request_id);
+
+                    var tempFolder = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
+                    var files = Directory.GetFiles(tempFolder);
+                    foreach (var oldFile in files)
+                    {
+                        var fileName = Path.GetFileName(oldFile);
+                        var newPath = Path.Combine(env.WebRootPath,
+                            "Uploads", request.leave_type_id,
+                            year.ToString(),
+                            request_id,
+                            fileName
+                        );
+                        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                        System.IO.File.Move(oldFile, newPath);
+                    }
+                    Directory.Delete(tempFolder, true);
+
+                    //Update File Path
+                    Requests.UpdateFilePath(request.request_id, request.path_file);
+                }
+                else
+                {
+                    RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
+                }
+                return Json("Success");
+            }
         }
         public string AddWorkingHours(List<WorkingHoursModel> whs)
         {

@@ -11,7 +11,7 @@ namespace WebENG.LeaveServices
     public class MailService : IMail
     {
 
-        public string Requester(List<string> to, string status,string name,string leave_type, string leave_date , string leave_time)
+        public string Requester(List<string> to, string status,CTLModels.EmployeeModel name,string leave_type, string leave_date , string leave_time)
         {
             try
             {
@@ -30,6 +30,11 @@ namespace WebENG.LeaveServices
                 if (status == "Rejected" || status == "Returned")
                 {
                     mail.CC.Add("hrs@contrologic.co.th");
+                    mail.CC.Add(name.email);
+                }
+                else
+                {
+                    mail.CC.Add(name.email);
                 }
 
                 mail.Subject = "แจ้งเตือนระบบวันลา";
@@ -69,7 +74,7 @@ namespace WebENG.LeaveServices
                             <div class=""info-card"">
                                 <table style=""width:100%; border-collapse:collapse;"">
                                     <tr><th width=""140"" align=""left"" style=""padding:8px 0;"">ประเภทการลา</th><td>{leave_type}</td></tr>
-                                    <tr><th align=""left"" style=""padding:8px 0;"">ชื่อ</th><td>{name}</td></tr>
+                                    <tr><th align=""left"" style=""padding:8px 0;"">ชื่อ</th><td>{name.name_th}</td></tr>
                                     <tr><th align=""left"" style=""padding:8px 0;"">วันที่ลา</th><td>{leave_date}</td></tr>
                                     <tr><th align=""left"" style=""padding:8px 0;"">เวลาที่ลา</th><td>{leave_time}</td></tr>
                                 </table>
@@ -115,7 +120,7 @@ namespace WebENG.LeaveServices
             }
             return "Success";
         }
-        public string Approver(string to, string status, string leave_type, string leave_date, string leave_time,string approver,string comment)
+        public string Approver(string to, string from ,string status, string leave_type, string leave_date, string leave_time,string approver,string comment)
         {
             try
             {
@@ -126,7 +131,7 @@ namespace WebENG.LeaveServices
                 string sender = "e-leave@contrologic.co.th";
                 mail.From = new MailAddress(sender);
                 mail.To.Add(to);
-
+                mail.CC.Add(from);
                 if (status == "Rejected" || status == "Returned")
                 {
                     mail.CC.Add("hrs@contrologic.co.th");

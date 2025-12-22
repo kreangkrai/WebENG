@@ -11,11 +11,13 @@ namespace WebENG.LeaveInterfaces
         List<RequestModel> GetRequests();
         RequestModel GetRequestByID(string request_id);
         List<RequestModel> GetRequestByEmpID(string emp_id);
+        List<RequestModel> GetRequestByDepartment(string department);
         List<RequestModel> GetRequestByDate(string date);
         List<RequestModel> GetRequestByMonth(string month);
         List<RequestModel> GetRequestByDurationDay(string start_day,string end_day);
         string Insert(RequestModel request);
         string Update(RequestModel request);
+        string UpdateFilePath(string request_id,string path_file);
         string Inserts(List<RequestModel> requests);
         string Updates(List<RequestModel> requests);
     }

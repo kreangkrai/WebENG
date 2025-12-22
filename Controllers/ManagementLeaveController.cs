@@ -420,6 +420,7 @@ namespace WebENG.Controllers
 
                         // Send Mail
                         string email_request = employees.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string email_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.email).FirstOrDefault();
                         string name_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
                         string status = "ใบลาถูกปฏิเสธ";
                         string leave_type = leave_type_th;
@@ -442,7 +443,7 @@ namespace WebENG.Controllers
                             leave_date = request.start_request_date.ToString("dd/MM/yyyy");
                             leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
                         }
-                        Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
+                        Mail.Approver(email_request, email_approver,status, leave_type, leave_date, leave_time, name_approver, request.comment);
 
                         return Json("Success");
 
@@ -599,6 +600,7 @@ namespace WebENG.Controllers
 
                         // Send Mail
                         string email_request = employees.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string email_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.email).FirstOrDefault();
                         string name_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
                         string status = "ใบลาถูกส่งกลับแก้ไข";
                         string leave_type = leave_type_th;
@@ -621,7 +623,7 @@ namespace WebENG.Controllers
                             leave_date = request.start_request_date.ToString("dd/MM/yyyy");
                             leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
                         }
-                        Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
+                        Mail.Approver(email_request, email_approver,status, leave_type, leave_date, leave_time, name_approver, request.comment);
 
                         return Json("Success");
 
@@ -793,6 +795,7 @@ namespace WebENG.Controllers
 
                         // Send Mail
                         string email_request = emps.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string email_approver = emps.Where(w => w.emp_id == approver.emp_id).Select(s => s.email).FirstOrDefault();
                         string name_approver = emps.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
                         string status = "ใบลาถูกอนุมัติ";
                         string leave_type = leave_type_th;
@@ -815,7 +818,7 @@ namespace WebENG.Controllers
                             leave_date = request.start_request_date.ToString("dd/MM/yyyy");
                             leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
                         }
-                        Mail.Approver(email_request, status, leave_type, leave_date, leave_time, name_approver, request.comment);
+                        Mail.Approver(email_request, email_approver,status, leave_type, leave_date, leave_time, name_approver, request.comment);
 
                         message = "Success";
                     }
