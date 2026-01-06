@@ -15,11 +15,13 @@ namespace WebForecastReport.Controllers
     {
         IJobMilestone JobMilestone;
         readonly IAccessory Accessory;
+        readonly WebENG.CTLInterfaces.IEmployee Employees;
 
         public JobMilestoneController()
         {
             JobMilestone = new JobMilestoneService();
             this.Accessory = new AccessoryService();
+            Employees = new WebENG.CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -33,6 +35,13 @@ namespace WebForecastReport.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+
+                List<WebENG.CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else

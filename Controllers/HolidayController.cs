@@ -15,11 +15,12 @@ namespace WebENG.Controllers
     {
         readonly CTLInterfaces.IHoliday HolidayService;
         readonly IAccessory Accessory;
-
+        readonly CTLInterfaces.IEmployee Employees;
         public HolidayController()
         {
             HolidayService = new CTLServices.HolidayService();
             Accessory = new AccessoryService();
+            Employees = new CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -33,6 +34,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else

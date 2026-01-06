@@ -53,6 +53,13 @@ namespace WebENG.Controllers
                 List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(DateTime.Now.Year.ToString());
                 ViewBag.holiday = holidays;
 
+                List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
+
                 return View(u);
             }
             else

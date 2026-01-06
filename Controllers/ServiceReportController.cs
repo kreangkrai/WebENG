@@ -18,6 +18,7 @@ namespace WebENG.Controllers
         private IJob Job;
         readonly IDailyReport DailyReport;
         private IExport Export;
+        readonly CTLInterfaces.IEmployee Employees;
         private readonly IHostingEnvironment _hostingEnvironment;
         static string _job = "";
         public ServiceReportController(IHostingEnvironment hostingEnvironment)
@@ -26,6 +27,7 @@ namespace WebENG.Controllers
             Job = new JobService();
             DailyReport = new DailyReportService();
             Export = new ExportService();
+            Employees = new CTLServices.EmployeeService();
             _hostingEnvironment = hostingEnvironment;
         }
         public IActionResult Index()
@@ -46,6 +48,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Department", u.department);
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else

@@ -18,6 +18,7 @@ namespace WebENG.Controllers
         private IQuotationSummary QuotationSummary;
         readonly IExport Export;
         readonly IEngUser EngUser;
+        readonly CTLInterfaces.IEmployee Employees;
         protected readonly IHostingEnvironment _hostingEnvironment;
         public QuotationSummaryController(IHostingEnvironment hostingEnvironment)
         {
@@ -25,6 +26,7 @@ namespace WebENG.Controllers
             QuotationSummary = new QuotationSummaryService();
             Export = new ExportService();
             EngUser = new EngUserService();
+            Employees = new CTLServices.EmployeeService();
             _hostingEnvironment = hostingEnvironment;
         }
         public IActionResult Index()
@@ -53,6 +55,13 @@ namespace WebENG.Controllers
                 ViewBag.ListYear = years;
                 ViewBag.ListEngineer = engineers;
                 ViewBag.ListDepartment = departments;
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
 
                 return View(u);
             }

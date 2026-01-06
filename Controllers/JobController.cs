@@ -28,6 +28,7 @@ namespace WebENG.Controllers
         readonly IHoliday Holiday;
         readonly IJobResponsible JobResponsible;
         protected readonly IHostingEnvironment _hostingEnvironment;
+        readonly CTLInterfaces.IEmployee Employees;
         static string _job_id;
         static string _item;
         public JobController(IHostingEnvironment hostingEnvironment)
@@ -44,6 +45,7 @@ namespace WebENG.Controllers
             Holiday = new HolidayService();
             JobResponsible = new JobResponsibleService();
             _hostingEnvironment = hostingEnvironment;
+            Employees = new CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -63,6 +65,13 @@ namespace WebENG.Controllers
                 for (int i = 0; i < jobs.Count; i++)
                 {
                     JobService.UpdateFinish(jobs[i]);
+                }
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
                 }
                 return View(u);
             }
@@ -137,6 +146,7 @@ namespace WebENG.Controllers
                     }
                 }
             }
+
             var data = new { jobs = new_jobs, jobs_owner = jobs_owner };
             return Json(data);
         }

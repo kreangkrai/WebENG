@@ -306,7 +306,7 @@
                         <tr id="LeaveTypeRow" class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="kanit-light">
                     </tbody>
                 </table>
             </div>
@@ -470,9 +470,14 @@
                 
                 const balance_al = parseFloat(data[i].entitlement_al) - parseFloat(used_al);
                 const late_time = late_times.filter(f => f.emp_id === data[i].emp_id).map(m => m)[0];
-                const count_late = late_time.totalCountLate;
-                const minute_late = late_time.totalMinuteLate;
-                const count_forgot_scan = late_time.totalCountForgotScan;
+                let count_late = 0;
+                let minute_late = 0;
+                let count_forgot_scan = 0;
+                if (late_time !== undefined) {
+                    count_late = late_time.totalCountLate;
+                    minute_late = late_time.totalMinuteLate;
+                    count_forgot_scan = late_time.totalCountForgotScan;
+                }
                 datas.push([(i + 1),
                 data[i].emp_id,
                 data[i].name_th,

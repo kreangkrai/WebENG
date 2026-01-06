@@ -22,6 +22,7 @@ namespace WebENG.Service
         public List<JobModel> GetAllJobs()
         {
             List<JobModel> jobs = new List<JobModel>();
+            List<Term_PaymentsModel> terms = new List<Term_PaymentsModel>();
             SqlCommand cmd = new SqlCommand();
             SqlDataReader dr = null;
             try
@@ -69,62 +70,64 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"
-                    SELECT
-                        Jobs.job_id,
-                        Jobs.job_name,
-                        Jobs.customer_name as customer,
-                        Jobs.job_date,
-                        Jobs.gp,
-                        Jobs.est_cost,
-                        Jobs.total_cost,
-                        Jobs.remaining_cost,
-                        Jobs.eng_cost,
-                        Jobs.cis_cost,
-                        Jobs.ais_cost,
-                        Jobs.process_id,
-                        Jobs.system_id,
-                        Jobs.md_rate,
-                        Jobs.pd_rate,
-                        Jobs.status,
-						Jobs.enduser,
-						Jobs.sale,
-						Jobs.sale_department,
-						Term_Payment.down_payment,
-						Term_Payment.document_submit,
-						Term_Payment.instrument_vendor,
-						Term_Payment.instrument_delivered_ctl,
-						Term_Payment.system_delivered_ctl,
-						Term_Payment.fat,
-						Term_Payment.delivery_instrument,
-						Term_Payment.delivery_system,
-						Term_Payment.progress_work,
-						Term_Payment.installation_work_complete,
-						Term_Payment.commissioning,
-						Term_Payment.startup,
-						Term_Payment.as_built,
-						Term_Payment.warranty,
-						Term_Payment.finished,
-                        Term_Payment.complete,
-                        Term_Payment.after_hmc,
-						Jobs.job_in_hand,
-                        Jobs.job_eng_in_hand,
-                        Jobs.job_cis_in_hand,
-                        Jobs.job_ais_in_hand,
-						Jobs.due_date,
-                        Jobs.quotation_no,
-                        Jobs.job_type,
-                        Jobs.finished_date,
-                        Jobs.warranty_period,
-						Jobs.bank_guarantee,
-						Jobs.bg_start,
-						Jobs.bg_finish,
-						Jobs.retention,
-                        Jobs.responsible,
-                        Jobs.note
-                    FROM Jobs
-					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
-                    ORDER BY Jobs.job_id");
+                string string_command = "select job_id,term_payment,value,forecast_month,forecast_value,comment from Term_Payments";
+                cmd = new SqlCommand(string_command, con);
+                dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        Term_PaymentsModel term = new Term_PaymentsModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            term_payment = dr["term_payment"].ToString(),
+                            value = dr["value"] != DBNull.Value ? Convert.ToInt32(dr["value"].ToString()) : 0,
+                            forecast_month = dr["forecast_month"] != DBNull.Value ? Convert.ToDateTime(dr["forecast_month"].ToString()) : DateTime.MinValue,
+                            forecast_value = dr["forecast_value"] != DBNull.Value ? Convert.ToInt32(dr["forecast_value"].ToString()) : 0,
+                            comment = dr["comment"].ToString()
+                        };
+                        terms.Add(term);
+                    }
+                    dr.Close();
+                }
+
+                string_command = @"SELECT
+                                   Jobs.job_id,
+                                   Jobs.job_name,
+                                   Jobs.customer_name as customer,
+                                   Jobs.job_date,
+                                   Jobs.gp,
+                                   Jobs.est_cost,
+                                   Jobs.total_cost,
+                                   Jobs.remaining_cost,
+                                   Jobs.eng_cost,
+                                   Jobs.cis_cost,
+                                   Jobs.ais_cost,
+                                   Jobs.process_id,
+                                   Jobs.system_id,
+                                   Jobs.md_rate,
+                                   Jobs.pd_rate,
+                                   Jobs.status,
+                	Jobs.enduser,
+                	Jobs.sale,
+                	Jobs.sale_department,
+                	Jobs.job_in_hand,
+                                   Jobs.job_eng_in_hand,
+                                   Jobs.job_cis_in_hand,
+                                   Jobs.job_ais_in_hand,
+                	Jobs.due_date,
+                                   Jobs.quotation_no,
+                                   Jobs.job_type,
+                                   Jobs.finished_date,
+                                   Jobs.warranty_period,
+                	Jobs.bank_guarantee,
+                	Jobs.bg_start,
+                	Jobs.bg_finish,
+                	Jobs.retention,
+                                   Jobs.responsible,
+                                   Jobs.note
+                               FROM Jobs
+                               ORDER BY Jobs.job_id";
                 cmd = new SqlCommand(string_command, con);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -134,31 +137,38 @@ namespace WebENG.Service
                         List<InvoiceModel> _invoices = new List<InvoiceModel>();
                         _invoices = invoices.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
 
+                        List<Term_PaymentsModel> term_s = terms.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
                         Term_PaymentModel term_Payment = new Term_PaymentModel()
                         {
-                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
-                            down_payment = dr["down_payment"] != DBNull.Value ? Convert.ToInt32(dr["down_payment"]) : 0,
-                            document_submit = dr["document_submit"] != DBNull.Value ? Convert.ToInt32(dr["document_submit"]) : 0,
-                            instrument_vendor = dr["instrument_vendor"] != DBNull.Value ? Convert.ToInt32(dr["instrument_vendor"]) : 0,
-                            instrument_delivered_ctl = dr["instrument_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["instrument_delivered_ctl"]) : 0,
-                            system_delivered_ctl = dr["system_delivered_ctl"] != DBNull.Value ? Convert.ToInt32(dr["system_delivered_ctl"]) : 0,
-                            fat = dr["fat"] != DBNull.Value ? Convert.ToInt32(dr["fat"]) : 0,
-                            delivery_instrument = dr["delivery_instrument"] != DBNull.Value ? Convert.ToInt32(dr["delivery_instrument"]) : 0,
-                            delivery_system = dr["delivery_system"] != DBNull.Value ? Convert.ToInt32(dr["delivery_system"]) : 0,
-                            progress_work = dr["progress_work"] != DBNull.Value ? Convert.ToInt32(dr["progress_work"]) : 0,
-                            installation_work_complete = dr["installation_work_complete"] != DBNull.Value ? Convert.ToInt32(dr["installation_work_complete"]) : 0,
-                            commissioning = dr["commissioning"] != DBNull.Value ? Convert.ToInt32(dr["commissioning"]) : 0,
-                            startup = dr["startup"] != DBNull.Value ? Convert.ToInt32(dr["startup"]) : 0,
-                            as_built = dr["as_built"] != DBNull.Value ? Convert.ToInt32(dr["as_built"]) : 0,
-                            warranty = dr["warranty"] != DBNull.Value ? Convert.ToInt32(dr["warranty"]) : 0,
-                            finished = dr["finished"] != DBNull.Value ? Convert.ToInt32(dr["finished"]) : 0,
-                            after_hmc = dr["after_hmc"] != DBNull.Value ? Convert.ToInt32(dr["after_hmc"]) : 0,
-                            complete = dr["complete"] != DBNull.Value ? Convert.ToInt32(dr["complete"]) : 0,
+                            job_id = dr["job_id"].ToString(),
+                            down_payment = term_s.Where(w=>w.term_payment == "Down Payment/KOM").Select(s=>s.value).FirstOrDefault(),
+                            document_submit = term_s.Where(w => w.term_payment == "Document Submit").Select(s => s.value).FirstOrDefault(),
+                            instrument_vendor = term_s.Where(w => w.term_payment == "Instrument to Vendor").Select(s => s.value).FirstOrDefault(),
+                            instrument_delivered_ctl = term_s.Where(w => w.term_payment == "Instrument Delivered @ CTL").Select(s => s.value).FirstOrDefault(),
+                            system_delivered_ctl = term_s.Where(w => w.term_payment == "System Delivered @ CTL").Select(s => s.value).FirstOrDefault(),
+                            fat = term_s.Where(w => w.term_payment == "FAT").Select(s => s.value).FirstOrDefault(),
+                            delivery_instrument = term_s.Where(w => w.term_payment == "Delivery Instrument").Select(s => s.value).FirstOrDefault(),
+                            delivery_system = term_s.Where(w => w.term_payment == "Delivery System").Select(s => s.value).FirstOrDefault(),
+                            progress_work = term_s.Where(w => w.term_payment.Contains("Progress Work")).Select(s => s.value).Sum(),
+                            progress_works = term_s.Where(w => w.term_payment.Contains("Progress Work")).Select(s => new Term_ProgressModel()
+                            {
+                                progress_name = s.term_payment,
+                                progress_value = s.value
+                            }).ToList(),
+                            installation_work_complete = term_s.Where(w => w.term_payment == "Installation work complete").Select(s => s.value).FirstOrDefault(),
+                            commissioning = term_s.Where(w => w.term_payment == "Commissioning").Select(s => s.value).FirstOrDefault(),
+                            startup = term_s.Where(w => w.term_payment == "Startup").Select(s => s.value).FirstOrDefault(),
+                            as_built = term_s.Where(w => w.term_payment == "As-Built").Select(s => s.value).FirstOrDefault(),
+                            warranty = term_s.Where(w => w.term_payment == "Warranty").Select(s => s.value).FirstOrDefault(),
+                            finished = term_s.Where(w => w.term_payment == "Finished").Select(s => s.value).FirstOrDefault(),
+                            after_hmc = term_s.Where(w => w.term_payment == "after HMC signed acceptance ").Select(s => s.value).FirstOrDefault(),
+                            complete = term_s.Where(w => w.term_payment == "Complete").Select(s => s.value).FirstOrDefault(),
                         };
+
                         JobModel job = new JobModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
-                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",                           
+                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             gp = dr["gp"] != DBNull.Value ? Convert.ToDouble(dr["gp"].ToString()) : 0.0,
                             est_cost = dr["est_cost"] != DBNull.Value ? Convert.ToDouble(dr["est_cost"]) : 0.0,
@@ -175,7 +185,7 @@ namespace WebENG.Service
                             manpower = 0,
                             cost_per_manpower = 0,
                             ot_manpower = 0,
-                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",                           
+                            status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0.0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0.0,
                             job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"]) : 0.0,

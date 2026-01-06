@@ -78,6 +78,7 @@ namespace WebENG.Models
         public int delivery_instrument { get; set; }
         public int delivery_system { get; set; }
         public int progress_work { get; set; }
+        public List<Term_ProgressModel> progress_works { get; set; }
         public int installation_work_complete { get; set; }
         public int commissioning { get; set; }
         public int startup { get; set; }
@@ -86,6 +87,21 @@ namespace WebENG.Models
         public int finished { get; set; }
         public int complete { get; set; }
         public int after_hmc { get; set; }
+    }
+
+    public class Term_ProgressModel
+    {
+        public string progress_name { get; set; }
+        public int progress_value { get; set; }
+    }
+    public class Term_PaymentsModel
+    {
+        public string job_id { get; set; }
+        public string term_payment { get; set; }
+        public int value { get; set; }
+        public DateTime forecast_month { get; set; }
+        public int forecast_value { get; set; }
+        public string comment { get; set; }     
     }
 
     public class JobProcessSystemModel

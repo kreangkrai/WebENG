@@ -19,6 +19,7 @@ namespace WebENG.Controllers
         readonly IHoliday Holiday;
         readonly IExport Export;
         protected readonly IHostingEnvironment _hostingEnvironment;
+        readonly CTLInterfaces.IEmployee Employees;
         public IdleTimeController(IHostingEnvironment hostingEnvironment)
         {
             Accessory = new AccessoryService();
@@ -26,6 +27,7 @@ namespace WebENG.Controllers
             Holiday = new HolidayService();
             Export = new ExportService();
             _hostingEnvironment = hostingEnvironment;
+            Employees = new CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -46,6 +48,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else

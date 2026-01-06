@@ -21,7 +21,7 @@ namespace WebENG.Controllers
         private IDepartment Department;
         private IApprover Approver;
         private IChecker Checker;
-   
+        readonly CTLInterfaces.IEmployee Employees;
         public LeaveAuthenController()
         {
             Accessory = new AccessoryService();
@@ -29,6 +29,7 @@ namespace WebENG.Controllers
             Department = new DepartmentService();
             Approver = new ApproverService();
             Checker = new CheckerService();
+            Employees = new CTLServices.EmployeeService();
         }
         public IActionResult Index()
         {
@@ -48,6 +49,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
 
                 return View(u);
             }

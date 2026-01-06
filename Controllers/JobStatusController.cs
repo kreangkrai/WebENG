@@ -19,6 +19,7 @@ namespace WebENG.Controllers
         readonly IJobStatus JobStatus;
         readonly IStatus Status;
         readonly IExport Export;
+        readonly CTLInterfaces.IEmployee Employees;
         protected readonly IHostingEnvironment _hostingEnvironment;
         public JobStatusController(IHostingEnvironment hostingEnvironment)
         {
@@ -27,6 +28,7 @@ namespace WebENG.Controllers
             JobStatus = new JobStatusService();
             Status = new EngStatusService();
             Export = new ExportService();
+            Employees = new CTLServices.EmployeeService();
         }
         public IActionResult Index()
         {
@@ -39,6 +41,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else

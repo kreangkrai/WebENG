@@ -19,6 +19,7 @@ namespace WebForecastReport.Controllers
         readonly IJob JobService;
         readonly IJobResponsible JobResponsibleService;
         readonly IAuthen Authen;
+        readonly WebENG.CTLInterfaces.IEmployee Employees;
         public AssignEngineerController()
         {
             WorkingHoursService = new WorkingHoursService();
@@ -27,6 +28,7 @@ namespace WebForecastReport.Controllers
             JobService = new JobService();
             JobResponsibleService = new JobResponsibleService();
             Authen = new AuthenService();
+            Employees = new WebENG.CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -40,6 +42,12 @@ namespace WebForecastReport.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+                List<WebENG.CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else

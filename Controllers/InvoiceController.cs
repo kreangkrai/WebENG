@@ -19,6 +19,7 @@ namespace WebENG.Controllers
         readonly ISummaryJobInHand SummaryJobInHand;
         readonly IExport Export;
         protected readonly IHostingEnvironment _hostingEnvironment;
+        readonly CTLInterfaces.IEmployee Employees;
         public InvoiceController(IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
@@ -26,6 +27,7 @@ namespace WebENG.Controllers
             SummaryInvoice = new SummayInvoiceService();
             SummaryJobInHand = new SummaryJobInHandService();
             Export = new ExportService();
+            Employees = new CTLServices.EmployeeService();
         }
         public IActionResult Index()
         {
@@ -38,6 +40,13 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
+
+                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                if (!u.role.Contains("Admin"))
+                {
+                    string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
+                    u.role = position;
+                }
                 return View(u);
             }
             else
