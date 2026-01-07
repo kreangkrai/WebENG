@@ -35,6 +35,7 @@ namespace WebENG.Models
         public string process { get; set; }
         public string system { get; set; }
         public Term_PaymentModel term_payment { get; set; }
+        public List<Term_PaymentsModel> term_payments { get; set; }
         public double job_in_hand { get; set; }
         public double job_eng_in_hand { get; set; }
         public double job_cis_in_hand { get; set; }
@@ -97,11 +98,11 @@ namespace WebENG.Models
     public class Term_PaymentsModel
     {
         public string job_id { get; set; }
-        public string term_payment { get; set; }
-        public int value { get; set; }
-        public DateTime forecast_month { get; set; }
-        public int forecast_value { get; set; }
-        public string comment { get; set; }     
+        public string payment_id { get; set; }
+        public string payment_name { get; set; }
+        public int percent { get; set; }
+        public string forecast_month { get; set; }
+        public string remark { get; set; }     
     }
 
     public class JobProcessSystemModel

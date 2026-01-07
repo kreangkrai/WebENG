@@ -13,8 +13,10 @@ namespace WebENG.Interface
         List<JobSummaryModel> GetJobsSummary();
         string CreateJob(JobModel job);
         string CreateTermPayment(Term_PaymentModel term_Payment);
+        string CreateTermPayments(List<Term_PaymentsModel> term_Payments);
         string UpdateJob(JobModel job);
         string UpdateTermPayment(Term_PaymentModel term_Payment);
+        string UpdateTermPayments(List<Term_PaymentsModel> term_Payments);
         List<JobQuotationModel> GetJobQuotations();
 
         List<EngProcessModel> GetProcesses();

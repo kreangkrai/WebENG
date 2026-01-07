@@ -70,7 +70,7 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = "select job_id,term_payment,value,forecast_month,forecast_value,comment from Term_Payments";
+                string string_command = "select job_id,payment_id,payment_name,[percent],forecast_month,remark from Term_Payments";
                 cmd = new SqlCommand(string_command, con);
                 dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -80,11 +80,11 @@ namespace WebENG.Service
                         Term_PaymentsModel term = new Term_PaymentsModel()
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
-                            term_payment = dr["term_payment"].ToString(),
-                            value = dr["value"] != DBNull.Value ? Convert.ToInt32(dr["value"].ToString()) : 0,
-                            forecast_month = dr["forecast_month"] != DBNull.Value ? Convert.ToDateTime(dr["forecast_month"].ToString()) : DateTime.MinValue,
-                            forecast_value = dr["forecast_value"] != DBNull.Value ? Convert.ToInt32(dr["forecast_value"].ToString()) : 0,
-                            comment = dr["comment"].ToString()
+                            payment_id = dr["payment_id"].ToString(),
+                            payment_name = dr["payment_name"].ToString(),
+                            percent = dr["percent"] != DBNull.Value ? Convert.ToInt32(dr["percent"].ToString()) : 0,
+                            forecast_month = dr["forecast_month"].ToString(),
+                            remark = dr["remark"].ToString()
                         };
                         terms.Add(term);
                     }
@@ -141,28 +141,28 @@ namespace WebENG.Service
                         Term_PaymentModel term_Payment = new Term_PaymentModel()
                         {
                             job_id = dr["job_id"].ToString(),
-                            down_payment = term_s.Where(w=>w.term_payment == "Down Payment/KOM").Select(s=>s.value).FirstOrDefault(),
-                            document_submit = term_s.Where(w => w.term_payment == "Document Submit").Select(s => s.value).FirstOrDefault(),
-                            instrument_vendor = term_s.Where(w => w.term_payment == "Instrument to Vendor").Select(s => s.value).FirstOrDefault(),
-                            instrument_delivered_ctl = term_s.Where(w => w.term_payment == "Instrument Delivered @ CTL").Select(s => s.value).FirstOrDefault(),
-                            system_delivered_ctl = term_s.Where(w => w.term_payment == "System Delivered @ CTL").Select(s => s.value).FirstOrDefault(),
-                            fat = term_s.Where(w => w.term_payment == "FAT").Select(s => s.value).FirstOrDefault(),
-                            delivery_instrument = term_s.Where(w => w.term_payment == "Delivery Instrument").Select(s => s.value).FirstOrDefault(),
-                            delivery_system = term_s.Where(w => w.term_payment == "Delivery System").Select(s => s.value).FirstOrDefault(),
-                            progress_work = term_s.Where(w => w.term_payment.Contains("Progress Work")).Select(s => s.value).Sum(),
-                            progress_works = term_s.Where(w => w.term_payment.Contains("Progress Work")).Select(s => new Term_ProgressModel()
+                            down_payment = term_s.Where(w=>w.payment_name == "Down Payment/KOM").Select(s=>s.percent).FirstOrDefault(),
+                            document_submit = term_s.Where(w => w.payment_name == "Document Submit").Select(s => s.percent).FirstOrDefault(),
+                            instrument_vendor = term_s.Where(w => w.payment_name == "Instrument to Vendor").Select(s => s.percent).FirstOrDefault(),
+                            instrument_delivered_ctl = term_s.Where(w => w.payment_name == "Instrument Delivered @ CTL").Select(s => s.percent).FirstOrDefault(),
+                            system_delivered_ctl = term_s.Where(w => w.payment_name == "System Delivered @ CTL").Select(s => s.percent).FirstOrDefault(),
+                            fat = term_s.Where(w => w.payment_name == "FAT").Select(s => s.percent).FirstOrDefault(),
+                            delivery_instrument = term_s.Where(w => w.payment_name == "Delivery Instrument").Select(s => s.percent).FirstOrDefault(),
+                            delivery_system = term_s.Where(w => w.payment_name == "Delivery System").Select(s => s.percent).FirstOrDefault(),
+                            progress_work = term_s.Where(w => w.payment_name.Contains("Progress Work")).Select(s => s.percent).Sum(),
+                            progress_works = term_s.Where(w => w.payment_name.Contains("Progress Work")).Select(s => new Term_ProgressModel()
                             {
-                                progress_name = s.term_payment,
-                                progress_value = s.value
+                                progress_name = s.payment_name,
+                                progress_value = s.percent
                             }).ToList(),
-                            installation_work_complete = term_s.Where(w => w.term_payment == "Installation work complete").Select(s => s.value).FirstOrDefault(),
-                            commissioning = term_s.Where(w => w.term_payment == "Commissioning").Select(s => s.value).FirstOrDefault(),
-                            startup = term_s.Where(w => w.term_payment == "Startup").Select(s => s.value).FirstOrDefault(),
-                            as_built = term_s.Where(w => w.term_payment == "As-Built").Select(s => s.value).FirstOrDefault(),
-                            warranty = term_s.Where(w => w.term_payment == "Warranty").Select(s => s.value).FirstOrDefault(),
-                            finished = term_s.Where(w => w.term_payment == "Finished").Select(s => s.value).FirstOrDefault(),
-                            after_hmc = term_s.Where(w => w.term_payment == "after HMC signed acceptance ").Select(s => s.value).FirstOrDefault(),
-                            complete = term_s.Where(w => w.term_payment == "Complete").Select(s => s.value).FirstOrDefault(),
+                            installation_work_complete = term_s.Where(w => w.payment_name == "Installation work complete").Select(s => s.percent).FirstOrDefault(),
+                            commissioning = term_s.Where(w => w.payment_name == "Commissioning").Select(s => s.percent).FirstOrDefault(),
+                            startup = term_s.Where(w => w.payment_name == "Startup").Select(s => s.percent).FirstOrDefault(),
+                            as_built = term_s.Where(w => w.payment_name == "As-Built").Select(s => s.percent).FirstOrDefault(),
+                            warranty = term_s.Where(w => w.payment_name == "Warranty").Select(s => s.percent).FirstOrDefault(),
+                            finished = term_s.Where(w => w.payment_name == "Finished").Select(s => s.percent).FirstOrDefault(),
+                            after_hmc = term_s.Where(w => w.payment_name == "after HMC signed acceptance ").Select(s => s.percent).FirstOrDefault(),
+                            complete = term_s.Where(w => w.payment_name == "Complete").Select(s => s.percent).FirstOrDefault(),
                         };
 
                         JobModel job = new JobModel()
@@ -209,6 +209,7 @@ namespace WebENG.Service
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
+                        job.term_payments = terms.Where(w=>w.job_id == job.job_id).ToList();
                         jobs.Add(job);
                     }
                     dr.Close();
@@ -1240,6 +1241,108 @@ namespace WebENG.Service
                 }
             }
             return jobs;
-        }      
+        }
+
+        public string UpdateTermPayments(List<Term_PaymentsModel> term_Payments)
+        {
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string string_command = string.Format($@"
+                    DELETE FROM Term_Payments WHERE job_id = @job_id");
+                using (SqlCommand command = new SqlCommand(string_command, con))
+                {
+                    var job_id = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
+                    
+                        job_id.Value = term_Payments[0].job_id ?? (object)DBNull.Value;
+                        command.ExecuteNonQuery();                    
+                }
+                string_command = string.Format($@"
+                    INSERT INTO Term_Payments (job_id,payment_id,payment_name,[percent],forecast_month,remark)
+                    VALUES (@job_id,@payment_id,@payment_name,@percent,@forecast_month,@remark)");
+                using (SqlCommand command = new SqlCommand(string_command, con))
+                {
+                    var job_id = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
+                    var payment_id = command.Parameters.Add("@payment_id", SqlDbType.NVarChar);
+                    var payment_name = command.Parameters.Add("@payment_name", SqlDbType.NVarChar);
+                    var percent = command.Parameters.Add("@percent", SqlDbType.Int);
+                    var forecast_month = command.Parameters.Add("@forecast_month", SqlDbType.NVarChar);
+                    var remark = command.Parameters.Add("@remark", SqlDbType.NVarChar);
+                    foreach (var term_Payment in term_Payments)
+                    {
+                        job_id.Value = term_Payment.job_id ?? (object)DBNull.Value;
+                        payment_id.Value = term_Payment.payment_id ?? (object)DBNull.Value;
+                        payment_name.Value = term_Payment.payment_name ?? (object)DBNull.Value;
+                        percent.Value = term_Payment.percent;
+                        forecast_month.Value = term_Payment.forecast_month ?? (object)DBNull.Value;
+                        remark.Value = term_Payment.remark ?? (object)DBNull.Value;
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return "Success";
+        }
+
+        public string CreateTermPayments(List<Term_PaymentsModel> term_Payments)
+        {
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+
+                string string_command = string.Format($@"
+                    INSERT INTO Term_Payments (job_id,payment_id,payment_name,[percent],forecast_month,remark)
+                    VALUES (@job_id,@payment_id,@payment_name,@percent,@forecast_month,@remark)");
+                using (SqlCommand command = new SqlCommand(string_command, con))
+                {
+                    var job_id = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
+                    var payment_id = command.Parameters.Add("@payment_id", SqlDbType.NVarChar);
+                    var payment_name = command.Parameters.Add("@payment_name", SqlDbType.NVarChar);
+                    var percent = command.Parameters.Add("@percent", SqlDbType.Int);
+                    var forecast_month = command.Parameters.Add("@forecast_month", SqlDbType.NVarChar);
+                    var remark = command.Parameters.Add("@remark", SqlDbType.NVarChar);
+                    foreach (var term_Payment in term_Payments)
+                    {
+                        job_id.Value = term_Payment.job_id ?? (object)DBNull.Value;
+                        payment_id.Value = term_Payment.payment_id ?? (object)DBNull.Value;
+                        payment_name.Value = term_Payment.payment_name ?? (object)DBNull.Value;
+                        percent.Value = term_Payment.percent;
+                        forecast_month.Value = term_Payment.forecast_month ?? (object)DBNull.Value;
+                        remark.Value = term_Payment.remark ?? (object)DBNull.Value;
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return "Success";
+        }
     }
 }

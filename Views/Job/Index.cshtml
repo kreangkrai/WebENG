@@ -54,6 +54,21 @@
             #checkcolumnboxes label:hover {
                 background-color: #1e90ff;
             }
+
+    #table_payment {
+        width: 100%;
+        height: 400px;
+    }
+
+    .delete-icon {
+        cursor: pointer;
+        color: #d32f2f;
+        font-size: 20px;
+    }
+
+        .delete-icon:hover {
+            color: #b71c1c;
+        }
             
 </style>
 <div class="row p-3">
@@ -469,7 +484,7 @@
                     </div>
                     <div class="form-row">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card" style="overflow-y:auto">
                                 <div class="card-header" style="background-color:#42D5D8">
                                     <span style="font-weight:bold">Term Payment</span>
                                     <div class="card-tools">
@@ -494,7 +509,7 @@
                                     </div>
                                     <div class="form-row pt-1">
                                         <div class="col-12">
-                                            <table id="table_payment" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
+                                            @*<table id="table_payment" class="table table-sm table-bordered table-hover text-center table-striped nowrap w-100">
                                                 <thead style="background-color:#42B4D8">
                                                     <tr>
                                                         <th>Milestone</th>
@@ -506,7 +521,8 @@
                                                 </thead>
                                                 <tbody>
                                                 </tbody>
-                                            </table>
+                                            </table>*@
+                                            <div id="table_payment"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1225,41 +1241,151 @@
             });
         };
 
-        function GenerateTablePayment(payments) {
-            let datas = [];
-            if (table_payment !== null)
-                $('#table_payment').DataTable().destroy();
+        function paymentIdSort(set_payments) {
+            function compare(a, b) {
+                const regex = /^([A-Z]+)(\d+)(?:-(\d+))?$/;
 
-            for (let i = 0; i < payments.length; i++) {
+                const aParts = a.payment_id.match(regex);
+                const bParts = b.payment_id.match(regex);
 
-                let payment = payments[i].payment_name;
-                let percent = payments[i].percent;
+                if (!aParts || !bParts) {
+                    return a.payment_id.localeCompare(b.payment_id);
+                }
 
-                datas.push([
-                    payment,
-                    percent
-                ]);
+                const [, aPrefix, aNum, aSub] = aParts;
+                const [, bPrefix, bNum, bSub] = bParts;
+
+                if (aPrefix !== bPrefix) {
+                    return aPrefix.localeCompare(bPrefix);
+                }
+
+                const numA = Number(aNum);
+                const numB = Number(bNum);
+                if (numA !== numB) {
+                    return numA - numB;
+                }
+
+                const subA = Number(aSub || 0);
+                const subB = Number(bSub || 0);
+                return subA - subB;
+            }
+            return [...set_payments].sort(compare);
+        }
+
+        function regenerateProgressWork(set_payments) {
+            const nonProgress = set_payments.filter(item => !item.payment_id.startsWith('STA009'));
+            let progressItems = set_payments.filter(item => item.payment_id.startsWith('STA009'));
+
+            progressItems.sort((a, b) => {
+                const numA = parseInt(a.payment_id.split('-')[1] || 9999);
+                const numB = parseInt(b.payment_id.split('-')[1] || 9999);
+                return numA - numB;
+            });
+
+            const newProgress = [];
+            let counter = 1;
+            for (let item of progressItems) {
+                const newId = `STA009-${counter.toString().padStart(2, '0')}`;
+                const newName = `Progress Work-${counter.toString().padStart(2, '0')}`;
+
+                newProgress.push({
+                    ...item, 
+                    payment_id: newId,
+                    payment_name: newName
+                });
+
+                counter++;
             }
 
-            table_payment = $('#table_payment').DataTable({
-                data: datas,
-                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
-                fixedHeader: true,
-                fixedColumns: {
-                    left: 5
-                },
-                columnDefs: [
-                    {
+            return [...nonProgress, ...newProgress];
+        }
+        const DeleteTermPaymentColumn = {
+            createCell: function (cell, value, x, y, instance) {
+                const icon = document.createElement('i');
+                icon.className = 'material-icons delete-icon';
+                icon.innerHTML = 'delete';
+                icon.title = 'ลบแถวนี้';
 
-                    },
-                ],
-                rowCallback: function (row, data) {
+                icon.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (confirm(`ยืนยันลบแถวที่ ${y + 1} ใช่ไหม?`)) {
+                        instance.deleteRow(y);
+                        set_payments.splice(y, 1);
 
+                        set_payments = regenerateProgressWork(set_payments);
+                        set_payments = paymentIdSort(set_payments);
+
+                        GenerateTablePayment(set_payments);
+                    }
+                });
+
+                cell.appendChild(icon);
+                cell.style.textAlign = 'center';
+                cell.style.verticalAlign = 'middle';
+            },
+            openEditor: function () { return false; },
+            updateCell: function () { return ''; }
+        };
+        function GenerateTablePayment(payments) {
+            const spreadsheetData = set_payments.map(item => [
+                item.payment_id,
+                item.payment_name,
+                item.percent,
+                item.forecast_month,
+                item.remark
+            ]);
+            $('#table_payment').empty();
+            jspreadsheet(document.getElementById('table_payment'), {
+                worksheets: [{
+                    data: spreadsheetData,
+                    columns: [
+                        { type: 'text', title: 'ID', width: 80, readOnly: true,},
+                        { type: 'text', title: 'Milestone', width: 150, readOnly: true, },
+                        {
+                            type: 'numeric',
+                            title: '%',
+                            width: 80,
+                            mask: '0',             
+                            decimal: '.',
+                            options: {
+                                decimal: '.',
+                                thousands: ',',
+                                regex: /^[0-9]*$/,
+                            }
+                        },
+                        {
+                            type: 'calendar', title: 'Month', width: 100,
+                            options: {
+                                type: 'year-month-picker',   
+                                format: 'MM/YYYY'            
+                            }},
+ 
+                        { type: 'text', title: 'Remark', width: 200 },
+                        {
+                            type: DeleteTermPaymentColumn,
+                            title: 'ลบ',
+                            width: 50,
+                            readOnly: true,
+                            align: 'center'
+                        }
+                    ],
+                    minDimensions: [6, spreadsheetData.length],
+                }],
+                toolbar: false,
+                tabs: false,
+                onchange: function (worksheet, changedCellElement, x, y, newValue) {
+                    const fullRowData = worksheet.getRowData(y);
+
+                    const payment_id = fullRowData[0];
+                    const percent = fullRowData[2];
+                    const forecast_month = fullRowData[3];
+                    const remark = fullRowData[4];
+
+                    const existingIndex = set_payments.findIndex(item => item.payment_id === payment_id);
+                    set_payments[existingIndex].percent = percent;
+                    set_payments[existingIndex].forecast_month = forecast_month;
+                    set_payments[existingIndex].remark = remark;
                 },
-                searching: false,
-                ordering: false,
-                paging: false,
-                info : false
             });
         };
 
@@ -1617,38 +1743,44 @@
                 $('#group_warranty_period').hide();
             }
 
-            let datas_percent = [];
-            datas_percent.push(job.term_payment.down_payment);
-            datas_percent.push(job.term_payment.document_submit);
-            datas_percent.push(job.term_payment.instrument_vendor);
-            datas_percent.push(job.term_payment.instrument_delivered_ctl);
-            datas_percent.push(job.term_payment.system_delivered_ctl);
-            datas_percent.push(job.term_payment.fat);
-            datas_percent.push(job.term_payment.delivery_instrument);
-            datas_percent.push(job.term_payment.delivery_system);
-            datas_percent.push(job.term_payment.progress_work);
-            datas_percent.push(job.term_payment.installation_work_complete);
-            datas_percent.push(job.term_payment.commissioning);
-            datas_percent.push(job.term_payment.startup);
-            datas_percent.push(job.term_payment.as_built);
-            datas_percent.push(job.term_payment.warranty);          
-            datas_percent.push(job.term_payment.complete);
-            datas_percent.push(job.term_payment.after_hmc);
-            datas_percent.push(job.term_payment.finished);
-
-            for (let i =0;i<statuses.length;i++){
-                set_payments.push({'payment_id': statuses[i].status_id ,'payment_name': statuses[i].status_name, 'percent': datas_percent[i]});
+            //let datas_percent = [];
+            //datas_percent.push(job.term_payment.down_payment);
+            //datas_percent.push(job.term_payment.document_submit);
+            //datas_percent.push(job.term_payment.instrument_vendor);
+            //datas_percent.push(job.term_payment.instrument_delivered_ctl);
+            //datas_percent.push(job.term_payment.system_delivered_ctl);
+            //datas_percent.push(job.term_payment.fat);
+            //datas_percent.push(job.term_payment.delivery_instrument);
+            //datas_percent.push(job.term_payment.delivery_system);
+            //datas_percent.push(job.term_payment.progress_work);
+            //datas_percent.push(job.term_payment.installation_work_complete);
+            //datas_percent.push(job.term_payment.commissioning);
+            //datas_percent.push(job.term_payment.startup);
+            //datas_percent.push(job.term_payment.as_built);
+            //datas_percent.push(job.term_payment.warranty);          
+            //datas_percent.push(job.term_payment.complete);
+            //datas_percent.push(job.term_payment.after_hmc);
+            //datas_percent.push(job.term_payment.finished);
+            for (let i = 0; i < job.term_payments.length; i++){
+                set_payments.push({
+                    'job_id': job_id,
+                    'payment_id': job.term_payments[i].payment_id,
+                    'payment_name': job.term_payments[i].payment_name,
+                    'percent': job.term_payments[i].percent,
+                    'forecast_month': job.term_payments[i].forecast_month,
+                    'remark': job.term_payments[i].remark
+                });
+                set_payments = paymentIdSort(set_payments);
             }
      
             //Term Payment
-            let new_payments = [];
-            for (let i=0;i<set_payments.length;i++){
-                if (set_payments[i].percent > 0){
-                    new_payments.push(set_payments[i]);
-                }
-                
-            }
-            set_payments = new_payments;
+            //let new_payments = [];
+            //for (let i=0;i<set_payments.length;i++){
+            //    if (set_payments[i].percent > 0){
+            //        new_payments.push(set_payments[i]);
+            //    }                
+            //}
+            //set_payments = new_payments;
             
             //Process
             for (let i=0;i<list_process.length;i++){
@@ -1860,7 +1992,8 @@
                 "md_rate": md_rate,
                 "pd_rate": pd_rate,
                 "status": status,
-                "term_payment":term_payment,
+                "term_payment": term_payment,
+                "term_payments": set_payments,
                 "job_in_hand":job_in_hand,
                 "job_eng_in_hand": job_eng_in_hand,
                 "job_cis_in_hand": job_cis_in_hand,
@@ -1887,12 +2020,44 @@
 
         $('#add_payment').on('click',function(){
             let _payment = $('#select_payment').val();
-            let payment = statuses.filter(f=>f.status_id === _payment ).map(m=>m.status_name)[0];
-            let check_payment = set_payments.find(f=>f.payment_name == payment);
+     
+            let progress_work_no = set_payments.filter(p => p.payment_id.startsWith('STA009-'));
+            let latestNum = 0;
+            if (progress_work_no.length > 0) {
+                progress_work_no.forEach(item => {
+                    let parts = item.payment_id.split('-');
+                    if (parts.length === 2) {
+                        let num = parseInt(parts[1]);
+                        if (!isNaN(num) && num > latestNum) {
+                            latestNum = num;
+                        }
+                    }
+                });
+            }
+            let nextNum = latestNum + 1;
+
+            let payment = statuses.filter(f => f.status_id === _payment).map(m => m.status_name)[0];
+            if (_payment === "STA009") {
+                _payment = `${_payment}-${String(nextNum).padStart(2, '0')}`;
+                payment = `${payment}-${String(nextNum).padStart(2, '0')}`;
+            }
+            
+            let check_payment = set_payments.find(f => f.payment_name == payment);
+            const job_id = $('#job_id').val();
             if (check_payment == undefined){
-                set_payments.push({'payment_id': _payment ,'payment_name': payment, 'percent': 0});
+                set_payments.push({
+                    'job_id': job_id,
+                    'payment_id': _payment,
+                    'payment_name': payment,
+                    'percent': 0,
+                    'forecast_month': '',
+                    'remark': ''
+                });
+
+                set_payments = paymentIdSort(set_payments);
                 GenerateTablePayment(set_payments);
             }
+
         });
 
         $('#add_process').on('click',function(){
@@ -1927,7 +2092,7 @@
             $('#add_system').attr('disabled',false);
         });
 
-        $('#table_payment tbody').on('click', 'tr', async function () {
+        @*$('#table_payment tbody').on('click', 'tr', async function () {
             let admin = '@Model.role' == "Admin" ? true : false;
             if (admin) {
                 let data = table_payment.row(this).data();
@@ -1937,7 +2102,7 @@
                 $('#edit_percent').val(percent);
                 $('#modal_edit_payment').modal();
             }
-        });
+        });*@
 
         $('#table_process tbody').on('click', 'tr', async function () {
             let admin = '@Model.role' == "Admin" ? true : false;
@@ -1978,15 +2143,15 @@
 
         });
 
-        $('#btn_payment_delete').on('click',function(){
-            let payment = $('#edit_payment_name').val();
-            let payment_id = set_payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
+        //$('#btn_payment_delete').on('click',function(){
+        //    let payment = $('#edit_payment_name').val();
+        //    let payment_id = set_payments.filter(f=>f.payment_name == payment).map(m=>m.payment_id)[0];
 
-            let index = set_payments.findIndex(f=>f.payment_id == payment_id);
-            set_payments.splice(index,1);
-            GenerateTablePayment(set_payments);
-            $('#modal_edit_payment').modal('hide');
-        });
+        //    let index = set_payments.findIndex(f=>f.payment_id == payment_id);
+        //    set_payments.splice(index,1);
+        //    GenerateTablePayment(set_payments);
+        //    $('#modal_edit_payment').modal('hide');
+        //});
 
         $('#btn_process_delete').on('click',function(){
             let process = $('#edit_process_name').val();

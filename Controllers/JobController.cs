@@ -317,7 +317,10 @@ namespace WebENG.Controllers
             var result = JobService.CreateJob(job);
             if (result == "Success")
             {
-                result = JobService.CreateTermPayment(job.term_payment);
+                if (job.term_payments.Count > 0)
+                {
+                    result = JobService.CreateTermPayments(job.term_payments);
+                }
                 if (result == "Success")
                 {
                     result = Invoice.Insert(job.invoices);
@@ -338,7 +341,10 @@ namespace WebENG.Controllers
 
             if (result == "Success")
             {
-                result = JobService.UpdateTermPayment(job.term_payment);
+                if (job.term_payments.Count > 0)
+                {
+                    result = JobService.UpdateTermPayments(job.term_payments);
+                }
                 if (result == "Success")
                 {
                     string delete = Invoice.Delete(job.job_id);
