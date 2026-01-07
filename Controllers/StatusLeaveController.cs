@@ -22,8 +22,8 @@ namespace WebENG.Controllers
 {
     public class StatusLeaveController : Controller
     {
-        readonly IAccessory Accessory;
-        readonly IEmployee Employees;
+        private readonly IAccessory Accessory;
+        private readonly IEmployee Employees;
         private ILeaveType LeaveType;
         private IRequest Requests;
         private ILeave Leave;
@@ -34,6 +34,7 @@ namespace WebENG.Controllers
         private INotification Notification;
         private IWorkingHours WorkingHours;
         private CTLInterfaces.IHoliday Holiday;
+
         public StatusLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
@@ -49,6 +50,7 @@ namespace WebENG.Controllers
             WorkingHours = new WorkingHoursService();
             Holiday = new CTLServices.HolidayService();
         }
+
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("Login_ENG") != null)
@@ -69,7 +71,7 @@ namespace WebENG.Controllers
                 HttpContext.Session.SetString("Role", u.role);
 
                 List<int> years = new List<int>();
-                for(int y = DateTime.Now.AddYears(1).Year;y > DateTime.Now.AddYears(-5).Year; y--)
+                for (int y = DateTime.Now.AddYears(1).Year; y > DateTime.Now.AddYears(-5).Year; y--)
                 {
                     years.Add(y);
                 }
@@ -155,7 +157,7 @@ namespace WebENG.Controllers
             List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
-            int max_level = levels.Where(w=>w.emp_id== emp_id).Max(m => m.level);
+            int max_level = levels.Where(w => w.emp_id == emp_id).Max(m => m.level);
             List<string> departments = new List<string>();
             if (max_level == 0)
             {
@@ -163,17 +165,16 @@ namespace WebENG.Controllers
             }
             if (max_level == 1 || max_level == 2)
             {
-                departments = levels.Where(w=>w.emp_id == emp_id).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
-            }            
+                departments = levels.Where(w => w.emp_id == emp_id).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+            }
             else if (max_level == 3)
             {
                 departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
             }
 
-
             departments = departments.OrderBy(o => o).ToList();
 
-            List<RequestModel> requests = Requests.GetRequestByDurationDay(start,stop);
+            List<RequestModel> requests = Requests.GetRequestByDurationDay(start, stop);
             List<string> emps = new List<string>();
             if (max_level == 0)
             {
@@ -181,7 +182,7 @@ namespace WebENG.Controllers
             }
             else
             {
-                 emps = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
+                emps = requests.GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
             }
 
             employees = employees.Where(w => emps.Contains(w.emp_id) && departments.Contains(w.department)).OrderBy(o => o.name_en).ToList();
@@ -190,7 +191,7 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetLeaveUsedByEmpID(string emp_id , int year)
+        public IActionResult GetLeaveUsedByEmpID(string emp_id, int year)
         {
             List<UsedLeaveModel> useds = new List<UsedLeaveModel>();
             List<string> status_pending = new List<string>()
@@ -205,10 +206,10 @@ namespace WebENG.Controllers
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
-           
+
             for (int i = 0; i < leaves.Count; i++)
             {
-                List<RequestModel>  _requests = requests.Where(w => w.leave_type_code == leaves[i].leave_type_code &&
+                List<RequestModel> _requests = requests.Where(w => w.leave_type_code == leaves[i].leave_type_code &&
                 w.start_request_date.Year == year &&
                 status_pending.Contains(w.status_request)).ToList();
 
@@ -246,7 +247,7 @@ namespace WebENG.Controllers
                     leave_type_id = leaves[i].leave_type_id,
                     leave_type_code = leaves[i].leave_type_code,
                     leave_name_en = leaves[i].leave_name_en,
-                    leave_name_th =leaves[i].leave_name_th,
+                    leave_name_th = leaves[i].leave_name_th,
                     amount_entitlement = leaves[i].amount_entitlement,
                     used = (decimal)used_leave,
                     priority = leaves[i].priority
@@ -256,14 +257,12 @@ namespace WebENG.Controllers
                     leave_type_code = s.Key,
                     leave_type_id = s.FirstOrDefault().leave_type_id,
                     leave_name_en = s.FirstOrDefault().leave_name_en,
-                    leave_name_th= s.FirstOrDefault().leave_name_th.Split(' ')[0],
+                    leave_name_th = s.FirstOrDefault().leave_name_th.Split(' ')[0],
                     amount_entitlement = s.FirstOrDefault().amount_entitlement,
                     used = s.FirstOrDefault().used,
                     priority = s.FirstOrDefault().priority
-
                 }).ToList();
                 useds.Add(used);
-
             }
             useds = useds.OrderBy(o => o.priority).ThenBy(t => t.leave_name_th).ToList();
             return Json(useds);
@@ -311,7 +310,7 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetRequestHistory(string emp_id,string start , string stop)
+        public IActionResult GetRequestHistory(string emp_id, string start, string stop)
         {
             DateTime _start = DateTime.Parse(start);
             DateTime _stop = DateTime.Parse(stop);
@@ -320,7 +319,7 @@ namespace WebENG.Controllers
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
             requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
             requests = requests.OrderBy(o => o.start_request_date).ToList();
-          
+
             var data = requests.Select(s => new
             {
                 request_id = s.request_id,
@@ -355,9 +354,10 @@ namespace WebENG.Controllers
         public IActionResult GetRequestLog(string request_id)
         {
             List<RequestLogModel> requests = RequestLog.GetLogByRequestId(request_id);
- 
+
             return Json(requests);
         }
+
         [HttpGet]
         public IActionResult GetRequest(string request_id)
         {
@@ -392,7 +392,7 @@ namespace WebENG.Controllers
         [HttpDelete]
         public IActionResult DeleteTemp(string request_id)
         {
-            var tempPath = Path.Combine(env.WebRootPath,"Uploads", "temp", request_id);
+            var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
             if (Directory.Exists(tempPath))
                 Directory.Delete(tempPath, true);
             return Ok();
@@ -414,7 +414,6 @@ namespace WebENG.Controllers
             {
                 return BadRequest("Invalid filename");
             }
-
 
             var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id, safeFileName);
             var fullPath = Path.GetFullPath(tempPath);
@@ -445,7 +444,7 @@ namespace WebENG.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditRequest(string request_id, string str,bool is_attach_file , string text_btn_send)
+        public IActionResult EditRequest(string request_id, string str, bool is_attach_file, string text_btn_send)
         {
             DateTime now = DateTime.Now;
             RequestModel request = JsonConvert.DeserializeObject<RequestModel>(str);
@@ -503,7 +502,6 @@ namespace WebENG.Controllers
 
                 List<RequestModel> requests = Requests.GetRequestByEmpID(request.emp_id);
                 string message = "";
-                
 
                 var connect = new ConnectSQL();
                 using (SqlConnection con = connect.OpenLeaveConnect())
@@ -551,7 +549,6 @@ namespace WebENG.Controllers
 
                             tran.Commit();
 
-
                             message = "Success";
                         }
                         catch (Exception ex)
@@ -569,7 +566,6 @@ namespace WebENG.Controllers
                         //Remove Uploads Request id
 
                         RemoveUploadsFiles(request.leave_type_id, year, request_id);
-
 
                         var tempFolder = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
                         var files = Directory.GetFiles(tempFolder);
@@ -592,7 +588,6 @@ namespace WebENG.Controllers
                         RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
                     }
 
-
                     // Notification
                     List<LevelModel> level_approves = Level.GetLevelByDepartment(level.FirstOrDefault().department);
                     level_approves = level_approves.Where(w => w.level == next_level).ToList();
@@ -602,7 +597,7 @@ namespace WebENG.Controllers
                         {
                             emp_id = level_approves[i].emp_id,
                             notification_date = DateTime.Now,
-                            notification_description = "แก้ไขใบลา",
+                            notification_description = "ขออนุมัติการแก้ไขใบลา",
                             notification_path = "Management",
                             notification_type = "Leave",
                             notification_issue = "ใบลารอการอนุมัติ",
@@ -614,7 +609,7 @@ namespace WebENG.Controllers
 
                     // Send Mail
                     List<string> email_approvers = level_approves.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
-                    string status = "แก้ไขใบลา";
+                    string status = "ขออนุมัติการแก้ไขใบลา";
                     CTLModels.EmployeeModel name = emps.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
                     string leave_type = leave_type_th;
                     string leave_date = "";
@@ -729,6 +724,7 @@ namespace WebENG.Controllers
                 return Json("Success");
             }
         }
+
         public string AddWorkingHours(List<WorkingHoursModel> whs)
         {
             try
@@ -748,8 +744,9 @@ namespace WebENG.Controllers
                 return ex.Message;
             }
         }
+
         [HttpDelete]
-        public IActionResult DeleteRequest(string request_id, string emp_id )
+        public IActionResult DeleteRequest(string request_id, string emp_id)
         {
             List<LevelModel> level = Level.GetLevelByEmpID(emp_id);
             level = level.Where(w => w.emp_id == emp_id).ToList();
@@ -800,7 +797,6 @@ namespace WebENG.Controllers
 
                         RemoveTempFiles(request.request_id);
                         RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
-
                     }
                     catch (Exception ex)
                     {
@@ -876,7 +872,6 @@ namespace WebENG.Controllers
 
                         RemoveTempFiles(request.request_id);
                         RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
-
                     }
                     catch (Exception ex)
                     {
@@ -899,6 +894,7 @@ namespace WebENG.Controllers
             }
             return Json(message);
         }
+
         [HttpPost]
         public IActionResult CopyUplodstoTempFile(string leave_type_id, int year, string request_id)
         {
@@ -956,7 +952,6 @@ namespace WebENG.Controllers
 
                 if (!Directory.Exists(targetFolder))
                     Directory.CreateDirectory(targetFolder);
-
 
                 var oldFiles = Directory.GetFiles(targetFolder);
                 foreach (var file in oldFiles)
@@ -1037,7 +1032,7 @@ namespace WebENG.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadTempFile(IFormFile file,string request_id)
+        public async Task<IActionResult> UploadTempFile(IFormFile file, string request_id)
         {
             if (file == null || file.Length == 0)
                 return BadRequest("No file");
@@ -1069,6 +1064,7 @@ namespace WebENG.Controllers
                 previewUrl
             });
         }
+
         private string GetFileType(string fileName)
         {
             var ext = Path.GetExtension(fileName).ToLowerInvariant();
@@ -1077,17 +1073,22 @@ namespace WebENG.Controllers
             {
                 case ".png":
                     return "image/png";
+
                 case ".jpg":
                 case ".jpeg":
                     return "image/jpeg";
+
                 case ".gif":
                     return "image/gif";
+
                 case ".webp":
                     return "image/webp";
+
                 default:
                     return "application/octet-stream";
             }
         }
+
         [HttpGet]
         public IActionResult GetFiles(string leave_type_id, string request_id, int year)
         {
@@ -1124,7 +1125,6 @@ namespace WebENG.Controllers
             catch { }
 
             return Json(files);
-
         }
 
         [HttpGet]
@@ -1135,11 +1135,9 @@ namespace WebENG.Controllers
 
             var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
 
-
             if (!Directory.Exists(tempPath))
                 return NotFound("ไม่พบโฟลเดอร์ temp ของ request_id นี้");
 
-           
             var files = Directory.GetFiles(tempPath);
 
             if (!files.Any())
@@ -1254,7 +1252,7 @@ namespace WebENG.Controllers
         {
             List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(Convert.ToDateTime(start).Year.ToString());
             List<RequestModel> requests = Requests.GetRequestByDurationDay(start, stop);
-            requests = requests.Where(w => w.status_request == "Completed").OrderBy(o=>o.emp_id).ToList();
+            requests = requests.Where(w => w.status_request == "Completed").OrderBy(o => o.emp_id).ToList();
             StringBuilder sb = new StringBuilder();
             string headers = string.Empty;
             headers += "รหัสพนักงาน    วันที่ลา ตามวันลาจริง    รหัสกะ   รหัสผลข้อตกลงเงินหัก    รหัสลักษณะการรูดบัตร    วิธีลา    จำนวนที่ลา" + Environment.NewLine;
@@ -1314,7 +1312,7 @@ namespace WebENG.Controllers
             {
                 string row = string.Empty;
                 row += string.Format($"{request.emp_id}    {request.start_request_date.ToString("yyyyMMdd")}    00    {request.leave_type_code}    0    1    {request.amount_leave_day}") + Environment.NewLine;
-                
+
                 sb.Append(row);
             }
             byte[] byteArray = Encoding.UTF8.GetBytes(sb.ToString());

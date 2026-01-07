@@ -10,12 +10,10 @@ namespace WebENG.LeaveServices
 {
     public class MailService : IMail
     {
-
-        public string Requester(List<string> to, string status,CTLModels.EmployeeModel name,string leave_type, string leave_date , string leave_time)
+        public string Requester(List<string> to, string status, CTLModels.EmployeeModel name, string leave_type, string leave_date, string leave_time)
         {
             try
             {
-
                 MailMessage mail = new MailMessage();
                 SmtpClient SmtpServer = new SmtpClient();
 
@@ -37,7 +35,7 @@ namespace WebENG.LeaveServices
                     mail.CC.Add(name.email);
                 }
 
-                mail.Subject = "แจ้งเตือนระบบวันลา";
+                mail.Subject = $"มีคำขออนุมัติใบลา จาก {name.name_th}";
                 string body = $@"<!DOCTYPE html>
                 <html>
                 <head>
@@ -65,7 +63,8 @@ namespace WebENG.LeaveServices
                         </div>
 
                         <div class=""content"">
-                            <p class=""kanit-bold"" style=""font-size:18px;"">แจ้งเตือนใบลา</p>
+                            <p class=""kanit-light"" style=""font-size:18px;"">เรียน ผู้พิจารณา</p>
+                            <p class=""kanit-light"" style=""font-size:18px;"">  ระบบการลาออนไลน์แจ้งว่ามีคำขอการลาใหม่ รายละเอียดดังนี้:</p>
 
                             <div style=""background:#fff3e0; border-left:4px solid #ff9100; padding:15px; margin:20px 0; border-radius:8px;"">
                                 <strong>สถานะใบลา:</strong> <span style=""color:#e65100;font-weight:600;"">{status}</span>
@@ -80,15 +79,17 @@ namespace WebENG.LeaveServices
                                 </table>
                             </div>
 
+                            <p class=""kanit-bold"" style="" font-size:18px;"">รบกวนท่านพิจารณาอนุมัติหรือปฏิเสธคำขอนี้</p>
+
                             <div style=""text-align:center;"">
                                     <a href = ""http://ctracking.contrologic.co.th/eng/ManagementLeave""
                                     style = ""text-decoration:none; color:inherit; display:block; width:100%; height:100%;border:none;font-size:18px;background:#fff3e0;"" >
-                                    <i class=""fas fa-edit fa-fw kanit-bold""></i> คลิ๊กเพื่อไปที่หน้าเว็บ
+                                    <i class=""fas fa-edit fa-fw kanit-bold""></i> คลิกเพื่ออนุมัติหรือปฏิเสธใบลา
                                     </a>
                             </div>
 
                             <div style=""background:#e3f2fd; padding:15px; border-radius:8px; text-align:center; margin-top:20px;"">
-                                คลิกปุ่มด้านบนเพื่อเข้าไปดำเนินการ<br>
+                                คลิกปุ่มด้านบนเพื่อเข้าไปดำเนินการบนหน้าเว็บ<br>
                             </div>
                         </div>
 
@@ -99,7 +100,6 @@ namespace WebENG.LeaveServices
                     </div>
                 </body>
                 </html>";
-
 
                 mail.IsBodyHtml = true;
                 string html = body;
@@ -120,7 +120,8 @@ namespace WebENG.LeaveServices
             }
             return "Success";
         }
-        public string Approver(string to, string from ,string status, string leave_type, string leave_date, string leave_time,string approver,string comment)
+
+        public string Approver(string to, string from, string status, string leave_type, string leave_date, string leave_time, string approver, string comment)
         {
             try
             {
@@ -137,7 +138,7 @@ namespace WebENG.LeaveServices
                     mail.CC.Add("hrs@contrologic.co.th");
                 }
 
-                mail.Subject = "แจ้งเตือนระบบวันลา";
+                mail.Subject = $"ใบลาได้รับการพิจารณา โดย {approver}";
                 string body = $@"<!DOCTYPE html>
                 <html>
                 <head>
@@ -165,7 +166,7 @@ namespace WebENG.LeaveServices
                         </div>
 
                         <div class=""content"">
-                            <p>แจ้งเตือนใบลา</p>
+                            <p class=""kanit-light"" style=""font-size:18px;"">  ระบบการลาออนไลน์แจ้งว่าคำขอลาของท่านได้รับการพิจารณาแล้ว รายละเอียดดังนี้:</p>
 
                             <div style=""background:#fff3e0; border-left:4px solid #ff9100; padding:15px; margin:20px 0; border-radius:8px;"">
                                 <strong>สถานะใบลา:</strong> <span style=""color:#e65100;font-weight:600;"">{status}</span>
@@ -185,15 +186,17 @@ namespace WebENG.LeaveServices
                                 {comment}
                             </div>
 
+                            <p class=""kanit-bold"" style="" font-size:18px;"">หมายเหตุ: หากใบลาของท่านถูกปฏิเสธ/ตีกลับ กรุณาดำเนินการแก้ไขใบลาที่หน้าเว็บ Leave</p>
+
                             <div style=""text-align:center;"">
                                     <a href = ""http://ctracking.contrologic.co.th/eng/StatusLeave""
                                     style = ""text-decoration:none; color:inherit; display:block; width:100%; height:100%;border:none;font-size:18px;background:#fff3e0;"" >
-                                    <i class=""fas fa-edit fa-fw kanit-bold""></i> คลิ๊กเพื่อไปที่หน้าเว็บ
+                                    <i class=""fas fa-edit fa-fw kanit-bold""></i> คลิกเพื่อแก้ไขใบลา
                                     </a>
                             </div>
 
                             <div style=""background:#e3f2fd; padding:15px; border-radius:8px; text-align:center; margin-top:20px;"">
-                                คลิกปุ่มด้านบนเพื่อเข้าไปดำเนินการ<br>
+                                คลิกปุ่มด้านบนเพื่อเข้าไปดำเนินการบนหน้าเว็บ<br>
                             </div>
                         </div>
 
@@ -204,7 +207,6 @@ namespace WebENG.LeaveServices
                     </div>
                 </body>
                 </html>";
-
 
                 mail.IsBodyHtml = true;
                 string html = body;
@@ -225,6 +227,5 @@ namespace WebENG.LeaveServices
             }
             return "Success";
         }
-
     }
 }
