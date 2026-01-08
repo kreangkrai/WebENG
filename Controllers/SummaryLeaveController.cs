@@ -295,9 +295,89 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetDataLeave(string date)
         {
+            DateTime startDate = Convert.ToDateTime(date);
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            List<RequestModel> requests = Requests.GetRequestByDate(date);
-            requests = requests.Where(w => w.status_request != "Canceled").ToList();
+            List<RequestModel> allRequests = Requests.GetRequestByDate(date);
+            allRequests = allRequests.Where(w => w.status_request != "Canceled").ToList();
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(startDate.Year.ToString());
+            List<RequestModel> new_requests = new List<RequestModel>();
+            for (int i = 0; i < allRequests.Count; i++)
+            {
+                if (allRequests[i].is_full_day)
+                {
+                    if (allRequests[i].amount_leave_day > 1)
+                    {
+                        for (DateTime date_ = allRequests[i].start_request_date; date_ <= allRequests[i].end_request_date; date_ = date_.AddDays(1))
+                        {
+                            if (date_.DayOfWeek != DayOfWeek.Saturday && date_.DayOfWeek != DayOfWeek.Sunday && !holidays.Any(a => a.date.Date == date_.Date))
+                            {
+                                RequestModel request = new RequestModel()
+                                {
+                                    emp_id = allRequests[i].emp_id,
+                                    leave_name_th = allRequests[i].leave_name_th,
+                                    start_request_date = date_,
+                                    end_request_date = date_,
+                                    amount_leave_day = 1,
+                                    start_request_time = new TimeSpan(8, 30, 0),
+                                    end_request_time = new TimeSpan(17, 30, 0),
+                                    is_full_day = allRequests[i].is_full_day,
+                                    description = allRequests[i].description,
+                                    request_date = allRequests[i].request_date,
+                                    path_file = allRequests[i].path_file,
+                                    amount_leave_hour = allRequests[i].amount_leave_hour,
+                                    color_code = allRequests[i].color_code,
+                                    status_request = allRequests[i].status_request,
+                                    comment = allRequests[i].comment,
+                                    is_two_step_approve = allRequests[i].is_two_step_approve,
+                                    leave_name_en = allRequests[i].leave_name_en,
+                                    leave_type_code = allRequests[i].leave_type_code,
+                                    leave_type_id = allRequests[i].leave_type_id,
+                                    level_step = allRequests[i].level_step,
+                                    request_id = allRequests[i].request_id
+                                };
+
+                                new_requests.Add(request);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        RequestModel request = new RequestModel()
+                        {
+                            emp_id = allRequests[i].emp_id,
+                            leave_name_th = allRequests[i].leave_name_th,
+                            start_request_date = allRequests[i].start_request_date,
+                            end_request_date = allRequests[i].end_request_date,
+                            amount_leave_day = 1,
+                            start_request_time = new TimeSpan(8, 30, 0),
+                            end_request_time = new TimeSpan(17, 30, 0),
+                            is_full_day = allRequests[i].is_full_day,
+                            description = allRequests[i].description,
+                            request_date = allRequests[i].request_date,
+                            path_file = allRequests[i].path_file,
+                            amount_leave_hour = allRequests[i].amount_leave_hour,
+                            color_code = allRequests[i].color_code,
+                            status_request = allRequests[i].status_request,
+                            comment = allRequests[i].comment,
+                            is_two_step_approve = allRequests[i].is_two_step_approve,
+                            leave_name_en = allRequests[i].leave_name_en,
+                            leave_type_code = allRequests[i].leave_type_code,
+                            leave_type_id = allRequests[i].leave_type_id,
+                            level_step = allRequests[i].level_step,
+                            request_id = allRequests[i].request_id
+                        };
+
+                        new_requests.Add(request);
+                    }
+                }
+                else
+                {
+                    new_requests.Add(allRequests[i]);
+                }
+            }
+
+            List<RequestModel> requests = new_requests;
+
             List<GroupRequestAmountModel> group_request = requests
                 .GroupBy(g => g.leave_type_code)
                 .Select(g =>

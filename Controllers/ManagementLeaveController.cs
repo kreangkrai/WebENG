@@ -243,7 +243,8 @@ namespace WebENG.Controllers
             RequestModel request = Requests.GetRequestByID(request_id);
             int current_level_step = request.level_step;
             bool is_two_step_approve = request.is_two_step_approve;
-            requests_log = requests_log.Where(w=>w.new_level_step <= current_level_step).OrderBy(o => o.log_date).ToList();
+            requests_log = requests_log.OrderBy(o => o.log_date).ToList();
+            //requests_log = requests_log.Where(w=>w.new_level_step <= current_level_step).OrderBy(o => o.log_date).ToList();
 
             List<LevelModel> hierarchies = Level.GetLevelByEmpID(emp_id);
             int level = hierarchies.Min(m => m.level);
@@ -251,7 +252,7 @@ namespace WebENG.Controllers
             List<ApprovedModel> approveds = new List<ApprovedModel>();
             for (int i = 0; i < requests_log.Count; i++)
             {
-                if (requests_log[i].action_by_level > 0 && (requests_log[i].new_status == "Created" || requests_log[i].new_status == "Resubmit"))
+                if (requests_log[i].action_by_level == 0)
                 {
                     approveds.Add(new ApprovedModel()
                     {
@@ -264,32 +265,36 @@ namespace WebENG.Controllers
                         next_level = requests_log[i].action_by_level + 1
                     });
                 }
-                else if (requests_log[i].action_by_level > 0 && requests_log[i].new_status != "Created" && requests_log[i].new_status != "Resubmit")
+                else
                 {
-                    approveds.Add(new ApprovedModel()
+                    if (requests_log[i].new_status == "Created" || requests_log[i].new_status == "Resubmit" || requests_log[i].new_status == "Returned" || requests_log[i].new_status == "Pending")
                     {
-                        emp_id = requests_log[i].action_by,
-                        emp_name = requests_log[i].action_by_name,
-                        current_level = requests_log[i].action_by_level,
-                        date = requests_log[i].log_date,
-                        status = requests_log[i].new_status,
-                        is_two_step_approve = requests_log[i].is_two_step_approve,
-                        next_level = 3
-                    });
-                }
-                else if (requests_log[i].action_by_level == 0)
-                {
-                    approveds.Add(new ApprovedModel()
+                        approveds.Add(new ApprovedModel()
+                        {
+                            emp_id = requests_log[i].action_by,
+                            emp_name = requests_log[i].action_by_name,
+                            current_level = requests_log[i].action_by_level,
+                            date = requests_log[i].log_date,
+                            status = requests_log[i].new_status,
+                            is_two_step_approve = requests_log[i].is_two_step_approve,
+                            next_level = requests_log[i].action_by_level + 1
+                        });
+                    }
+                    else if (requests_log[i].new_status == "Approved")
                     {
-                        emp_id = requests_log[i].action_by,
-                        emp_name = requests_log[i].action_by_name,
-                        current_level = requests_log[i].action_by_level,
-                        date = requests_log[i].log_date,
-                        status = requests_log[i].new_status,
-                        is_two_step_approve = requests_log[i].is_two_step_approve,
-                        next_level = requests_log[i].action_by_level + 1
-                    });
+                        approveds.Add(new ApprovedModel()
+                        {
+                            emp_id = requests_log[i].action_by,
+                            emp_name = requests_log[i].action_by_name,
+                            current_level = requests_log[i].action_by_level,
+                            date = requests_log[i].log_date,
+                            status = requests_log[i].new_status,
+                            is_two_step_approve = requests_log[i].is_two_step_approve,
+                            next_level = 3
+                        });
+                    }
                 }
+
             }
             return Json(approveds);
         }
@@ -663,6 +668,7 @@ namespace WebENG.Controllers
         {
             string message = "";
             int approve_level = -1;
+            int approve_next_level = -1;
             RequestModel request = Requests.GetRequestByID(request_id);
             int current_level_step = request.level_step;
             string request_emp_id = request.emp_id;
@@ -686,6 +692,7 @@ namespace WebENG.Controllers
                     {
                         new_status = "Pending";
                         approve_level = 1;
+                        
                     }
                     if (current_status == "Pending")
                     {
@@ -826,6 +833,56 @@ namespace WebENG.Controllers
                         }
                         Mail.Approver(email_request, email_approver,status, leave_type, leave_date, leave_time, name_approver, request.comment);
 
+
+                        // Send Mail Next Level
+
+                        if (level_step == 0) // Operation Only
+                        {
+                            if (is_two_step_approve)
+                            {
+                                approve_next_level = approve_level + 1;
+                            }
+                            else
+                            {
+                                approve_next_level = approve_level + 2;
+                            }
+                        }
+                        else
+                        {
+                            approve_next_level = approve_level + 1;
+                        }
+
+                        if (approve_level < 4)
+                        {                                          
+                            List<LevelModel> level_approves = Level.GetLevelByDepartment(level.FirstOrDefault().department);
+                            level_approves = level_approves.Where(w => w.level == approve_next_level).ToList();
+
+                            List<string> email_approvers = level_approves.GroupBy(g => g.email).Select(s => s.FirstOrDefault().email).ToList();
+                            status = "ขออนุมัติการลา";
+                            CTLModels.EmployeeModel name = emps.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
+                            leave_type = leave_type_th;
+                            leave_date = "";
+                            leave_time = "";
+                            if (request.is_full_day)
+                            {
+                                if (request.amount_leave_day > 1)
+                                {
+                                    leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                                }
+                                else
+                                {
+                                    leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                                }
+                                leave_time = "08:30-17:30";
+                            }
+                            else
+                            {
+                                leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                                leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                            }
+                            Mail.Requester(email_approvers, status, name, leave_type, leave_date, leave_time);
+
+                        }
                         message = "Success";
                     }
                     catch (Exception ex)

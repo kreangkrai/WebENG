@@ -336,10 +336,10 @@
     .table {
         border-collapse: separate !important;
         border-spacing: 0;
-        table-layout: fixed !important; /* สำคัญที่สุด! */
+       /* table-layout: fixed !important;*/ /*สำคัญที่สุด!*/
         overflow-x: auto;
-        width: 100%; /* บังคับให้เต็ม container */
-        /* border-radius: 12px !important; */
+        width: 100%; /*บังคับให้เต็ม container*/
+        border-radius: 12px !important;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
@@ -355,15 +355,15 @@
             border-left: none !important;
             border-right: none !important;
             padding: 10px 10px !important; /* ทำให้เซลล์สูงขึ้น */
-            vertical-align: middle !important; /* สำรองถ้า Bootstrap ไม่ทำงาน */
+            vertical-align: middle !important;  /*สำรองถ้า Bootstrap ไม่ทำงาน */
         }
 
         .table th {
-            padding: 3px 10px !important; /* ทำให้เซลล์สูงขึ้น */
+            padding: 3px 10px !important;  /*ทำให้เซลล์สูงขึ้น */
         }
 
         .table td {
-            padding: 10px 10px !important; /* ทำให้เซลล์สูงขึ้น */
+            padding: 10px 10px !important;  /*ทำให้เซลล์สูงขึ้น */
         }
 
         /* Badge โค้งมน */
@@ -411,12 +411,12 @@
     }
 
     /* 2. body sticky (td) เป็นสีขาว */
-    .table tbody td.freeze-left-1,
+    /*.table tbody td.freeze-left-1,
     .table tbody td.freeze-left-2,
     .table tbody td.freeze-left-3 {
         background: white !important;
         z-index: 10;
-    }
+    }*/
 
     /* 3. ป้องกันทับกันตอนเลื่อน */
     .freeze-head {
@@ -595,13 +595,13 @@
                 </h4>
             </div>
 
-            <div class="freeze-pane">
-                <table id="table_approve" class="table table-sm table-hover text-center mb-0">
+            <div style="overflow-x:auto">
+                <table id="table_approve" class="table table-sm table-hover text-center mb-0 w-100">
                     <thead style="font-size:18px; color:#555">
-                        <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
-                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
-                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                        <tr class="kanit-light align-middle" style="vertical-align:middle">
+                            <th style="width:80px;"> ลำดับ</th>
+                            <th style="width:80px;">รหัสพนักงาน</th>
+                            <th style="width:180px;">ชื่อ-สกุล</th>
                             <th>วันที่ยื่นลา</th>
                             <th>วันที่ลา</th>
                             <th>เวลาที่ลา</th>
@@ -655,13 +655,13 @@
                 </h4>
             </div>
 
-            <div class="freeze-pane">
-                <table id="table_complete" class="table table-sm table-hover text-center mb-0 overflow-auto">
+            <div style="overflow-x:auto">
+                <table id="table_complete" class="table table-sm table-hover text-center mb-0 w-100">
                     <thead style="font-size:18px; color:#555">
-                        <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner" style="vertical-align:middle">
-                            <th class="freeze-left-1" style="width:70px;"> ลำดับ</th>
-                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                        <tr class="kanit-light align-middle">
+                            <th style="width:80px;"> ลำดับ</th>
+                            <th style="width:80px;">รหัสพนักงาน</th>
+                            <th style="width:180px;">ชื่อ-สกุล</th>
                             <th>วันที่ยื่นลา</th>
                             <th>วันที่ลา</th>
                             <th>เวลาที่ลา</th>
@@ -1207,9 +1207,9 @@
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"
                         data-time="${row.start_request_time}" data-duration="${duration}"
                         data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
-                        <td class="freeze-left-1 clickable-col">${index + 1}</td>
-                        <td class="freeze-left-2 clickable-col">${row.emp_id}</td>
-                        <td class="freeze-left-3 clickable-col">${row.emp_name_th}</td>
+                        <td class="clickable-col">${index + 1}</td>
+                        <td class="clickable-col">${row.emp_id}</td>
+                        <td class="clickable-col">${row.emp_name_th}</td>
                         <td class="clickable-col">${request_date}</td>
                         <td class="clickable-col">${start_request_date}</td>
                         <td class="clickable-col">${start_request_time}-${end_request_time}</td>
@@ -1485,7 +1485,7 @@
                         if (row.path_file === "" || row.path_file === null) {
                             class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
                         } else {
-                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: green; font-size:22px"></i></td>`;
+                            class_path_file = `<td class="clickable-col"><i class="fas fa-check-circle" style="color: deepskyblue; font-size:22px"></i></td>`;
                         }
                     }
                 }
@@ -1522,14 +1522,14 @@
                 pageLength: 25,
                 scrollX: true,
                 fixedHeader: true,
-                fixedColumns: {
-                    left: 3
-                },
+                //fixedColumns: {
+                //    left: 3
+                //},
                 order: [[4, 'desc']],
                 columnDefs: [
-                    { className: "freeze-left-1", targets: 0 },
-                    { className: "freeze-left-2", targets: 1 },
-                    { className: "freeze-left-3", targets: 2 }
+                    //{ className: "freeze-left-1", targets: 0 },
+                    //{ className: "freeze-left-2", targets: 1 },
+                    //{ className: "freeze-left-3", targets: 2 }
                 ],
                 columns: [
                     { data: 'no' },
@@ -1675,9 +1675,9 @@
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"
                         data-time="${row.start_request_time}" data-duration="${duration}"
                         data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
-                        <td class="freeze-left-1 clickable-col">${index + 1}</td>
-                        <td class="freeze-left-2 clickable-col">${row.emp_id}</td>
-                        <td class="freeze-left-3 clickable-col">${row.emp_name_th}</td>
+                        <td class="clickable-col">${index + 1}</td>
+                        <td class="clickable-col">${row.emp_id}</td>
+                        <td class="clickable-col">${row.emp_name_th}</td>
                         <td class="clickable-col">${request_date}</td>
                         <td class="clickable-col">${start_request_date}</td>
                         <td class="clickable-col">${start_request_time}-${end_request_time}</td>

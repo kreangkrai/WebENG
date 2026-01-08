@@ -255,13 +255,13 @@
         }
 
         /* ลบเส้นแนวตั้งทั้งหมด (ถ้าต้องการ) */
-        #table_leave th,
+        /*#table_leave th,
         #table_leave td {
             border-left: none !important;
             border-right: none !important;
-            padding: 8px 10px !important; /* ทำให้เซลล์สูงขึ้น */
-            vertical-align: middle !important; /* สำรองถ้า Bootstrap ไม่ทำงาน */
-        }
+            padding: 8px 10px !important;*/ /* ทำให้เซลล์สูงขึ้น */
+            /*vertical-align: middle !important;*/ /* สำรองถ้า Bootstrap ไม่ทำงาน */
+        /*}*/
 
         /* Badge โค้งมน */
         #table_leave .badge {
@@ -308,12 +308,12 @@
     }
 
     /* 2. body sticky (td) เป็นสีขาว */
-    #table_leave tbody td.freeze-left-1,
+    /*#table_leave tbody td.freeze-left-1,
     #table_leave tbody td.freeze-left-2,
     #table_leave tbody td.freeze-left-3 {
         background: white !important;
         z-index: 10;
-    }
+    }*/
 
     /* 3. ป้องกันทับกันตอนเลื่อน */
     .freeze-head {
@@ -656,13 +656,13 @@
                 }
             </div>
 
-            <div class="freeze-pane">
+            <div>
                 <table id="table_leave" class="table table-sm table-hover text-center mb-0 w-100">
                     <thead style="font-size:18px; color:#555">
                         <tr class="kanit-light align-middle freeze-head freeze-left freeze-corner">
-                            <th class="freeze-left-1" style="width:80px;"> ลำดับ</th>
-                            <th class="freeze-left-2" style="width:100px;">รหัสพนักงาน</th>
-                            <th class="freeze-left-3" style="width:180px;">ชื่อ-สกุล</th>
+                            <th style="width:40px;"> ลำดับ</th>
+                            <th style="width:80px;">รหัสพนักงาน</th>
+                            <th style="width:180px;">ชื่อ-สกุล</th>
                             <th>วันที่ยื่นลา</th>
                             <th>วันที่ลา</th>
                             <th>เวลาที่ลา</th>
@@ -1267,9 +1267,9 @@
                             }
                             $('#btn_leave_send').prop('disabled', false);
                         } else {
-                            alert('วันลาไม่เพียงพอ');
-                            daysInput.value = 1;
-                            stopDateInput.value = today;
+                            //alert('วันลาไม่เพียงพอ');
+                            //daysInput.value = _leave.amount_leave_day;
+                            //stopDateInput.value = stopDateInput.value;
                             $('#btn_leave_send').prop('disabled', true);
                         }
                     } else {
@@ -2242,14 +2242,14 @@
                 pageLength: 20,
                 scrollX: true,
                 fixedHeader: true,
-                fixedColumns: {
-                    left: 3
-                },
+                //fixedColumns: {
+                //    left: 3
+                //},
                 /*order: [[4, 'desc']],*/
                 columnDefs: [
-                    { className: "freeze-left-1", targets: 0 },
-                    { className: "freeze-left-2", targets: 1 },
-                    { className: "freeze-left-3", targets: 2 }
+                    //{ className: "freeze-left-1", targets: 0 },
+                    //{ className: "freeze-left-2", targets: 1 },
+                    //{ className: "freeze-left-3", targets: 2 }
                 ],
                 columns: [
                     { data: 'no' },
@@ -2314,6 +2314,7 @@
                 $('#select_leave_type').val(data.leave_type_id);
                 $('#leave_start_date').val(data.start_request_date.split('T')[0]);
                 $('#leave_stop_date').val(data.end_request_date.split('T')[0]);
+                $('#leave_note').val(data.note);
 
                 if (request.is_full_day) {
                     // Full day
@@ -2702,7 +2703,7 @@
         const create_dateGroup = document.getElementById('create_leave_date_group');
         const create_attachFileGroup = document.getElementById('create_leave_attach_file_group');
         const create_timeGroup = document.getElementById('create_leave_time_group');
-    const create_durationSelect = create_timeGroup.querySelector('select');
+        const create_durationSelect = create_timeGroup.querySelector('select');
         const create_startHourTimeInput = document.getElementById('create_leave_start_hour');
         const create_startMinuteTimeInput = document.getElementById('create_leave_start_minute');
         const create_startDateInput = document.getElementById('create_leave_start_date');
@@ -2960,7 +2961,7 @@
                     setTimeout(() => {
                         group.style.display = 'none';
                         // รีเซ็ตค่าใน time_group เมื่อซ่อน
-                        if (group === timeGroup) {
+                        if (group === create_timeGroup) {
                             create_startHourTimeInput.value = '';
                             create_startMinuteTimeInput.value = '';
                             create_stopTimeInput.value = '';
@@ -3532,7 +3533,7 @@
                 url: '@Url.Action("CreateRequest", "Leave")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    str, tempFileIds
+                    str, create_tempFileIds
                 },
                 success: function (response) {
                     if (response === "Success") {
