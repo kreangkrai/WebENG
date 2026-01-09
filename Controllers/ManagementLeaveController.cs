@@ -252,48 +252,59 @@ namespace WebENG.Controllers
             List<ApprovedModel> approveds = new List<ApprovedModel>();
             for (int i = 0; i < requests_log.Count; i++)
             {
-                if (requests_log[i].action_by_level == 0)
+                int n_level = requests_log[i].action_by_level + 1;
+                approveds.Add(new ApprovedModel()
                 {
-                    approveds.Add(new ApprovedModel()
-                    {
-                        emp_id = requests_log[i].action_by,
-                        emp_name = requests_log[i].action_by_name,
-                        current_level = requests_log[i].action_by_level,
-                        date = requests_log[i].log_date,
-                        status = requests_log[i].new_status,
-                        is_two_step_approve = requests_log[i].is_two_step_approve,
-                        next_level = requests_log[i].action_by_level + 1
-                    });
-                }
-                else
-                {
-                    if (requests_log[i].new_status == "Created" || requests_log[i].new_status == "Resubmit" || requests_log[i].new_status == "Returned" || requests_log[i].new_status == "Pending")
-                    {
-                        approveds.Add(new ApprovedModel()
-                        {
-                            emp_id = requests_log[i].action_by,
-                            emp_name = requests_log[i].action_by_name,
-                            current_level = requests_log[i].action_by_level,
-                            date = requests_log[i].log_date,
-                            status = requests_log[i].new_status,
-                            is_two_step_approve = requests_log[i].is_two_step_approve,
-                            next_level = requests_log[i].action_by_level + 1
-                        });
-                    }
-                    else if (requests_log[i].new_status == "Approved")
-                    {
-                        approveds.Add(new ApprovedModel()
-                        {
-                            emp_id = requests_log[i].action_by,
-                            emp_name = requests_log[i].action_by_name,
-                            current_level = requests_log[i].action_by_level,
-                            date = requests_log[i].log_date,
-                            status = requests_log[i].new_status,
-                            is_two_step_approve = requests_log[i].is_two_step_approve,
-                            next_level = 3
-                        });
-                    }
-                }
+                    emp_id = requests_log[i].action_by,
+                    emp_name = requests_log[i].action_by_name,
+                    current_level = requests_log[i].action_by_level,
+                    date = requests_log[i].log_date,
+                    status = requests_log[i].new_status,
+                    is_two_step_approve = requests_log[i].is_two_step_approve,
+                    next_level = n_level > 3 ? 3 : n_level
+                });
+                //if (requests_log[i].action_by_level == 0)
+                //{
+                //    approveds.Add(new ApprovedModel()
+                //    {
+                //        emp_id = requests_log[i].action_by,
+                //        emp_name = requests_log[i].action_by_name,
+                //        current_level = requests_log[i].action_by_level,
+                //        date = requests_log[i].log_date,
+                //        status = requests_log[i].new_status,
+                //        is_two_step_approve = requests_log[i].is_two_step_approve,
+                //        next_level = requests_log[i].action_by_level + 1
+                //    });
+                //}
+                //else
+                //{
+                //    if (requests_log[i].new_status == "Created" || requests_log[i].new_status == "Resubmit" || requests_log[i].new_status == "Returned" || requests_log[i].new_status == "Pending")
+                //    {
+                //        approveds.Add(new ApprovedModel()
+                //        {
+                //            emp_id = requests_log[i].action_by,
+                //            emp_name = requests_log[i].action_by_name,
+                //            current_level = requests_log[i].action_by_level,
+                //            date = requests_log[i].log_date,
+                //            status = requests_log[i].new_status,
+                //            is_two_step_approve = requests_log[i].is_two_step_approve,
+                //            next_level = requests_log[i].action_by_level + 1
+                //        });
+                //    }
+                //    else if (requests_log[i].new_status == "Approved" || requests_log[i].new_status == "Completed")
+                //    {
+                //        approveds.Add(new ApprovedModel()
+                //        {
+                //            emp_id = requests_log[i].action_by,
+                //            emp_name = requests_log[i].action_by_name,
+                //            current_level = requests_log[i].action_by_level,
+                //            date = requests_log[i].log_date,
+                //            status = requests_log[i].new_status,
+                //            is_two_step_approve = requests_log[i].is_two_step_approve,
+                //            next_level = 3
+                //        });
+                //    }
+                //}
 
             }
             return Json(approveds);
