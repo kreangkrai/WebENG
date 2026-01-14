@@ -248,11 +248,28 @@ namespace WebENG.Controllers
 
             List<LevelModel> hierarchies = Level.GetLevelByEmpID(emp_id);
             int level = hierarchies.Min(m => m.level);
+            //string position = hierarchies.FirstOrDefault().position;
 
             List<ApprovedModel> approveds = new List<ApprovedModel>();
             for (int i = 0; i < requests_log.Count; i++)
             {
-                int n_level = requests_log[i].action_by_level + 1;
+                int n_level = 0;
+                if (requests_log[i].action_by_level > 0)
+                {
+                    if (level == 0)
+                    {
+                        n_level = is_two_step_approve ? requests_log[i].action_by_level + 1 : requests_log[i].action_by_level + 2;
+                    }
+                    else
+                    {
+                        n_level = requests_log[i].action_by_level + 1;
+                    }
+                }
+                else
+                {
+                    n_level = requests_log[i].action_by_level + 1;
+                }
+                
                 approveds.Add(new ApprovedModel()
                 {
                     emp_id = requests_log[i].action_by,
