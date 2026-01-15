@@ -79,8 +79,8 @@ namespace WebENG.Controllers
             ForecastPaymentModel forecast = new ForecastPaymentModel();
             double job_in_hand = Forecast.GetJonInHand(year);
             double backlog = Forecast.GetBacklog(year);
-
-
+            double backlog_next_year = 50;
+             
             forecast.month_label = new string[14]
             { $"{year}",
     "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
@@ -127,8 +127,9 @@ namespace WebENG.Controllers
                     forecast.acc_actual_amount[i] = accActual;
                 }
             }
-
-            var data = new { forecast = forecast, job_in_hand = job_in_hand / 1_000_000 };
+            forecast.actual_amount[forecast.actual_amount.Length - 1] = backlog_next_year;
+            double sum_invoice = forecast.acc_actual_amount[forecast.acc_actual_amount.Length - 2];
+            var data = new { forecast = forecast, job_in_hand = job_in_hand / 1_000_000 , sum_invoice = sum_invoice };
 
             return Json(data);
         }

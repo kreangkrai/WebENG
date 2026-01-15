@@ -70,10 +70,11 @@
             let year = $('#year').val();
             const forecast = await GetData(year);
             const job_in_hand = forecast.job_in_hand;
-            GenerateChart(forecast.forecast, job_in_hand);
+            const sum_invoice = forecast.sum_invoice;
+            GenerateChart(forecast.forecast, job_in_hand, sum_invoice);
         });
 
-        function GenerateChart(forecast, job_in_hand) {
+        function GenerateChart(forecast, job_in_hand, sum_invoice) {
             if (chart_forecast !== undefined) {
                 chart_forecast.destroy();
             }
@@ -95,7 +96,7 @@
                         },
                         {
                             label: 'Payment (Actual)',
-                            data: [job_in_hand,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                            data: [job_in_hand, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, sum_invoice],
                             backgroundColor: '#2DB0E0',
                             borderColor: '#2DB0E0',
                             borderWidth: 2,
@@ -150,13 +151,17 @@
                     scales: {
                         x: {
                             stacked: false,
-                            title: { display: true, text: 'เดือน' },
-                            ticks: { maxRotation: 45, minRotation: 45 }
+                            title: {
+                                display: true, text: 'MONTH', font: { size: 20 }
+                            },
+                            ticks: { maxRotation: 0, minRotation: 0, font: { size: 16 }}
                         },
                         y: {
                             stacked: true,
                             min: 0,
-                            title: { display: true, text: 'MB' },
+                            title: {
+                                display: true, text: 'MB', font: { size: 20 }
+                            },
                             ticks: { callback: value => value },
                             type: 'logarithmic',
                         }
