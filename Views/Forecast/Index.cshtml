@@ -1,0 +1,175 @@
+﻿@using Microsoft.AspNetCore.Http
+@model WebENG.Models.UserModel;
+@{
+    ViewData["Title"] = "Forecast";
+}
+
+<div class="row p-4" style="row-gap:5px">
+    <div class="col-xl-12">
+        <div class="card card-dark">
+            <div class="card-body">
+                <div class="row" style="row-gap:10px">
+                    <div class="col-xl-8">
+
+                    </div>
+                    <div class="col-xl-2">
+                        <select id="year" class="form-control">
+                            <option value="" selected disabled>Please Select Year</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2">
+                        <button id="btnUpdate" type="button" class="btn btn-primary form-control">
+                            OK
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-dark" style="position: relative; height: 450px; width: 100%;">
+            <div class="card-body">
+                <canvas id="chart_forecast" style="height:400px" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        let chart_forecast;
+        $(document).ready(async function () {
+            getYear();
+        });
+        function getYear(){
+            var year_string = "";
+            var today = new Date();
+            var year = today.getFullYear();
+            for (var i = year; i > year - 5; i--) {
+                year_string += `<option value="${i}">${i}</option>`;
+            }
+            $('#year').empty();
+            $('#year').append(year_string);
+        };
+
+
+        async function GetData(year) {
+            let datas = [];
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetData", "Forecast")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { year},
+                success: function (response) {
+                    datas = response;
+                }
+            });
+            return datas;
+        };
+
+        $('#btnUpdate').on('click',async function(){
+            let year = $('#year').val();
+            const forecast = await GetData(year);
+            const job_in_hand = forecast.job_in_hand;
+            GenerateChart(forecast.forecast, job_in_hand);
+        });
+
+        function GenerateChart(forecast, job_in_hand) {
+            if (chart_forecast !== undefined) {
+                chart_forecast.destroy();
+            }
+
+            const ctx = document.getElementById('chart_forecast').getContext('2d');
+
+            chart_forecast = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: forecast.month_label,
+                    datasets: [
+                        {
+                            label: 'Payment (Actual)',
+                            data: forecast.actual_amount,
+                            backgroundColor: 'rgba(102, 187, 106, 1)',
+                            borderColor: '#66BB6A',                          
+                            borderWidth: 2,
+                            stack: 'actual'
+                        },
+                        {
+                            label: 'Payment (Actual)',
+                            data: [job_in_hand,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                            backgroundColor: '#2DB0E0',
+                            borderColor: '#2DB0E0',
+                            borderWidth: 2,
+                            stack: 'actual'
+                        },
+                        {
+                            label: 'Payment (Forecast)',
+                            data: forecast.forecast_amount,
+                            backgroundColor: 'rgba(100, 181, 246, 0.15)',
+                            borderColor: '#64B5F6',
+                            borderWidth: 2,
+                            borderDash: [5, 3],
+                            stack: 'forecast'
+                        },
+                        {
+                            label: 'Acc Payment (Actual)',
+                            data: forecast.acc_actual_amount,
+                            type: 'line',
+                            borderColor: '#E04B2D',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Acc Payment (Forecast)',
+                            data: forecast.acc_forecast_amount,
+                            type: 'line',
+                            borderColor: '#E04B2D',
+                            borderWidth: 3,
+                            borderDash: [6, 4],
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: false },
+                        legend: {
+                            position: 'top',
+                            labels: { boxWidth: 20, usePointStyle: true }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: false,
+                            title: { display: true, text: 'เดือน' },
+                            ticks: { maxRotation: 45, minRotation: 45 }
+                        },
+                        y: {
+                            stacked: true,
+                            min: 0,
+                            title: { display: true, text: 'MB' },
+                            ticks: { callback: value => value },
+                            type: 'logarithmic',
+                        }
+                    },
+                    animation: { duration: 500 }
+                }
+            });
+        }
+
+        $('#btnExport').on('click', function () {
+            let year = $('#year :selected').text();
+            let department = $('#departments :selected').text();
+            location.href = '@Url.Action("ExportSummaryJobInHand", "JobInHand")?department=' + department + '&year=' + year;
+        });
+    </script>
+}
