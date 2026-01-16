@@ -1841,8 +1841,8 @@
             { status_en: "Canceled", status: { status_th: "ยกเลิก", class: "danger" } },
             { status_en: "Approved", status: { status_th: "อนุมัติ", class: "success" } },
             { status_en: "Rejected", status: { status_th: "ไม่อนุมัติ", class: "danger" } },
-            { status_en: "Returned", status: { status_th: "ตีกลับ", class: "info" } },
-            { status_en: "Completed", status: { status_th: "สำเร็จ", class: "success" } },
+            { status_en: "Returned", status: { status_th: "ตีกลับ", class: "secondary" } },
+            { status_en: "Completed", status: { status_th: "สำเร็จ", class: "info" } },
         ];
 
         $(document).ready(async function () {
@@ -2300,7 +2300,6 @@
             const request = requestHistory.filter(f => f.request_id === request_id).map(m => m)[0];
             $('#emp_id').val(data.empId);
             $('#emp_name').val($(this).find('td:eq(2)').text());
-
             try {
                 let emp_id = $('#emp_id').val();
                 let year = new Date(request.start_request_date).getFullYear();
@@ -2453,16 +2452,15 @@
 
         async function handleLeaveTypeChange(leave_type_id) {
             try {
-                //let leave_type_id = $('#select_leave_type').val();
+                let leave_type_id = $('#select_leave_type').val();
                 let request_date = today.toISOString();
-                let start_request_date = $('#start_request_date').val();
+                let start_request_date = $('#leave_start_date').val();
                 let leave_ = leaves.filter(f => f.leave_type_id === leave_type_id).map(m => m)[0];
                 let description = leave_.description;
                 let emp_id = $('#emp_id').val();
                 let leave;
                 let year = new Date(start_request_date).getFullYear();
                 const result = await GetLeaveByID(leave_type_id, emp_id, year)
-
                 let hire_date = new Date();
                 $('#leave_stop_date').val(request_date);
                 $('#amount_leave').val(1);
