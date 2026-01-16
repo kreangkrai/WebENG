@@ -11,5 +11,6 @@ namespace WebENG.Interface
         List<ForecastModel> GetForecasts(int year);
         double GetBacklog(int year);
         double GetJonInHand(int year);
+        double GetInvoice(int year);
     }
 }

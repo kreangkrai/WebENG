@@ -61,8 +61,6 @@ namespace WebENG.Controllers
                     string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
                     u.role = position;
                 }
-
-                //ForecastPaymentModel forecast = GetData(2025);
                 return View(u);
             }
             else
@@ -79,7 +77,8 @@ namespace WebENG.Controllers
             ForecastPaymentModel forecast = new ForecastPaymentModel();
             double job_in_hand = Forecast.GetJonInHand(year);
             double backlog = Forecast.GetBacklog(year);
-            double backlog_next_year = 50;
+            double total_invoice = Forecast.GetInvoice(year);
+            double backlog_next_year = job_in_hand - total_invoice;
              
             forecast.month_label = new string[14]
             { $"{year}",
@@ -127,7 +126,7 @@ namespace WebENG.Controllers
                     forecast.acc_actual_amount[i] = accActual;
                 }
             }
-            forecast.actual_amount[forecast.actual_amount.Length - 1] = backlog_next_year;
+            forecast.actual_amount[forecast.actual_amount.Length - 1] = backlog_next_year / 1_000_000;
             double sum_invoice = forecast.acc_actual_amount[forecast.acc_actual_amount.Length - 2];
             var data = new { forecast = forecast, job_in_hand = job_in_hand / 1_000_000 , sum_invoice = sum_invoice };
 

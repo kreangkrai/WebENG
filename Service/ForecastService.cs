@@ -209,6 +209,45 @@ namespace WebENG.Service
             return forecasts;
         }
 
+        public double GetInvoice(int year)
+        {
+            double total_invoice = 0;
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string string_command = string.Format($@"SELECT 
+                                                            COALESCE(SUM(i.invoice), 0) AS total_invoice
+                                                        FROM 
+                                                            Jobs j
+                                                        LEFT JOIN 
+                                                            Invoice i ON j.job_id = i.job_id
+                                                        WHERE 
+                                                            FORMAT(j.job_date, 'yyyy') = @year;");
+                SqlCommand cmd = new SqlCommand(string_command, con);
+                cmd.Parameters.AddWithValue("@year", year);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        total_invoice = dr["total_invoice"] != DBNull.Value ? Convert.ToDouble(dr["total_invoice"].ToString()) : 0;
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return total_invoice;
+        }
+
         public double GetJonInHand(int year)
         {
             double job_in_hand = 0;
