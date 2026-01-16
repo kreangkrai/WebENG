@@ -1382,12 +1382,41 @@
                     const remark = fullRowData[4];
 
                     const existingIndex = set_payments.findIndex(item => item.payment_id === payment_id);
-                    set_payments[existingIndex].percent = percent;
-                    set_payments[existingIndex].forecast_month = forecast_month;
-                    set_payments[existingIndex].remark = remark;
+                    if (existingIndex !== -1) {
+                        set_payments[existingIndex].percent = percent;
+                        set_payments[existingIndex].forecast_month = forecast_month;
+                        set_payments[existingIndex].remark = remark;
+                    }
+
+                    updatePercentSum();
                 },
             });
+            addTotalRow(table);
         };
+
+        function updatePercentSum() {
+            const total = set_payments.reduce((sum, item) => sum + (Number(item.percent) || 0), 0);
+
+            $('#payment_total_percent').text(total.toFixed(2) + '%');
+
+            if (total > 100) {
+                $('#payment_total_percent').css('color', 'red');
+            } else if (total < 100) {
+                $('#payment_total_percent').css('color', 'orange');
+            } else {
+                $('#payment_total_percent').css('color', 'green');
+            }
+        }
+
+        function addTotalRow(table) {
+            const total = set_payments.reduce((sum, item) => sum + (Number(item.percent) || 0), 0);
+            if (!$('#payment_total_percent').length) {
+                $('#table_payment').after(
+                    '<div style="margin-top:8px; font-weight:bold;">รวม: <span id="payment_total_percent">'
+                    + total.toFixed(2) + '%</span></div>'
+                );
+            }
+        }
 
         function GenerateTableProcess(processes) {
             let datas = [];

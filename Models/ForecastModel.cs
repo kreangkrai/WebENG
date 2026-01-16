@@ -10,7 +10,13 @@ namespace WebENG.Models
         public string month { get; set; }
         public string job_id { get; set; }
         public string job_name { get; set; }
+        public string responsible { get; set; }
+        public string department { get; set; }
         public double job_in_hand { get; set; }
+        public double job_ais_in_hand { get; set; }
+        public double job_cis_in_hand { get; set; }
+        public double job_eng_in_hand { get; set; }
+        public string job_type { get; set; }
         public string payment_id { get; set; }
         public string payment_name { get; set; }
         public string forecast_month { get; set; }

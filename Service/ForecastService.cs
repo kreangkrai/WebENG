@@ -74,7 +74,12 @@ namespace WebENG.Service
                                                         SELECT 
                                                             j.job_id,
                                                             j.job_name,
+															j.responsible,
 		                                                    j.job_in_hand,
+															j.job_ais_in_hand,
+															j.job_cis_in_hand,
+															j.job_eng_in_hand,
+															j.job_type,
                                                             tp.payment_id,
                                                             tp.payment_name,
                                                             tp.[percent],
@@ -85,12 +90,18 @@ namespace WebENG.Service
                                                         FROM [dbo].[Term_Payments] tp
                                                         INNER JOIN [dbo].[Jobs] j ON tp.job_id = j.job_id
                                                         WHERE tp.forecast_month >= '{year}-01-01' 
-                                                          AND tp.forecast_month < '{year + 1}-01'
+                                                          AND tp.forecast_month < '{year+1}-01'
                                                     ),
                                                     Actual AS (
                                                         SELECT 
                                                             j.job_id,
-		                                                    j.job_in_hand,
+		                                                    j.job_name,
+															j.responsible,
+															j.job_in_hand,
+															j.job_ais_in_hand,
+															j.job_cis_in_hand,
+															j.job_eng_in_hand,
+															j.job_type,
                                                             i.milestone,
                                                             i.invoice AS actual_amount,
                                                             CONVERT(varchar(7), i.actual_date, 126) AS actual_month,
@@ -106,7 +117,12 @@ namespace WebENG.Service
                                                             m.month,
                                                             f.job_id,
                                                             f.job_name,
+															f.responsible,
 		                                                    f.job_in_hand,
+															f.job_ais_in_hand,
+															f.job_cis_in_hand,
+															f.job_eng_in_hand,
+															f.job_type,
                                                             f.payment_id,
                                                             f.payment_name,
                                                             f.forecast_month_str AS forecast_month,
@@ -129,7 +145,12 @@ namespace WebENG.Service
                                                             m.month,
                                                             a.job_id,
                                                             j.job_name,
+															j.responsible,
 		                                                    a.job_in_hand AS JobInHand,
+															a.job_ais_in_hand,
+															a.job_cis_in_hand,
+															a.job_eng_in_hand,
+															a.job_type,
                                                             t.payment_id AS payment_id,
                                                             a.milestone AS payment_name,
                                                             NULL AS forecast_month,
@@ -155,7 +176,13 @@ namespace WebENG.Service
                                                         month,
                                                         job_id,
                                                         job_name,
+														responsible,
+														emp.department,
 	                                                    job_in_hand,
+														job_ais_in_hand,
+														job_cis_in_hand,
+														job_eng_in_hand,
+														job_type,
                                                         payment_id,
                                                         payment_name,
                                                         forecast_month, 
@@ -168,6 +195,7 @@ namespace WebENG.Service
                                                         status,
                                                         actual_remark
                                                     FROM Combined
+													LEFT JOIN [CTL].dbo.Employees emp ON Combined.responsible = emp.name_en
                                                     WHERE job_id IS NOT NULL
                                                     ORDER BY month, job_id, payment_id; ");
                 SqlCommand cmd = new SqlCommand(string_command, con);
@@ -181,7 +209,13 @@ namespace WebENG.Service
                             month = dr["month"].ToString(),
                             job_id = dr["job_id"].ToString(),
                             job_name = dr["job_name"].ToString(),
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) : 0,
+                            job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"].ToString()) : 0,
+                            job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"].ToString()) : 0,
+                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) : 0,
+                            job_type = dr["job_type"].ToString(),
                             payment_id = dr["payment_id"].ToString(),
                             payment_name = dr["payment_name"].ToString(),
                             forecast_month = dr["forecast_month"].ToString(),
