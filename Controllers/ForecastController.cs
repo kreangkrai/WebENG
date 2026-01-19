@@ -69,15 +69,87 @@ namespace WebENG.Controllers
             }
         }
 
+
         [HttpGet]
-        public IActionResult GetData(int year)
+        public IActionResult GetResponsibles(string department)
+        {
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            employees = employees.Where(w => w.active).ToList();
+            if (department != "ALL")
+            {
+                List<string> deps = new List<string>();
+                if (department == "CES")
+                {
+                    deps = new List<string>()
+                    {
+                        "ces-system"
+                    };
+                    
+                }
+                if (department == "CIS")
+                {
+                    deps = new List<string>()
+                    {
+                        "ces-cis"
+                    };
+                }
+
+                if (department == "AES")
+                {
+                    deps = new List<string>()
+                    {
+                        "aes"
+                    };
+                }
+                employees = employees.Where(w => deps.Contains(w.department.ToLower())).ToList();
+            }
+            return Json(employees);
+        }
+
+        [HttpGet]
+        public IActionResult GetData(int year ,string department , string responsible)
         {
             List<ForecastModel> forecasts = Forecast.GetForecasts(year);
 
             ForecastPaymentModel forecast = new ForecastPaymentModel();
-            double job_in_hand = Forecast.GetJonInHand(year);
-            double backlog = Forecast.GetBacklog(year);
-            double total_invoice = Forecast.GetInvoice(year);
+            List<string> deps = new List<string>();
+            if (department == "CES")
+            {
+                deps = new List<string>()
+                {
+                    "CES-System",
+                    "CES-Exp",
+                    "CES-PMD",
+                    "CES-QIR"
+                };
+            }
+            
+            if (department == "CIS")
+            {
+                deps = new List<string>()
+                {
+                    "CES-CIS"
+                };
+            }
+            if (department == "AES")
+            {
+                deps = new List<string>()
+                {
+                    "AES"
+                };
+            }
+
+            //Department
+            forecasts = forecasts.Where(w => deps.Contains(w.department)).ToList();
+
+            if (responsible != "ALL")
+            {
+                forecasts = forecasts.Where(w => w.responsible.ToLower().Contains(responsible.ToLower())).ToList();
+            }
+
+            double job_in_hand = Forecast.GetJonInHand(year,department,responsible);
+            double backlog = Forecast.GetBacklog(year, department, responsible);
+            double total_invoice = Forecast.GetInvoice(year, department, responsible);
             double backlog_next_year = job_in_hand - total_invoice;
              
             forecast.month_label = new string[14]

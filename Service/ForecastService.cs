@@ -19,7 +19,7 @@ namespace WebENG.Service
             con = connect.OpenConnect();
         }
 
-        public double GetBacklog(int year)
+        public double GetBacklog(int year , string department , string responsible)
         {
             double backlog = 0;
             try
@@ -28,14 +28,173 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM (
-				select 			
-	                    CAST((( CASE WHEN job_in_hand IS NULL THEN 0 ELSE job_in_hand END ) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * (CASE WHEN job_in_hand IS NULL THEN 0 ELSE job_in_hand END)) as decimal(18,3))) as decimal(18,3)) as remaining_amount
-                from Jobs
-                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= @year GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
-                where FORMAT(job_date ,'yyyy') < @year OR job_date is null ) as main");
+                string string_command = "";
+                if (department == "ALL" && responsible == "ALL")
+                {
+                    string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_in_hand IS NULL THEN 0 ELSE job_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand, 0)) *(CASE WHEN job_in_hand IS NULL THEN 0 ELSE job_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                        LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null ) as main");
+                }
+
+                else if (responsible != "ALL")
+                {
+                    if (department == "CES")
+                    {
+                        string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_eng_in_hand IS NULL THEN 0 ELSE job_eng_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_eng_in_hand, 0)) *(CASE WHEN job_eng_in_hand IS NULL THEN 0 ELSE job_eng_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                        LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null AND LOWER(Jobs.responsible) = @responsible ) as main");
+                    }
+                    if (department == "CIS")
+                    {
+                        string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_cis_in_hand IS NULL THEN 0 ELSE job_cis_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_cis_in_hand, 0)) *(CASE WHEN job_cis_in_hand IS NULL THEN 0 ELSE job_cis_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                        LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null AND LOWER(Jobs.responsible) = @responsible) as main");
+                    }
+                    if (department == "AES")
+                    {
+                        string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_ais_in_hand IS NULL THEN 0 ELSE job_ais_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_ais_in_hand, 0)) *(CASE WHEN job_ais_in_hand IS NULL THEN 0 ELSE job_ais_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                        LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null AND LOWER(Jobs.responsible) = @responsible) as main");
+                    }
+
+                }
+                else if (department != "ALL" && responsible == "ALL")
+                {
+                    if (department == "CES")
+                    {
+                        string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_eng_in_hand IS NULL THEN 0 ELSE job_eng_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_eng_in_hand, 0)) *(CASE WHEN job_eng_in_hand IS NULL THEN 0 ELSE job_eng_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                       LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null ) as main");
+                    }
+                    if (department == "CIS")
+                    {
+                        string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_cis_in_hand IS NULL THEN 0 ELSE job_cis_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_cis_in_hand, 0)) *(CASE WHEN job_cis_in_hand IS NULL THEN 0 ELSE job_cis_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                        LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null ) as main");
+                    }
+                    if (department == "AES")
+                    {
+                        string_command = string.Format($@"select SUM(main.remaining_amount) as backlog FROM(
+                                                        select
+                                                                CAST(((CASE WHEN job_ais_in_hand IS NULL THEN 0 ELSE job_ais_in_hand END) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_ais_in_hand, 0)) *(CASE WHEN job_ais_in_hand IS NULL THEN 0 ELSE job_ais_in_hand END)) as decimal(18, 3))) as decimal(18, 3)) as remaining_amount
+                                                        from Jobs
+                                                       LEFT JOIN 
+                                                        (SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,											
+                                                                    i.invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year                                                               
+																	) as invoice
+														ON invoice.job_id = Jobs.job_id
+                                                        where FORMAT(job_date ,'yyyy') < @year OR job_date is null ) as main");
+                    }
+                }
+
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 cmd.Parameters.AddWithValue("@year", year);
+                cmd.Parameters.AddWithValue("@responsible", responsible);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -243,7 +402,7 @@ namespace WebENG.Service
             return forecasts;
         }
 
-        public double GetInvoice(int year)
+        public double GetInvoice(int year , string department, string responsible)
         {
             double total_invoice = 0;
             try
@@ -252,16 +411,123 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"SELECT 
-                                                            COALESCE(SUM(i.invoice), 0) AS total_invoice
+                string string_command = "";
+                if (department == "ALL" && responsible == "ALL")
+                {
+                    string_command = string.Format($@"SELECT SUM (main.total_invoice) total_invoice FROM (
+                                                                SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,
+                                                                    SUM(i.invoice) AS total_invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year
+                                                                GROUP BY 
+                                                                    j.job_id, j.job_name, j.responsible, e.department
+                                                                HAVING 
+                                                                    SUM(i.invoice) > 0 
+	
+	                                                                ) as main");
+                }
+                else if (responsible != "ALL")
+                {
+                    string_command = string.Format($@"SELECT SUM (main.total_invoice) total_invoice FROM (
+                                                                SELECT 
+                                                                    j.job_id,
+                                                                    j.job_name,
+                                                                    j.responsible,
+                                                                    e.department,
+                                                                    SUM(i.invoice) AS total_invoice
+                                                                FROM 
+                                                                    [dbo].[Jobs] j
+                                                                LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                                LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                                WHERE FORMAT(i.actual_date,'yyyy') = @year AND LOWER(responsible) = @responsible
+                                                                GROUP BY 
+                                                                    j.job_id, j.job_name, j.responsible, e.department
+                                                                HAVING 
+                                                                    SUM(i.invoice) > 0 
+	
+	                                                                ) as main");               
+                }
+
+                else if (department != "ALL" && responsible == "ALL")
+                {
+                    if (department == "CES")
+                    {
+                        string_command = string.Format($@"SELECT SUM (main.total_invoice) total_invoice FROM (
+                                                            SELECT 
+                                                                j.job_id,
+                                                                j.job_name,
+                                                                j.responsible,
+                                                                e.department,
+                                                                SUM(i.invoice) AS total_invoice
+                                                            FROM 
+                                                                [dbo].[Jobs] j
+                                                            LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                            LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                            WHERE FORMAT(i.actual_date,'yyyy') = '2025' AND e.department IN('CES-system','CES-Exp','CES-PMD','CES-QIR')
+                                                            GROUP BY 
+                                                                j.job_id, j.job_name, j.responsible, e.department
+                                                            HAVING 
+                                                                SUM(i.invoice) > 0 
+	
+	                                                            ) as main");
+                    }
+                    if (department == "CIS")
+                    {
+                        string_command = string.Format($@"
+                                                            SELECT SUM (main.total_invoice) total_invoice FROM (
+                                                            SELECT 
+                                                                j.job_id,
+                                                                j.job_name,
+                                                                j.responsible,
+                                                                e.department,
+                                                                SUM(i.invoice) AS total_invoice
+                                                            FROM 
+                                                                [dbo].[Jobs] j
+                                                            LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                            LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                            WHERE FORMAT(i.actual_date,'yyyy') = '2025' AND e.department IN('CES-CIS')
+                                                            GROUP BY 
+                                                                j.job_id, j.job_name, j.responsible, e.department
+                                                            HAVING 
+                                                                SUM(i.invoice) > 0 
+	
+	                                                            ) as main");
+                    }
+                    if (department == "AES")
+                    {
+                        string_command = string.Format($@"
+                                                        SELECT SUM (main.total_invoice) total_invoice FROM (
+                                                        SELECT 
+                                                            j.job_id,
+                                                            j.job_name,
+                                                            j.responsible,
+                                                            e.department,
+                                                            SUM(i.invoice) AS total_invoice
                                                         FROM 
-                                                            Jobs j
-                                                        LEFT JOIN 
-                                                            Invoice i ON j.job_id = i.job_id
-                                                        WHERE 
-                                                            FORMAT(j.job_date, 'yyyy') = @year;");
+                                                            [dbo].[Jobs] j
+                                                        LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                        LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                        WHERE FORMAT(i.actual_date,'yyyy') = '2025' AND e.department IN('AES')
+                                                        GROUP BY 
+                                                            j.job_id, j.job_name, j.responsible, e.department
+                                                        HAVING 
+                                                            SUM(i.invoice) > 0 
+	
+	                                                        ) as main");
+                    }
+                }
+
+
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 cmd.Parameters.AddWithValue("@year", year);
+                cmd.Parameters.AddWithValue("@responsible", responsible);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
@@ -282,7 +548,7 @@ namespace WebENG.Service
             return total_invoice;
         }
 
-        public double GetJonInHand(int year)
+        public double GetJonInHand(int year , string department, string responsible)
         {
             double job_in_hand = 0;
             try
@@ -291,11 +557,49 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"select 
+                string string_command = "";
+                if (department == "ALL" && responsible == "ALL")
+                {
+                    string_command = string.Format($@"select 
 	                                                          Sum(job_in_hand) as job_in_hand
                                                         from jobs where FORMAT(job_date,'yyyy') = @year");
+                }
+
+                else if(responsible != "ALL")
+                {
+                    string_command = string.Format($@"select 
+	                                                          Sum(job_in_hand) as job_in_hand
+                                                        from jobs where FORMAT(job_date,'yyyy') = @year AND LOWER(responsible) = @responsible");
+                }
+                else if (department != "ALL" && responsible == "ALL")
+                {
+                    if (department == "CES")
+                    {
+                        string_command = string.Format($@"select 
+	                                                          Sum(job_eng_in_hand) as job_in_hand
+                                                        from jobs 
+														where FORMAT(job_date,'yyyy') = @year");
+                    }
+                    if (department == "CIS")
+                    {
+                        string_command = string.Format($@"select 
+	                                                          Sum(job_cis_in_hand) as job_in_hand
+                                                        from jobs 
+														where FORMAT(job_date,'yyyy') = @year");
+                    }
+                    if (department == "AES")
+                    {
+                        string_command = string.Format($@"select 
+	                                                          Sum(job_ais_in_hand) as job_in_hand
+                                                        from jobs 
+														where FORMAT(job_date,'yyyy') = @year");
+                    }                   
+                }
+                
+
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 cmd.Parameters.AddWithValue("@year", year);
+                cmd.Parameters.AddWithValue("@responsible", responsible);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {

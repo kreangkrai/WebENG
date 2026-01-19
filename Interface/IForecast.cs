@@ -9,8 +9,8 @@ namespace WebENG.Interface
     public interface IForecast
     {
         List<ForecastModel> GetForecasts(int year);
-        double GetBacklog(int year);
-        double GetJonInHand(int year);
-        double GetInvoice(int year);
+        double GetBacklog(int year, string department, string responsible);
+        double GetJonInHand(int year, string department, string responsible);
+        double GetInvoice(int year, string department, string responsible);
     }
 }
