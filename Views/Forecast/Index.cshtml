@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-xl-2">
                         <select id="select_department" class="form-control">
-                            <option value="" selected disabled>Please Select Depaertment</option>
+                            <option value="ALL" selected>ALL</option>
                             <option value="CES">CES</option>
                             <option value="CIS">CIS</option>
                             <option value="AES">AES</option>
@@ -27,7 +27,7 @@
                     </div>
                     <div class="col-xl-2">
                         <select id="select_responsible" class="form-control">
-                            <option value="" selected disabled>Please Select Responsible</option>
+                            <option value="ALL" selected>ALL</option>
                         </select>
                     </div>
                     <div class="col-xl-2">
@@ -114,10 +114,12 @@
             const forecast = await GetData(year, department, responsible);
             const job_in_hand = forecast.job_in_hand;
             const sum_invoice = forecast.sum_invoice;
-            GenerateChart(forecast.forecast, job_in_hand, sum_invoice);
+            const backlog = forecast.backlog;
+            const backlog_next_year = forecast.backlog_next_year;
+            GenerateChart(forecast.forecast, job_in_hand, backlog, sum_invoice, backlog_next_year);
         });
 
-        function GenerateChart(forecast, job_in_hand, sum_invoice) {
+        function GenerateChart(forecast, job_in_hand, backlog, sum_invoice,backlog_next_year) {
             if (chart_forecast !== undefined) {
                 chart_forecast.destroy();
             }
@@ -131,23 +133,23 @@
                     datasets: [
                         {
                             label: 'Job In Hand',
-                            data: [5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(102, 17, 106, 1)',
-                            borderColor: '#66AB6A',
+                            data: [job_in_hand, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(209, 168, 54, 1)',
+                            borderColor: '#D1A836',
                             borderWidth: 2,
                             stack: 'job'
                         },
                         {
-                            label: 'Back Log',
-                            data: [10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(12, 187, 106, 1)',
-                            borderColor: '#6600B6A',
+                            label: 'Backlog',
+                            data: [backlog, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(54, 121, 209, 1)',
+                            borderColor: '#3679D1',
                             borderWidth: 2,
                             stack: 'job'
                         },
                         {
                             label: 'Payment (Actual)',
-                            data: [0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            data: forecast.actual_amount,
                             backgroundColor: 'rgba(102, 187, 106, 1)',
                             borderColor: '#66BB6A',
                             borderWidth: 2,
@@ -155,7 +157,7 @@
                         },
                         {
                             label: 'Payment (Forecast)',
-                            data: [0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            data: forecast.forecast_amount,
                             backgroundColor: 'rgba(100, 181, 246, 0.15)',
                             borderColor: '#64B5F6',
                             borderWidth: 2,
@@ -163,18 +165,18 @@
                             stack: 'forecast'
                         },
                         {
-                            label: 'Next Backlog',
-                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20],
-                            backgroundColor: 'rgba(12, 70, 96, 1)',
-                            borderColor: '#66AB6A',
+                            label: 'Backlog Next Year',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, backlog_next_year],
+                            backgroundColor: 'rgba(206, 54, 209, 1)',
+                            borderColor: '#CE36D1',
                             borderWidth: 2,
                             stack: 'next year'
                         },
                         {
                             label: 'Total Invoice',
-                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30],
-                            backgroundColor: 'rgba(81, 17, 56, 1)',
-                            borderColor: '#6600B6A',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, sum_invoice],
+                            backgroundColor: 'rgba(209, 93, 54, 1)',
+                            borderColor: '#D15D36',
                             borderWidth: 2,
                             stack: 'next year'
                         },

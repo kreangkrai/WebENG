@@ -331,6 +331,8 @@ namespace WebENG.Service
                     select Jobs.job_id,
 		                Jobs.job_name,
 		                Jobs.customer_name,
+                        Jobs.responsible,
+						emp.department,
 		                Jobs.job_type,
 		                Jobs.job_in_hand,
 		                Jobs.job_ais_in_hand,
@@ -340,6 +342,7 @@ namespace WebENG.Service
 	                    CAST((( CASE WHEN job_ais_in_hand IS NULL THEN 0 ELSE job_ais_in_hand END ) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * (CASE WHEN job_ais_in_hand IS NULL THEN 0 ELSE job_ais_in_hand END)) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
 
@@ -362,6 +365,8 @@ namespace WebENG.Service
                             job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"]) : 0,
@@ -400,6 +405,8 @@ namespace WebENG.Service
                     select Jobs.job_id,
 	                    customer_name,
 	                    job_name,
+                        Jobs.responsible,
+						emp.department,
 	                    job_type,
 	                    job_in_hand,
 	                    job_ais_in_hand,
@@ -409,6 +416,7 @@ namespace WebENG.Service
 	                    CAST((job_cis_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_ais_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                    LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
                     where FORMAT(job_date,'yyyy') = '{year}'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
@@ -430,6 +438,8 @@ namespace WebENG.Service
                             job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"]) : 0,
@@ -468,6 +478,8 @@ namespace WebENG.Service
                     select Jobs.job_id,
 		                Jobs.job_name,
 		                Jobs.customer_name,
+                        Jobs.responsible,
+						emp.department,
 		                Jobs.job_type,
 		                Jobs.job_in_hand,
 		                Jobs.job_cis_in_hand,
@@ -477,6 +489,7 @@ namespace WebENG.Service
 	                    CAST((( CASE WHEN job_cis_in_hand IS NULL THEN 0 ELSE job_cis_in_hand END ) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * (CASE WHEN job_cis_in_hand IS NULL THEN 0 ELSE job_cis_in_hand END)) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
 
@@ -499,6 +512,8 @@ namespace WebENG.Service
                             job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"]) : 0,
@@ -537,6 +552,8 @@ namespace WebENG.Service
                     select Jobs.job_id,
 	                    customer_name,
 	                    job_name,
+                        Jobs.responsible,
+						emp.department,
 	                    job_type,
 	                    job_in_hand,
 	                    job_cis_in_hand,
@@ -546,6 +563,7 @@ namespace WebENG.Service
 	                    CAST((job_cis_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_cis_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                    LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
                     where FORMAT(job_date,'yyyy') = '{year}'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
@@ -567,6 +585,8 @@ namespace WebENG.Service
                             job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"]) : 0,
@@ -605,6 +625,8 @@ namespace WebENG.Service
                     select Jobs.job_id,
 		                Jobs.job_name,
 		                Jobs.customer_name,
+                        Jobs.responsible,
+						emp.department,
 		                Jobs.job_type,
 		                Jobs.job_in_hand,
 		                Jobs.job_eng_in_hand,
@@ -614,6 +636,7 @@ namespace WebENG.Service
 	                    CAST((( CASE WHEN job_eng_in_hand IS NULL THEN 0 ELSE job_eng_in_hand END ) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * (CASE WHEN job_eng_in_hand IS NULL THEN 0 ELSE job_eng_in_hand END)) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                
                 where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
 
 
@@ -636,6 +659,8 @@ namespace WebENG.Service
                             job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
@@ -674,6 +699,8 @@ namespace WebENG.Service
                     select Jobs.job_id,
 	                    customer_name,
 	                    job_name,
+                        Jobs.responsible,
+						emp.department,
 	                    job_type,
 	                    job_in_hand,
 	                    job_eng_in_hand,
@@ -683,6 +710,7 @@ namespace WebENG.Service
 	                    CAST((job_eng_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_eng_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                    LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
                     where FORMAT(job_date,'yyyy') = '{year}'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
@@ -704,6 +732,8 @@ namespace WebENG.Service
                             job_id = job_id,
                             customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
                             job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0,
@@ -1272,6 +1302,147 @@ namespace WebENG.Service
                             month = dr["month"] != DBNull.Value ? dr["month"].ToString() : "",
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"]) : 0
                         };                       
+                        jobsSummaries.Add(jobSummary);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return jobsSummaries;
+        }
+
+        public List<JobInhandModel> GetsJobBackLog(int year)
+        {
+            List<JobInhandModel> jobsSummaries = new List<JobInhandModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string stringCommand = string.Format($@" select Jobs.job_id,
+		                Jobs.job_name,
+		                Jobs.customer_name,
+						Jobs.responsible,
+						emp.department,
+		                Jobs.job_type,
+		                Jobs.job_in_hand,
+		                case when Invoice.invoice is null then 0 else Invoice.invoice end as invoice,	
+	                    CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_in_hand) as decimal(18,2)) as invoice_eng,
+	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,3))) as remaining_percent_invoice,
+	                    CAST((( CASE WHEN job_in_hand IS NULL THEN 0 ELSE job_in_hand END ) - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * (CASE WHEN job_in_hand IS NULL THEN 0 ELSE job_in_hand END)) as decimal(18,3))) as decimal(18,3)) as remaining_amount
+                from Jobs
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en
+				where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null");
+
+
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    List<JobModel> _jobs = JobStatus.GetJobStatusALL();
+                    while (dr.Read())
+                    {
+                        string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
+                        JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
+                        double eng_cost = _job.job_summary.FirstOrDefault().eng_cost;
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalCost) / eng_cost * 100);
+                        double invoice_eng = _job.eng_invoice;
+                        double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
+                        double remaining_amount = _job.job_in_hand - _job.invoices.Sum(s => s.invoice);
+                        JobInhandModel jobSummary = new JobInhandModel()
+                        {
+                            job_id = job_id,
+                            customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
+                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
+                            job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
+                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
+                            percent_eng_cost = percent_eng_cost,
+                            percent_invoice = percent_invoice_eng,
+                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0,
+                            invoice_eng = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"]) : 0,
+                            remaining_percent_invoice = dr["remaining_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["remaining_percent_invoice"]) : 0,
+                            remaining_amount = Double.IsNaN(remaining_amount) ? 0 : remaining_amount
+                        };
+                        jobsSummaries.Add(jobSummary);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return jobsSummaries;
+        }
+
+        public List<JobInhandModel> GetsJobInhand(int year)
+        {
+            List<JobInhandModel> jobsSummaries = new List<JobInhandModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string stringCommand = string.Format($@"select Jobs.job_id,
+	                    customer_name,
+	                    job_name,
+                        Jobs.responsible,
+						emp.department,
+	                    job_type,
+	                    job_in_hand,
+	                    case when Invoice.invoice is null then 0 else Invoice.invoice end as invoice,	
+	                    CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_in_hand) as decimal(18,3)) as invoice_eng,
+	                    (100.0 - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * 100) as decimal(18,3))) as remaining_percent_invoice,
+	                    CAST((job_in_hand - CAST(((case when Invoice.invoice is null then 0 else Invoice.invoice end / NULLIF(job_in_hand,0)) * job_in_hand) as decimal(18,3))) as decimal(18,3)) as remaining_amount
+                    from Jobs 
+                    LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
+                    LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
+                    where FORMAT(job_date,'yyyy') = '{year}'");
+
+                SqlCommand cmd = new SqlCommand(stringCommand, con);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    List<JobModel> _jobs = JobStatus.GetJobStatusALL();
+                    while (dr.Read())
+                    {
+                        string job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "";
+                        JobModel _job = _jobs.Where(w => w.job_id == job_id).FirstOrDefault();
+                        double eng_cost = _job.job_summary.FirstOrDefault().eng_cost;
+                        double percent_eng_cost = Math.Ceiling(_job.job_summary.Sum(s => s.totalCost) / eng_cost * 100);
+                        double invoice_eng = _job.eng_invoice;
+                        double percent_invoice_eng = Math.Ceiling(invoice_eng / _job.job_eng_in_hand * 100);
+                        double remaining_amount = _job.job_eng_in_hand - invoice_eng;
+                        JobInhandModel jobSummary = new JobInhandModel()
+                        {
+                            job_id = job_id,
+                            customer_name = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
+                            job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
+                            responsible = dr["responsible"].ToString(),
+                            department = dr["department"].ToString(),
+                            job_type = dr["job_type"] != DBNull.Value ? dr["job_type"].ToString() : "",
+                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"]) : 0,
+                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"]) : 0,
+                            invoice_eng = invoice_eng,
+                            percent_eng_cost = percent_eng_cost,
+                            percent_invoice = percent_invoice_eng,
+                            remaining_percent_invoice = dr["remaining_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["remaining_percent_invoice"]) : 0,
+                            remaining_amount = Double.IsNaN(remaining_amount) ? 0 : remaining_amount
+                        };
                         jobsSummaries.Add(jobSummary);
                     }
                     dr.Close();

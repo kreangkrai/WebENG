@@ -24,10 +24,12 @@ namespace WebENG.Interface
         List<SummaryCISJobInHandModel> GetsServiceCISJobInHand(int year, string type);
         List<SummaryAISJobInHandModel> GetsServiceAISJobInHand(int year, string type);
 
+        List<JobInhandModel> GetsJobInhand(int year);
         List<JobENGInhandModel> GetsENGJobInhand(int year);
         List<JobCISInhandModel> GetsCISJobInhand(int year);
         List<JobAISInhandModel> GetsAISJobInhand(int year);
 
+        List<JobInhandModel> GetsJobBackLog(int year);
         List<JobENGInhandModel> GetsENGJobBackLog(int year);
         List<JobCISInhandModel> GetsCISJobBackLog(int year);
         List<JobAISInhandModel> GetsAISJobBackLog(int year);
