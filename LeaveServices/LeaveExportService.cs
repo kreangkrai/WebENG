@@ -238,48 +238,59 @@ namespace WebENG.LeaveServices
                                     if (months[m] == "สรุป")
                                     {
                                         TimeInOutModel timeInOut = calLatetimes.Where(w => w.emp_id == datas[i].emp_id).FirstOrDefault();
-                                        if (col == startHeaderCols + headerCount - 3)
+                                        if (timeInOut != null)
                                         {
-                                            cellRange.Value = timeInOut.TotalCountLate;
-                                            cellRange.Formula = $"IF({timeInOut.TotalCountLate}<>0, {timeInOut.TotalCountLate}, \"-\")";
-                                            cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            if (col == startHeaderCols + headerCount - 3)
+                                            {
+                                                cellRange.Value = timeInOut.TotalCountLate;
+                                                cellRange.Formula = $"IF({timeInOut.TotalCountLate}<>0, {timeInOut.TotalCountLate}, \"-\")";
+                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            }
+                                            if (col == startHeaderCols + headerCount - 2)
+                                            {
+                                                cellRange.Value = timeInOut.TotalMinuteLate;
+                                                cellRange.Formula = $"IF({timeInOut.TotalMinuteLate}<>0, {timeInOut.TotalMinuteLate}, \"-\")";
+                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            }
+                                            if (col == startHeaderCols + headerCount - 1)
+                                            {
+                                                cellRange.Value = timeInOut.TotalCountForgotScan;
+                                                cellRange.Formula = $"IF({timeInOut.TotalCountForgotScan}<>0, {timeInOut.TotalCountForgotScan}, \"-\")";
+                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                            }
                                         }
-                                        if (col == startHeaderCols + headerCount - 2)
+                                        else
                                         {
-                                            cellRange.Value = timeInOut.TotalMinuteLate;
-                                            cellRange.Formula = $"IF({timeInOut.TotalMinuteLate}<>0, {timeInOut.TotalMinuteLate}, \"-\")";
-                                            cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                                        }
-                                        if (col == startHeaderCols + headerCount - 1)
-                                        {
-                                            cellRange.Value = timeInOut.TotalCountForgotScan;
-                                            cellRange.Formula = $"IF({timeInOut.TotalCountForgotScan}<>0, {timeInOut.TotalCountForgotScan}, \"-\")";
+                                            cellRange.Value = 0;
                                             cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                                         }
                                     }
                                     else
                                     {
                                         TimeInOutModel timeInOut = calLatetimes.Where(w => w.emp_id == datas[i].emp_id).FirstOrDefault();
-                                        var time_InOut = timeInOut.months.Where(w => w.month == m + 1).FirstOrDefault();
-                                        if (time_InOut != null)
+                                        if (timeInOut != null)
                                         {
-                                            if (col == startHeaderCols + headerCount - 3)
+                                            var time_InOut = timeInOut.months.Where(w => w.month == m + 1).FirstOrDefault();
+                                            if (time_InOut != null)
                                             {
-                                                cellRange.Value = time_InOut.count_late;
-                                                cellRange.Formula = $"IF({time_InOut.count_late}<>0, {time_InOut.count_late}, \"-\")";
-                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                                            }
-                                            if (col == startHeaderCols + headerCount - 2)
-                                            {
-                                                cellRange.Value = time_InOut.minute_late;
-                                                cellRange.Formula = $"IF({time_InOut.minute_late}<>0, {time_InOut.minute_late}, \"-\")";
-                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                                            }
-                                            if (col == startHeaderCols + headerCount - 1)
-                                            {
-                                                cellRange.Value = time_InOut.count_forgot_scan;
-                                                cellRange.Formula = $"IF({time_InOut.count_forgot_scan}<>0, {time_InOut.count_forgot_scan}, \"-\")";
-                                                cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                                if (col == startHeaderCols + headerCount - 3)
+                                                {
+                                                    cellRange.Value = time_InOut.count_late;
+                                                    cellRange.Formula = $"IF({time_InOut.count_late}<>0, {time_InOut.count_late}, \"-\")";
+                                                    cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                                }
+                                                if (col == startHeaderCols + headerCount - 2)
+                                                {
+                                                    cellRange.Value = time_InOut.minute_late;
+                                                    cellRange.Formula = $"IF({time_InOut.minute_late}<>0, {time_InOut.minute_late}, \"-\")";
+                                                    cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                                }
+                                                if (col == startHeaderCols + headerCount - 1)
+                                                {
+                                                    cellRange.Value = time_InOut.count_forgot_scan;
+                                                    cellRange.Formula = $"IF({time_InOut.count_forgot_scan}<>0, {time_InOut.count_forgot_scan}, \"-\")";
+                                                    cellRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                                                }
                                             }
                                         }
                                     }

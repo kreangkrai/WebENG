@@ -209,7 +209,7 @@ namespace WebENG.Service
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
-                        job.term_payments = terms.Where(w=>w.job_id == job.job_id).ToList();
+                        job.term_payments = terms.Where(w=>w.job_id == job.job_id).OrderBy(o=>o.forecast_month).ThenBy(t=>t.payment_id).ToList();
                         jobs.Add(job);
                     }
                     dr.Close();
