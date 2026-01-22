@@ -1315,7 +1315,7 @@
                         set_payments = regenerateProgressWork(set_payments);
                         set_payments = paymentIdSort(set_payments);
 
-                        GenerateTablePayment(set_payments);
+                        GenerateTablePayment();
                     }
                 });
 
@@ -1326,7 +1326,7 @@
             openEditor: function () { return false; },
             updateCell: function () { return ''; }
         };
-        function GenerateTablePayment(payments) {
+        function GenerateTablePayment() {
             const spreadsheetData = set_payments.map(item => [
                 item.payment_id,
                 item.payment_name,
@@ -1391,7 +1391,7 @@
                     updatePercentSum();
                 },
             });
-            addTotalRow(table);
+            addTotalRow();
         };
 
         function updatePercentSum() {
@@ -1408,11 +1408,12 @@
             }
         }
 
-        function addTotalRow(table) {
-            const total = set_payments.reduce((sum, item) => sum + (Number(item.percent) || 0), 0);
+        function addTotalRow() {
+            let total = set_payments.reduce((sum, item) => sum + (Number(item.percent) || 0), 0);
+            $('#div_payment_total').empty();
             if (!$('#payment_total_percent').length) {
                 $('#table_payment').after(
-                    '<div style="margin-top:8px; font-weight:bold;">รวม: <span id="payment_total_percent">'
+                    '<div id="div_payment_total" style="margin-top:8px; font-weight:bold;">รวม: <span id="payment_total_percent">'
                     + total.toFixed(2) + '%</span></div>'
                 );
             }
@@ -1545,7 +1546,7 @@
 
             GenerateStatusInvoiceOption();
             GenerateMilestoneOption();
-            GenerateTablePayment(set_payments);
+            GenerateTablePayment();
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
             GenerateTableInvoice(set_invoice);
@@ -1853,7 +1854,7 @@
 
             GenerateStatusInvoiceOption();
             GenerateMilestoneOption();
-            GenerateTablePayment(set_payments);
+            GenerateTablePayment();
             GenerateTableProcess(set_processes);
             GenerateTableSystem(set_systems);
             GenerateTableInvoice(set_invoice);
@@ -2084,7 +2085,7 @@
                 });
 
                 set_payments = paymentIdSort(set_payments);
-                GenerateTablePayment(set_payments);
+                GenerateTablePayment();
             }
 
         });
@@ -2166,7 +2167,7 @@
                 set_payments[index].payment_id = payment_id;
                 set_payments[index].payment_name = payment;
                 set_payments[index].percent = percent;
-                GenerateTablePayment(set_payments);
+                GenerateTablePayment();
                 $('#modal_edit_payment').modal('hide');
             }
 

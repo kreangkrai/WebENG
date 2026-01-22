@@ -125,7 +125,7 @@
             }
 
             const ctx = document.getElementById('chart_forecast').getContext('2d');
-
+            console.log(forecast);
             chart_forecast = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -237,6 +237,7 @@
                                 display: true, text: 'MB', font: { size: 20 }
                             },
                             ticks: { callback: value => value },
+                            type: 'logarithmic',
                         }
                     },
                     animation: { duration: 500 }

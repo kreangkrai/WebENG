@@ -43,7 +43,7 @@ namespace WebENG.Service
                                                     FROM [dbo].[Jobs] j
                                                     LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
                                                     LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
-                                                    WHERE FORMAT(i.actual_date, 'yyyy') = @year");
+                                                    WHERE FORMAT(i.actual_date, 'yyyy') = @year and j.responsible IS NOT NULL");
 
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 cmd.Parameters.AddWithValue("@year", year);
