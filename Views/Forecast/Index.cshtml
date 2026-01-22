@@ -188,7 +188,8 @@
                             borderWidth: 3,
                             pointRadius: 0,
                             fill: false,
-                            tension: 0.2
+                            tension: 0.2,
+                            order:1
                         },
                         {
                             label: 'Acc Payment (Forecast)',
@@ -199,7 +200,8 @@
                             borderDash: [6, 4],
                             pointRadius: 0,
                             fill: false,
-                            tension: 0.2
+                            tension: 0.2,
+                            order: 0
                         }
                     ]
                 },
@@ -231,13 +233,13 @@
                             offset: true,
                         },
                         y: {
-                            stacked: true,
+                           /* stacked: false,*/
                             min: 0,
                             title: {
                                 display: true, text: 'MB', font: { size: 20 }
                             },
                             ticks: { callback: value => value },
-                            type: 'logarithmic',
+                            /*type: 'logarithmic',*/
                         }
                     },
                     animation: { duration: 500 }
