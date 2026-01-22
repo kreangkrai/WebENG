@@ -70,13 +70,18 @@ namespace WebENG.Service
                     {
                         EngUserModel user = new EngUserModel()
                         {
-                            user_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
+                            user_id = dr["name_en"] != DBNull.Value ? dr["name_en"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["name_en"] != DBNull.Value ? dr["name_en"].ToString().ToLower() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             allow_edit = false,
                             group = dr["group"] != DBNull.Value ? dr["group"].ToString().ToLower() : "",
                             active = dr["active"] != DBNull.Value ? Convert.ToBoolean(dr["active"].ToString()) : false,
                         };
+                        string name = user.user_id;
+                        string first = name.Split(' ')[0];
+                        string last =  name.Split(' ')[1].Substring(0,1).ToUpper();
+                        user.user_id = $"{first}.{last}";
                         users.Add(user);
                     }
                     dr.Close();

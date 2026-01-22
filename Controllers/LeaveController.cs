@@ -366,16 +366,21 @@ namespace WebENG.Controllers
                     //Insert Leave Working Hours
                     List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(request.start_request_date.Year.ToString());
                     List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
-                    List<UserModel> users = Accessory.getAllUser();
+                    //List<UserModel> users = Accessory.getAllUser();
+                    
                     for (DateTime date = request.start_request_date; date <= request.end_request_date; date = date.AddDays(1))
                     {
                         if (holidays.Any(a => a.date.Date != date.Date) && date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday)
                         {
+                            string n = emps.Where(w => w.emp_id == request.emp_id).Select(s => s.name_en).FirstOrDefault();
+                            string first = n.Split(' ')[0];
+                            string last = n.Split(' ')[1].Substring(0, 1).ToUpper();
+                            string user_id = $"{first}.{last}";
                             if (request.is_full_day)
                             {
                                 WorkingHoursModel wh = new WorkingHoursModel()
                                 {
-                                    user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                                    user_id = user_id,
                                     working_date = date.Date,
                                     job_id = "J999999",
                                     task_id = "T002",
@@ -393,7 +398,7 @@ namespace WebENG.Controllers
                             {
                                 WorkingHoursModel wh = new WorkingHoursModel()
                                 {
-                                    user_id = users.Where(w => w.emp_id == request.emp_id).Select(s => s.user_id).FirstOrDefault(),
+                                    user_id = user_id,
                                     working_date = date.Date,
                                     job_id = "J999999",
                                     task_id = "T002",

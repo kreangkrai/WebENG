@@ -494,11 +494,12 @@ namespace WebENG.Controllers
                     }
                     finally
                     {
-
                         //Delete Working Hours
-                        List<UserModel> users = Accessory.getAllUser();
-                        UserModel user_ = users.Where(w => w.emp_id == request.emp_id).FirstOrDefault();
-                        WorkingHoursModel wh = WorkingHours.GetWorkingHourByLeave(user_.user_id, request.start_request_date.ToString("yyyy-MM-dd"));
+                        string n = employees.Where(w => w.emp_id == request.emp_id).Select(s => s.name_en).FirstOrDefault();
+                        string first = n.Split(' ')[0];
+                        string last = n.Split(' ')[1].Substring(0, 1).ToUpper();
+                        string user_id = $"{first}.{last}";
+                        WorkingHoursModel wh = WorkingHours.GetWorkingHourByLeave(user_id, request.start_request_date.ToString("yyyy-MM-dd"));
 
                         WorkingHours.DeleteWorkingHours(wh);
                     }
