@@ -18,6 +18,12 @@
                         </select>
                     </div>
                     <div class="col-xl-2">
+                        <select id="select_mode" class="form-control">
+                            <option value="Department">Department</option>
+                            <option value="Responsible">Responsible</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2" id="div_department">
                         <select id="select_department" class="form-control">
                             <option value="ALL" selected>ALL</option>
                             <option value="CES">CES</option>
@@ -25,9 +31,8 @@
                             <option value="AES">AES</option>
                         </select>
                     </div>
-                    <div class="col-xl-2">
+                    <div class="col-xl-2" id="div_responsible" hidden>
                         <select id="select_responsible" class="form-control">
-                            <option value="ALL" selected>ALL</option>
                         </select>
                     </div>
                     <div class="col-xl-2">
@@ -52,6 +57,8 @@
         let chart_forecast;
         $(document).ready(async function () {
             getYear();
+            let responsibles = await GetResponsibles();
+            GenerateResponsibleOption(responsibles);
         });
         function getYear(){
             var year_string = "";
@@ -64,19 +71,24 @@
             $('#select_year').append(year_string);
         };
 
-        $('#select_department').on('change', async function () {
-            const department = $('#select_department').val();
-            let responsibles = await GetResponsibles(department);
-            GenerateResponsibleOption(responsibles);
+        $('#select_mode').on('change', function () {
+            const mode = $('#select_mode').val();
+            if (mode === "Department") {
+                $('#div_department').prop('hidden', false);
+                $('#div_responsible').prop('hidden', true);
+            } else {
+                $('#div_department').prop('hidden', true);
+                $('#div_responsible').prop('hidden', false);
+            }
         });
 
-        async function GetResponsibles(department) {
+        async function GetResponsibles() {
             let data = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetResponsibles", "Forecast")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { department },
+                data: {  },
                 success: function (response) {
                     data = response;
                 }
@@ -87,19 +99,18 @@
 
         function GenerateResponsibleOption(responsibles) {
             $('#select_responsible').empty();
-            $('#select_responsible').append(`<option value="ALL" selected>ALL</option>`);
             for (let i = 0; i < responsibles.length; i++) {
                 $('#select_responsible').append(`<option value="${responsibles[i].emp_id}">${responsibles[i].name_en}</option>`);
             }
         }
 
-        async function GetData(year,department,responsible) {
+        async function GetData(year,mode,department,responsible) {
             let datas = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetData", "Forecast")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { year, department, responsible},
+                data: { year, mode,department, responsible},
                 success: function (response) {
                     datas = response;
                 }
@@ -109,9 +120,10 @@
 
         $('#btnUpdate').on('click',async function(){
             let year = $('#select_year').val();
+            let mode = $('#select_mode').val();
             let department = $('#select_department').val();
             let responsible = $('#select_responsible :selected').text();
-            const forecast = await GetData(year, department, responsible);
+            const forecast = await GetData(year, mode ,department, responsible);
             const job_in_hand = forecast.job_in_hand;
             const sum_invoice = forecast.sum_invoice;
             const backlog = forecast.backlog;
@@ -136,7 +148,8 @@
                             backgroundColor: 'rgba(54, 121, 209, 1)',
                             borderColor: '#3679D1',
                             borderWidth: 2,
-                            stack: 'job'
+                            stack: 'job',
+                            barThickness: 15,
                         },
                         {
                             label: 'Job In Hand',
@@ -144,7 +157,8 @@
                             backgroundColor: 'rgba(209, 168, 54, 1)',
                             borderColor: '#D1A836',
                             borderWidth: 2,
-                            stack: 'job'
+                            stack: 'job',
+                            barThickness: 15,
                         },
                         {
                             label: 'Payment (Actual)',
@@ -152,7 +166,8 @@
                             backgroundColor: 'rgba(102, 187, 106, 1)',
                             borderColor: '#66BB6A',
                             borderWidth: 2,
-                            stack: 'actual'
+                            stack: 'actual',
+                            barThickness: 15,
                         },
                         {
                             label: 'Payment (Forecast)',
@@ -161,7 +176,8 @@
                             borderColor: '#64B5F6',
                             borderWidth: 2,
                             borderDash: [5, 3],
-                            stack: 'forecast'
+                            stack: 'forecast',
+                            barThickness: 15,
                         },                       
                         {
                             label: 'Total Invoice',
@@ -169,7 +185,8 @@
                             backgroundColor: 'rgba(209, 93, 54, 1)',
                             borderColor: '#D15D36',
                             borderWidth: 2,
-                            stack: 'next year'
+                            stack: 'next year',
+                            barThickness: 15,
                         },
                         {
                             label: 'Backlog Next Year',
@@ -177,11 +194,12 @@
                             backgroundColor: 'rgba(206, 54, 209, 1)',
                             borderColor: '#CE36D1',
                             borderWidth: 2,
-                            stack: 'next year'
+                            stack: 'next year',
+                            barThickness: 15,
                         },
                         {
                             label: 'Acc Payment (Actual)',
-                            data: forecast.acc_actual_amount,
+                            data: forecast.acc_actual_amount.splice(0, 13),
                             type: 'line',
                             borderColor: '#E04B2D',
                             borderWidth: 3,
@@ -192,7 +210,7 @@
                         },
                         {
                             label: 'Acc Payment (Forecast)',
-                            data: forecast.acc_forecast_amount,
+                            data: forecast.acc_forecast_amount.splice(0, 13),
                             type: 'line',
                             borderColor: '#E04B2D',
                             borderWidth: 3,
