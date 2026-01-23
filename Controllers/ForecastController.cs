@@ -168,13 +168,13 @@ namespace WebENG.Controllers
             List<InvoicesModel> invoices = Forecast.GetInvoice(year);
 
             
-            double total_invoice = 0;
+            //double total_invoice = 0;
 
             if (department == "ALL" && responsible == "ALL")
             {
                 forecasts = forecasts.Where(w => deps.Contains(w.department)).ToList();
 
-                total_invoice = invoices.Where(w=>w.job_in_hand > 0).Sum(s => s.invoice);
+                //total_invoice = invoices.Where(w=>w.job_in_hand > 0).Sum(s => s.invoice);
 
                 List<JobInhandModel> j = SummaryJobInHand.GetsJobInhand(year);
                 job_in_hand = j.Sum(s => s.job_in_hand);
@@ -189,7 +189,7 @@ namespace WebENG.Controllers
                 var ces = inv.Where(w=>w.job_eng_in_hand > 0).Sum(s => s.job_eng_in_hand / s.job_in_hand * s.invoice);
                 var cis = inv.Where(w => w.job_cis_in_hand > 0).Sum(s => s.job_cis_in_hand / s.job_in_hand * s.invoice);
                 var ais = inv.Where(w => w.job_ais_in_hand > 0).Sum(s => s.job_ais_in_hand / s.job_in_hand * s.invoice);
-                total_invoice = ces + cis + ais;
+                //total_invoice = ces + cis + ais;
                 //if (department == "CES")
                 //{
                 //    total_invoice = inv.Where(w=>w.job_eng_in_hand > 0).Sum(s => s.job_eng_in_hand / s.job_in_hand * s.invoice);
@@ -221,7 +221,7 @@ namespace WebENG.Controllers
                     List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobBackLog(year);
                     List<JobENGInhandModel> j = SummaryJobInHand.GetsENGJobInhand(year);
                     job_in_hand = j.Sum(s => s.job_eng_in_hand);                   
-                    total_invoice = invoices.Where(w => w.job_eng_in_hand > 0).Sum(s => s.job_eng_in_hand / s.job_in_hand * s.invoice);
+                    //total_invoice = invoices.Where(w => w.job_eng_in_hand > 0).Sum(s => s.job_eng_in_hand / s.job_in_hand * s.invoice);
                     backlog = jobs.Where(w => w.job_eng_in_hand > 0).Sum(s => s.remaining_amount);
                 }
                 if (department == "CIS")
@@ -229,7 +229,7 @@ namespace WebENG.Controllers
                     List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobBackLog(year);
                     List<JobCISInhandModel> j = SummaryJobInHand.GetsCISJobInhand(year);
                     job_in_hand = j.Sum(s => s.job_cis_in_hand);                 
-                    total_invoice = invoices.Where(w => w.job_cis_in_hand > 0).Sum(s => s.job_cis_in_hand / s.job_in_hand * s.invoice);
+                    //total_invoice = invoices.Where(w => w.job_cis_in_hand > 0).Sum(s => s.job_cis_in_hand / s.job_in_hand * s.invoice);
                     backlog = jobs.Where(w => w.job_cis_in_hand > 0).Sum(s => s.remaining_amount);
                 }
                 if (department == "AIS")
@@ -237,7 +237,7 @@ namespace WebENG.Controllers
                     List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobBackLog(year);
                     List<JobAISInhandModel> j = SummaryJobInHand.GetsAISJobInhand(year);
                     job_in_hand = j.Sum(s => s.job_ais_in_hand);
-                    total_invoice = invoices.Where(w => w.job_ais_in_hand > 0).Sum(s => s.job_ais_in_hand / s.job_in_hand * s.invoice);
+                    //total_invoice = invoices.Where(w => w.job_ais_in_hand > 0).Sum(s => s.job_ais_in_hand / s.job_in_hand * s.invoice);
                     backlog = jobs.Where(w => w.job_ais_in_hand > 0).Sum(s => s.remaining_amount);
                 }               
             }
@@ -275,7 +275,7 @@ namespace WebENG.Controllers
                 var ces = inv.Where(w => w.job_eng_in_hand > 0).Sum(s => s.job_eng_in_hand / s.job_in_hand * s.invoice);
                 var cis = inv.Where(w => w.job_cis_in_hand > 0).Sum(s => s.job_cis_in_hand / s.job_in_hand * s.invoice);
                 var ais = inv.Where(w => w.job_ais_in_hand > 0).Sum(s => s.job_ais_in_hand / s.job_in_hand * s.invoice);
-                total_invoice = ces + cis + ais;
+                //total_invoice = ces + cis + ais;
             }
 
            
@@ -327,7 +327,7 @@ namespace WebENG.Controllers
             double sum_invoice = forecast.acc_actual_amount[forecast.acc_actual_amount.Length - 2];
 
             job_in_hand = job_in_hand / 1_000_000;
-            total_invoice = total_invoice / 1_000_000;
+            //total_invoice = total_invoice / 1_000_000;
 
             backlog = backlog / 1_000_000;
 

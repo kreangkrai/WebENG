@@ -129,20 +129,20 @@
                 type: 'bar',
                 data: {
                     labels: forecast.month_label,
-                    datasets: [
-                        {
-                            label: 'Job In Hand',
-                            data: [job_in_hand, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                            backgroundColor: 'rgba(209, 168, 54, 1)',
-                            borderColor: '#D1A836',
-                            borderWidth: 2,
-                            stack: 'job'
-                        },
+                    datasets: [                       
                         {
                             label: 'Backlog',
                             data: [backlog, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             backgroundColor: 'rgba(54, 121, 209, 1)',
                             borderColor: '#3679D1',
+                            borderWidth: 2,
+                            stack: 'job'
+                        },
+                        {
+                            label: 'Job In Hand',
+                            data: [job_in_hand, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(209, 168, 54, 1)',
+                            borderColor: '#D1A836',
                             borderWidth: 2,
                             stack: 'job'
                         },
@@ -162,20 +162,20 @@
                             borderWidth: 2,
                             borderDash: [5, 3],
                             stack: 'forecast'
+                        },                       
+                        {
+                            label: 'Total Invoice',
+                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, sum_invoice],
+                            backgroundColor: 'rgba(209, 93, 54, 1)',
+                            borderColor: '#D15D36',
+                            borderWidth: 2,
+                            stack: 'next year'
                         },
                         {
                             label: 'Backlog Next Year',
                             data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, backlog_next_year],
                             backgroundColor: 'rgba(206, 54, 209, 1)',
                             borderColor: '#CE36D1',
-                            borderWidth: 2,
-                            stack: 'next year'
-                        },
-                        {
-                            label: 'Total Invoice',
-                            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, sum_invoice],
-                            backgroundColor: 'rgba(209, 93, 54, 1)',
-                            borderColor: '#D15D36',
                             borderWidth: 2,
                             stack: 'next year'
                         },
