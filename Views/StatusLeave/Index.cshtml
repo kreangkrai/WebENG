@@ -1411,9 +1411,17 @@
                     date.setHours(date.getHours() + duration);
 
                     if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
-                        if (parseInt(startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0) || (date.getHours() > 12 )) {
-                            date.setHours(date.getHours() + 1);
+                        const duration = $('#select_leave_hours_duration').val();
+                        if (duration === 6) {
+                            if (parseInt(startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0) || (date.getHours() > 12)) {
+                                date.setHours(date.getHours() + 1);
+                            }
+                        } else {
+                            if (parseInt(startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0)) {
+                                date.setHours(date.getHours() + 1);
+                            }
                         }
+
                         if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
                             let stopHours = String(date.getHours()).padStart(2, '0');
                             let stopMinutes = String(date.getMinutes()).padStart(2, '0');
