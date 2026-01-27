@@ -98,6 +98,7 @@ namespace WebENG.Controllers
         public IActionResult GetData(int year ,string mode , string department , string responsible)
         {
             double backlog = 0;
+            double backlog_next_year = 0;
             List<ForecastModel> forecasts = Forecast.GetForecasts(year);
 
             ForecastPaymentModel forecast = new ForecastPaymentModel();
@@ -156,6 +157,9 @@ namespace WebENG.Controllers
 
                     List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
                     backlog = jobs.Sum(s => s.remaining_amount);
+
+                    //List<JobInhandModel> jobs_next = SummaryJobInHand.GetsJobBackLog(year + 1);
+                    //backlog_next_year = jobs_next.Sum(s => s.remaining_amount);
                 }
                 else
                 {
@@ -164,25 +168,31 @@ namespace WebENG.Controllers
                     {
                         invoices = invoices.Where(w => w.job_eng_in_hand > 0 && deps.Contains(w.department)).ToList();
                         List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobBackLog(year);
+                        //List<JobENGInhandModel> jobs_next = SummaryJobInHand.GetsENGJobBackLog(year + 1);
                         List<JobENGInhandModel> j = SummaryJobInHand.GetsENGJobInhand(year);
                         job_in_hand = j.Sum(s => s.job_eng_in_hand);
                         backlog = jobs.Where(w => w.job_eng_in_hand > 0).Sum(s => s.remaining_amount);
+                        //backlog_next_year = jobs_next.Where(w => w.job_eng_in_hand > 0).Sum(s => s.remaining_amount);
                     }
                     if (department == "CIS")
                     {
                         invoices = invoices.Where(w => w.job_cis_in_hand > 0 && deps.Contains(w.department)).ToList();
                         List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobBackLog(year);
+                        //List<JobCISInhandModel> jobs_next = SummaryJobInHand.GetsCISJobBackLog(year + 1);
                         List<JobCISInhandModel> j = SummaryJobInHand.GetsCISJobInhand(year);
                         job_in_hand = j.Sum(s => s.job_cis_in_hand);
                         backlog = jobs.Where(w => w.job_cis_in_hand > 0).Sum(s => s.remaining_amount);
+                        //backlog_next_year = jobs_next.Where(w => w.job_cis_in_hand > 0).Sum(s => s.remaining_amount);
                     }
                     if (department == "AES")
                     {
                         invoices = invoices.Where(w => w.job_ais_in_hand > 0 && deps.Contains(w.department)).ToList();
                         List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobBackLog(year);
+                        //List<JobAISInhandModel> jobs_next = SummaryJobInHand.GetsAISJobBackLog(year + 1);
                         List<JobAISInhandModel> j = SummaryJobInHand.GetsAISJobInhand(year);
                         job_in_hand = j.Sum(s => s.job_ais_in_hand);
                         backlog = jobs.Where(w => w.job_ais_in_hand > 0).Sum(s => s.remaining_amount);
+                        //backlog_next_year = jobs_next.Where(w => w.job_ais_in_hand > 0).Sum(s => s.remaining_amount);
                     }
                 }
             }
@@ -197,6 +207,9 @@ namespace WebENG.Controllers
 
                 List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
                 backlog = jobs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
+
+                //List<JobInhandModel> jobs_next = SummaryJobInHand.GetsJobBackLog(year + 1);
+                //backlog_next_year = jobs_next.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
             }
          
             forecast.month_label = new string[14]
@@ -266,8 +279,9 @@ namespace WebENG.Controllers
 
             backlog = backlog / 1_000_000;
 
-            double backlog_next_year = (job_in_hand + backlog) - sum_invoice;
-           
+            backlog_next_year = (job_in_hand + backlog) - sum_invoice;
+            //backlog_next_year = backlog_next_year / 1_100_000;
+
             var data = new
             {
                 forecast = forecast,
