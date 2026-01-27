@@ -11,6 +11,6 @@ namespace WebENG.LeaveInterfaces
         List<LevelModel> GetLevelByEmpID(string emp_id);
         List<LevelModel> GetLevelByDepartment(string department);
         int CalcuLevelStep(List<LevelModel> levels, RequestModel request,LeaveTypeModel leave);
-        //List<LevelModel> GetHierarchyByEmpID(string emp_id);
+        List<LevelModel> GetHierarchyByEmpID(string emp_id);
     }
 }

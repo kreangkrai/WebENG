@@ -280,7 +280,7 @@ namespace WebENG.LeaveServices
             return levels;
         }
 
-        public List<LevelModel> GetLevelByEmpID_OLD(string emp_id)
+        public List<LevelModel> GetHierarchyByEmpID(string emp_id)
         {
             List<LevelModel> levels = new List<LevelModel>();
             try
