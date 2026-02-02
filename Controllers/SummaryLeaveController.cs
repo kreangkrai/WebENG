@@ -30,22 +30,29 @@ namespace WebENG.Controllers
             Requests = new RequestService();
             LeaveType = new LeaveTypeService();
             Holiday = new CTLServices.HolidayService();
-        }
+        }      
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("Login_ENG") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<UserModel> users = new List<UserModel>();
-                users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel
+
+                List<UserModel> users = Accessory.getAllUser();
+                List<WebENG.CTLModels.EmployeeModel> emps = Employee.GetEmployees();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).FirstOrDefault();
+                if (u == null)
                 {
-                    name = s.name,
-                    department = s.department,
-                    role = s.role,
-                    user_id = s.user_id,
-                    emp_id = s.emp_id
-                }).FirstOrDefault();
+                    List<WebENG.CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+                    WebENG.CTLModels.EmployeeModel employee = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+                    u = new UserModel()
+                    {
+                        emp_id = employee.emp_id,
+                        name = employee.name_en,
+                        role = "User",
+                        department = employee.department,
+                        user_id = ConvertUserID(employee.name_en)
+                    };
+                }
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
@@ -53,7 +60,6 @@ namespace WebENG.Controllers
                 List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(DateTime.Now.Year.ToString());
                 ViewBag.holiday = holidays;
 
-                List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
                 if (!u.role.Contains("Admin"))
                 {
                     string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
@@ -67,7 +73,14 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-
+        public string ConvertUserID(string user)
+        {
+            string first = user.Split(' ')[0];
+            string last = user.Split(' ')[1];
+            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
+            string lastname = last.Substring(0, 1).ToUpper();
+            return name + "." + lastname;
+        }
         [HttpGet]
         public IActionResult GetDapartments()
         {

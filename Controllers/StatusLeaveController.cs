@@ -9,8 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WebENG.CTLInterfaces;
-using WebENG.CTLServices;
 using WebENG.Interface;
 using WebENG.LeaveInterfaces;
 using WebENG.LeaveModels;
@@ -23,7 +21,6 @@ namespace WebENG.Controllers
     public class StatusLeaveController : Controller
     {
         private readonly IAccessory Accessory;
-        private readonly IEmployee Employees;
         private ILeaveType LeaveType;
         private IRequest Requests;
         private ILeave Leave;
@@ -34,11 +31,11 @@ namespace WebENG.Controllers
         private INotification Notification;
         private IWorkingHours WorkingHours;
         private CTLInterfaces.IHoliday Holiday;
+        private CTLInterfaces.IEmployee Employee;
 
         public StatusLeaveController(IHostingEnvironment _env)
         {
             Accessory = new AccessoryService();
-            Employees = new EmployeeService();
             LeaveType = new LeaveTypeService();
             Requests = new RequestService();
             Leave = new LeaveService();
@@ -49,6 +46,7 @@ namespace WebENG.Controllers
             Notification = new NotificationService();
             WorkingHours = new WorkingHoursService();
             Holiday = new CTLServices.HolidayService();
+            Employee = new CTLServices.EmployeeService();
         }
 
         public IActionResult Index()
@@ -56,16 +54,23 @@ namespace WebENG.Controllers
             if (HttpContext.Session.GetString("Login_ENG") != null)
             {
                 string user = HttpContext.Session.GetString("userId");
-                List<UserModel> users = new List<UserModel>();
-                users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel
+
+                List<UserModel> users = Accessory.getAllUser();
+                List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).FirstOrDefault();
+                if (u == null)
                 {
-                    name = s.name,
-                    department = s.department,
-                    role = s.role,
-                    user_id = s.user_id,
-                    emp_id = s.emp_id
-                }).FirstOrDefault();
+                    List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+                    CTLModels.EmployeeModel employee = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+                    u = new UserModel()
+                    {
+                        emp_id = employee.emp_id,
+                        name = employee.name_en,
+                        role = "User",
+                        department = employee.department,
+                        user_id = ConvertUserID(employee.name_en)
+                    };
+                }
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
                 HttpContext.Session.SetString("Role", u.role);
@@ -75,6 +80,7 @@ namespace WebENG.Controllers
                 {
                     years.Add(y);
                 }
+
                 ViewBag.listYears = years;
 
                 List<LevelModel> levels = Level.GetLevelByEmpID(u.emp_id);
@@ -83,7 +89,6 @@ namespace WebENG.Controllers
 
                 ViewBag.role = u.role;
 
-                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
                 if (!u.role.Contains("Admin"))
                 {
                     string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
@@ -96,6 +101,15 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
+        }
+
+        public string ConvertUserID(string user)
+        {
+            string first = user.Split(' ')[0];
+            string last = user.Split(' ')[1];
+            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
+            string lastname = last.Substring(0, 1).ToUpper();
+            return name + "." + lastname;
         }
 
         [HttpGet]
@@ -112,7 +126,7 @@ namespace WebENG.Controllers
             };
             LeaveTypeModel leave = LeaveType.GetLeaveTypeByID(leave_type_id);
             string leave_type_code = leave.leave_type_code;
-            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+            List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
             requests = requests.Where(w => w.leave_type_code == leave_type_code &&
             w.start_request_date.Year == year &&
@@ -154,7 +168,7 @@ namespace WebENG.Controllers
         public IActionResult GetEmployee(string start, string stop)
         {
             string user = HttpContext.Session.GetString("userId");
-            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
             List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
             int max_level = levels.Where(w => w.emp_id == emp_id).Max(m => m.level);
@@ -204,7 +218,7 @@ namespace WebENG.Controllers
                 "Completed"
             };
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
-            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+            List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
 
             for (int i = 0; i < leaves.Count; i++)
@@ -273,7 +287,7 @@ namespace WebENG.Controllers
         {
             DateTime _start = DateTime.Parse(start);
             DateTime _stop = DateTime.Parse(stop);
-            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
 
             List<RequestModel> requests = Requests.GetRequestByDepartment(department);
             requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
@@ -314,7 +328,7 @@ namespace WebENG.Controllers
         {
             DateTime _start = DateTime.Parse(start);
             DateTime _stop = DateTime.Parse(stop);
-            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
 
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
             requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
@@ -465,7 +479,7 @@ namespace WebENG.Controllers
                 LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
                 string leave_type_th = leaveType.leave_name_th;
 
-                List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+                List<CTLModels.EmployeeModel> emps = Employee.GetEmployees();
 
                 // Check Two Step Approve
                 bool is_full_day = request.is_full_day;

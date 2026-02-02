@@ -63,6 +63,7 @@ namespace WebENG.Controllers
                     string position = emps.Where(w => w.emp_id == u.emp_id).Select(s => s.position).FirstOrDefault();
                     u.role = position;
                 }
+
                 return View(u);
             }
             else
@@ -70,7 +71,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-
 
         [HttpGet]
         public IActionResult GetResponsibles()

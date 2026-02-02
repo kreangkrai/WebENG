@@ -1313,7 +1313,7 @@
                         set_payments.splice(y, 1);
 
                         set_payments = regenerateProgressWork(set_payments);
-                        set_payments = paymentIdSort(set_payments);
+                        //set_payments = paymentIdSort(set_payments);
 
                         GenerateTablePayment();
                     }
@@ -1800,7 +1800,7 @@
                     'forecast_month': job.term_payments[i].forecast_month,
                     'remark': job.term_payments[i].remark
                 });
-                set_payments = paymentIdSort(set_payments);
+                //set_payments = paymentIdSort(set_payments);
             }
      
             //Term Payment
@@ -2084,7 +2084,7 @@
                     'remark': ''
                 });
 
-                set_payments = paymentIdSort(set_payments);
+                //set_payments = paymentIdSort(set_payments);
                 GenerateTablePayment();
             }
 
