@@ -31,10 +31,10 @@ namespace WebENG.Models
     }
     public class ForecastPaymentModel
     {
-        public double[] actual_amount { get; set; } = new double[14] { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] forecast_amount { get; set; } = new double[14] { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] acc_actual_amount { get; set; } = new double[14] { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        public double[] acc_forecast_amount { get; set; } = new double[14] { -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] actual_amount { get; set; } = new double[14] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] forecast_amount { get; set; } = new double[14] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] acc_actual_amount { get; set; } = new double[14] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public double[] acc_forecast_amount { get; set; } = new double[14] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         public string[] month_label { get; set; }
     }
 }
