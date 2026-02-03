@@ -17,7 +17,6 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly IWorkingHours WorkingHoursService;
         readonly IHoliday HolidayService;
-        static List<UserModel> users;
         readonly CTLInterfaces.IEmployee Employees;
         public WorkingHoursController()
         {
@@ -116,7 +115,8 @@ namespace WebENG.Controllers
 
         public IActionResult FormOvertime(string user_name,string month)
         {
-            string department = users.Where(w => w.name.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
+            List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
+            string department = employees.Where(w => w.name_en.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
             List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
 
             List<Form_OvertimeDataModel> datas = new List<Form_OvertimeDataModel>();
