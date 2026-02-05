@@ -559,9 +559,10 @@
             let datas = [];
             datas.push(["Task","Hours"]);
             for(let i=0;i<trs.length;i++){
-                let name = trs[i].task_name;
+                let name = trs[i].task_id  + ' : ' + trs[i].task_name;
                 datas.push([name , trs[i].hours]);
             }
+
             var data = google.visualization.arrayToDataTable(datas);
 
             var options = {

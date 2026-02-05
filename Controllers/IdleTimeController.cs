@@ -129,8 +129,25 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public List<EngineerIdleTimeModel> GetIdleTimes(string start_month, string stop_month)
+        public List<EngineerIdleTimeModel> GetIdleTimes(string department, string start_month, string stop_month)
         {
+            List<string> deps = new List<string>();
+            if (department == "ALL")
+            {
+                deps = new List<string>()
+                {
+                    "ENG",
+                    "CIS",
+                    "AIS",
+                };
+            }
+            else
+            {
+                deps = new List<string>()
+                {
+                    department
+                };
+            }
             DateTime _start = Convert.ToDateTime(start_month);
             DateTime _stop = Convert.ToDateTime(stop_month);
             int diff = ((_stop.Year - _start.Year) * 12) + _stop.Month - _start.Month;
@@ -154,7 +171,10 @@ namespace WebENG.Controllers
             }).ToList();
 
             List<EngineerIdleTimeModel> idles = new List<EngineerIdleTimeModel>();
-            string[] users = Accessory.getWorkingUser(_start,_stop.AddMonths(1)).Select(s => s.name).Distinct().ToArray();
+
+            var users_ = Accessory.getWorkingUser(_start,_stop.AddMonths(1));
+            users_ = users_.Where(w => deps.Contains(w.department)).ToList();
+            string[] users = users_.Select(s => s.name).Distinct().ToArray();
             int end = DateTime.DaysInMonth(stop_yy, stop_mm);
             DateTime start = new DateTime(start_yy, start_mm, 1);
             DateTime stop = new DateTime(stop_yy, stop_mm, end);
@@ -206,9 +226,9 @@ namespace WebENG.Controllers
             }
             return idles;
         }
-        public IActionResult ExportIdleTime(string start_year,string stop_year)
+        public IActionResult ExportIdleTime(string department,string start_year,string stop_year)
         {
-            List<EngineerIdleTimeModel> idles = GetIdleTimes(start_year, stop_year);
+            List<EngineerIdleTimeModel> idles = GetIdleTimes(department,start_year, stop_year);
             //Download Excel
             var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "idletime.xlsx"));
             var stream = Export.ExportIdleTime(templateFileInfo, idles);

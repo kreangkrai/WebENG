@@ -6,10 +6,18 @@
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-6">
+                    <div class="col-xl-4">
 
                     </div>
-                     <div class="col-xl-2">
+                    <div class="col-xl-2">
+                        <select id="select_department" class="form-control">
+                            <option value="ALL" selected>ALL</option>
+                            <option value="ENG">ENG</option>
+                            <option value="CIS">CIS</option>
+                            <option value="AIS">AIS</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2">
                         <input id="start_month" type="month" class="form-control" />
                     </div>
                     <div class="col-xl-2">
@@ -41,7 +49,7 @@
                 <table id="tableIdleHrs" class="table table-bordered table-hover table-sm text-center w-100">
                     <thead>
                         <tr>
-                            <th>User</th>
+                            <th style="width:180px">User</th>
                             <th>Idle (Hours)</th>
                             <th>Normal (Hours)</th>
                             <th>OT 1.5 (Hours)</th>
@@ -86,19 +94,20 @@
         async function UpdateView() {
             let start_month = new Date($('#start_month').val());
             let stop_month = new Date($('#stop_month').val());
-            let idles = await GetIdleTimes(start_month.toJSON(),stop_month.toJSON());
+            let department = $('#select_department').val();
+            let idles = await GetIdleTimes(department,start_month.toJSON(),stop_month.toJSON());
             GenerateChart(idles);
             GenerateRadarChart(idles);
             GenerateTable(idles);
         }
 
-        async function GetIdleTimes(start_month,stop_month) {
+        async function GetIdleTimes(department , start_month,stop_month) {
             let idles = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetIdleTimes", "IdleTime")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { start_month,stop_month },
+                data: { department,start_month,stop_month },
                 success: function (response) {
                     idles = response;
                 }
@@ -290,6 +299,7 @@
         function GenerateTable(idles) {
             let datas = idles;
             datas = datas.filter(f => f.userName !== "");
+            $('#tableIdleHrs').DataTable().destroy();
             $('#tableIdleHrs tbody').empty();
             for (let i = 0; i < datas.length; i++) {
                 let rowStr = `
@@ -306,6 +316,17 @@
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);
             }
+
+           
+            $('#tableIdleHrs').DataTable({
+                order: [[0, 'asc']],
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100],
+                paging: false,
+                searching: false,
+                info: false,
+                destroy: true
+            });
         }
 
         $('#btnExport').on('click',function(){
