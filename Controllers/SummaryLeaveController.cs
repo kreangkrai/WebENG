@@ -84,11 +84,25 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetDapartments()
         {
+            string user = HttpContext.Session.GetString("userId");
+
+            List<UserModel> users = Accessory.getAllUser();
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
-            employees = employees.OrderBy(o => o.name_en).ToList();
-            List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
-            var data = new { departments = departments };
-            return Json(data);
+            UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).FirstOrDefault();
+            if (u == null || ( u.role != "Admin" && u.role != "Admin_Leave"))
+            {
+                CTLModels.EmployeeModel employee = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+                List<string> departments = employees.Where(w=>w.name_en.ToLower() == user.ToLower()).GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).ToList();
+                var data = new { departments = departments };
+                return Json(data);
+            }
+            else
+            {
+                employees = employees.OrderBy(o => o.name_en).ToList();
+                List<string> departments = employees.GroupBy(g => g.department).Select(s => s.FirstOrDefault().department).OrderBy(o => o).ToList();
+                var data = new { departments = departments };
+                return Json(data);
+            }
         }
 
         [HttpGet]
@@ -306,12 +320,23 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetDataLeave(string date)
-        {
+        public IActionResult GetDataLeave(string date,string department)
+        {           
             DateTime startDate = Convert.ToDateTime(date);
             List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
             List<RequestModel> allRequests = Requests.GetRequestByDate(date);
-            allRequests = allRequests.Where(w => w.status_request != "Canceled").ToList();
+
+            if (department != "ALL")
+            {
+                List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+                List<string> emps = employees.Where(w => w.department == department).Select(s => s.emp_id).ToList();
+                allRequests = allRequests.Where(w => emps.Contains(w.emp_id) && w.status_request != "Canceled").ToList();
+            }
+            else
+            {
+                allRequests = allRequests.Where(w => w.status_request != "Canceled").ToList();
+            }
+
             List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(startDate.Year.ToString());
             List<RequestModel> new_requests = new List<RequestModel>();
             for (int i = 0; i < allRequests.Count; i++)
