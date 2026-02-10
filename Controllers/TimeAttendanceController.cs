@@ -35,6 +35,7 @@ namespace WebENG.Controllers
         private ILeaveExport LeaveExport;
         private IDeviceGroup DeviceGroup;
         private ITripExpense TripExpense;
+        private readonly INEWTripExpense NewTripExpense;
         private IHr Hr;
         private CTLInterfaces.IHoliday Holiday;
         private IHostingEnvironment _hostingEnvironment;
@@ -51,6 +52,7 @@ namespace WebENG.Controllers
             TripExpense = new TripExpenseService();
             Hr = new HrService();
             Holiday = new CTLServices.HolidayService();
+            NewTripExpense = new NewTripExpenseService();
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -122,13 +124,13 @@ namespace WebENG.Controllers
         [HttpGet]
         public IActionResult GetTimeAttendance(string department, int year)
         {
-            List<TimeAttendanceModel> timeAttendances = CalcilateTimeAttendance(department, year);
+            List<TimeAttendanceModel> timeAttendances = CalculateTimeAttendance(department, year);
             List<TimeInOutModel> calLatetimes = CalLateTime(year);
             var data = new { timeAttendances = timeAttendances, calLatetimes = calLatetimes };
             return Json(data);
         }
 
-        List<TimeAttendanceModel> CalcilateTimeAttendance(string department, int year)
+        List<TimeAttendanceModel> CalculateTimeAttendance(string department, int year)
         {
             List<TimeAttendanceModel> objs = new List<TimeAttendanceModel>();
             List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
@@ -207,7 +209,7 @@ namespace WebENG.Controllers
         }
         public IActionResult ExportTimeAttendance(string department, int year)
         {
-            List<TimeAttendanceModel> objs = CalcilateTimeAttendance(department, year);
+            List<TimeAttendanceModel> objs = CalculateTimeAttendance(department, year);
             objs = objs.OrderBy(o => o.department).ThenBy(t => t.position).ToList();
             List<TimeInOutModel> calLatetimes = CalLateTime(year);
 
@@ -224,7 +226,7 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(year, 1, 1);
             DateTime stop = new DateTime(year, 12, 31);
             List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(year.ToString());
-            var holidayDates = new HashSet<DateTime>(holidays.Select(h => h.date.Date)); // Optimize เช็คเร็ว
+            var holidayDates = new HashSet<DateTime>(holidays.Select(h => h.date.Date));
             List<EmployeeWorkModel> dailyRecords = CalData(start, stop);
 
             var groupedByEmp = dailyRecords.GroupBy(g => g.emp_id);
@@ -260,19 +262,44 @@ namespace WebENG.Controllers
                         {
                             if (rec.start_time_face_scan > TimeSpan.Parse(rec.shift_time)) // Late
                             {
-                                var lateMinutes = (int)(rec.start_time_face_scan - TimeSpan.Parse(rec.shift_time)).TotalMinutes;
-                                if (lateMinutes > 0)
+                                bool check_leave = request_leave.Any(w => w.start_request_date.Date == date); // Check Leave
+                                if (!check_leave)
                                 {
-                                    if (rec.start_time_face_scan > new TimeSpan(13, 0, 0))
+                                    var lateMinutes = (int)(rec.start_time_face_scan - TimeSpan.Parse(rec.shift_time)).TotalMinutes;
+                                    if (lateMinutes > 0)
                                     {
-                                        lateMinutes -= 60;
+                                        if (rec.start_time_face_scan > new TimeSpan(13, 0, 0))
+                                        {
+                                            lateMinutes -= 60;
+                                        }
+                                        if (lateMinutes > 480)
+                                        {
+                                            lateMinutes = 480;
+                                        }
+                                        monthly.minute_late += lateMinutes;
+                                        monthly.count_late++;
                                     }
-                                    if (lateMinutes > 480)
+                                }
+                                else
+                                {
+                                    var leave = request_leave.Where(w => w.start_request_date.Date == date).FirstOrDefault();
+                                    if (!leave.is_full_day)
                                     {
-                                        lateMinutes = 480;
+                                        var lateMinutes = (int)(rec.start_time_face_scan - leave.end_request_time).TotalMinutes;
+                                        if (lateMinutes > 0)
+                                        {
+                                            if (rec.start_time_face_scan > new TimeSpan(13, 0, 0))
+                                            {
+                                                lateMinutes -= 60;
+                                            }
+                                            if (lateMinutes > 480)
+                                            {
+                                                lateMinutes = 480;
+                                            }
+                                            monthly.minute_late += lateMinutes;
+                                            monthly.count_late++;
+                                        }
                                     }
-                                    monthly.minute_late += lateMinutes;
-                                    monthly.count_late++;
                                 }
                             }
                         }
@@ -319,6 +346,13 @@ namespace WebENG.Controllers
 
             //Data Trip Expense
             List<TripExpenseModel> trips = TripExpense.GetData(start, stop);
+
+            //Data Trip Expense New
+            List<TripExpenseModel> new_trips = NewTripExpense.GetData(start, stop);
+
+            //Combine Trip
+            trips.AddRange(new_trips);
+
             List<EmployeeTimesModel> all = trips
             .GroupBy(g => new { g.date, g.emp_id })
             .AsParallel()

@@ -21,16 +21,16 @@ namespace WebENG.Service
 		public List<EngineerScoreModel> GetScores(string user_id, string department)
         {
 			string cost = "";
-			if (department == "ENG")
+			if (department == "CES-System" || department == "CES-QIR" || department == "CES-Exp" || department == "CES-PMD" || department == "CES-ENG")
             {
 				cost = "eng_cost";
             }
-			if (department == "CIS")
+			if (department == "CES-CIS")
 			{
 				cost = "cis_cost";
 			}
 
-			if (department == "AIS")
+			if (department == "AES")
 			{
 				cost = "ais_cost";
 			}

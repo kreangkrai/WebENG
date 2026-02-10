@@ -136,9 +136,13 @@ namespace WebENG.Controllers
             {
                 deps = new List<string>()
                 {
-                    "ENG",
-                    "CIS",
-                    "AIS",
+                    "CES-CIS",
+                    "CES-System",
+                    "CES-QIR",
+                    "CES-PMD",
+                    "CES-Exp",
+                    "CES-ENG",
+                    "AES"
                 };
             }
             else

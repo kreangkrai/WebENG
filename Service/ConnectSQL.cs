@@ -11,6 +11,7 @@ namespace WebENG.Service
         public SqlConnection con;
         public SqlConnection con_hr;
         public SqlConnection con_trip;
+        public SqlConnection con_newtrip;
         public SqlConnection OpenConnect()
         {
             con = new SqlConnection("Data Source = 192.168.15.12, 1433; Initial Catalog = MES; User Id = sa; Password = p@ssw0rd; Timeout = 120");
@@ -39,6 +40,12 @@ namespace WebENG.Service
         {
             con_trip = new SqlConnection("Data Source = 192.168.15.202, 1433; Initial Catalog = gps_sale_tracking; User Id = sa; Password = p@ssw0rd;TrustServerCertificate=True; Timeout = 120");
             return con_trip;
+        }
+
+        public SqlConnection OpenNEWTRIPConnect()
+        {
+            con_newtrip = new SqlConnection("Data Source = 192.168.15.12, 1433; Initial Catalog = TRIP_EXPENSE; User Id = sa; Password = p@ssw0rd; Timeout = 120");
+            return con_newtrip;
         }
     }
 }
