@@ -18,6 +18,7 @@
                 <table id="table_user" class="table table-sm table-hover table-striped text-center w-100">
                     <thead class="text-center">
                         <tr>
+                            <th>EMP ID</th>
                             <th>Name</th>
                             <th>User ID</th>
                             <th>Department</th>
@@ -40,6 +41,7 @@
                 <table id="table_super_admin" class="table table-sm table-hover table-striped text-center w-100">
                     <thead>
                         <tr>
+                            <th>EMP ID</th>
                             <th>Name</th>
                             <th>User ID</th>
                             <th>Department</th>
@@ -60,6 +62,7 @@
                 <table id="table_admin_operation" class="table table-sm table-hover table-striped text-center w-100">
                     <thead>
                         <tr>
+                            <th>EMP ID</th>
                             <th>Name</th>
                             <th>User ID</th>
                             <th>Department</th>
@@ -80,6 +83,7 @@
                 <table id="table_admin_leave" class="table table-sm table-hover table-striped text-center w-100">
                     <thead>
                         <tr>
+                            <th>EMP ID</th>
                             <th>Name</th>
                             <th>User ID</th>
                             <th>Department</th>
@@ -100,6 +104,7 @@
                 <table id="table_sale" class="table table-sm table-hover table-striped text-center w-100">
                     <thead>
                         <tr>
+                            <th>EMP ID</th>
                             <th>Name</th>
                             <th>User ID</th>
                             <th>Department</th>
@@ -120,6 +125,7 @@
                 <table id="table_manager" class="table table-sm table-hover table-striped text-center w-100">
                     <thead>
                         <tr>
+                            <th>EMP ID</th>
                             <th>Name</th>
                             <th>User ID</th>
                             <th>Department</th>
@@ -144,6 +150,10 @@
             </div>
             <div class="modal-body">
                 <form>
+                    <div class="form-group">
+                        <label for="emp_id">EMP ID</label>
+                        <select id="emp_id" class="form-control"></select>
+                    </div>
                     <div class="form-group">
                         <label for="user_name">User Name</label>
                         <select id="user_name" class="form-control"></select>
@@ -185,16 +195,20 @@
             <div class="modal-body">
                 <form>
                     <div class="form-group">
+                        <label for="EmpID">EMP ID</label>
+                        <input id="EmpID" type="text" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
                         <label for="UserName">User Name</label>
-                        <input id="UserName" type="text" class="form-control" readonly/>
+                        <input id="UserName" type="text" class="form-control" readonly />
                     </div>
                     <div class="form-group">
                         <label for="UserID">User ID</label>
-                        <input id="UserID" type="text" class="form-control" readonly/>
+                        <input id="UserID" type="text" class="form-control" readonly />
                     </div>
                     <div class="form-group">
                         <label for="Department">Department</label>
-                        <input id="Department" type="text" class="form-control" readonly/>
+                        <input id="Department" type="text" class="form-control" readonly />
                     </div>
                     <div class="form-group">
                         <div class="row">
@@ -208,7 +222,7 @@
                                     <i class="fas fa-recycle"></i> Update Level
                                 </button>
                             </div>
-                        </div>                       
+                        </div>
                     </div>
                 </form>
             </div>
@@ -297,6 +311,7 @@
 
         $('#user_name').on('change', function () {
             var user = users.filter(f => f.user_name === $('#user_name').val());
+            $('#emp_id').val(user[0].emp_id);
             $('#user_name').val(user[0].user_name);
             $('#user_id').val(user[0].user_id);
             $('#department').val(user[0].department);
@@ -306,11 +321,13 @@
         });
 
         $('#btn_add').on('click', function () {
+            var emp_id = $('#emp_id').val();
             var user_id = $('#user_id').val();
             var user_name = $('#user_name').val();
             var department = $('#department').val();
             var level = $('#level').val();
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id": user_id,
                 "name": user_name,
                 "department": department,
@@ -357,6 +374,7 @@
 
             for (var i = 0; i < users.length; i++) {
                 datas.push([
+                    users[i].emp_id,
                     users[i].name,
                     users[i].user_id,
                     users[i].department,
@@ -398,6 +416,7 @@
 
             for (var i = 0; i < admins.length; i++) {
                 datas.push([
+                    admins[i].emp_id,
                     admins[i].name,
                     admins[i].user_id,
                     admins[i].department,
@@ -438,6 +457,7 @@
 
             for (var i = 0; i < admins.length; i++) {
                 datas.push([
+                    admins[i].emp_id,
                     admins[i].name,
                     admins[i].user_id,
                     admins[i].department,
@@ -479,6 +499,7 @@
 
             for (var i = 0; i < admins.length; i++) {
                 datas.push([
+                    admins[i].emp_id,
                     admins[i].name,
                     admins[i].user_id,
                     admins[i].department,
@@ -519,6 +540,7 @@
 
             for (var i = 0; i < sales.length; i++) {
                 datas.push([
+                    sales[i].emp_id,
                     sales[i].name,
                     sales[i].user_id,
                     sales[i].department,
@@ -560,6 +582,7 @@
 
             for (var i = 0; i < managers.length; i++) {
                 datas.push([
+                    managers[i].emp_id,
                     managers[i].name,
                     managers[i].user_id,
                     managers[i].department,
@@ -704,12 +727,14 @@
             ShowModal(data);
         });
 
-        $('#btnUpdateLevel').on('click',async function(){
+        $('#btnUpdateLevel').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id": user_id,
                 "name": name,
                 "department": department,
@@ -730,12 +755,14 @@
             });
 
         });
-        $('#btnToUser').on('click',async function(){
+        $('#btnToUser').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id": user_id,
                 "name": name,
                 "department": department,
@@ -756,12 +783,14 @@
             });
         });
 
-        $('#btnToSuperAdmin').on('click',async function(){
+        $('#btnToSuperAdmin').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id":user_id,
                 "name": name,
                 "department": department,
@@ -781,12 +810,14 @@
                 }
             });
         });
-        $('#btnToAdminOperation').on('click',async function(){
+        $('#btnToAdminOperation').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id":user_id,
                 "name": name,
                 "department": department,
@@ -806,12 +837,14 @@
                 }
             });
         });
-        $('#btnToAdminLeave').on('click',async function(){
+        $('#btnToAdminLeave').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id":user_id,
                 "name": name,
                 "department": department,
@@ -832,12 +865,14 @@
             });
         });
 
-        $('#btnToSale').on('click',async function(){
+        $('#btnToSale').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id":user_id,
                 "name": name,
                 "department": department,
@@ -858,12 +893,14 @@
             });
         });
 
-        $('#btnToManager').on('click',async function(){
+        $('#btnToManager').on('click', async function () {
+            var emp_id = document.getElementById("EmpID").value;
             var user_id = document.getElementById("UserID").value;
             var name = document.getElementById("UserName").value;
             var department = document.getElementById("Department").value;
             var level = document.getElementById("Level").value;
             var user_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id":user_id,
                 "name": name,
                 "department": department,

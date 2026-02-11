@@ -8,6 +8,7 @@ namespace WebENG.Models
     public class JobSummaryModel
     {
         public string user_id { get; set; }
+        public string emp_id { get; set; }
         public int levels { get; set; }
         public string jobId { get; set; }
         public string jobName { get; set; }
@@ -25,5 +26,6 @@ namespace WebENG.Models
         public string system { get; set; }
         public double remainingCost { get; set; }
         public double remainingOTCost { get; set; }
+        public List<Term_PaymentsModel> term_payments { get; set; }
     }
 }

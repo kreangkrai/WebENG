@@ -129,7 +129,7 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public List<EngineerIdleTimeModel> GetIdleTimes(string department, string start_month, string stop_month)
+        public List<EngineerIdleTimeModel> GetIdleTimes(string department, DateTime start, DateTime stop)
         {
             List<string> deps = new List<string>();
             if (department == "ALL")
@@ -152,21 +152,18 @@ namespace WebENG.Controllers
                     department
                 };
             }
-            DateTime _start = Convert.ToDateTime(start_month);
-            DateTime _stop = Convert.ToDateTime(stop_month);
-            int diff = ((_stop.Year - _start.Year) * 12) + _stop.Month - _start.Month;
+            //DateTime _start = Convert.ToDateTime(start_month);
+            //DateTime _stop = Convert.ToDateTime(stop_month);
+            //int diff = ((_stop.Year - _start.Year) * 12) + _stop.Month - _start.Month;
 
-            int start_yy = Convert.ToInt32(start_month.Split("-")[0]);
-            int start_mm = Convert.ToInt32(start_month.Split("-")[1]);
-            int stop_yy = Convert.ToInt32(stop_month.Split("-")[0]);
-            int stop_mm = Convert.ToInt32(stop_month.Split("-")[1]);
+            //int start_yy = Convert.ToInt32(start_month.Split("-")[0]);
+            //int start_mm = Convert.ToInt32(start_month.Split("-")[1]);
+            //int stop_yy = Convert.ToInt32(stop_month.Split("-")[0]);
+            //int stop_mm = Convert.ToInt32(stop_month.Split("-")[1]);
 
             List<HolidayModel> holidays = new List<HolidayModel>();
-            for (int i = start_yy; i <= stop_yy; i++)
-            {
-                holidays.AddRange(Holiday.GetHolidays(i.ToString()));
-            }
-            
+
+            holidays = holidays.Where(w => w.date.Year == start.Year).ToList();
             holidays = holidays.GroupBy(g => g.date).Select(s => new HolidayModel()
             {
                 date = s.Key,
@@ -176,12 +173,12 @@ namespace WebENG.Controllers
 
             List<EngineerIdleTimeModel> idles = new List<EngineerIdleTimeModel>();
 
-            var users_ = Accessory.getWorkingUser(_start,_stop.AddMonths(1));
+            var users_ = Accessory.getWorkingUser(start,stop);
             users_ = users_.Where(w => deps.Contains(w.department)).ToList();
             string[] users = users_.Select(s => s.name).Distinct().ToArray();
-            int end = DateTime.DaysInMonth(stop_yy, stop_mm);
-            DateTime start = new DateTime(start_yy, start_mm, 1);
-            DateTime stop = new DateTime(stop_yy, stop_mm, end);
+            //int end = DateTime.DaysInMonth(stop_yy, stop_mm);
+            //DateTime start = new DateTime(start_yy, start_mm, 1);
+            //DateTime stop = new DateTime(stop_yy, stop_mm, end);
 
             double working_hours = 0;
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
@@ -201,9 +198,9 @@ namespace WebENG.Controllers
                 double ot3_0 = 0.0;
                 double leave = 0.0;
                 double idleTime = 0.0;
-                for (DateTime month = _start; month <= _start.AddMonths(diff); month = month.AddMonths(1))
+                for (DateTime month = start; month <= stop; month = month.AddMonths(1))
                 {
-                    List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users[i], month.ToString("yyyy-MM-dd"));
+                    List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users[i], start,stop);
                     List<WorkingHoursSummaryModel> summaries = WorkingHours.CalculateMonthlySummary(monthly);
 
                     normal += summaries.Select(s => s.normal).Sum() / 60;
@@ -230,7 +227,7 @@ namespace WebENG.Controllers
             }
             return idles;
         }
-        public IActionResult ExportIdleTime(string department,string start_year,string stop_year)
+        public IActionResult ExportIdleTime(string department,DateTime start_year,DateTime stop_year)
         {
             List<EngineerIdleTimeModel> idles = GetIdleTimes(department,start_year, stop_year);
             //Download Excel

@@ -91,7 +91,8 @@ namespace WebENG.Controllers
                     user_id = ConvertUserID(not_emp[i]),
                     department = employees.Where(w=>w.name_en.ToLower() == not_emp[i].ToLower()).Select(s=>s.department).FirstOrDefault(),
                     name = not_emp[i],
-                    role = "User"
+                    role = "User",
+                    emp_id = employees.Where(w => w.name_en.ToLower() == not_emp[i].ToLower()).Select(s => s.emp_id).FirstOrDefault(),
                 };
                 authens.Add(authen);
             }

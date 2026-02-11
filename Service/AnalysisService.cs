@@ -230,6 +230,7 @@ namespace WebENG.Service
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             hours = dr["hours"] != DBNull.Value ? Math.Truncate(Convert.ToDouble(dr["hours"])) * (dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"].ToString()) : 1) : 0,
+                            //hours = dr["hours"] != DBNull.Value ? Math.Truncate(Convert.ToDouble(dr["hours"])) : 0,
                             percents = 0
                         };
                         mrs.Add(mr);

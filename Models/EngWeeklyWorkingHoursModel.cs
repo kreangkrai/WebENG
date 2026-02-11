@@ -10,6 +10,7 @@ namespace WebENG.Models
     {
         [JsonProperty("user_id")]
         public string user_id { get; set; }
+        public string emp_id { get; set; }
 
         [JsonProperty("user_name")]
         public string user_name { get; set; }

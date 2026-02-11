@@ -93,14 +93,26 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetWorkingHours(string user_name, string month)
         {
-            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
+            var parts = month.Split('-');
+            int y = int.Parse(parts[0]);
+            int m = int.Parse(parts[1]);
+            DateTime start = new DateTime(y, m, 1);
+            DateTime stop = new DateTime(y, m, DateTime.DaysInMonth(y, m));
+
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, start,stop);
             return Json(monthly);
         }
 
         [HttpGet]
         public JsonResult GetMonthlySummary(string user_name, string month)
         {
-            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
+            var parts = month.Split('-');
+            int y = int.Parse(parts[0]);
+            int m = int.Parse(parts[1]);
+            DateTime start = new DateTime(y, m, 1);
+            DateTime stop = new DateTime(y, m, DateTime.DaysInMonth(y, m));
+
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, start, stop);
             List<WorkingHoursSummaryModel> whs = WorkingHoursService.CalculateMonthlySummary(monthly);
             return Json(whs);
         }
@@ -115,9 +127,15 @@ namespace WebENG.Controllers
 
         public IActionResult FormOvertime(string user_name,string month)
         {
+            var parts = month.Split('-');
+            int y = int.Parse(parts[0]);
+            int m = int.Parse(parts[1]);
+            DateTime start = new DateTime(y, m, 1);
+            DateTime stop = new DateTime(y, m, DateTime.DaysInMonth(y, m));
+
             List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
             string department = employees.Where(w => w.name_en.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
-            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, month);
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, start,stop);
 
             List<Form_OvertimeDataModel> datas = new List<Form_OvertimeDataModel>();
             List<HolidayModel> holidays = HolidayService.GetHolidays(monthly[0].working_date.Year.ToString());

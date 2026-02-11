@@ -1,12 +1,12 @@
 ﻿@{
-    ViewData["title"] = "Idle Time";
+    ViewData["title"] = "Job Time";
 }
 <div class="row p-4" style="row-gap:5px">
     <div class="col-xl-12">
         <div class="card card-dark">
             <div class="card-body">
                 <div class="row" style="row-gap:10px">
-                    <div class="col-xl-4">
+                    <div class="col-xl-7">
 
                     </div>
                     <div class="col-xl-2">
@@ -22,19 +22,12 @@
                         </select>
                     </div>
                     <div class="col-xl-2">
-                        <input id="start_month" type="date" class="form-control" />
-                    </div>
-                    <div class="col-xl-2">
-                        <input id="stop_month" type="date" class="form-control" />
+                        <select id="select_responsible" class="form-control">
+                        </select>
                     </div>
                     <div class="col-xl-1">
                         <button id="btnUpdate" type="button" class="btn btn-primary form-control">
                             Update
-                        </button>
-                    </div>
-                    <div class="col-xl-1">
-                        <button id="btnExport" type="button" class="btn btn-success form-control">
-                            Export
                         </button>
                     </div>
                 </div>
@@ -53,14 +46,12 @@
                 <table id="tableIdleHrs" class="table table-bordered table-hover table-sm text-center w-100">
                     <thead>
                         <tr>
-                            <th style="width:180px">User</th>
-                            <th>Idle (Hours)</th>
-                            <th>Normal (Hours)</th>
-                            <th>OT 1.5 (Hours)</th>
-                            <th>OT 3.0 (Hours)</th>
-                            <th>Leave (Hours)</th>
-                            <th>Working Hours</th>                                                      
-                            <th>Total (Hours)</th>
+                            <th style="width:150px">Job</th>
+                            <th>Job Name</th>
+                            <th style="width:150px">Normal (Hours)</th>
+                            <th style="width:150px">OT 1.5 (Hours)</th>
+                            <th style="width:150px">OT 3.0 (Hours)</th>
+                            <th style="width:150px">Total (Hours)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -83,45 +74,48 @@
         let table;
 
         $(document).ready(function () {
-            var today = new Date();
-            var year = today.getFullYear();
-            var month = today.getMonth();
-
-            //var startDate = new Date(year, month, 1);
-            var start_month = year + "-" +
-                (month + 1).toString().padStart(2, '0') + "-" +
-                "01";
-            var lastDay = new Date(year, month + 1, 0).getDate();
-            var stop_month = year + "-" +
-                (month + 1).toString().padStart(2, '0') + "-" +
-                lastDay.toString().padStart(2, '0');
-
-            $('#start_month').val(start_month);
-            $('#stop_month').val(stop_month);
-            UpdateView();
+            GetEmployees();
+            //UpdateView();
         });
 
         $('#btnUpdate').on('click', function () {
             UpdateView();
         });
 
+        $('#select_department').on('change', function () {
+            GetEmployees();
+        });
+
+        async function GetEmployees() {
+            const department = $('#select_department').val();
+            await $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetEmployees", "JobTime")',
+	            contentType: 'application/x-www-form-urlencoded',
+                data: { department},
+                success: function (response) {
+                    const employees = response;
+                    GenerateResponsibleOption(employees);
+                }
+            });
+        }
+
         async function UpdateView() {
-            let start_month = $('#start_month').val();
-            let stop_month = $('#stop_month').val();
             let department = $('#select_department').val();
-            let idles = await GetIdleTimes(department,start_month,stop_month);
+            let responsible = $('#select_responsible :selected').text();
+            let idles = await GetJobTimes(department, responsible);
             GenerateChart(idles);
             GenerateRadarChart(idles);
             GenerateTable(idles);
         }
 
-        async function GetIdleTimes(department , start,stop) {
+        async function GetJobTimes(department, responsible) {
             let idles = [];
             await $.ajax({
                 type: "GET",
-                url: '@Url.Action("GetIdleTimes", "IdleTime")',
+                url: '@Url.Action("GetJobTimes", "JobTime")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { department,start,stop },
+                data: { department, responsible },
                 success: function (response) {
                     idles = response;
                 }
@@ -129,26 +123,30 @@
             return idles;
         };
 
+        function GenerateResponsibleOption(employees) {
+            $('#select_responsible').empty();
+            $('#select_responsible').append(`<option value="ALL" selected>ALL</option>`);
+            for (let i = 0; i < employees.length; i++) {
+                $('#select_responsible').append(`<option value="${employees[i].emp_id}">${employees[i].name_en}</option>`);
+            }
+        }
+
         function GenerateChart(idles) {
 
-            let colors = ['#CAE9FF', '#5FA8D3', '#1B4965','#291F7D','#209F7D'];
+            let colors = ['#96F035', '#F0EA35', '#F09235'];
 
-            let users = [];
-            users = idles.map(m => m.userName).filter(f => f !== "");
-            users = [... new Set(users)];
+            let jobs = [];
+            jobs = idles.map(m => m.job).filter(f => f !== "");
+            jobs = [... new Set(jobs)];
 
-            let hoursIdle = [];
             let hoursNormal = [];
             let hoursOT1_5 = [];
             let hoursOT3_0 = [];
-            let hoursLeave = [];
-            for (let i = 0; i < users.length; i++) {
-                let datas = idles.filter(f => f.userName === users[i]);
-                hoursIdle.push(datas.map(m => m.idle)[0]);
+            for (let i = 0; i < jobs.length; i++) {
+                let datas = idles.filter(f => f.job === jobs[i]);
                 hoursNormal.push(datas.map(m => m.normal)[0]);
                 hoursOT1_5.push(datas.map(m => m.ot1_5)[0]);
                 hoursOT3_0.push(datas.map(m => m.ot3_0)[0]);
-                hoursLeave.push(datas.map(m => m.leave)[0]);
             }
 
             if (chart !== undefined) {
@@ -159,40 +157,30 @@
             chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: users,
+                    labels: jobs,
                     datasets: [
-                        {
-                            label: 'Idle',
-                            data: hoursIdle,
-                            backgroundColor: colors[0]
-                        },
                         {
                             label: 'Normal',
                             data: hoursNormal,
-                            backgroundColor: colors[1]
+                            backgroundColor: colors[0]
                         },
                         {
                             label: 'OT 1.5',
                             data: hoursOT1_5,
-                            backgroundColor: colors[2]
+                            backgroundColor: colors[1]
                         },
                         {
                             label: 'OT 3.0',
                             data: hoursOT3_0,
-                            backgroundColor: colors[3]
+                            backgroundColor: colors[2]
                         },
-                        {
-                            label: 'Leave',
-                            data: hoursLeave,
-                            backgroundColor: colors[4]
-                        }
                     ]
                 },
                 options: {
                     scales: {
                         x: {
                             title: {
-                                text: "Users",
+                                text: "Jobs",
                                 display: true
                             },
                             stacked: true
@@ -226,24 +214,20 @@
 
         function GenerateRadarChart(idles) {
 
-            let colors = ['rgba(202, 233, 255, 0.7)', 'rgba(95, 168, 211, 0.7)', 'rgba(27, 73, 101, 0.7)','rgba(41, 31, 125, 0.7)','rgba(32, 159, 125, 0.7)'];
+            let colors = ['#96F035', '#F0EA35', '#F09235'];
 
-            let users = [];
-            users = idles.map(m => m.userName).filter(f => f !== "");
-            users = [... new Set(users)];
+            let jobs = [];
+            jobs = idles.map(m => m.job).filter(f => f !== "");
+            jobs = [... new Set(jobs)];
 
-            let hoursIdle = [];
             let hoursNormal = [];
             let hoursOT1_5 = [];
             let hoursOT3_0 = [];
-            let hoursLeave = [];
-            for (let i = 0; i < users.length; i++) {
-                let datas = idles.filter(f => f.userName === users[i]);
-                hoursIdle.push(datas.map(m => m.idle)[0]);
+            for (let i = 0; i < jobs.length; i++) {
+                let datas = idles.filter(f => f.job === jobs[i]);
                 hoursNormal.push(datas.map(m => m.normal)[0]);
                 hoursOT1_5.push(datas.map(m => m.ot1_5)[0]);
                 hoursOT3_0.push(datas.map(m => m.ot3_0)[0]);
-                hoursLeave.push(datas.map(m => m.leave)[0]);
             }
 
             if (radar_chart !== undefined) {
@@ -254,33 +238,23 @@
             radar_chart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: users,
+                    labels: jobs,
                     datasets: [
-                        {
-                            label: 'Idle',
-                            data: hoursIdle,
-                            backgroundColor: colors[0]
-                        },
                         {
                             label: 'Normal',
                             data: hoursNormal,
-                            backgroundColor: colors[1]
+                            backgroundColor: colors[0]
                         },
                         {
                             label: 'OT 1.5',
                             data: hoursOT1_5,
-                            backgroundColor: colors[2]
+                            backgroundColor: colors[1]
                         },
                         {
                             label: 'OT 3.0',
                             data: hoursOT3_0,
-                            backgroundColor: colors[3]
+                            backgroundColor: colors[2]
                         },
-                        {
-                            label: 'Leave',
-                            data: hoursLeave,
-                            backgroundColor: colors[4]
-                        }
                     ]
                 },
                 options: {
@@ -296,15 +270,15 @@
                     plugins: {
                         title: {
                             text: `Working Hours Radar Chart`,
-                            display: true,                
+                            display: true,
                             font: {
                                 size: 18
-                            },                           
+                            },
                         },
                         legend: {
                             position: 'bottom',
-                            display: true,                           
-                        },                       
+                            display: true,
+                        },
                     },
                     maintainAspectRatio: false
                 }
@@ -318,35 +292,30 @@
             for (let i = 0; i < datas.length; i++) {
                 let rowStr = `
                     <tr>
-                        <td style="text-align:left">${datas[i].userName}</td>
-                        <td>${datas[i].idle}</td>
-                        <td>${datas[i].normal}</td>
-                        <td>${datas[i].ot1_5}</td>
-                        <td>${datas[i].ot3_0}</td>
-                        <td>${datas[i].leave}</td>
-                        <td>${datas[i].workingHours}</td>                        
-                        <td>${datas[i].normal + datas[i].leave + datas[i].ot1_5 + datas[i].ot3_0}</td>
+                        <td>${datas[i].job}</td>
+                        <td>${datas[i].job_name}</td>
+                        <td>${datas[i].normal.toFixed(2)}</td>
+                        <td>${datas[i].ot1_5.toFixed(2)}</td>
+                        <td>${datas[i].ot3_0.toFixed(2)}</td>
+                        <td>${(datas[i].normal + datas[i].ot1_5 + datas[i].ot3_0).toFixed(2)}</td>
                     </tr>
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);
             }
 
-           
+
             $('#tableIdleHrs').DataTable({
                 order: [[0, 'asc']],
                 pageLength: 25,
                 lengthMenu: [10, 25, 50, 100],
+                columnDefs: [
+                    { targets: [1], className: 'dt-left' },
+                ],
                 paging: false,
                 searching: false,
                 info: false,
                 destroy: true
             });
         }
-
-        $('#btnExport').on('click',function(){
-            let start_year = $('#start_month').val();
-            let stop_year = $('#stop_month').val();
-            location.href = '@Url.Action("ExportIdleTime", "IdleTime")?start_year='+ start_year + '&stop_year='+stop_year;
-        });
     </script>
 }

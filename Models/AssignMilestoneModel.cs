@@ -17,6 +17,7 @@ namespace WebENG.Models
         public string milestone_id { get; set; }
         public string milestone_name { get; set; }
         public string user_id { get; set; }
+        public string emp_id { get; set; }
         public string user_name { get; set; }
         public string department { get; set; }
         public float days { get; set; }

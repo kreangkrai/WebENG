@@ -31,6 +31,7 @@ namespace WebENG.Models
         public string customer { get; set; }
         public string enduser { get; set; }
         public string sale_name { get; set; }
+        public string sale_id { get; set; }
         public string department { get; set; }
         public string process { get; set; }
         public string system { get; set; }
@@ -53,6 +54,7 @@ namespace WebENG.Models
         public DateTime bg_finish { get; set; }
         public int retention { get; set; }
         public string responsible { get; set; }
+        public string responsible_id { get; set; }
         public string note { get; set; }
     }
 

@@ -249,7 +249,8 @@ namespace WebENG.Controllers
                 remainingOTCost = Math.Round(((jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
                 + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
                 + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost)) -
-                (jwh.Where(x => x.job_id == s.Key).Select(f => f.total).FirstOrDefault() / 8.0),0)
+                (jwh.Where(x => x.job_id == s.Key).Select(f => f.total).FirstOrDefault() / 8.0),0),
+                term_payments = s.FirstOrDefault().term_payments
 
             }).ToList();
             return Json(sum);
@@ -358,14 +359,14 @@ namespace WebENG.Controllers
         public JsonResult UpdateJob(string job_string)
         {
             JobModel job = JsonConvert.DeserializeObject<JobModel>(job_string);
+            string job_id = job.job_id;
             string result = JobService.UpdateJob(job);
 
             if (result == "Success")
             {
-                if (job.term_payments.Count > 0)
-                {
-                    result = JobService.UpdateTermPayments(job.term_payments);
-                }
+               
+                result = JobService.UpdateTermPayments(job_id,job.term_payments);
+                
                 if (result == "Success")
                 {
                     string delete = Invoice.Delete(job.job_id);

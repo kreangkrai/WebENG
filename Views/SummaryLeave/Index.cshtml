@@ -1157,8 +1157,8 @@
                             const currentDay = colIndex;
                             const currentDate = new Date(start);
                             currentDate.setDate(currentDate.getDate() + (currentDay - 1));
-              
                             const dayOfWeek = currentDate.getDay();
+                            currentDate.setDate(currentDate.getDate() + 1);
                             const dateStr = currentDate.toISOString().split('T')[0];
 
                             $(this).removeClass('today-highlight weekend-holiday public-holiday');

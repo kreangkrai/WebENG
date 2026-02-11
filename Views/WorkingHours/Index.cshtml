@@ -325,7 +325,6 @@
         }
 
         function GenerateTable(whs) {
-            console.log(whs);
             var report_month = new Date(whs[0].working_date.split("T")[0]);
             var report_name = report_month.getFullYear() + " " + months[report_month.getUTCMonth()] + " - Working Hours Report";
             $('#report_title').text(report_name);

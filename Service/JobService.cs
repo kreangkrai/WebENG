@@ -230,10 +230,33 @@ namespace WebENG.Service
             List<JobSummaryModel> jobsSummaries = new List<JobSummaryModel>();
             try
             {
+                List<Term_PaymentsModel> terms = new List<Term_PaymentsModel>();
                 if (con.State == ConnectionState.Closed)
                 {
                     con.Open();
                 }
+
+                string string_command = "select job_id,payment_id,payment_name,[percent],forecast_month,remark from Term_Payments";
+                SqlCommand cmd = new SqlCommand(string_command, con);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        Term_PaymentsModel term = new Term_PaymentsModel()
+                        {
+                            job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
+                            payment_id = dr["payment_id"].ToString(),
+                            payment_name = dr["payment_name"].ToString(),
+                            percent = dr["percent"] != DBNull.Value ? Convert.ToInt32(dr["percent"].ToString()) : 0,
+                            forecast_month = dr["forecast_month"].ToString(),
+                            remark = dr["remark"].ToString()
+                        };
+                        terms.Add(term);
+                    }
+                    dr.Close();
+                }
+
                 string stringCommand = string.Format($@"               
                     WITH T1 AS (
                         SELECT
@@ -311,12 +334,39 @@ namespace WebENG.Service
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
 					LEFT JOIN JobResponsible ON JobResponsible.user_id = T1.user_id AND JobResponsible.job_id = T1.job_id
                     ORDER BY Jobs.job_id");
-                SqlCommand cmd = new SqlCommand(stringCommand, con);
-                SqlDataReader dr = cmd.ExecuteReader();
+                cmd = new SqlCommand(stringCommand, con);
+                dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
+                        List<Term_PaymentsModel> term_s = terms.Where(w => w.job_id == dr["job_id"].ToString()).ToList();
+                        Term_PaymentModel term_Payment = new Term_PaymentModel()
+                        {
+                            job_id = dr["job_id"].ToString(),
+                            down_payment = term_s.Where(w => w.payment_name == "Down Payment/KOM").Select(s => s.percent).FirstOrDefault(),
+                            document_submit = term_s.Where(w => w.payment_name == "Document Submit").Select(s => s.percent).FirstOrDefault(),
+                            instrument_vendor = term_s.Where(w => w.payment_name == "Instrument to Vendor").Select(s => s.percent).FirstOrDefault(),
+                            instrument_delivered_ctl = term_s.Where(w => w.payment_name == "Instrument Delivered @ CTL").Select(s => s.percent).FirstOrDefault(),
+                            system_delivered_ctl = term_s.Where(w => w.payment_name == "System Delivered @ CTL").Select(s => s.percent).FirstOrDefault(),
+                            fat = term_s.Where(w => w.payment_name == "FAT").Select(s => s.percent).FirstOrDefault(),
+                            delivery_instrument = term_s.Where(w => w.payment_name == "Delivery Instrument").Select(s => s.percent).FirstOrDefault(),
+                            delivery_system = term_s.Where(w => w.payment_name == "Delivery System").Select(s => s.percent).FirstOrDefault(),
+                            progress_work = term_s.Where(w => w.payment_name.Contains("Progress Work")).Select(s => s.percent).Sum(),
+                            progress_works = term_s.Where(w => w.payment_name.Contains("Progress Work")).Select(s => new Term_ProgressModel()
+                            {
+                                progress_name = s.payment_name,
+                                progress_value = s.percent
+                            }).ToList(),
+                            installation_work_complete = term_s.Where(w => w.payment_name == "Installation work complete").Select(s => s.percent).FirstOrDefault(),
+                            commissioning = term_s.Where(w => w.payment_name == "Commissioning").Select(s => s.percent).FirstOrDefault(),
+                            startup = term_s.Where(w => w.payment_name == "Startup").Select(s => s.percent).FirstOrDefault(),
+                            as_built = term_s.Where(w => w.payment_name == "As-Built").Select(s => s.percent).FirstOrDefault(),
+                            warranty = term_s.Where(w => w.payment_name == "Warranty").Select(s => s.percent).FirstOrDefault(),
+                            finished = term_s.Where(w => w.payment_name == "Finished").Select(s => s.percent).FirstOrDefault(),
+                            after_hmc = term_s.Where(w => w.payment_name == "after HMC signed acceptance ").Select(s => s.percent).FirstOrDefault(),
+                            complete = term_s.Where(w => w.payment_name == "Complete").Select(s => s.percent).FirstOrDefault(),
+                        };
                         JobSummaryModel jobSummary = new JobSummaryModel()
                         {
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
@@ -335,6 +385,7 @@ namespace WebENG.Service
                             responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
 
                         };
+                        jobSummary.term_payments = terms.Where(w => w.job_id == jobSummary.jobId).OrderBy(o => o.forecast_month).ThenBy(t => t.payment_id).ToList();
                         jobSummary.totalCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
                         jobSummary.remainingCost = (jobSummary.eng_cost + jobSummary.cis_cost + jobSummary.ais_cost) - jobSummary.totalCost;
                         jobsSummaries.Add(jobSummary);
@@ -1243,7 +1294,7 @@ namespace WebENG.Service
             return jobs;
         }
 
-        public string UpdateTermPayments(List<Term_PaymentsModel> term_Payments)
+        public string UpdateTermPayments(string jobid ,List<Term_PaymentsModel> term_Payments)
         {
             try
             {
@@ -1255,32 +1306,35 @@ namespace WebENG.Service
                     DELETE FROM Term_Payments WHERE job_id = @job_id");
                 using (SqlCommand command = new SqlCommand(string_command, con))
                 {
-                    var job_id = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
+                    var job = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
                     
-                        job_id.Value = term_Payments[0].job_id ?? (object)DBNull.Value;
+                        job.Value = jobid ?? (object)DBNull.Value;
                         command.ExecuteNonQuery();                    
                 }
-                string_command = string.Format($@"
+                if (term_Payments.Count > 0)
+                {
+                    string_command = string.Format($@"
                     INSERT INTO Term_Payments (job_id,payment_id,payment_name,[percent],forecast_month,remark)
                     VALUES (@job_id,@payment_id,@payment_name,@percent,@forecast_month,@remark)");
-                using (SqlCommand command = new SqlCommand(string_command, con))
-                {
-                    var job_id = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
-                    var payment_id = command.Parameters.Add("@payment_id", SqlDbType.NVarChar);
-                    var payment_name = command.Parameters.Add("@payment_name", SqlDbType.NVarChar);
-                    var percent = command.Parameters.Add("@percent", SqlDbType.Int);
-                    var forecast_month = command.Parameters.Add("@forecast_month", SqlDbType.NVarChar);
-                    var remark = command.Parameters.Add("@remark", SqlDbType.NVarChar);
-                    foreach (var term_Payment in term_Payments)
+                    using (SqlCommand command = new SqlCommand(string_command, con))
                     {
-                        job_id.Value = term_Payment.job_id ?? (object)DBNull.Value;
-                        payment_id.Value = term_Payment.payment_id ?? (object)DBNull.Value;
-                        payment_name.Value = term_Payment.payment_name ?? (object)DBNull.Value;
-                        percent.Value = term_Payment.percent;
-                        forecast_month.Value = term_Payment.forecast_month ?? (object)DBNull.Value;
-                        remark.Value = term_Payment.remark ?? (object)DBNull.Value;
+                        var job_id = command.Parameters.Add("@job_id", SqlDbType.NVarChar);
+                        var payment_id = command.Parameters.Add("@payment_id", SqlDbType.NVarChar);
+                        var payment_name = command.Parameters.Add("@payment_name", SqlDbType.NVarChar);
+                        var percent = command.Parameters.Add("@percent", SqlDbType.Int);
+                        var forecast_month = command.Parameters.Add("@forecast_month", SqlDbType.NVarChar);
+                        var remark = command.Parameters.Add("@remark", SqlDbType.NVarChar);
+                        foreach (var term_Payment in term_Payments)
+                        {
+                            job_id.Value = term_Payment.job_id ?? (object)DBNull.Value;
+                            payment_id.Value = term_Payment.payment_id ?? (object)DBNull.Value;
+                            payment_name.Value = term_Payment.payment_name ?? (object)DBNull.Value;
+                            percent.Value = term_Payment.percent;
+                            forecast_month.Value = term_Payment.forecast_month ?? (object)DBNull.Value;
+                            remark.Value = term_Payment.remark ?? (object)DBNull.Value;
 
-                        command.ExecuteNonQuery();
+                            command.ExecuteNonQuery();
+                        }
                     }
                 }
             }

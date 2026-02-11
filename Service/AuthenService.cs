@@ -27,7 +27,7 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"SElECT user_id,name,department,role,levels FROM Authen ORDER BY name");
+                string strCmd = string.Format($@"SElECT emp_id,user_id,name,department,role,levels FROM Authen ORDER BY name");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -36,6 +36,7 @@ namespace WebENG.Service
                     {
                         AuthenModel authen = new AuthenModel()
                         {
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"].ToString(),
                             name = dr["name"].ToString(),
                             department = dr["department"].ToString(),
@@ -69,12 +70,14 @@ namespace WebENG.Service
                 IF (SELECT COUNT(name) FROM Authen WHERE name ='{authen.name}') = 0
                 BEGIN
                     INSERT INTO Authen (
+                        emp_id,
                         user_id,
                         name,
                         department,
                         role,
                         levels) 
                     VALUES (
+                        @emp_id,
                         @user_id,
                         @name, 
                         @department,
@@ -84,6 +87,7 @@ namespace WebENG.Service
                 END");
                 SqlCommand command = new SqlCommand(string_command, con);
                 command.CommandType = CommandType.Text;
+                command.Parameters.AddWithValue("@emp_id", authen.emp_id);
                 command.Parameters.AddWithValue("@user_id", authen.user_id);
                 command.Parameters.AddWithValue("@name", authen.name.ToLower());
                 command.Parameters.AddWithValue("@department", authen.department);
@@ -117,11 +121,12 @@ namespace WebENG.Service
                     UPDATE Authen 
                     SET
                         levels = @levels
-                    WHERE name = @name");
+                    WHERE name = @name AND emp_id = @emp_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@levels", authen.levels);
+                    cmd.Parameters.AddWithValue("@emp_id", authen.emp_id);
                     cmd.Parameters.AddWithValue("@name", authen.name.ToLower());
                     cmd.ExecuteNonQuery();
                 }
@@ -148,11 +153,12 @@ namespace WebENG.Service
                     UPDATE Authen 
                     SET
                         role = @role
-                    WHERE name = @name");
+                    WHERE name = @name AND emp_id = @emp_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@role", authen.role);
+                    cmd.Parameters.AddWithValue("@emp_id", authen.emp_id);
                     cmd.Parameters.AddWithValue("@name", authen.name.ToLower());
                     cmd.ExecuteNonQuery();
                 }

@@ -9,8 +9,8 @@ namespace WebENG.Interface
     interface IWorkingHours
     {
         List<WorkingHoursModel> GetWorkingHours();
-        List<WorkingHoursModel> GetWorkingHours(string user_name);
-        List<WorkingDayModel> GetWorkingHours(string year, string month, string user_name);
+        List<WorkingHoursModel> GetWorkingHours(string user_name);      
+        List<WorkingDayModel> GetWorkingHours(DateTime start, DateTime stop, string user_name);
         List<WorkingDayModel> GetAllWorkingHours();
         List<WorkingHoursModel> GetWorkingHours(string user_name, DateTime working_date);
         WorkingHoursModel GetWorkingHourByLeave(string user_id, string working_date);
@@ -24,7 +24,7 @@ namespace WebENG.Interface
 
         int GetLastWorkingHoursID();
 
-        List<WorkingHoursModel> CalculateWorkingHours(string user_name, string month);
+        List<WorkingHoursModel> CalculateWorkingHours(string user_name, DateTime start, DateTime stop);
         List<WorkingHoursSummaryModel> CalculateMonthlySummary(List<WorkingHoursModel> workings);
     }
 }

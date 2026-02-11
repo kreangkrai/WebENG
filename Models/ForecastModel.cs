@@ -11,6 +11,7 @@ namespace WebENG.Models
         public string job_id { get; set; }
         public string job_name { get; set; }
         public string responsible { get; set; }
+        public string responsible_id { get; set; }
         public string department { get; set; }
         public double job_in_hand { get; set; }
         public double job_ais_in_hand { get; set; }

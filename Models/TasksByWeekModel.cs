@@ -7,6 +7,7 @@ namespace WebENG.Models
 {
     public class TasksByWeekModel
     {
+        public string emp_id { get; set; }
         public string user_id { get; set; }
         public string user_name { get; set; }
         public int week_number { get; set; }

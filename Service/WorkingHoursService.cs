@@ -33,6 +33,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
+                        WorkingHours.emp_id,
                         WorkingHours.user_id,
                         Authen.name,
                         Authen.department,
@@ -69,6 +70,7 @@ namespace WebENG.Service
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -117,6 +119,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
+                        WorkingHours.emp_id,
                         WorkingHours.user_id,
                         Authen.name,
                         Authen.department,
@@ -153,6 +156,7 @@ namespace WebENG.Service
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -189,7 +193,7 @@ namespace WebENG.Service
             return whs;
         }
 
-        public List<WorkingDayModel> GetWorkingHours(string year, string month, string user_name)
+        public List<WorkingDayModel> GetWorkingHours(DateTime start,DateTime stop, string user_name)
         {
             List<WorkingDayModel> wd = new List<WorkingDayModel>();
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
@@ -199,9 +203,13 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"
+                string string_command = "";
+                if (user_name == "ALL")
+                {
+                    string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
+                        WorkingHours.emp_id,
                         WorkingHours.user_id,
                         Authen.name,
                         Authen.department,
@@ -228,8 +236,43 @@ namespace WebENG.Service
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
-                    WHERE WorkingHours.working_date like '{year}-{month}%' 
+                    WHERE WorkingHours.working_date >= '{start.ToString("yyyy-MM-dd")}' AND WorkingHours.working_date <= '{stop.ToString("yyyy-MM-dd")}'");
+                }
+                else
+                {
+                    string_command = string.Format($@"
+                    SELECT
+                        WorkingHours.ind,
+                        WorkingHours.emp_id,
+                        WorkingHours.user_id,
+                        Authen.name,
+                        Authen.department,
+                        WorkingHours.working_date,
+                        WorkingHours.week_number,
+                        WorkingHours.job_id,
+					    Eng_Process.Process_ID as process_id,
+                        Eng_Process.process_Name as process_name,
+						Eng_System.System_ID as system_id,
+                        Eng_System.system_Name as system_name,
+                        Jobs.job_name,
+                        WorkingHours.task_id,
+                        Tasks.task_name,
+                        WorkingHours.start_time,
+                        WorkingHours.stop_time,
+                        WorkingHours.lunch_full,
+                        WorkingHours.lunch_half,
+                        WorkingHours.dinner_full,
+                        WorkingHours.dinner_half,
+                        WorkingHours.note
+                    FROM WorkingHours
+                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
+                        LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
+						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
+						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
+                    WHERE WorkingHours.working_date >= '{start.ToString("yyyy-MM-dd")}' AND WorkingHours.working_date <= '{stop.ToString("yyyy-MM-dd")}'
                     AND LOWER(Authen.name) ='{user_name}'");
+                }
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -239,6 +282,7 @@ namespace WebENG.Service
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -294,6 +338,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
+                        WorkingHours.emp_id,
                         WorkingHours.user_id,
                         Authen.name,
                         Authen.department,
@@ -329,6 +374,7 @@ namespace WebENG.Service
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -382,6 +428,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
+                        WorkingHours.emp_id,
                         WorkingHours.user_id,
                         Authen.name,
                         Authen.department,
@@ -419,6 +466,7 @@ namespace WebENG.Service
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -464,13 +512,14 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     INSERT INTO WorkingHours(
-                        ind,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch_full,lunch_half, dinner_full,dinner_half, note)
+                        ind,emp_id,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch_full,lunch_half, dinner_full,dinner_half, note)
                     VALUES (
-                        @ind,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch_full,@lunch_half, @dinner_full,@dinner_half, @note)");
+                        @ind,@emp_id,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch_full,@lunch_half, @dinner_full,@dinner_half, @note)");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
                     cmd.Parameters.AddWithValue("@ind", wh.index);
+                    cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
@@ -537,6 +586,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     UPDATE WorkingHours 
                     SET
+                        emp_id = @emp_id,
                         user_id = @user_id,
                         working_date = @working_date,
                         week_number = (SELECT DATEPART(ISO_WEEK,@working_date)),
@@ -555,6 +605,7 @@ namespace WebENG.Service
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
@@ -671,11 +722,12 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     DELETE FROM WorkingHours
-                    WHERE user_id = @user_id
+                    WHERE user_id = @user_id AND emp_id = @emp_id
                         AND ind = @ind");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
                     cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@ind", wh.index);
                     cmd.ExecuteNonQuery();
@@ -766,7 +818,7 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     SELECT 
-	                    DISTINCT user_id,
+	                    DISTINCT emp_id,user_id,
 	                    {week} as week_number,
 	                    {year} as year,
 	                    ISNULL(a.hours, 0) AS hours
@@ -790,6 +842,7 @@ namespace WebENG.Service
                     {
                         EngWeeklyWorkingHoursModel wh = new EngWeeklyWorkingHoursModel()
                         {
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             year = dr["year"] != DBNull.Value ? Convert.ToInt32(dr["year"]) : 0,
                             week = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : 0,
@@ -822,6 +875,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
+                        WorkingHours.emp_id,
                         WorkingHours.user_id,
                         Authen.name,
                         Authen.department,
@@ -858,6 +912,7 @@ namespace WebENG.Service
                         WorkingHoursModel wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -1275,19 +1330,17 @@ namespace WebENG.Service
         //    }
         //    return monthly;
         //}
-        public List<WorkingHoursModel> CalculateWorkingHours_O(string user_name, string month)
+        public List<WorkingHoursModel> CalculateWorkingHours_O(string user_name, DateTime start , DateTime stop)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
 
             string day = "";
-            int yy = Convert.ToInt32(month.Split("-")[0]);
-            int mm = Convert.ToInt32(month.Split("-")[1]);
 
-            List<WorkingDayModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
-            List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
+            List<WorkingDayModel> whs = GetWorkingHours(start, stop, user_name);
+            List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
-            for (DateTime date = new DateTime(yy, mm, 1); date <= new DateTime(yy, mm, DateTime.DaysInMonth(yy, mm)); date = date.AddDays(1))
+            for (DateTime date = start; date <= stop; date = date.AddDays(1))
             {
                 day = date.DayOfWeek.ToString();
                 List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date).ToList();
@@ -1395,8 +1448,9 @@ namespace WebENG.Service
                                     }
 
                                     wh = new WorkingHoursModel()
-                                    {
+                                    {                                       
                                         working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
                                         job_id = _wd[i].workings[j].job_id,
                                         job_name = _wd[i].workings[j].job_name,
                                         task_id = _wd[i].workings[j].task_id,
@@ -1489,6 +1543,7 @@ namespace WebENG.Service
                                 wh = new WorkingHoursModel()
                                 {
                                     working_date = _wd[i].date,
+                                    emp_id = _wd[i].workings[j].emp_id,
                                     job_id = _wd[i].workings[j].job_id,
                                     job_name = _wd[i].workings[j].job_name,
                                     task_id = _wd[i].workings[j].task_id,
@@ -1562,6 +1617,7 @@ namespace WebENG.Service
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
                                         job_id = _wd[i].workings[j].job_id,
                                         job_name = _wd[i].workings[j].job_name,
                                         task_id = _wd[i].workings[j].task_id,
@@ -1596,6 +1652,7 @@ namespace WebENG.Service
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
                                         job_id = _wd[i].workings[j].job_id,
                                         job_name = _wd[i].workings[j].job_name,
                                         task_id = _wd[i].workings[j].task_id,
@@ -1734,6 +1791,7 @@ namespace WebENG.Service
                                 wh = new WorkingHoursModel()
                                 {
                                     working_date = _wd[i].date,
+                                    emp_id = _wd[i].workings[j].emp_id,
                                     job_id = _wd[i].workings[j].job_id,
                                     job_name = _wd[i].workings[j].job_name,
                                     task_id = _wd[i].workings[j].task_id,
@@ -1782,19 +1840,17 @@ namespace WebENG.Service
             return monthly;
         }
 
-        public List<WorkingHoursModel> CalculateWorkingHours_OLD2(string user_name, string month)
+        public List<WorkingHoursModel> CalculateWorkingHours_OLD2(string user_name, DateTime start , DateTime stop)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
 
             string day = "";
-            int yy = Convert.ToInt32(month.Split("-")[0]);
-            int mm = Convert.ToInt32(month.Split("-")[1]);
 
-            List<WorkingDayModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
-            List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
+            List<WorkingDayModel> whs = GetWorkingHours(start,stop, user_name);
+            List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
-            for (DateTime date = new DateTime(yy, mm, 1); date <= new DateTime(yy, mm, DateTime.DaysInMonth(yy, mm)); date = date.AddDays(1))
+            for (DateTime date = start; date <= stop; date = date.AddDays(1))
             {
                 day = date.DayOfWeek.ToString();
                 List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date).ToList();
@@ -2260,24 +2316,22 @@ namespace WebENG.Service
             return monthly;
         }
 
-        public List<WorkingHoursModel> CalculateWorkingHours(string user_name, string month)
+        public List<WorkingHoursModel> CalculateWorkingHours(string user_name, DateTime start , DateTime stop)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
 
             string day = "";
-            int yy = Convert.ToInt32(month.Split("-")[0]);
-            int mm = Convert.ToInt32(month.Split("-")[1]);
 
-            List<WorkingDayModel> whs = GetWorkingHours(yy.ToString(), mm.ToString().PadLeft(2, '0'), user_name);
-            List<HolidayModel> holidays = Holiday.GetHolidays(yy.ToString());
+            List<WorkingDayModel> whs = GetWorkingHours(start,stop, user_name);
+            List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
-            for (DateTime date = new DateTime(yy, mm, 1); date <= new DateTime(yy, mm, DateTime.DaysInMonth(yy, mm)); date = date.AddDays(1))
+            for (DateTime date = start; date <= stop; date = date.AddDays(1))
             {
                 //if (date == new DateTime(2025, 10, 30))
                 {
                     day = date.DayOfWeek.ToString();
-                    List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date).ToList();
+                    List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date.Date).ToList();
                     //_wd = _wd.Where(w => w.date == new DateTime(2025, 10, 15)).ToList();
                     bool isHoliday = holidays.Where(w => w.date.Date == date.Date).Count() > 0 ? true : false;
                     bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
@@ -2383,6 +2437,7 @@ namespace WebENG.Service
                                         wh = new WorkingHoursModel()
                                         {
                                             working_date = _wd[i].date,
+                                            emp_id = _wd[i].workings[j].emp_id,
                                             job_id = _wd[i].workings[j].job_id,
                                             job_name = _wd[i].workings[j].job_name,
                                             task_id = _wd[i].workings[j].task_id,
@@ -2393,6 +2448,7 @@ namespace WebENG.Service
                                             lunch_half = _wd[i].workings[j].lunch_half,
                                             dinner_full = _wd[i].workings[j].dinner_full,
                                             dinner_half = _wd[i].workings[j].dinner_half,
+                                            department = _wd[i].workings[j].department,
                                             day = day,
                                             normal = regular,
                                             ot1_5 = ot15,
@@ -2475,6 +2531,7 @@ namespace WebENG.Service
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
                                         job_id = _wd[i].workings[j].job_id,
                                         job_name = _wd[i].workings[j].job_name,
                                         task_id = _wd[i].workings[j].task_id,
@@ -2485,6 +2542,7 @@ namespace WebENG.Service
                                         lunch_half = _wd[i].workings[j].lunch_half,
                                         dinner_full = _wd[i].workings[j].dinner_full,
                                         dinner_half = _wd[i].workings[j].dinner_half,
+                                        department = _wd[i].workings[j].department,
                                         day = day,
                                         normal = default(TimeSpan),
                                         ot1_5 = ot15,
@@ -2535,6 +2593,7 @@ namespace WebENG.Service
                                         wh = new WorkingHoursModel()
                                         {
                                             working_date = _wd[i].date,
+                                            emp_id = _wd[i].workings[j].emp_id,
                                             job_id = _wd[i].workings[j].job_id,
                                             job_name = _wd[i].workings[j].job_name,
                                             task_id = _wd[i].workings[j].task_id,
@@ -2545,6 +2604,7 @@ namespace WebENG.Service
                                             lunch_half = _wd[i].workings[j].lunch_half,
                                             dinner_full = _wd[i].workings[j].dinner_full,
                                             dinner_half = _wd[i].workings[j].dinner_half,
+                                            department = _wd[i].workings[j].department,
                                             day = day,
                                             normal = regular,
                                             ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
@@ -2569,6 +2629,7 @@ namespace WebENG.Service
                                         wh = new WorkingHoursModel()
                                         {
                                             working_date = _wd[i].date,
+                                            emp_id = _wd[i].workings[j].emp_id,
                                             job_id = _wd[i].workings[j].job_id,
                                             job_name = _wd[i].workings[j].job_name,
                                             task_id = _wd[i].workings[j].task_id,
@@ -2579,6 +2640,7 @@ namespace WebENG.Service
                                             lunch_half = _wd[i].workings[j].lunch_half,
                                             dinner_full = _wd[i].workings[j].dinner_full,
                                             dinner_half = _wd[i].workings[j].dinner_half,
+                                            department = _wd[i].workings[j].department,
                                             day = day,
                                             normal = regular,
                                             ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
@@ -2730,6 +2792,7 @@ namespace WebENG.Service
                                         wh = new WorkingHoursModel()
                                         {
                                             working_date = _wd[i].date,
+                                            emp_id = _wd[i].workings[j].emp_id,
                                             job_id = _wd[i].workings[j].job_id,
                                             job_name = _wd[i].workings[j].job_name,
                                             task_id = _wd[i].workings[j].task_id,
@@ -2740,6 +2803,7 @@ namespace WebENG.Service
                                             lunch_half = _wd[i].workings[j].lunch_half,
                                             dinner_full = _wd[i].workings[j].dinner_full,
                                             dinner_half = _wd[i].workings[j].dinner_half,
+                                            department = _wd[i].workings[j].department,
                                             day = day,
                                             normal = regular,
                                             ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
@@ -2818,6 +2882,7 @@ namespace WebENG.Service
                         wh = new WorkingHoursModel()
                         {
                             index = dr["ind"].ToString(),
+                            emp_id = dr["emp_id"].ToString(),
                             user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),

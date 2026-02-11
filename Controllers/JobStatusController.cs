@@ -15,6 +15,7 @@ namespace WebENG.Controllers
 {
     public class JobStatusController : Controller
     {
+        readonly IJob JobService;
         readonly IAccessory Accessory;
         readonly IJobStatus JobStatus;
         readonly IStatus Status;
@@ -28,6 +29,7 @@ namespace WebENG.Controllers
             JobStatus = new JobStatusService();
             Status = new EngStatusService();
             Export = new ExportService();
+            JobService = new JobService();
             Employees = new CTLServices.EmployeeService();
         }
         public IActionResult Index()
@@ -119,7 +121,11 @@ namespace WebENG.Controllers
         public JsonResult UpdateJobByProcessSystem(string job_string)
         {
             JobModel job = JsonConvert.DeserializeObject<JobModel>(job_string);
+            string job_id = job.job_id;
             var result = JobStatus.UpdateJobByProcessSystem(job);
+
+            result = JobService.UpdateTermPayments(job_id,job.term_payments);
+
             return Json(result);
         }
 

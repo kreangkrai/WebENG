@@ -13,6 +13,7 @@ namespace WebENG.Models
         public double job_cis_in_hand { get; set; }
         public double job_ais_in_hand { get; set; }
         public string responsible { get; set; }
+        public string emp_id { get; set; }
         public DateTime job_date { get; set; }
         public string department { get; set; }
         public double invoice { get; set; }

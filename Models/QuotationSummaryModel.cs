@@ -14,6 +14,7 @@ namespace WebENG.Models
         public string quotation_type { get; set; }
         public string end_user { get; set; }
         public string sale_name { get; set; }
+        public string sale_id { get; set; }
         public string sale_department { get; set; }
         public List<ENGQuotationSummaryModel> engineers { get; set; }
 
