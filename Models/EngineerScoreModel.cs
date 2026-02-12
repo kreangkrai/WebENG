@@ -8,6 +8,7 @@ namespace WebENG.Models
     public class EngineerScoreModel
     {
         public string job_id { get; set; }
+        public string emp_id { get; set; }
         public string job_name { get; set; }
         public string job_status { get; set; }
         public string customer { get; set; }

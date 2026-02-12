@@ -430,8 +430,8 @@
             await GetStatus();
             await GenerateStatusOption();
             await GenerateDepartmentOptions();
-            let user = '@Model.user_id.ToLower()';
-            $('#user_name').val(user);
+            let emp_id = '@Model.emp_id';
+            $('#user_name').val(emp_id);
         });
 
          async function GetStatus() {
@@ -477,17 +477,17 @@
             }
            
             for (var i = 0; i < employees.length; i++) {
-                user_string += `<option value="${employees[i].user_id.toLowerCase()}">${employees[i].name}</option>`;
+                user_string += `<option value="${employees[i].emp_id}">${employees[i].name}</option>`;
             }
             $('#user_name').append(user_string);
         }
 
-        async function GetJobStatusByUser(user) {
+        async function GetJobStatusByUser(emp_id) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobStatusByUser", "JobStatus")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user},
+                data: { emp_id },
                 success: function (response) {
                     jobs_status = response;
                     GenerateTable(jobs_status);
@@ -510,8 +510,8 @@
             set_column.add({ 'title': 'Due Date', 'index': 30 });
 
 
-            let user = $('#user_name').val();
-            await GetJobStatusByUser(user);
+            let emp_id = $('#user_name').val();
+            await GetJobStatusByUser(emp_id);
 
             GenerateCheckBox();
             GenerateColumnCheckBox();
@@ -1418,8 +1418,8 @@
         }
 
         $('#btn_export').on('click',function(){
-            let user = $('#user_name').val();
-            location.href = '@Url.Action("ExportData", "JobStatus")?user='+ user;
+            let emp_id = $('#user_name').val();
+            location.href = '@Url.Action("ExportData", "JobStatus")?emp_id=' + emp_id;
         });
     </script>
 }

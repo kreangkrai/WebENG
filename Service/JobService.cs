@@ -260,7 +260,7 @@ namespace WebENG.Service
                 string stringCommand = string.Format($@"               
                     WITH T1 AS (
                         SELECT
-							WorkingHours.user_id,
+							WorkingHours.emp_id,
 		                    WorkingHours.job_id,
 		                    SUM(case when task_id = 'T001' then
 									case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
@@ -313,10 +313,11 @@ namespace WebENG.Service
 								end ) AS total_manpower 
 	                    FROM WorkingHours
                         WHERE WorkingHours.job_id <> 'J999999'
-	                    GROUP BY job_id,user_id
+	                    GROUP BY job_id,emp_id
 					)
                     SELECT
-						T1.user_id,
+						T1.emp_id,
+						emp.name_en as name,
 						case when JobResponsible.levels is null then 1 else JobResponsible.levels end levels,
                         Jobs.job_id,
                         Jobs.job_name,
@@ -332,7 +333,8 @@ namespace WebENG.Service
 						Jobs.system_id as system
                     FROM Jobs                  
                     LEFT JOIN T1 ON Jobs.job_id = T1.job_id
-					LEFT JOIN JobResponsible ON JobResponsible.user_id = T1.user_id AND JobResponsible.job_id = T1.job_id
+					LEFT JOIN JobResponsible ON JobResponsible.emp_id = T1.emp_id AND JobResponsible.job_id = T1.job_id
+					LEFT JOIN CTL.dbo.Employees emp ON t1.emp_id = emp.emp_id
                     ORDER BY Jobs.job_id");
                 cmd = new SqlCommand(stringCommand, con);
                 dr = cmd.ExecuteReader();
@@ -369,7 +371,8 @@ namespace WebENG.Service
                         };
                         JobSummaryModel jobSummary = new JobSummaryModel()
                         {
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
+                            name = dr["name"].ToString(),
                             levels = dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"]) : 1,
                             jobId = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             jobName = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
@@ -1007,7 +1010,7 @@ namespace WebENG.Service
             return "Success";
         }
 
-        public List<EngProcessModel> GetProcessByUser(string user)
+        public List<EngProcessModel> GetProcessByUser(string emp_id)
         {
             List<EngProcessModel> processes = new List<EngProcessModel>();
             try
@@ -1016,7 +1019,7 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"SELECT DISTINCT Jobs.process_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                string string_command = string.Format($@"SELECT DISTINCT Jobs.process_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where emp_id='{emp_id}')");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -1073,7 +1076,7 @@ namespace WebENG.Service
             return new_processes;
         }
 
-        public List<EngSystemModel> GetSystemByUser(string user)
+        public List<EngSystemModel> GetSystemByUser(string emp_id)
         {
             List<EngSystemModel> systems = new List<EngSystemModel>();
             try
@@ -1082,7 +1085,7 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"SELECT DISTINCT Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                string string_command = string.Format($@"SELECT DISTINCT Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where emp_id='{emp_id}')");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -1139,7 +1142,7 @@ namespace WebENG.Service
             return new_systems;
         }
 
-        public List<JobProcessSystemModel> getsJobprocessSystemByUser(string user)
+        public List<JobProcessSystemModel> getsJobprocessSystemByUser(string emp_id)
         {
             List<JobProcessSystemModel> jobProcessSystems = new List<JobProcessSystemModel>();
             List<EngProcessSystemModel> jobs = new List<EngProcessSystemModel>();
@@ -1149,7 +1152,7 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"SELECT Jobs.job_id, Jobs.process_id,Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where user_id='{user}')");
+                string string_command = string.Format($@"SELECT Jobs.job_id, Jobs.process_id,Jobs.system_id FROM Jobs WHERE job_id IN (select job_id from JobResponsible where emp_id='{emp_id}')");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)

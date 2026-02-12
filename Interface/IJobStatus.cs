@@ -8,7 +8,7 @@ namespace WebENG.Interface
 {
     interface IJobStatus
     {
-        List<JobModel> GetJobStatusByUser(string user);
+        List<JobModel> GetJobStatusByUser(string emp_id);
         List<JobModel> GetJobStatusALL();
         string UpdateJobStatus(string job,string status);
         string UpdateJobByProcessSystem(JobModel job);

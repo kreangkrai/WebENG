@@ -7,6 +7,7 @@ namespace WebENG.Models
 {
     public class Form_OvertimeModel
     {
+        public string emp_id { get; set; }
         public string employee_name { get; set; }
         public string department { get; set; }
         public string phone_number { get; set; }

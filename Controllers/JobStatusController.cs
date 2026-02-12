@@ -50,8 +50,7 @@ namespace WebENG.Controllers
                         emp_id = employee.emp_id,
                         name = employee.name_en,
                         role = "User",
-                        department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
+                        department = employee.department
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -71,14 +70,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
 
         [HttpGet]
         public JsonResult GetWorkingUser()
@@ -89,16 +80,16 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetJobStatusByUser(string user)
+        public JsonResult GetJobStatusByUser(string emp_id)
         {
             List<JobModel> jobs = new List<JobModel>();
-            if (user == "ALL")
+            if (emp_id == "ALL")
             {
                 jobs = JobStatus.GetJobStatusALL();
             }
             else
             {
-                jobs = JobStatus.GetJobStatusByUser(user);
+                jobs = JobStatus.GetJobStatusByUser(emp_id);
             }
             return Json(jobs);
         }
@@ -129,22 +120,22 @@ namespace WebENG.Controllers
             return Json(result);
         }
 
-        public IActionResult ExportData(string user)
+        public IActionResult ExportData(string emp_id)
         {
             List<JobModel> jobs = new List<JobModel>();
-            if (user == "ALL")
+            if (emp_id == "ALL")
             {
                 jobs = JobStatus.GetJobStatusALL();
             }
             else
             {
-                jobs = JobStatus.GetJobStatusByUser(user);
+                jobs = JobStatus.GetJobStatusByUser(emp_id);
             }
 
             //Download Excel
             var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "project_inhand.xlsx"));
             var stream = Export.ExportData(templateFileInfo, jobs);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", user + ".xlsx");
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", emp_id + ".xlsx");
         }
 
     }

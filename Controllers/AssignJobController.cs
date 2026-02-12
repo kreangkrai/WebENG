@@ -49,8 +49,7 @@ namespace WebENG.Controllers
                         emp_id = employee.emp_id,
                         name = employee.name_en,
                         role = "User",
-                        department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
+                        department = employee.department
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -69,14 +68,6 @@ namespace WebENG.Controllers
             {
                 return RedirectToAction("Index", "Account");
             }
-        }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
         }
 
         [HttpGet]
@@ -114,7 +105,7 @@ namespace WebENG.Controllers
             {
                 List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
                 JobResponsibleModel jr = JsonConvert.DeserializeObject<JobResponsibleModel>(jr_string);
-                if (jr.user_id == "ALL")
+                if (jr.emp_id == "ALL")
                 {
                     List<AuthenModel> users = Authen.GetAuthens().OrderBy(o => o.name).ToList();
                     users = users.Where(w => w.department == jr.department).ToList();
@@ -123,7 +114,7 @@ namespace WebENG.Controllers
                     {
                         _jr = new JobResponsibleModel()
                         {
-                            user_id = users[i].user_id,
+                            emp_id = users[i].emp_id,
                             job_id = jr.job_id,
                             level = users[i].levels,
                             role = users[i].role,

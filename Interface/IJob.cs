@@ -9,7 +9,7 @@ namespace WebENG.Interface
     interface IJob
     {
         List<JobModel> GetAllJobs();
-        List<JobProcessSystemModel> getsJobprocessSystemByUser(string user);
+        List<JobProcessSystemModel> getsJobprocessSystemByUser(string emp_id);
         List<JobSummaryModel> GetJobsSummary();
         string CreateJob(JobModel job);
         string CreateTermPayment(Term_PaymentModel term_Payment);
@@ -21,10 +21,10 @@ namespace WebENG.Interface
 
         List<EngProcessModel> GetProcesses();
         List<EngProcessModel> GetProcessByJob(string job);
-        List<EngProcessModel> GetProcessByUser(string user);
+        List<EngProcessModel> GetProcessByUser(string emp_id);
         List<EngSystemModel> GetSystems();
         List<EngSystemModel> GetSystemByJob(string job);
-        List<EngSystemModel> GetSystemByUser(string user);
+        List<EngSystemModel> GetSystemByUser(string emp_id);
         string UpdateFinish(string job);
         List<string> GetDueWarranty();
     }

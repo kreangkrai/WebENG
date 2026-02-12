@@ -40,8 +40,7 @@ namespace WebENG.Controllers
                         emp_id = employee.emp_id,
                         name = employee.name_en,
                         role = "User",
-                        department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
+                        department = employee.department
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -61,15 +60,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
-
 
         [HttpGet]
         public List<EngStatusModel> GetStatuses()

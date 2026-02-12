@@ -23,7 +23,7 @@ namespace WebENG.Service
         public List<QuotationSummaryModel> GetQuotationSummaries()
         {
             List<JobSummaryModel> jobs = Job.GetJobsSummary();
-            jobs = jobs.Where(w => w.user_id != "").ToList();
+            jobs = jobs.Where(w => w.emp_id != "").ToList();
 
             List<QuotationSummaryModel> quotations = new List<QuotationSummaryModel>();
             try
@@ -56,11 +56,11 @@ namespace WebENG.Service
                             customer = dr["customer_name"] != DBNull.Value ? dr["customer_name"].ToString() : "",
                             end_user = dr["enduser"] != DBNull.Value ? dr["enduser"].ToString() : "",
                             sale_department = dr["sale_department"] != DBNull.Value ? dr["sale_department"].ToString() : "",
-                            sale_name = dr["sale"] != DBNull.Value ? dr["sale"].ToString() : ""
+                            sale_name = dr["sale"] != DBNull.Value ? dr["sale"].ToString() : "",
                         };
                         quotation.engineers = jobs.Where(w => w.jobId == quotation.quotation).Select(s => new ENGQuotationSummaryModel()
-                        {
-                            name = s.user_id,
+                        {                           
+                            name = s.name,
                             total_manhour = s.totalManhour
                         }).ToList();
 

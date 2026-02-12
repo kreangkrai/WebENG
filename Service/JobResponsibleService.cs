@@ -18,7 +18,7 @@ namespace WebENG.Service
             connect = new ConnectSQL();
             con = connect.OpenConnect();
         }
-        public List<JobResponsibleModel> GetJobResponsible(string user_name)
+        public List<JobResponsibleModel> GetJobResponsible(string emp_id)
         {
             List<JobResponsibleModel> jrs = new List<JobResponsibleModel>();
             try
@@ -29,19 +29,20 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"SELECT
 	                    JobResponsible.job_id,
+                        JobResponsible.emp_id,
 	                    Jobs.job_name,
                         Jobs.customer_name as customer,
 	                    JobResponsible.user_id,
-	                    Authen.name AS user_name,
-	                    Authen.department AS department,
+	                    emp.name_en AS user_name,
+	                    emp.department,
                         JobResponsible.levels as level,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
 	                    JobResponsible.assign_date
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
-                        LEFT JOIN Authen AS Authen ON JobResponsible.user_id = Authen.user_id
-                    WHERE LOWER(Authen.name) = '{user_name}' AND Jobs.status <> 'STA999'
+                        LEFT JOIN CTL.dbo.Employees AS emp ON JobResponsible.emp_id = emp.emp_id
+                    WHERE JobResponsible.emp_id = '{emp_id}' AND Jobs.status <> 'STA999'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -51,7 +52,7 @@ namespace WebENG.Service
                     {
                         JobResponsibleModel jr = new JobResponsibleModel()
                         {
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"].ToString(),
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
@@ -90,12 +91,12 @@ namespace WebENG.Service
 	                    Jobs.job_id,
                         Jobs.job_name,
                         Jobs.customer_name as customer,
-	                    JobResponsible.user_id,
-                        Authen.name
+                        JobResponsible.emp_id,
+                        emp.name_en as name
                     FROM Jobs
                     LEFT JOIN JobResponsible ON Jobs.job_id = JobResponsible.job_id
-                    LEFT JOIN Authen ON JobResponsible.user_id = Authen.user_id
-                    ORDER BY Jobs.job_id, JobResponsible.user_id");
+                    LEFT JOIN CTL.dbo.Employees emp ON JobResponsible.emp_id = emp.emp_id
+                    ORDER BY Jobs.job_id, JobResponsible.emp_id");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -104,11 +105,11 @@ namespace WebENG.Service
                     {
                         JobResponsibleModel jr = new JobResponsibleModel()
                         {
+                            emp_id = dr["emp_id"].ToString(),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             customer = dr["customer"] != DBNull.Value ? dr["customer"].ToString() : "",
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
-                            user_name = dr["Name"] != DBNull.Value ? dr["Name"].ToString() : "",
+                            user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                         };
                         jrs.Add(jr);
                     }
@@ -181,18 +182,19 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"SELECT
 	                    JobResponsible.job_id,
+                        JobResponsible.emp_id,
 	                    Jobs.job_name,
                         Jobs.customer_name as customer,
 	                    JobResponsible.user_id,
-	                    Authen.name AS user_name,
-	                    Authen.department AS department,
+	                    emp.name_en AS user_name,
+	                    emp.department,
                         JobResponsible.levels as level,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
                         JobResponsible.assign_date
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
-                        LEFT JOIN Authen ON JobResponsible.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees AS emp ON JobResponsible.emp_id = emp.emp_id
                     WHERE  JobResponsible.job_id = '{job_id}'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, con);
@@ -203,7 +205,7 @@ namespace WebENG.Service
                     {
                         JobResponsibleModel jr = new JobResponsibleModel()
                         {
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"].ToString(),
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
@@ -242,11 +244,11 @@ namespace WebENG.Service
                     string string_command = string.Format($@"
                     BEGIN
                         IF NOT EXISTS (
-                            SELECT job_id, user_id FROM JobResponsible WHERE user_id = @user_id AND job_id = @job_id
+                            SELECT job_id, emp_id FROM JobResponsible WHERE emp_id = @emp_id AND job_id = @job_id
                         )
                         BEGIN
-                            INSERT INTO JobResponsible(job_id, user_id, role, levels, assign_by, assign_date)
-                            VALUES(@job_id, @user_id, @role, @levels, @assign_by, @assign_date)
+                            INSERT INTO JobResponsible(job_id, emp_id, role, levels, assign_by, assign_date)
+                            VALUES(@job_id, @emp_id, @role, @levels, @assign_by, @assign_date)
                         END
                     END
                 ");
@@ -256,7 +258,7 @@ namespace WebENG.Service
                     {
                         cmd.CommandType = CommandType.Text;
                         cmd.Parameters.AddWithValue("@job_id", jrs[i].job_id.Replace("-", String.Empty));
-                        cmd.Parameters.AddWithValue("@user_id", jrs[i].user_id);
+                        cmd.Parameters.AddWithValue("@emp_id", jrs[i].emp_id);
                         cmd.Parameters.AddWithValue("@role", jrs[i].role);
                         cmd.Parameters.AddWithValue("@levels", jrs[i].level);
                         cmd.Parameters.AddWithValue("@assign_by", jrs[i].assign_by);
@@ -290,18 +292,18 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"SELECT
 	                    JobResponsible.job_id,
+                        JobResponsible.emp_id,
 	                    Jobs.job_name,
                         Jobs.customer_name as customer,
-	                    JobResponsible.user_id,
-	                    Authen.name AS user_name,
-	                    Authen.department AS department,
+	                    emp.name_en AS user_name,
+	                    emp.department,
                         JobResponsible.levels as level,
 	                    JobResponsible.role,
 	                    JobResponsible.assign_by,
 	                    JobResponsible.assign_date
                     FROM JobResponsible
                         LEFT JOIN Jobs ON JobResponsible.job_id = Jobs.job_id
-                        LEFT JOIN Authen AS Authen ON JobResponsible.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees AS emp ON JobResponsible.emp_id = emp.emp_id
                     WHERE Jobs.status <> 'STA999'
                     ORDER BY JobResponsible.job_id");
                 SqlCommand cmd = new SqlCommand(string_command, con);
@@ -312,7 +314,7 @@ namespace WebENG.Service
                     {
                         JobResponsibleModel jr = new JobResponsibleModel()
                         {
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"].ToString(),
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",

@@ -48,8 +48,7 @@ namespace WebENG.Controllers
                         emp_id = employee.emp_id,
                         name = employee.name_en,
                         role = "User",
-                        department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
+                        department = employee.department
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -69,15 +68,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
-
         public IActionResult EngineerIdleTimes()
         {
             if (HttpContext.Session.GetString("Login_ENG") != null)
@@ -90,7 +80,7 @@ namespace WebENG.Controllers
                     name = s.name,
                     department = s.department,
                     role = s.role,
-                    user_id = s.user_id
+                    emp_id = s.emp_id
                 }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
@@ -115,7 +105,7 @@ namespace WebENG.Controllers
                     name = s.name,
                     department = s.department,
                     role = s.role,
-                    user_id = s.user_id
+                    emp_id = s.emp_id
                 }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
@@ -152,33 +142,15 @@ namespace WebENG.Controllers
                     department
                 };
             }
-            //DateTime _start = Convert.ToDateTime(start_month);
-            //DateTime _stop = Convert.ToDateTime(stop_month);
-            //int diff = ((_stop.Year - _start.Year) * 12) + _stop.Month - _start.Month;
-
-            //int start_yy = Convert.ToInt32(start_month.Split("-")[0]);
-            //int start_mm = Convert.ToInt32(start_month.Split("-")[1]);
-            //int stop_yy = Convert.ToInt32(stop_month.Split("-")[0]);
-            //int stop_mm = Convert.ToInt32(stop_month.Split("-")[1]);
 
             List<HolidayModel> holidays = new List<HolidayModel>();
-
-            holidays = holidays.Where(w => w.date.Year == start.Year).ToList();
-            holidays = holidays.GroupBy(g => g.date).Select(s => new HolidayModel()
-            {
-                date = s.Key,
-                name = holidays.Where(w => w.date == s.Key).Select(s1 => s1.name).FirstOrDefault(),
-                no = holidays.Where(w => w.date == s.Key).Select(s2 => s2.no).FirstOrDefault()
-            }).ToList();
+            holidays = Holiday.GetHolidays(start.Year.ToString());
 
             List<EngineerIdleTimeModel> idles = new List<EngineerIdleTimeModel>();
 
             var users_ = Accessory.getWorkingUser(start,stop);
             users_ = users_.Where(w => deps.Contains(w.department)).ToList();
-            string[] users = users_.Select(s => s.name).Distinct().ToArray();
-            //int end = DateTime.DaysInMonth(stop_yy, stop_mm);
-            //DateTime start = new DateTime(start_yy, start_mm, 1);
-            //DateTime stop = new DateTime(stop_yy, stop_mm, end);
+            //string[] emps = users_.Select(s => s.emp_id).Distinct().ToArray();
 
             double working_hours = 0;
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
@@ -191,7 +163,7 @@ namespace WebENG.Controllers
                 }
             }
 
-            for (int i = 0; i < users.Length; i++)
+            for (int i = 0; i < users_.Count; i++)
             {
                 double normal = 0.0;
                 double ot1_5 = 0.0;
@@ -200,7 +172,7 @@ namespace WebENG.Controllers
                 double idleTime = 0.0;
                 for (DateTime month = start; month <= stop; month = month.AddMonths(1))
                 {
-                    List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users[i], start,stop);
+                    List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users_[i].emp_id, start,stop);
                     List<WorkingHoursSummaryModel> summaries = WorkingHours.CalculateMonthlySummary(monthly);
 
                     normal += summaries.Select(s => s.normal).Sum() / 60;
@@ -215,7 +187,8 @@ namespace WebENG.Controllers
                 }
                 EngineerIdleTimeModel idle = new EngineerIdleTimeModel()
                 {
-                    userName = users[i],
+                    emp_id = users_[i].emp_id,
+                    userName = users_[i].name,
                     workingHours = (working_hours * 8),
                     idle = idleTime,
                     normal = normal,

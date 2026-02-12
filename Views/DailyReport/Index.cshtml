@@ -160,7 +160,7 @@
             var month = today.getMonth();
             $('#month').val(year + "-" + (today.getMonth()+1).toString().padStart(2,0));
 
-            $('#user_name').val('@Model.name.ToLower()');
+            $('#user_name').val('@Model.emp_id');
             table = $('#table_activity').DataTable();
             EnablePrint();
             EnableExport();
@@ -181,27 +181,28 @@
         function GenerateUsers() {
             var user_string = '';
             for (var i = 0; i < users.length; i++) {
-                user_string += `<option value="${users[i].name.toLowerCase()}">${users[i].name}</option>`;
+                user_string += `<option value="${users[i].emp_id}">${users[i].name}</option>`;
             }
             $('#user_name').empty();
             $('#user_name').append(user_string);
         }
 
         $('#btn_load').on('click', async function () {
-            var username = $('#user_name').val();
+            var emp_id = $('#user_name').val();
+            //var username = $('#user_name :selected').text();
             var month = $('#month').val();
-            await GetDailyActivities(username, month);
+            await GetDailyActivities(emp_id, month);
             EnablePrint();
             EnableExport();
             GenerateTableActivity();
         });
 
-        async function GetDailyActivities(user_name, month) {
+        async function GetDailyActivities(emp_id, month) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetDailyActivities", "DailyReport")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name, month },
+                data: { emp_id, month },
                 success: function (response) {
                     drs = response;
                 }
@@ -238,7 +239,7 @@
                     drs[i].solution,
                     drs[i].tomorrow_plan,
                     drs[i].note,
-                    drs[i].user_id,
+                    drs[i].user_name,
                     drs[i].customer
                 ]);
             }
@@ -331,9 +332,10 @@
         }
 
         $('#btn_print').on('click', function () {
-            var user_name = $('#user_name option:selected').text().toLowerCase();
+            var emp_id = $('#user_name').val();
+            var user_name = $('#user_name :selected').text();
             var month = $('#month').val();
-            var url = '@Url.Action("FormDailyReport", "DailyReport")?user_name='+user_name+'&month='+month;
+            var url = '@Url.Action("FormDailyReport", "DailyReport")?emp_id=' + emp_id + '&user_name=' + user_name + '&month=' + month;
             window.open(url);
         });
 

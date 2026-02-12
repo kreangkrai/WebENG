@@ -45,8 +45,7 @@ namespace WebENG.Controllers
                         emp_id = employee.emp_id,
                         name = employee.name_en,
                         role = "User",
-                        department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
+                        department = employee.department
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -66,14 +65,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
 
         [HttpGet]
         public JsonResult GetWorkingUser()
@@ -84,11 +75,12 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public List<DailyActivityModel> GetDailyActivities(string user_name, string month)
+        public List<DailyActivityModel> GetDailyActivities(string emp_id, string user_name, string month)
         {
-            List<DailyActivityModel> drs = DailyReport.GetDailyActivities(user_name, month);
+            List<DailyActivityModel> drs = DailyReport.GetDailyActivities(emp_id, month);
             Form_DailyReportModel form_model = new Form_DailyReportModel()
             {
+                emp_id = emp_id,
                 name = user_name,
                 month = month,
                 datas = drs
@@ -105,22 +97,17 @@ namespace WebENG.Controllers
             return Json(result);
         }
 
-        public IActionResult FormDailyReport(string user_name, string month)
+        public IActionResult FormDailyReport(string emp_id,string user_name, string month)
         {
-            List<DailyActivityModel> drs = DailyReport.GetDailyActivities(user_name, month);
+            List<DailyActivityModel> drs = DailyReport.GetDailyActivities(emp_id, month);
             Form_DailyReportModel form_model = new Form_DailyReportModel()
             {
+                emp_id = emp_id,
                 name = user_name,
                 month = month,
                 datas = drs
             };
 
-            //string footer = "" +
-            //    "--print-media-type " + 
-            //    "--footer-left \"Job No : J99-9999\" " +
-            //    "--footer-center \"Page 1 of 1\" " + 
-            //    "--footer-right \"Report Date : 08-07-2022\" " +
-            //    "--footer-font-size \"14\"";
             var form_dailyreport = new ViewAsPdf("FormDailyReport")
             {
                 Model = form_model,

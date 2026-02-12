@@ -45,7 +45,6 @@ namespace WebENG.Controllers
                         name = employee.name_en,
                         role = "User",
                         department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -65,14 +64,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
 
         [HttpGet]
         public string GetLastWorkingHoursID()
@@ -91,7 +82,7 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetWorkingHours(string user_name, string month)
+        public JsonResult GetWorkingHours(string emp_id, string month)
         {
             var parts = month.Split('-');
             int y = int.Parse(parts[0]);
@@ -99,12 +90,12 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(y, m, 1);
             DateTime stop = new DateTime(y, m, DateTime.DaysInMonth(y, m));
 
-            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, start,stop);
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(emp_id, start,stop);
             return Json(monthly);
         }
 
         [HttpGet]
-        public JsonResult GetMonthlySummary(string user_name, string month)
+        public JsonResult GetMonthlySummary(string emp_id, string month)
         {
             var parts = month.Split('-');
             int y = int.Parse(parts[0]);
@@ -112,7 +103,7 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(y, m, 1);
             DateTime stop = new DateTime(y, m, DateTime.DaysInMonth(y, m));
 
-            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, start, stop);
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(emp_id, start, stop);
             List<WorkingHoursSummaryModel> whs = WorkingHoursService.CalculateMonthlySummary(monthly);
             return Json(whs);
         }
@@ -125,7 +116,7 @@ namespace WebENG.Controllers
             return Json(result);
         }
 
-        public IActionResult FormOvertime(string user_name,string month)
+        public IActionResult FormOvertime(string emp_id,string month)
         {
             var parts = month.Split('-');
             int y = int.Parse(parts[0]);
@@ -134,8 +125,8 @@ namespace WebENG.Controllers
             DateTime stop = new DateTime(y, m, DateTime.DaysInMonth(y, m));
 
             List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
-            string department = employees.Where(w => w.name_en.ToLower() == user_name).Select(s => s.department).FirstOrDefault();
-            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(user_name, start,stop);
+            string department = employees.Where(w => w.emp_id == emp_id).Select(s => s.department).FirstOrDefault();
+            List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(emp_id, start,stop);
 
             List<Form_OvertimeDataModel> datas = new List<Form_OvertimeDataModel>();
             List<HolidayModel> holidays = HolidayService.GetHolidays(monthly[0].working_date.Year.ToString());
@@ -179,6 +170,10 @@ namespace WebENG.Controllers
                     {
                         data.location = "Office";
                     }
+                    if (monthly[i].task_id.Substring(0, 1) == "H")
+                    {
+                        data.location = "Home";
+                    }
                     if (monthly[i].task_id.Substring(0, 1) == "S")
                     {
                         data.location = "Site";
@@ -217,7 +212,8 @@ namespace WebENG.Controllers
 
             Form_OvertimeModel form_data = new Form_OvertimeModel()
             {
-                employee_name = user_name,
+                emp_id = emp_id,
+                employee_name = employees.Where(w => w.emp_id == emp_id).Select(s => s.name_en).FirstOrDefault(),
                 department = department,
                 phone_number = "",
                 normal_start_time = "08:30",

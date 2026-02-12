@@ -8,8 +8,6 @@ namespace WebENG.Models
 {
     public class EngWeeklyWorkingHoursModel
     {
-        [JsonProperty("user_id")]
-        public string user_id { get; set; }
         public string emp_id { get; set; }
 
         [JsonProperty("user_name")]

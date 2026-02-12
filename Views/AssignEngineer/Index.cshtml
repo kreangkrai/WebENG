@@ -52,7 +52,7 @@
                         <table id="table_staffs" class="table table-sm compact table-bordered text-center">
                             <thead>
                                 <tr>
-                                    <th>Staff ID</th>
+                                    <th>EMP ID</th>
                                     <th>Staff Name</th>
                                     <th>Level</th>
                                     <th>Role</th>
@@ -226,7 +226,7 @@
 
             for (var i = 0; i < assign_engs.length; i++) {
                 datas.push([
-                    assign_engs[i].user_id,
+                    assign_engs[i].emp_id,
                     assign_engs[i].user_name,
                     assign_engs[i].level,
                     assign_engs[i].role,
@@ -300,7 +300,7 @@
             engineer_str += '<option value="ALL">ALL</option>';
             for (var i = 0; i < engineers.length; i++) {
                 if (department === "" || (engineers[i].department === department))
-                    engineer_str += '<option value="' + engineers[i].user_id + '">' + engineers[i].name + '</option>';
+                    engineer_str += '<option value="' + engineers[i].emp_id + '">' + engineers[i].name + '</option>';
             }
             $('#user_id').empty();
             $('#user_id').append(engineer_str);
@@ -361,13 +361,15 @@
         });
 
         $('#btn_accept').on('click', async function () {
-            var user_id = $('#user_id').val();
+            var emp_id = $('#user_id').val();
+            var user_id = $('#user_id :selected').text();
             var job_id = $('#job_id').val();
             var level = $('#user_level').val();
             var assign_by = '@Model.name';
             var assign_date = new Date();
             var department = $('#department').val();
             var jr_string = JSON.stringify({
+                "emp_id": emp_id,
                 "user_id": user_id,
                 "job_id": job_id,
                 "level":level,

@@ -42,7 +42,6 @@ namespace WebENG.Controllers
                         name = employee.name_en,
                         role = "User",
                         department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -62,15 +61,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
-
         public IActionResult EngineerWeeklySummary()
         {
             if (HttpContext.Session.GetString("Login_ENG") != null)
@@ -78,7 +68,7 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
@@ -94,7 +84,7 @@ namespace WebENG.Controllers
         public JsonResult GetWorkingHours(string week)
         {
             whs = WorkingHours.GetWorkingHours(Convert.ToInt32(week.Split("-")[0]), Convert.ToInt32(week.Split("W")[1]));
-            string[] engineers = whs.OrderBy(o => o.user_id).Select(s => s.user_id).Distinct().ToArray();
+            string[] engineers = whs.OrderBy(o => o.user_name).Select(s => s.emp_id).Distinct().ToArray();
             string[] jobs = whs.OrderBy(o => o.job_id).Select(s => s.job_id).Distinct().ToArray();
             string[] tasks = whs.OrderBy(o => o.task_id).Select(s => s.task_id).Distinct().ToArray();
             List<WeeklySummaryModel> weekly = new List<WeeklySummaryModel>();
@@ -104,7 +94,7 @@ namespace WebENG.Controllers
                 {
                     for(int k = 0;k<engineers.Count();k++)
                     {
-                        List<WorkingHoursModel> wh = whs.Where(w => w.task_id == tasks[i] && w.job_id == jobs[j] && w.user_id == engineers[k]).ToList();
+                        List<WorkingHoursModel> wh = whs.Where(w => w.task_id == tasks[i] && w.job_id == jobs[j] && w.emp_id == engineers[k]).ToList();
                         int hours = 0;
                         if(wh.Count > 0)
                         {
@@ -112,7 +102,7 @@ namespace WebENG.Controllers
                         }
                         weekly.Add(new WeeklySummaryModel{
                             user_id = engineers[k],
-                            user_name = whs.Where(w => w.user_id == engineers[k]).Select(s => s.user_name).FirstOrDefault(),
+                            user_name = whs.Where(w => w.emp_id == engineers[k]).Select(s => s.user_name).FirstOrDefault(),
                             job_id = jobs[j],
                             job_name = whs.Where(w => w.job_id == jobs[j]).Select(s => s.job_name).FirstOrDefault(),
                             task_id = tasks[i],

@@ -774,20 +774,20 @@
 
         $(document).ready(async function () {
             await GetHolidays();
-            await GetEngineerUser("@Model.name.ToLower()");
-            await GetWorkingHours("@Model.name.ToLower()");
-            await GetProcessSystemByUser("@Model.user_id.ToLower()");
+            //await GetEngineerUser("@Model.emp_id.ToLower()");
+            await GetWorkingHours("@Model.emp_id.ToLower()");
+            await GetProcessSystemByUser("@Model.emp_id.ToLower()");
             await GetUsers();
             await GetJobs();
             await GetTasks();
         });
 
-        async function GetProcessSystemByUser(user){
+        async function GetProcessSystemByUser(emp_id){
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetProcessSystemByUser", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user },
+                data: { emp_id },
                 success: function (response) {
                     list_process_system = response;
                 }
@@ -835,20 +835,17 @@
                 data: { },
                 success: function (response) {
                     users = response;
-                    if (debug_user) {
-                        console.log(users);
-                    }
                 }
             });
         }
 
         async function GetJobs() {
-            let user_name = '@Model.name.ToLower()';
+            let emp_id = '@Model.emp_id.ToLower()';
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetJobs", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name },
+                data: { emp_id },
                 success: function (response) {
                     jobs = response;
                     if (debug_jobs) {
@@ -860,12 +857,12 @@
         };
 
         async function GetQuotations() {
-            let user_name = '@Model.name.ToLower()';
+            let emp_id = '@Model.emp_id.ToLower()';
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetQuotations", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name },
+                data: { emp_id },
                 success: function (response) {
                     quotations = response;
                     if (debug_quotations) {
@@ -908,35 +905,28 @@
             });
         };
 
-        async function GetWorkingHours(user_name) {
+        async function GetWorkingHours(emp_id) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetWorkingHours", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name },
+                data: { emp_id },
                 success: function (response) {
-                    if (debug_whs) {
-                        console.log("Working Hours Data");
-                        console.log(response);
-                    }
                     GenerateCalendar(response);
                 }
             });
         };
 
-        async function GetWorkingHoursByDate(user_name ,working_date) {
+        async function GetWorkingHoursByDate(emp_id ,working_date) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetWorkingHoursByDate", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    user_name, working_date
+                    emp_id, working_date
                 },
                 success: function (response) {
                     wh_day = response;
-                    if (debug_wh_day) {
-                        console.log(wh_day);
-                    }
                 }
             });
         }
@@ -945,15 +935,15 @@
             let datas = [];
             for (let i = 0; i < whs.length; i++) {
                 let start_date = new Date(whs[i].working_date);
-                let enable_edit = false;
+                //let enable_edit = false;
 
-                if (eng.role === "Admin" || eng.allow_edit === true) {
-                    enable_edit = true;
-                } else {
-                    let today = new Date();
-                    let date_diff = Math.floor((today - start_date) / (1000 * 60 * 60 * 24));
-                    enable_edit = date_diff < 15 ? true : false;
-                }
+                //if (eng.role === "Admin" || eng.allow_edit === true) {
+                //    enable_edit = true;
+                //} else {
+                //    let today = new Date();
+                //    let date_diff = Math.floor((today - start_date) / (1000 * 60 * 60 * 24));
+                //    enable_edit = date_diff < 15 ? true : false;
+                //}
 
                 datas.push(
                     {
@@ -961,10 +951,11 @@
                         start: start_date.setHours(whs[i].start_time.split(":")[0], whs[i].start_time.split(":")[1]),
                         end: start_date.setHours(whs[i].stop_time.split(":")[0], whs[i].stop_time.split(":")[1]),
                         allDay: false,
-                        editable: enable_edit,
+                        editable: true,
                         overlap: true,
                         extendedProps: {
                             "index": whs[i].index,
+                            "emp_id": whs[i].emp_id,
                             "user_id": whs[i].user_id,
                             "user_name": whs[i].user_name,
                             "working_date": whs[i].working_date,
@@ -987,11 +978,6 @@
                         }
                     }
                 );
-            }
-
-            if (debug_whs_datas) {
-                console.log("Calendar Working Hours Data");
-                console.log(datas);
             }
 
             calendarEl = document.getElementById('calendar');
@@ -1062,7 +1048,6 @@
                     }
                 },
                 eventClick: async function (info) {
-                    console.log(info);
                     let title = info.event.title;
                     if (title.includes("Leave")) {
                         window.open('./StatusLeave/Index', '_blank', 'noopener');
@@ -1137,7 +1122,7 @@
             $('#user_id').empty();
             let user_string = `<option value="" selected disabled>Please Select User</option>`;
             for (let i = 0; i < users.length; i++) {
-                user_string += `<option value="${users[i].user_id}">${users[i].name}</option>`;
+                user_string += `<option value="${users[i].emp_id}">${users[i].name}</option>`;
             }
             $('#user_id').append(user_string);
         }
@@ -1187,13 +1172,13 @@
         }
 
         async function CheckAllowEditable() {
-            let user_name = '@Model.name.ToLower()';
+            let emp_id = '@Model.emp_id.ToLower()';
             let allow = false;
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("CheckAllowEditable", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name },
+                data: { emp_id },
                 success: function (response) {
                     allow = response;
                 }
@@ -1222,7 +1207,7 @@
                 await GetLastWorkingHoursID();
                 await GetUsers();
                 await GenerateUsersOption();
-                await GetWorkingHoursByDate("@Model.name.ToLower()", date_start);
+                await GetWorkingHoursByDate("@Model.emp_id.ToLower()", date_start);
                 await GetJobs();
                 await GetQuotations();
                 await GenerateCustomerOptions();
@@ -1277,10 +1262,10 @@
         function PrepmodalTask(date_start) {
             $('#modal_task').modal();
             $('#modal_task_title').text("Add Task");
-            let user_name = '@Model.name.ToLower()';
-            let user_id = users.filter(f => f.name.toLowerCase() === user_name).map(m => m.user_id);
+            let emp_id = '@Model.emp_id.ToLower()';
+            let user_id = users.filter(f => f.emp_id === emp_id).map(m => m.user_id);
             $('#working_hour_id').val(last_id);
-            $('#user_id').val(user_id);
+            $('#user_id').val(emp_id);
             $('#working_date_group').show();
             $('#working_date').prop('disabled', true);
             $('#working_date').val(date_start);
@@ -1296,10 +1281,10 @@
         function PrepmodalTasks(date_start, date_end) {
             $('#modal_task').modal();
             $('#modal_task_title').text("Add Tasks");
-            let user_name = '@Model.name.ToLower()';
-            let user_id = users.filter(f => f.name.toLowerCase() === user_name).map(m => m.user_id);
+            let emp_id = '@Model.emp_id.ToLower()';
+            let user_id = users.filter(f => f.emp_id === emp_id).map(m => m.user_id);
             $('$working_hour_id').val(last_id);
-            $('#user_id').val(user_id);
+            $('#user_id').val(emp_id);
             $('#working_date_group').hide();
             $('#working_date').prop('disabled', true);
             $('#working_date').val(null);
@@ -1483,7 +1468,8 @@
         });
 
         $('#btn_accept').on('click', async function () {
-            let user_id = $('#user_id').val();
+            let emp_id = $('#user_id').val();
+            let user_id = $('#user_id :selected').text();
             let working_date = $('#working_date').val();
             let wh_index = $('#working_hour_id').val();
 
@@ -1508,20 +1494,10 @@
             let dinner_half = $('#dinner_half').prop('checked');
             let note = $('#note').val();
 
-            if (debug_accept) {
-                console.log("Add Task");
-                console.log("User ID -> " + user_id);
-                console.log("Date -> " + working_date);
-                console.log("Job -> " + job_id);
-                console.log("Task -> " + task_id);
-                console.log("From -> " + start_time);
-                console.log("To -> " + stop_time);
-                console.log("Note -> " + note);
-            }
-
             if (update) {
                 let wh_string = JSON.stringify({
                     "index": wh_index,
+                    "emp_id": emp_id,
                     "user_id": user_id,
                     "working_date": working_date,
                     "job_id": job_id,
@@ -1537,14 +1513,14 @@
                     "note": note,
                 });
 
-                let enable_edit = false;
-                if (eng.role === "Admin" || eng.allow_edit === true) {
-                    enable_edit = true;
-                } else {
-                    let today = new Date();
-                    let date_diff = Math.floor((today - working_date) / (1000 * 60 * 60 * 24));
-                    enable_edit = date_diff < 15 ? true : false;
-                }
+                let enable_edit = true;
+                //if (eng.role === "Admin" || eng.allow_edit === true) {
+                //    enable_edit = true;
+                //} else {
+                //    let today = new Date();
+                //    let date_diff = Math.floor((today - working_date) / (1000 * 60 * 60 * 24));
+                //    enable_edit = date_diff < 15 ? true : false;
+                //}
 
                 if (enable_edit) {
                     await UpdateWorkingHours(wh_string);
@@ -1559,6 +1535,7 @@
                 if (working_date !== "") {
                     let wh_string = JSON.stringify({
                         "index": wh_index,
+                        "emp_id": emp_id,
                         "user_id": user_id,
                         "working_date": working_date,
                         "job_id": job_id,
@@ -1583,6 +1560,7 @@
                         let task_overlap = false;
                         let wh_string = JSON.stringify({
                             "index": wh_index,
+                            "emp_id": emp_id,
                             "user_id": user_id,
                             "working_date": cur_date,
                             "job_id": job_id,
@@ -1613,7 +1591,8 @@
         });
 
         $('#btn_confirm_delete').on('click', async function () {
-            let user_id = $('#user_id').val();
+            let emp_id = $('#user_id').val();
+            let user_id = $('#user_id :selected').text();
             let wh_index = $('#working_hour_id').val();
             let working_date = $('#working_date').val();
             let job_id = "";
@@ -1639,6 +1618,7 @@
 
             let wh_string = JSON.stringify({
                 "index": wh_index,
+                "emp_id": emp_id,
                 "user_id": user_id,
                 "working_date": working_date,
                 "job_id": job_id,
@@ -1670,7 +1650,7 @@
             stop_time.setMinutes(task.stop_time.split(":")[1]);
             stop_time.setSeconds(0);
             stop_time.setMilliseconds(0);
-            await GetWorkingHoursByDate("@Model.name", date);
+            await GetWorkingHoursByDate("@Model.emp_id", date);
             if (update) {
                 wh_day = wh_day.filter(f => f.index !== task.index);
             }
@@ -1714,7 +1694,7 @@
             stop_time.setMinutes(task.stop_time.split(":")[1]);
             stop_time.setSeconds(0);
             stop_time.setMilliseconds(0);
-            await GetWorkingHoursByDate("@Model.name", date);
+            await GetWorkingHoursByDate("@Model.emp_id", date);
             for (let i = 0; i < wh_day.length; i++) {
                 let task_start = new Date();
                 let task_stop = new Date();
@@ -1753,7 +1733,7 @@
             stop_time.setMinutes(task.stop_time.split(":")[1]);
             stop_time.setSeconds(0);
             stop_time.setMilliseconds(0);
-            await GetWorkingHoursByDate("@Model.name", date);
+            await GetWorkingHoursByDate("@Model.emp_id", date);
             for (let i = 0; i < wh_day.length; i++) {
                 let task_start = new Date();
                 task_start.setHours(wh_day[i].start_time.split(":")[0]);
@@ -1781,12 +1761,12 @@
             return false;
         }
 
-        async function GetEngineerUser(user_name) {
+        async function GetEngineerUser(emp_id) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetEngineerUser", "Calendar")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name },
+                data: { emp_id },
                 success: function (response) {
                     eng = response;
                 }
@@ -1795,8 +1775,9 @@
 
         async function EditTask(event) {
             update = true;
+            let emp_id = event.extendedProps.emp_id;
             let user_id = event.extendedProps.user_id;
-            let user_name = users.filter(f => f.user_id === user_id).map(m => m.name.toLowerCase());
+            //let user_name = users.filter(f => f.user_id === user_id).map(m => m.name.toLowerCase());
             let date = event.extendedProps.working_date;
 
             let job_id = event.extendedProps.job_id;
@@ -1814,7 +1795,7 @@
             }
             await GetUsers();
             await GenerateUsersOption();
-            await GetWorkingHoursByDate(user_name, date.split("T")[0]);
+            await GetWorkingHoursByDate(emp_id, date.split("T")[0]);
             await GetJobs();
            // await GetQuotations();
             await GenerateCustomerOptions();
@@ -1831,6 +1812,7 @@
             task.working_date = event.startStr.split("T")[0];
             let wh_string = JSON.stringify({
                 "index": task.index,
+                "emp_id": task.emp_id,
                 "user_id": task.user_id,
                 "working_date": event.startStr.split("T")[0],
                 "job_id": task.job_id,
@@ -1886,7 +1868,7 @@
             $('#modal_task').modal();
             $('#modal_task_title').text("Edit Task");
             $('#working_hour_id').val(task.index);
-            $('#user_id').val(task.user_id);
+            $('#user_id').val(task.emp_id);
             $('#working_date_group').show();
             $('#working_date').val(task.working_date.split("T")[0]);
             $('#date_group').hide();

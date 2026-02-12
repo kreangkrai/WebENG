@@ -30,13 +30,11 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"
-                    SELECT
+                string string_command = string.Format($@"SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -55,7 +53,7 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
@@ -71,7 +69,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -107,7 +104,7 @@ namespace WebENG.Service
             return whs;
         }
 
-        public List<WorkingHoursModel> GetWorkingHours(string user_name)
+        public List<WorkingHoursModel> GetWorkingHours(string emp_id)
         {
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
@@ -120,9 +117,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -141,12 +137,12 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
-                    WHERE LOWER(Authen.name) = '{user_name}'");
+                    WHERE WorkingHours.emp_id = '{emp_id}'");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -157,7 +153,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -193,7 +188,7 @@ namespace WebENG.Service
             return whs;
         }
 
-        public List<WorkingDayModel> GetWorkingHours(DateTime start,DateTime stop, string user_name)
+        public List<WorkingDayModel> GetWorkingHours(DateTime start,DateTime stop, string emp_id)
         {
             List<WorkingDayModel> wd = new List<WorkingDayModel>();
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
@@ -204,15 +199,14 @@ namespace WebENG.Service
                     con.Open();
                 }
                 string string_command = "";
-                if (user_name == "ALL")
+                if (emp_id == "ALL")
                 {
                     string_command = string.Format($@"
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -231,7 +225,7 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
@@ -244,9 +238,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -265,13 +258,13 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
                     WHERE WorkingHours.working_date >= '{start.ToString("yyyy-MM-dd")}' AND WorkingHours.working_date <= '{stop.ToString("yyyy-MM-dd")}'
-                    AND LOWER(Authen.name) ='{user_name}'");
+                    AND WorkingHours.emp_id ='{emp_id}'");
                 }
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -283,7 +276,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -339,9 +331,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -360,7 +351,7 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
@@ -375,7 +366,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -416,7 +406,7 @@ namespace WebENG.Service
             }
             return wd;
         }
-        public List<WorkingHoursModel> GetWorkingHours(string user_name, DateTime working_date)
+        public List<WorkingHoursModel> GetWorkingHours(string emp_id, DateTime working_date)
         {
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
             try
@@ -429,9 +419,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -450,12 +439,12 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
 						LEFT JOIN Eng_System ON WorkingHours.system_id = Eng_System.System_ID
-                    WHERE LOWER(Authen.name) = '{user_name}'
+                    WHERE WorkingHours.emp_id = '{emp_id}'
                     AND WorkingHours.working_date LIKE '{working_date.ToString("yyyy-MM-dd")}'");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -467,7 +456,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
@@ -512,15 +500,14 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     INSERT INTO WorkingHours(
-                        ind,emp_id,user_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch_full,lunch_half, dinner_full,dinner_half, note)
+                        ind,emp_id, working_date, week_number, job_id,process_id,system_id, task_id, start_time, stop_time, lunch_full,lunch_half, dinner_full,dinner_half, note)
                     VALUES (
-                        @ind,@emp_id,@user_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch_full,@lunch_half, @dinner_full,@dinner_half, @note)");
+                        @ind,@emp_id, @working_date, (SELECT DATEPART(ISO_WEEK,@working_date)), @job_id,@process_id,@system_id, @task_id, @start_time, @stop_time, @lunch_full,@lunch_half, @dinner_full,@dinner_half, @note)");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@ind", wh.index);
                     cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
-                    cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
                     if (wh.job_id == "J999999")
@@ -587,7 +574,6 @@ namespace WebENG.Service
                     UPDATE WorkingHours 
                     SET
                         emp_id = @emp_id,
-                        user_id = @user_id,
                         working_date = @working_date,
                         week_number = (SELECT DATEPART(ISO_WEEK,@working_date)),
                         job_id = @job_id,
@@ -604,9 +590,8 @@ namespace WebENG.Service
                     WHERE ind = @ind");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
-                    cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
 
@@ -675,7 +660,7 @@ namespace WebENG.Service
                         lunch_half = @lunch_half,
                         dinner_full = @dinner_full,
                         dinner_half = @dinner_half
-                    WHERE user_id = @user_id 
+                    WHERE emp_id = @emp_id 
                         AND working_date = @working_date 
                         AND job_id = @job_id
                         AND task_id = @task_id
@@ -688,7 +673,7 @@ namespace WebENG.Service
                     cmd.Parameters.AddWithValue("@lunch_half", wh.lunch_half);
                     cmd.Parameters.AddWithValue("@dinner_full", wh.dinner_full);
                     cmd.Parameters.AddWithValue("@dinner_half", wh.dinner_half);
-                    cmd.Parameters.AddWithValue("@user_id", wh.user_id);
+                    cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
                     cmd.Parameters.AddWithValue("@working_date", wh.working_date);
                     cmd.Parameters.AddWithValue("@job_id", wh.job_id);
                     cmd.Parameters.AddWithValue("@task_id", wh.task_id);
@@ -722,13 +707,12 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     DELETE FROM WorkingHours
-                    WHERE user_id = @user_id AND emp_id = @emp_id
+                    WHERE emp_id = @emp_id
                         AND ind = @ind");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
-                    cmd.CommandType = System.Data.CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@emp_id", wh.emp_id);
-                    cmd.Parameters.AddWithValue("@user_id", wh.user_id);
                     cmd.Parameters.AddWithValue("@ind", wh.index);
                     cmd.ExecuteNonQuery();
                 }
@@ -818,13 +802,13 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     SELECT 
-	                    DISTINCT emp_id,user_id,
+	                    DISTINCT emp_id,
 	                    {week} as week_number,
 	                    {year} as year,
 	                    ISNULL(a.hours, 0) AS hours
                     FROM (
 	                    SELECT 
-		                    user_id, 
+		                    emp_id, 
 		                    SUM(CASE 
 				                    WHEN DATEDIFF(HOUR,start_time,stop_time) > 0
 				                    THEN DATEDIFF(HOUR,start_time,stop_time)
@@ -832,7 +816,7 @@ namespace WebENG.Service
 			                    END) AS hours
 	                    FROM WorkingHours
 	                    WHERE working_date LIKE '{year}%' AND week_number = {week}
-	                    GROUP BY user_id) AS a
+	                    GROUP BY emp_id) AS a
                     ");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -843,7 +827,6 @@ namespace WebENG.Service
                         EngWeeklyWorkingHoursModel wh = new EngWeeklyWorkingHoursModel()
                         {
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             year = dr["year"] != DBNull.Value ? Convert.ToInt32(dr["year"]) : 0,
                             week = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : 0,
                             hours = dr["hours"] != DBNull.Value ? Convert.ToInt32(dr["hours"]) : 0
@@ -876,9 +859,8 @@ namespace WebENG.Service
                     SELECT
                         WorkingHours.ind,
                         WorkingHours.emp_id,
-                        WorkingHours.user_id,
-                        Authen.name,
-                        Authen.department,
+                        emp.name_en as name,
+                        emp.department,
                         WorkingHours.working_date,
                         WorkingHours.week_number,
                         WorkingHours.job_id,
@@ -897,7 +879,7 @@ namespace WebENG.Service
                         WorkingHours.dinner_half,
                         WorkingHours.note
                     FROM WorkingHours
-                        LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                        LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                         LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                         LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 						LEFT JOIN Eng_Process ON WorkingHours.process_id = Eng_Process.Process_ID
@@ -913,7 +895,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
@@ -2316,13 +2297,13 @@ namespace WebENG.Service
             return monthly;
         }
 
-        public List<WorkingHoursModel> CalculateWorkingHours(string user_name, DateTime start , DateTime stop)
+        public List<WorkingHoursModel> CalculateWorkingHours(string emp_id, DateTime start , DateTime stop)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
 
             string day = "";
 
-            List<WorkingDayModel> whs = GetWorkingHours(start,stop, user_name);
+            List<WorkingDayModel> whs = GetWorkingHours(start,stop, emp_id);
             List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
@@ -2861,7 +2842,7 @@ namespace WebENG.Service
             return whs;
         }
 
-        public WorkingHoursModel GetWorkingHourByLeave(string user_id, string working_date)
+        public WorkingHoursModel GetWorkingHourByLeave(string emp_id, string working_date)
         {
             WorkingHoursModel wh = new WorkingHoursModel();
             try
@@ -2870,9 +2851,9 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"SELECT * FROM WorkingHours WHERE user_id = @user_id AND working_date = @working_date AND job_id = 'J999999'");
+                string string_command = string.Format($@"SELECT * FROM WorkingHours WHERE emp_id = @emp_id AND working_date = @working_date AND job_id = 'J999999'");
                 SqlCommand cmd = new SqlCommand(string_command, con);
-                cmd.Parameters.AddWithValue("@user_id", user_id);
+                cmd.Parameters.AddWithValue("@emp_id", emp_id);
                 cmd.Parameters.AddWithValue("@working_date", working_date);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -2883,7 +2864,6 @@ namespace WebENG.Service
                         {
                             index = dr["ind"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
                             working_date = dr["working_date"] != DBNull.Value ? Convert.ToDateTime(dr["working_date"]) : default(DateTime),
                             week_number = dr["week_number"] != DBNull.Value ? Convert.ToInt32(dr["week_number"]) : default(Int32),
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",

@@ -18,7 +18,7 @@ namespace WebENG.Service
             connect = new ConnectSQL();
             con = connect.OpenConnect();
         }
-        public List<DailyActivityModel> GetDailyActivities(string user_name, DateTime start_date, DateTime stop_date)
+        public List<DailyActivityModel> GetDailyActivities(string emp_id, DateTime start_date, DateTime stop_date)
         {
             List<DailyActivityModel> dlrs = new List<DailyActivityModel>();
             try
@@ -27,9 +27,9 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"
-                    SELECT
+                string string_command = string.Format($@" SELECT
 	                    ind,
+						WorkingHours.emp_id,
                         working_date,
                         start_time,
                         stop_time,
@@ -41,19 +41,17 @@ namespace WebENG.Service
                         problem,
                         solution,
                         tomorrow_plan,
-                        WorkingHours.user_id,
-	                    EngineerUsers.user_name,
+	                    emp.name_en as user_name,
                         Quotation.customer,
-                        note
+                        WorkingHours.note
                     FROM WorkingHours 
-                    LEFT JOIN EngineerUsers ON WorkingHours.user_id = EngineerUsers.user_id
+                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
-                    WHERE EngineerUsers.user_name LIKE '{user_name}'
+                    WHERE WorkingHours.emp_id = '{emp_id}'
                     AND working_date BETWEEN '{start_date.ToString("yyyy-MM-dd")}' AND '{stop_date.ToString("yyyy-MM-dd")}'
-                    ORDER BY working_date, start_time;
-                ");
+                    ORDER BY working_date, start_time;");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -70,7 +68,7 @@ namespace WebENG.Service
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                             activity = dr["activity"] != DBNull.Value ? dr["activity"].ToString() : "",
@@ -135,7 +133,7 @@ namespace WebENG.Service
             return "Success";
         }
 
-        public List<DailyActivityModel> GetDailyActivities(string user_name, string month)
+        public List<DailyActivityModel> GetDailyActivities(string emp_id, string month)
         {
             int yy = Convert.ToInt32(month.Split("-")[0]);
             int mm = Convert.ToInt32(month.Split("-")[1]);
@@ -160,16 +158,16 @@ namespace WebENG.Service
                         problem,
                         solution,
                         tomorrow_plan,
-                        WorkingHours.user_id,
-	                    EngineerUsers.user_name,
+                        WorkingHours.emp_id,
+	                    emp.name_en as user_name,
                         Quotation.customer,
                         WorkingHours.note
                     FROM WorkingHours 
-                    LEFT JOIN EngineerUsers ON WorkingHours.user_id = EngineerUsers.user_id
+                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
-                    WHERE EngineerUsers.user_name LIKE '{user_name}'
+                    WHERE  WorkingHours.emp_id = '{emp_id}'
                     AND YEAR(working_date) = {yy} AND MONTH(working_date) = {mm}
                     ORDER BY working_date, start_time;
                 ");
@@ -189,7 +187,7 @@ namespace WebENG.Service
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                             activity = dr["activity"] != DBNull.Value ? dr["activity"].ToString() : "",
@@ -236,12 +234,12 @@ namespace WebENG.Service
                         problem,
                         solution,
                         tomorrow_plan,
-                        WorkingHours.user_id,
-	                    EngineerUsers.user_name,
+                        WorkingHours.emp_id,
+	                    emp.name_en as user_name,
                         Quotation.customer,
                         WorkingHours.note
                     FROM WorkingHours 
-                    LEFT JOIN EngineerUsers ON WorkingHours.user_id = EngineerUsers.user_id
+                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     LEFT JOIN Quotation ON Jobs.quotation_no = Quotation.quotation_no
@@ -263,7 +261,7 @@ namespace WebENG.Service
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             note = dr["note"] != DBNull.Value ? dr["note"].ToString() : "",
                             activity = dr["activity"] != DBNull.Value ? dr["activity"].ToString() : "",

@@ -220,7 +220,7 @@ namespace WebENG.Service
             return jobs;
         }
 
-        public List<JobModel> GetJobStatusByUser(string user)
+        public List<JobModel> GetJobStatusByUser(string emp_id)
         {
             List<JobModel> jobs = new List<JobModel>();
             SqlCommand cmd = new SqlCommand();
@@ -319,7 +319,7 @@ namespace WebENG.Service
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
-                    WHERE Jobs.job_id IN (SELECT job_id FROM JobResponsible WHERE user_id = '{user}')
+                    WHERE Jobs.job_id IN (SELECT job_id FROM JobResponsible WHERE emp_id = '{emp_id}')
                     ORDER BY Jobs.job_id");
                 cmd = new SqlCommand(string_command, con);
                 dr = cmd.ExecuteReader();

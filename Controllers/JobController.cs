@@ -66,7 +66,6 @@ namespace WebENG.Controllers
                         name = employee.name_en,
                         role = "User",
                         department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -93,15 +92,6 @@ namespace WebENG.Controllers
                 return RedirectToAction("Index", "Account");
             }
         }
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
-
         public IActionResult JobsSummary()
         {
             if (HttpContext.Session.GetString("Login_ENG") != null)
@@ -109,7 +99,7 @@ namespace WebENG.Controllers
                 string user = HttpContext.Session.GetString("userId");
                 List<UserModel> users = new List<UserModel>();
                 users = Accessory.getAllUser();
-                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role, user_id = s.user_id ,emp_id = s.emp_id }).FirstOrDefault();
+                UserModel u = users.Where(w => w.name.ToLower() == user.ToLower()).Select(s => new UserModel { name = s.name, department = s.department, role = s.role ,emp_id = s.emp_id }).FirstOrDefault();
                 HttpContext.Session.SetString("Role", u.role);
                 HttpContext.Session.SetString("Name", u.name);
                 HttpContext.Session.SetString("Department", u.department);
@@ -124,7 +114,7 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetAllUsers()
         {
-            List<EngUserModel> users = EngUserService.GetUsers().Where(w=>w.group != "" && w.active == true).OrderBy(o => o.user_id).ToList();
+            List<EngUserModel> users = EngUserService.GetUsers().Where(w=>w.group != "" && w.active == true).OrderBy(o => o.user_name).ToList();
             return Json(users);
         }
 
@@ -187,20 +177,20 @@ namespace WebENG.Controllers
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<WorkingHoursModel> workings = WorkingHours.GetWorkingHours();
             List<string> jobs = workings.GroupBy(g => g.job_id).Select(s => s.FirstOrDefault().job_id).OrderBy(o=>o).ToList();
-
+            jobs = jobs.Where(w => w == "J250585").ToList();
             List<HolidayModel> holidays = Holiday.GetAllHolidays();
             for (int i = 0; i < jobs.Count; i++)
             {
-                List<string> names = workings.Where(w => w.job_id == jobs[i]).GroupBy(g=>g.user_id).Select(s=>s.FirstOrDefault().user_id).ToList();
+                List<string> emps = workings.Where(w => w.job_id == jobs[i]).GroupBy(g=>g.emp_id).Select(s=>s.FirstOrDefault().emp_id).ToList();
                 JobsWorkingHoursModel sum_jwh = new JobsWorkingHoursModel();
-                for (int j = 0; j < names.Count; j++)
+                for (int j = 0; j < emps.Count; j++)
                 {
                     int level = 1;
-                    if (jr.Any(w => w.job_id == jobs[i] && w.user_id == names[j]))
+                    if (jr.Any(w => w.job_id == jobs[i] && w.emp_id == emps[j]))
                     {
-                         level = jr.Where(w => w.job_id == jobs[i] && w.user_id == names[j]).FirstOrDefault().level;
+                         level = jr.Where(w => w.job_id == jobs[i] && w.emp_id == emps[j]).FirstOrDefault().level;
                     }
-                    List<WorkingHoursModel> workings_ = workings.Where(w => w.job_id == jobs[i] && w.user_id == names[j]).ToList();
+                    List<WorkingHoursModel> workings_ = workings.Where(w => w.job_id == jobs[i] && w.emp_id == emps[j]).ToList();
                     List<WorkingDayModel> wd = workings_.GroupBy(g => g.working_date).Select(s => new WorkingDayModel()
                     {
                         date = s.Key,
@@ -292,15 +282,15 @@ namespace WebENG.Controllers
 
             List<HolidayModel> holidays = Holiday.GetAllHolidays();
 
-            List<string> names = workings.Where(w => w.job_id == job_id).GroupBy(g => g.user_id).Select(s => s.FirstOrDefault().user_id).ToList();
-            for (int j = 0; j < names.Count; j++)
+            List<string> emps = workings.Where(w => w.job_id == job_id).GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
+            for (int j = 0; j < emps.Count; j++)
             {
                 int level = 1;
-                if (jr.Any(w => w.job_id == job_id && w.user_id == names[j]))
+                if (jr.Any(w => w.job_id == job_id && w.emp_id == emps[j]))
                 {
-                    level = jr.Where(w => w.job_id == job_id && w.user_id == names[j]).FirstOrDefault().level;
+                    level = jr.Where(w => w.job_id == job_id && w.emp_id == emps[j]).FirstOrDefault().level;
                 }
-                List<WorkingHoursModel> workings_ = workings.Where(w => w.job_id == job_id && w.user_id == names[j]).ToList();
+                List<WorkingHoursModel> workings_ = workings.Where(w => w.job_id == job_id && w.emp_id == emps[j]).ToList();
                 List<WorkingDayModel> wd = workings_.GroupBy(g => g.working_date).Select(s => new WorkingDayModel()
                 {
                     date = s.Key,

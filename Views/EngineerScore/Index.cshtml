@@ -229,10 +229,6 @@
     let colors = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600', '#28cc9e', '#a6ed8e', '#ffdd83', '#e3f8ff','#912AB4','#D32D67','#3973DF','#298ED9','#73E5AE','#EFC67A','#CAEF7A','#485E1A','#93A6DA','#0B717A'];
 
     let statuses = [];
-
-    //Change these parameters to true to see result
-    let debug_score = false;
-    let debug_user = false;
   
     $(document).ready(async function () {
         await GetStatus();
@@ -241,15 +237,15 @@
         GenerateUserOption();
         GenerateYearOption();
         let date = new Date();
-        $('#user_id').val('@Model.user_id');
+        $('#user_id').val('@Model.emp_id');
         $('#year').val(date.getFullYear());
         
-        let user_id = $('#user_id').val();
+        let emp_id = $('#user_id').val();
         let department = $('#departments :selected').text();
-        await GetScores(user_id, department);
+        await GetScores(emp_id, department);
         GenerateTable();
-        $('#name1').html(user_id + " Manpower");
-        $('#name2').html(user_id + " Manpower");
+        $('#name1').html(emp_id + " Manpower");
+        $('#name2').html(emp_id + " Manpower");
     });
 
     async function GetStatus() {
@@ -271,9 +267,6 @@
             data: { },
             success: function (response) {
                 users = response;
-                if (debug_user) {
-                    console.log(users);
-                }
             }
         });
     }
@@ -311,18 +304,14 @@
         });
     }
 
-    async function GetScores(user_id,department) {
+    async function GetScores(emp_id,department) {
         await $.ajax({
             type: "GET",
             url: '@Url.Action("GetScores", "EngineerScore")',
             contentType: 'application/x-www-form-urlencoded',
-            data: { user_id, department},
+            data: { emp_id, department},
             success: function (response) {
                 scores = response;
-                if (debug_score) {
-                    console.log("Scores");
-                    console.log(scores);
-                }
             }
         });
     }
@@ -346,13 +335,13 @@
         let department = $('#departments').val();
         if (department === "ALL") {
             for (let i = 0; i < users.length; i++) {
-                $('#user_id').append(`<option value="${users[i].user_id}">${users[i].name}</option>`);
+                $('#user_id').append(`<option value="${users[i].emp_id}">${users[i].name}</option>`);
             }
         }
         else {
             let employees = users.filter(f => f.department === department);
             for (let i = 0; i < employees.length; i++) {
-                $('#user_id').append(`<option value="${employees[i].user_id}">${employees[i].name}</option>`);
+                $('#user_id').append(`<option value="${employees[i].emp_id}">${employees[i].name}</option>`);
             }
         }
     }
@@ -484,10 +473,10 @@
     }
 
     $('#btn_filter').on('click', async function () {
-        let user_id = $('#user_id').val();
+        let emp_id = $('#user_id').val();
         let department = $('#departments :selected').text();
         
-        await GetScores(user_id, department);
+        await GetScores(emp_id, department);
         await GenerateTable();
         $('#name1').html(user_id + " Manpower");
         $('#name2').html(user_id + " Manpower");

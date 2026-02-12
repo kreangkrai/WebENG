@@ -51,7 +51,6 @@ namespace WebENG.Controllers
                         name = employee.name_en,
                         role = "User",
                         department = employee.department,
-                        user_id = ConvertUserID(employee.name_en)
                     };
                 }
                 HttpContext.Session.SetString("Name", u.name);
@@ -88,7 +87,6 @@ namespace WebENG.Controllers
                 AuthenModel authen = new AuthenModel()
                 {
                     levels = 1,
-                    user_id = ConvertUserID(not_emp[i]),
                     department = employees.Where(w=>w.name_en.ToLower() == not_emp[i].ToLower()).Select(s=>s.department).FirstOrDefault(),
                     name = not_emp[i],
                     role = "User",
@@ -100,47 +98,38 @@ namespace WebENG.Controllers
             return Json(users);
         }
 
-        public string ConvertUserID(string user)
-        {
-            string first = user.Split(' ')[0];
-            string last = user.Split(' ')[1];
-            string name = first.Substring(0, 1).ToUpper() + first.Substring(1, first.Length - 1);
-            string lastname = last.Substring(0, 1).ToUpper();
-            return name + "." + lastname;
-        }
-
         [HttpGet]
-        public List<JobProcessSystemModel> GetProcessSystemByUser(string user)
+        public List<JobProcessSystemModel> GetProcessSystemByUser(string emp_id)
         {
-            List<JobProcessSystemModel> jps = Job.getsJobprocessSystemByUser(user);
+            List<JobProcessSystemModel> jps = Job.getsJobprocessSystemByUser(emp_id);
             return jps;
         }
 
         [HttpGet]
-        public List<JobResponsibleModel> GetJobs(string user_name)
+        public List<JobResponsibleModel> GetJobs(string emp_id)
         {
-            List<JobResponsibleModel> jrs = JobResponsibleService.GetJobResponsible(user_name);
+            List<JobResponsibleModel> jrs = JobResponsibleService.GetJobResponsible(emp_id);
             return jrs;
         }
 
         [HttpGet]
-        public List<QuotationResponsibleModel> GetQuotations(string user_name)
+        public List<QuotationResponsibleModel> GetQuotations(string emp_id)
         {
-            List<QuotationResponsibleModel> qrs = JobResponsibleService.GetQuotationResponsible(user_name);
+            List<QuotationResponsibleModel> qrs = JobResponsibleService.GetQuotationResponsible(emp_id);
             return qrs;
         }
 
         [HttpGet]
-        public bool CheckAllowEditable(string user_name)
+        public bool CheckAllowEditable(string emp_id)
         {
-            bool allow = EngineerService.CheckAllowEditable(user_name);
+            bool allow = EngineerService.CheckAllowEditable(emp_id);
             return allow;
         }
 
         [HttpGet]
-        public JsonResult GetWorkingHours(string user_name)
+        public JsonResult GetWorkingHours(string emp_id)
         {
-            List<WorkingHoursModel> whs = WorkingHoursService.GetWorkingHours(user_name);
+            List<WorkingHoursModel> whs = WorkingHoursService.GetWorkingHours(emp_id);
             whs = whs.OrderByDescending(w => w.working_date).ToList();
             return Json(whs);
         }
@@ -152,13 +141,13 @@ namespace WebENG.Controllers
             return Json(users);
         }
         [HttpGet] 
-        public JsonResult GetEngineerUser(string user_name)
+        public JsonResult GetEngineerUser(string emp_id)
         {
-            EngUserModel eng = EngineerService.GetEngineerUser(user_name);
+            EngUserModel eng = EngineerService.GetEngineerUser(emp_id);
             if (eng == null)
             {
                 List<CTLModels.EmployeeModel> employees = Employees.GetEmployees();
-                CTLModels.EmployeeModel emp = employees.Where(w => w.name_en.ToLower() == user_name.ToLower()).FirstOrDefault();
+                CTLModels.EmployeeModel emp = employees.Where(w => w.emp_id == emp_id).FirstOrDefault();
                 eng = new EngUserModel()
                 {
                     role = "User",
@@ -166,7 +155,6 @@ namespace WebENG.Controllers
                     active = emp.active,
                     allow_edit = true,
                     group = emp.group,
-                    user_id = ConvertUserID(emp.name_en),
                     user_name =emp.name_en
                 };
             }
@@ -174,9 +162,9 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetWorkingHoursByDate(string user_name, DateTime working_date)
+        public JsonResult GetWorkingHoursByDate(string emp_id, DateTime working_date)
         {
-            List<WorkingHoursModel> whs = WorkingHoursService.GetWorkingHours(user_name, working_date);
+            List<WorkingHoursModel> whs = WorkingHoursService.GetWorkingHours(emp_id, working_date);
             whs = whs.OrderByDescending(w => w.working_date).ToList();
             return Json(whs);
         }
@@ -203,12 +191,13 @@ namespace WebENG.Controllers
         public JsonResult AddWorkingHoursDays(string[] wh_strings)
         {
             List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+            string message = "";
             for (int i = 0; i < wh_strings.Count(); i++)
             {
                 WorkingHoursModel wh = JsonConvert.DeserializeObject<WorkingHoursModel>(wh_strings[i]);
-                var result = WorkingHoursService.AddWorkingHours(wh);
+                message = WorkingHoursService.AddWorkingHours(wh);
             }
-            return Json("Success");
+            return Json(message);
         }
 
         [HttpPatch]

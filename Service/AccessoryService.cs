@@ -30,7 +30,6 @@ namespace WebENG.Service
                 SqlCommand cmd = new SqlCommand(@"SELECT [MES].dbo.Authen.name,
                                                     [MES].dbo.Authen.department,
                                                     role,
-                                                    user_id,
                                                     emp.emp_id
                                                     FROM [MES].dbo.Authen
                                                     LEFT JOIN [CTL].dbo.[Employees] emp ON [MES].dbo.Authen.name = emp.name_en
@@ -42,7 +41,6 @@ namespace WebENG.Service
                     {
                         UserModel u = new UserModel()
                         {
-                            user_id = dr["user_id"].ToString(),
                             emp_id = dr["emp_id"].ToString(),
                             name = dr["name"].ToString().ToLower(),
                             department = dr["department"].ToString(),
@@ -72,26 +70,24 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                SqlCommand cmd = new SqlCommand(@"SELECT DISTINCT Authen.user_id,
-				                                                    Authen.name,
-				                                                    Authen.department,
-				                                                    Authen.role 
+                SqlCommand cmd = new SqlCommand(@"SELECT DISTINCT emp.emp_id,
+				                                                    emp.name_en as name,
+				                                                    emp.department
                                                     FROM WorkingHours 
-                                                    LEFT JOIN Authen ON Authen.user_id = WorkingHours.user_id 
-                                                    ORDER BY Authen.name", con);
+                                                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id  = emp.emp_id
+                                                    ORDER BY emp.name_en", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
-                        if (dr["user_id"] != DBNull.Value && dr["user_id"].ToString() != "")
+                        if (dr["emp_id"] != DBNull.Value && dr["emp_id"].ToString() != "")
                         {
                             UserModel u = new UserModel()
                             {
-                                user_id = dr["user_id"].ToString(),
+                                emp_id = dr["emp_id"].ToString(),
                                 name = dr["name"].ToString().ToLower(),
                                 department = dr["department"].ToString(),
-                                role = dr["role"].ToString()
                             };
                             users.Add(u);
                         }
@@ -118,27 +114,25 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                SqlCommand cmd = new SqlCommand($@"SELECT DISTINCT Authen.user_id,
-				                                                    Authen.name,
-				                                                    Authen.department,
-				                                                    Authen.role 
+                SqlCommand cmd = new SqlCommand($@"SELECT DISTINCT emp.emp_id,
+				                                                    emp.name_en as name,
+				                                                    emp.department
                                                     FROM WorkingHours 
-                                                    LEFT JOIN Authen ON Authen.user_id = WorkingHours.user_id
+                                                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id  = emp.emp_id                                                   
                                                     Where working_date between '{start.ToString("yyyy-MM-dd")}' AND '{stop.ToString("yyyy-MM-dd")}'
-                                                    ORDER BY Authen.name", con);
+                                                    ORDER BY emp.name_en", con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
                 {
                     while (dr.Read())
                     {
-                        if (dr["user_id"] != DBNull.Value && dr["user_id"].ToString() != "")
+                        if (dr["emp_id"] != DBNull.Value && dr["emp_id"].ToString() != "")
                         {
                             UserModel u = new UserModel()
                             {
-                                user_id = dr["user_id"].ToString(),
+                                emp_id = dr["emp_id"].ToString(),
                                 name = dr["name"].ToString().ToLower(),
                                 department = dr["department"].ToString(),
-                                role = dr["role"].ToString()
                             };
                             users.Add(u);
                         }

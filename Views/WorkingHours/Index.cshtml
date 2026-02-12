@@ -244,10 +244,10 @@
 
             await GetUsers();
             await GenerateUsersOption();
-            $('#user_id').val("@Model.user_id");
+            $('#user_id').val("@Model.emp_id");
             $('#whs_month').val(today.getFullYear() + "-" + (today.getMonth() + 1).toString().padStart(2, 0));
 
-            await GetWorkingHours("@Model.name.ToLower()", today.toISOString().substring(0, 7));
+            await GetWorkingHours("@Model.emp_id", today.toISOString().substring(0, 7));
             await GetWorkingHoursSummary();
 
         });
@@ -260,8 +260,6 @@
                 data: { },
                 success: function (response) {
                     users = response;
-                    if (debug_user)
-                        console.log(users);
                 }
             });
         }
@@ -270,7 +268,7 @@
             $('#user_id').empty();
             var user_str = '<option value="" disabled>Please Select User</option>';
             for (var i = 0; i < users.length; i++) {
-                user_str += '<option value="' + users[i].user_id + '">' + users[i].name + '</option>';
+                user_str += '<option value="' + users[i].emp_id + '">' + users[i].name + '</option>';
             }
             $('#user_id').append(user_str);
         }
@@ -297,28 +295,25 @@
 
         $('#btn_load').on('click', function () {
             var load_enable = 1;
-            var user_name = $('#user_id option:selected').text().toLowerCase();
+            var emp_id = $('#user_id').val();
+            //var user_name = $('#user_id option:selected').text().toLowerCase();
             var month = $('#whs_month').val();
-            load_enable *= user_name !== "" ? 1 : 0;
+            load_enable *= emp_id !== "" ? 1 : 0;
             load_enable *= month !== "" ? 1 : 0;
             if (load_enable) {
-                GetWorkingHours(user_name, month).then(() => GetWorkingHoursSummary());
+                GetWorkingHours(emp_id, month).then(() => GetWorkingHoursSummary());
             }
         });
 
-        async function GetWorkingHours(user_name, month) {
+        async function GetWorkingHours(emp_id, month) {
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetWorkingHours", "WorkingHours")',
                 contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    user_name, month
+                    emp_id, month
                 },
                 success: function (response) {
-                    if (debug_whs) {
-                        console.log("Working Hours Data");
-                        console.log(response);
-                    }
                     GenerateTable(response);
                 }
             });
@@ -405,16 +400,14 @@
         }
 
         async function GetWorkingHoursSummary() {
-            var user_name = $('#user_id option:selected').text().toLowerCase();
+            var emp_id = $('#user_id').val();
             var month = $('#whs_month').val();
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetMonthlySummary", "WorkingHours")',
 	            contentType: 'application/x-www-form-urlencoded',
-                data: { user_name, month},
+                data: { emp_id, month},
                 success: function (response) {
-                    if(debug_summary)
-                        console.log(response);
                     GenerateSummaryTable(response);
                 }
             });
@@ -602,9 +595,9 @@
         }
 
         $('#btn_print').on('click', function () {
-            var user_name = $('#user_id option:selected').text().toLowerCase();
+            var emp_id = $('#user_id').val();
             var month = $('#whs_month').val();
-            var url = '@Url.Action("FormOvertime","WorkingHours")?user_name='+user_name+'&month='+month;
+            var url = '@Url.Action("FormOvertime","WorkingHours")?emp_id=' + emp_id +'&month='+month;
             window.open(url);
         });
 

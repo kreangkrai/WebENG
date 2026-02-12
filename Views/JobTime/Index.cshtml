@@ -102,7 +102,7 @@
 
         async function UpdateView() {
             let department = $('#select_department').val();
-            let responsible = $('#select_responsible :selected').text();
+            let responsible = $('#select_responsible').val();
             let idles = await GetJobTimes(department, responsible);
             GenerateChart(idles);
             GenerateRadarChart(idles);

@@ -7,8 +7,8 @@ namespace WebENG.Models
 {
     public class JobSummaryModel
     {
-        public string user_id { get; set; }
         public string emp_id { get; set; }
+        public string name { get; set; }
         public int levels { get; set; }
         public string jobId { get; set; }
         public string jobName { get; set; }

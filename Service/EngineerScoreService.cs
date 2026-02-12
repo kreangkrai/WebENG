@@ -18,7 +18,7 @@ namespace WebENG.Service
 			connect = new ConnectSQL();
 			con = connect.OpenConnect();
 		}
-		public List<EngineerScoreModel> GetScores(string user_id, string department)
+		public List<EngineerScoreModel> GetScores(string emp_id, string department)
         {
 			string cost = "";
 			if (department == "CES-System" || department == "CES-QIR" || department == "CES-Exp" || department == "CES-PMD" || department == "CES-ENG")
@@ -45,18 +45,17 @@ namespace WebENG.Service
 					{
 						con.Open();
 					}
-					string string_command = string.Format($@"                                       
-                with t2 as (
+					string string_command = string.Format($@"with t2 as (
 					SELECT t.job_id,CAST(SUM(t.total_manpower * t. level) AS decimal(18,1)) as total_manpower ,
 						 CAST(SUM(t.total_manpower / 60.0 / 8.0 * t.level * 3200) AS decimal(18,1)) as total_used_cost FROM ( 
-							SELECT main.user_id,
+							SELECT main.emp_id,
 							main.job_id,
 							main.total_manpower,
 							CASE WHEN JobResponsible.levels IS NULL THEN 1 ELSE JobResponsible.levels END as level
 							 FROM (
 							SELECT 
 								WorkingHours.job_id,
-								WorkingHours.user_id,
+								WorkingHours.emp_id,
 								SUM(
 									case when task_id = 'T001' then
 										case when FORMAT(working_date,'ddd') NOT IN ('Sun','Sat') then
@@ -110,9 +109,9 @@ namespace WebENG.Service
 								
 							FROM WorkingHours						
 							WHERE WorkingHours.job_id <> 'J999999'
-							GROUP BY WorkingHours.job_id,WorkingHours.user_id
+							GROUP BY WorkingHours.job_id,WorkingHours.emp_id
 							) as main
-							LEFT JOIN JobResponsible ON main.user_id = JobResponsible.user_id AND main.job_id = JobResponsible.job_id
+							LEFT JOIN JobResponsible ON main.emp_id = JobResponsible.emp_id AND main.job_id = JobResponsible.job_id
 							) as t
 							GROUP BY t.job_id
 					),
@@ -170,11 +169,11 @@ namespace WebENG.Service
 										end
 								end) AS working_hours 
 	                    FROM WorkingHours
-						WHERE user_id = '{user_id}'
-	                    GROUP BY user_id,job_id
+						WHERE emp_id = '{emp_id}'
+	                    GROUP BY emp_id,job_id
 					)
 					SELECT distinct
-	                    t1.user_id AS user_id,
+	                    t1.emp_id AS emp_id,
 	                    t1.job_id AS job_id,
 	                    Jobs.job_name AS job_name,
                         Jobs.customer_name as customer,
@@ -204,7 +203,7 @@ namespace WebENG.Service
                     ON t1.job_id = t2.job_id
                     INNER JOIN t3					
                     ON t1.job_id = t3.job_id
-                 WHERE t1.user_id = '{user_id}'");
+                 WHERE t1.emp_id = '{emp_id}'");
 					SqlCommand cmd = new SqlCommand(string_command, con);
 					SqlDataReader dr = cmd.ExecuteReader();
 					if (dr.HasRows)
@@ -213,6 +212,7 @@ namespace WebENG.Service
 						{
 							EngineerScoreModel score = new EngineerScoreModel()
 							{
+								emp_id = dr["emp_id"].ToString(),
 								job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
 								job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
 								job_status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "",

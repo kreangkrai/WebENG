@@ -9,7 +9,6 @@ namespace WebENG.Models
     {
         public string index { get; set; }
         public string emp_id { get; set; }
-        public string user_id { get; set; }
         public string user_name { get; set; }
         public string department { get; set; }
         public DateTime working_date { get; set; }
@@ -47,7 +46,6 @@ namespace WebENG.Models
     {
         public string index { get; set; }
         public string emp_id { get; set; }
-        public string user_id { get; set; }
         public string user_name { get; set; }
         public string job_id { get; set; }
         public double normal { get; set; }

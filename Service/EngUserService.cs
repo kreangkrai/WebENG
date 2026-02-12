@@ -70,7 +70,6 @@ namespace WebENG.Service
                     {
                         EngUserModel user = new EngUserModel()
                         {
-                            user_id = dr["name_en"] != DBNull.Value ? dr["name_en"].ToString() : "",
                             emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["name_en"] != DBNull.Value ? dr["name_en"].ToString().ToLower() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
@@ -78,10 +77,6 @@ namespace WebENG.Service
                             group = dr["group"] != DBNull.Value ? dr["group"].ToString().ToLower() : "",
                             active = dr["active"] != DBNull.Value ? Convert.ToBoolean(dr["active"].ToString()) : false,
                         };
-                        string name = user.user_id;
-                        string first = name.Split(' ')[0];
-                        string last =  name.Split(' ')[1].Substring(0,1).ToUpper();
-                        user.user_id = $"{first}.{last}";
                         users.Add(user);
                     }
                     dr.Close();
@@ -108,7 +103,7 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     SELECT 
-                        user_id,
+                        emp_id,
                         user_name,
                         department,
                         role,
@@ -122,7 +117,7 @@ namespace WebENG.Service
                     {
                         EngUserModel eng = new EngUserModel()
                         {
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             role = dr["role"] != DBNull.Value ? dr["role"].ToString() : "",
@@ -154,7 +149,7 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     SELECT 
-                        user_id,
+                        emp_id,
                         user_name,
                         department,
                         role,
@@ -169,7 +164,7 @@ namespace WebENG.Service
                     {
                         EngUserModel eng = new EngUserModel()
                         {
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["user_name"] != DBNull.Value ? dr["user_name"].ToString() : "",
                             department = dr["department"] != DBNull.Value ? dr["department"].ToString() : "",
                             role = dr["role"] != DBNull.Value ? dr["role"].ToString() : "",
@@ -201,12 +196,12 @@ namespace WebENG.Service
                 }
                 string string_command = string.Format($@"
                     INSERT INTO 
-                        EngineerUsers(user_id, user_name, department, allow_edit)
-                        VALUES(@user_id, @user_name, @department, @allow_edit)");
+                        EngineerUsers(emp_id, user_name, department, allow_edit)
+                        VALUES(@emp_id, @user_name, @department, @allow_edit)");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@user_id", engineer.user_id);
+                    cmd.Parameters.AddWithValue("@emp_id", engineer.emp_id);
                     cmd.Parameters.AddWithValue("@user_name", engineer.user_name);
                     cmd.Parameters.AddWithValue("@department", engineer.department);
                     cmd.Parameters.AddWithValue("@allow_edit", engineer.allow_edit);
@@ -237,11 +232,11 @@ namespace WebENG.Service
                         user_name = @user_name,
                         department = @department,
                         allow_edit = @allow_edit
-                    WHERE user_id = @user_id");
+                    WHERE emp_id = @emp_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = CommandType.Text;
-                    cmd.Parameters.AddWithValue("@user_id", engineer.user_id);
+                    cmd.Parameters.AddWithValue("@emp_id", engineer.emp_id);
                     cmd.Parameters.AddWithValue("@user_name", engineer.user_name);
                     cmd.Parameters.AddWithValue("@department", engineer.department);
                     cmd.Parameters.AddWithValue("@allow_edit", engineer.allow_edit);

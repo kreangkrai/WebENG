@@ -27,7 +27,7 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string strCmd = string.Format($@"SElECT emp_id,user_id,name,department,role,levels FROM Authen ORDER BY name");
+                string strCmd = string.Format($@"SElECT emp_id,name,department,role,levels FROM Authen ORDER BY name");
                 SqlCommand command = new SqlCommand(strCmd, con);
                 SqlDataReader dr = command.ExecuteReader();
                 if (dr.HasRows)
@@ -37,7 +37,6 @@ namespace WebENG.Service
                         AuthenModel authen = new AuthenModel()
                         {
                             emp_id = dr["emp_id"].ToString(),
-                            user_id = dr["user_id"].ToString(),
                             name = dr["name"].ToString(),
                             department = dr["department"].ToString(),
                             role = dr["role"].ToString(),
@@ -71,14 +70,12 @@ namespace WebENG.Service
                 BEGIN
                     INSERT INTO Authen (
                         emp_id,
-                        user_id,
                         name,
                         department,
                         role,
                         levels) 
                     VALUES (
                         @emp_id,
-                        @user_id,
                         @name, 
                         @department,
                         @role,
@@ -88,7 +85,6 @@ namespace WebENG.Service
                 SqlCommand command = new SqlCommand(string_command, con);
                 command.CommandType = CommandType.Text;
                 command.Parameters.AddWithValue("@emp_id", authen.emp_id);
-                command.Parameters.AddWithValue("@user_id", authen.user_id);
                 command.Parameters.AddWithValue("@name", authen.name.ToLower());
                 command.Parameters.AddWithValue("@department", authen.department);
                 command.Parameters.AddWithValue("@role", authen.role);
