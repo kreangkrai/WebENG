@@ -239,13 +239,14 @@
         let date = new Date();
         $('#user_id').val('@Model.emp_id');
         $('#year').val(date.getFullYear());
-        
+
         let emp_id = $('#user_id').val();
+        let name = $('#user_id :selected').text();
         let department = $('#departments :selected').text();
         await GetScores(emp_id, department);
         GenerateTable();
-        $('#name1').html(emp_id + " Manpower");
-        $('#name2').html(emp_id + " Manpower");
+        $('#name1').html(name + " Manpower");
+        $('#name2').html(name + " Manpower");
     });
 
     async function GetStatus() {
@@ -474,12 +475,13 @@
 
     $('#btn_filter').on('click', async function () {
         let emp_id = $('#user_id').val();
+        let name = $('#user_id :selected').text();
         let department = $('#departments :selected').text();
         
         await GetScores(emp_id, department);
         await GenerateTable();
-        $('#name1').html(user_id + " Manpower");
-        $('#name2').html(user_id + " Manpower");
+        $('#name1').html(name + " Manpower");
+        $('#name2').html(name + " Manpower");
     });
 
     async function GetTaskRatio(job_id) {
@@ -759,21 +761,21 @@
     }
 
     function GenerateChartManpowerDistribution() {
-        let users = mds.map(m => m.user_id);
-        users = [...new Set(users)];
 
+        let emps = mds.map(m => m.user_name);
+        emps = [...new Set(emps)];
         let tasks = mds.map(m => m.task_id);
         tasks = [...new Set(tasks)];
 
         let hours = [];
-        for (let i = 0; i < users.length; i++) {
+        for (let i = 0; i < emps.length; i++) {
             for (let j = 0; j < tasks.length; j++) {
                 let hrs = [];
-                hrs = mds.filter(f => f.user_id === users[i] && f.task_id === tasks[j]).map(m => m.hours);
+                hrs = mds.filter(f => f.user_name === emps[i] && f.task_id === tasks[j]).map(m => m.hours);
                 if (hrs[0] === undefined) {
                     hrs[0] = 0;
                 }
-                hours.push([users[i], tasks[j], hrs[0]]);
+                hours.push([emps[i], tasks[j], hrs[0]]);
             }
         }
 
@@ -799,7 +801,7 @@
         chartManpowerDistribution = new Chart(ctx4, {
             type: 'bar',
             data: {
-                labels: users,
+                labels: emps,
                 datasets: ds
             },
             options: {

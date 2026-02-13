@@ -1004,10 +1004,10 @@
                 height: 750,
                 editable: true,
                 eventDrop: async function (info) {
-                    let enable = false;
+                    let enable = true;
                     let drop_date = new Date(info.event.startStr.split("T")[0]);
-                    let today = new Date();
-                    let date_diff = Math.floor((today - drop_date) / (1000 * 60 * 60 * 24));
+                    //let today = new Date();
+                    //let date_diff = Math.floor((today - drop_date) / (1000 * 60 * 60 * 24));
                     let drop_overlap = await CheckDropOverlap(info.event.extendedProps, drop_date.toISOString().split("T")[0]);
                     if (drop_overlap === true) {
                         $('#modal_alert_title').text('Alert Task Overlap');
@@ -1017,12 +1017,12 @@
                         return;
                     }
 
-                    if (date_diff < 15) {
-                        enable = true;
-                    }
-                    else {
-                        enable = CheckAllowEditable();
-                    }
+                    //if (date_diff < 15) {
+                    //    enable = true;
+                    //}
+                    //else {
+                    //    enable = CheckAllowEditable();
+                    //}
 
                     if (enable == true) {
                         DropTask(info.event);
@@ -1187,17 +1187,17 @@
         }
 
         async function AddTask(date_start) {
-            let show_modal = 0;
-            let today = new Date();
-            let edit_date = new Date(date_start);
-            let date_diff = Math.floor((today - edit_date) / (1000 * 60 * 60 * 24));
+            let show_modal = 1;
+            //let today = new Date();
+            //let edit_date = new Date(date_start);
+            //let date_diff = Math.floor((today - edit_date) / (1000 * 60 * 60 * 24));
 
-            if (date_diff < 15) {
-                show_modal = 1;
-            }
-            else {
-                show_modal = await CheckAllowEditable();
-            }
+            //if (date_diff < 15) {
+            //    show_modal = 1;
+            //}
+            //else {
+            //    show_modal = await CheckAllowEditable();
+            //}
 
             if (show_modal) {
                 update = false;
@@ -1220,17 +1220,17 @@
         }
 
         async function AddTasks(date_start, date_end) {
-            let show_modal = 0;
-            let today = new Date();
-            let edit_date = new Date(date_start);
-            let date_diff = Math.floor((today - edit_date) / (1000 * 60 * 60 * 24));
+            let show_modal = 1;
+            //let today = new Date();
+            //let edit_date = new Date(date_start);
+            //let date_diff = Math.floor((today - edit_date) / (1000 * 60 * 60 * 24));
 
-            if (date_diff < 15) {
-                show_modal = 1;
-            }
-            else {
-                show_modal = await CheckAllowEditable();
-            }
+            //if (date_diff < 15) {
+            //    show_modal = 1;
+            //}
+            //else {
+            //    show_modal = await CheckAllowEditable();
+            //}
 
             if (show_modal) {
                 update = false;

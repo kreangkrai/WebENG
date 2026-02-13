@@ -194,9 +194,9 @@
             </li>*@
                 }
 
-                @*@if (Model.role == "Admin_Operation" || Model.role == "Admin")
+                @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {
-                    <li class="nav-item">
+                    @*<li class="nav-item">
                         <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-search"></i>
                             <p class="text-bold">VIEW TASKS<i class="right fas fa-angle-left"></i></p>
@@ -239,7 +239,7 @@
                                 </a>
                             </li>
                         </ul>
-                    </li>
+                    </li>*@
 
                     <li class="nav-item">
                         <a class="nav-link" href="#">
@@ -259,7 +259,7 @@
                                     <p>JOB TIME</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            @*<li class="nav-item">
             <a class="nav-link" asp-controller="IdleTime" asp-action="EngineerIdleTimes">
                 <i class="nav-icon fas fa-user"></i>
                 <p>ENGINEER IDLE TIMES <span class="badge badge-danger right">DEMO</span></p>
@@ -270,10 +270,10 @@
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <p>MONTHLY IDLE TIMES <span class="badge badge-danger right">DEMO</span></p>
             </a>
-        </li>
+        </li>*@
                         </ul>
                     </li>
-                }*@
+                }
 
                 @if (Model.role == "Admin_Operation" || Model.role == "Admin")
                 {

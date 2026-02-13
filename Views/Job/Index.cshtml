@@ -2393,7 +2393,9 @@
                 ],
                 rowCallback: function (row, data) {
                     let sum_invoice = set_invoice.map(m=>Number(m.invoice)).reduce((acc,curr)=> acc+curr);
-                    $('#invoice').val(sum_invoice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                    let sumStr = sum_invoice.toFixed(2);
+                    let formatted = sumStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    $('#invoice').val(formatted);
                 },
                 searching: false,
                 ordering: false,

@@ -86,9 +86,9 @@ namespace WebENG.Controllers
         {
             List<ManpowerRatioModel> mrs = AnalysisService.GetManpowerRatio(job_id);
             int total_hours = Convert.ToInt32(mrs.Sum(s => s.hours));
-            mrs = mrs.GroupBy(g => g.user_id).Select(s => new ManpowerRatioModel
+            mrs = mrs.GroupBy(g => g.emp_id).Select(s => new ManpowerRatioModel
             {
-                user_id = s.FirstOrDefault().user_id,
+                emp_id = s.FirstOrDefault().emp_id,
                 user_name = s.FirstOrDefault().user_name,
                 job_id = s.FirstOrDefault().job_id,
                 job_name = s.FirstOrDefault().job_name,
@@ -102,6 +102,7 @@ namespace WebENG.Controllers
         public JsonResult GetManpowerDistribution(string job_id)
         {
             List<ManpowerDistributionModel> mds = AnalysisService.GetManpowerDistribution(job_id);
+            mds = mds.Where(w => w.emp_id != "").ToList();
             return Json(mds);
         }
     }

@@ -177,10 +177,9 @@ namespace WebENG.Service
                     con.Open();
                 }
                 string string_command = string.Format($@"
-                    SELECT 
-	                    WorkingHours.user_id,
-	                    Authen.name,
-						Authen.user_id,
+                     SELECT 
+	                    WorkingHours.emp_id,
+	                    emp.name_en as name,
 	                    WorkingHours.job_id,
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
@@ -210,13 +209,13 @@ namespace WebENG.Service
 						end
 	                    ) / 60.0 as decimal(18,1))as hours
                     FROM WorkingHours
-                    LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
 					LEFT JOIN JobResponsible ON JobResponsible.user_id = WorkingHours.user_id AND JobResponsible.job_id = WorkingHours.job_id
                     Where WorkingHours.job_id = '{job_id}'                    
-                    GROUP BY WorkingHours.user_id, Authen.name,Authen.user_id,JobResponsible.levels, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
-                    ORDER BY WorkingHours.user_id");
+                    GROUP BY WorkingHours.emp_id, emp.name_en,JobResponsible.levels, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
+                    ORDER BY emp.name_en");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -227,7 +226,7 @@ namespace WebENG.Service
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             hours = dr["hours"] != DBNull.Value ? Math.Truncate(Convert.ToDouble(dr["hours"])) * (dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"].ToString()) : 1) : 0,
                             //hours = dr["hours"] != DBNull.Value ? Math.Truncate(Convert.ToDouble(dr["hours"])) : 0,
@@ -257,10 +256,9 @@ namespace WebENG.Service
                 {
                     con.Open();
                 }
-                string string_command = string.Format($@"
-                    SELECT 
-	                    WorkingHours.user_id,
-	                    Authen.name,
+                string string_command = string.Format($@"SELECT 
+	                    WorkingHours.emp_id,
+	                    emp.name_en as name,
 	                    WorkingHours.job_id,
 	                    Jobs.job_name,
 	                    WorkingHours.task_id,
@@ -289,12 +287,12 @@ namespace WebENG.Service
 						end
 	                    ) / 60.0 as decimal(18,1))as hours
                     FROM WorkingHours
-                    LEFT JOIN Authen ON WorkingHours.user_id = Authen.user_id
+                    LEFT JOIN CTL.dbo.Employees emp ON WorkingHours.emp_id = emp.emp_id
                     LEFT JOIN Jobs ON WorkingHours.job_id = Jobs.job_id
                     LEFT JOIN Tasks ON WorkingHours.task_id = Tasks.task_id
                     WHERE WorkingHours.job_id = '{job_id}'
-                    GROUP BY WorkingHours.user_id, Authen.name, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
-                    ORDER BY user_id");
+                    GROUP BY WorkingHours.emp_id, emp.name_en, WorkingHours.job_id, job_name, WorkingHours.task_id, Tasks.task_name
+                    ORDER BY emp.name_en");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -305,7 +303,7 @@ namespace WebENG.Service
                         {
                             job_id = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             job_name = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
-                            user_id = dr["user_id"] != DBNull.Value ? dr["user_id"].ToString() : "",
+                            emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             user_name = dr["name"] != DBNull.Value ? dr["name"].ToString() : "",
                             task_id = dr["task_id"] != DBNull.Value ? dr["task_id"].ToString() : "",
                             task_name = dr["task_name"] != DBNull.Value ? dr["task_name"].ToString() : "",

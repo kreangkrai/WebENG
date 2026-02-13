@@ -135,6 +135,10 @@
             if (chart_forecast !== undefined) {
                 chart_forecast.destroy();
             }
+            let acc_actual = forecast.acc_actual_amount.splice(0, 13);
+            acc_actual[0] = null;
+            let acc_forecast = forecast.acc_forecast_amount.splice(0, 13);
+            acc_forecast[0] = null;
 
             const ctx = document.getElementById('chart_forecast').getContext('2d');
             chart_forecast = new Chart(ctx, {
@@ -182,8 +186,8 @@
                         {
                             label: 'Total Invoice',
                             data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, sum_invoice],
-                            backgroundColor: 'rgba(209, 93, 54, 1)',
-                            borderColor: '#D15D36',
+                            backgroundColor: '#A5C910',
+                            borderColor: '#A5C910',
                             borderWidth: 2,
                             stack: 'next year',
                             barThickness: 15,
@@ -199,7 +203,7 @@
                         },
                         {
                             label: 'Acc Payment (Actual)',
-                            data: forecast.acc_actual_amount.splice(0, 13),
+                            data: acc_actual,
                             type: 'line',
                             borderColor: '#E04B2D',
                             borderWidth: 3,
@@ -210,7 +214,7 @@
                         },
                         {
                             label: 'Acc Payment (Forecast)',
-                            data: forecast.acc_forecast_amount.splice(0, 13),
+                            data: acc_forecast,
                             type: 'line',
                             borderColor: '#E04B2D',
                             borderWidth: 3,
