@@ -48,9 +48,11 @@ namespace WebENG.Models
         public string emp_id { get; set; }
         public string user_name { get; set; }
         public string job_id { get; set; }
+        public string job_name { get; set; }
         public double normal { get; set; }
         public double ot1_5 { get; set; }
         public double ot3_0 { get; set; }
         public double total { get; set; }
+        public double total_amount { get; set; }
     }
 }

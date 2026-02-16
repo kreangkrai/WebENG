@@ -9,6 +9,7 @@ namespace WebENG.Models
     {
         public string emp_id { get; set; }
         public string name { get; set; }
+        public string department { get; set; }
         public int levels { get; set; }
         public string jobId { get; set; }
         public string jobName { get; set; }

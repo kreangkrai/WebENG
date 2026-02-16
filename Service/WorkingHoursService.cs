@@ -2297,161 +2297,92 @@ namespace WebENG.Service
             return monthly;
         }
 
-        public List<WorkingHoursModel> CalculateWorkingHours(string emp_id, DateTime start , DateTime stop)
+        public List<WorkingHoursModel> CalculateWorkingHours(string emp_id, DateTime start, DateTime stop)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
 
             string day = "";
 
-            List<WorkingDayModel> whs = GetWorkingHours(start,stop, emp_id);
+            List<WorkingDayModel> whs = GetWorkingHours(start, stop, emp_id);
             List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
             {
-                //if (date == new DateTime(2025, 10, 30))
+                day = date.DayOfWeek.ToString();
+                List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date.Date).ToList();
+                //_wd = _wd.Where(w => w.date == new DateTime(2025, 10, 15)).ToList();
+                bool isHoliday = holidays.Where(w => w.date.Date == date.Date).Count() > 0 ? true : false;
+                bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
+                if (isHoliday)
                 {
-                    day = date.DayOfWeek.ToString();
-                    List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date.Date).ToList();
-                    //_wd = _wd.Where(w => w.date == new DateTime(2025, 10, 15)).ToList();
-                    bool isHoliday = holidays.Where(w => w.date.Date == date.Date).Count() > 0 ? true : false;
-                    bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
-                    if (isHoliday)
+                    day = "Holiday";
+                }
+                if (_wd.Count > 0)
+                {
+                    for (int i = 0; i < _wd.Count; i++)
                     {
-                        day = "Holiday";
-                    }
-                    if (_wd.Count > 0)
-                    {
-                        for (int i = 0; i < _wd.Count; i++)
+                        _wd[i].workings = _wd[i].workings.OrderBy(o => o.start_time).ToList();
+
+                        working_date = new TimeSpan(0, 0, 0);
+
+                        TimeSpan regular = new TimeSpan(0, 0, 0);
+                        TimeSpan ot15 = new TimeSpan(0, 0, 0);
+                        TimeSpan ot3 = new TimeSpan(0, 0, 0);
+                        TimeSpan leave = new TimeSpan(0, 0, 0);
+
+                        //Check Total Time 8 Hours
+                        TimeSpan wd_time = new TimeSpan(0, 0, 0);
+                        for (int j = 0; j < _wd[i].workings.Count; j++)
                         {
-                            _wd[i].workings = _wd[i].workings.OrderBy(o => o.start_time).ToList();
-
-                            working_date = new TimeSpan(0, 0, 0);
-
-                            TimeSpan regular = new TimeSpan(0, 0, 0);
-                            TimeSpan ot15 = new TimeSpan(0, 0, 0);
-                            TimeSpan ot3 = new TimeSpan(0, 0, 0);
-                            TimeSpan leave = new TimeSpan(0, 0, 0);
-
-                            //Check Total Time 8 Hours
-                            TimeSpan wd_time = new TimeSpan(0, 0, 0);
-                            for (int j = 0; j < _wd[i].workings.Count; j++)
+                            if (_wd[i].workings[j].task_name != "Traveling" && _wd[i].workings[j].task_name != "Leave")
                             {
-                                if (_wd[i].workings[j].task_name != "Traveling" && _wd[i].workings[j].task_name != "Leave")
+                                wd_time += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                if (_wd[i].workings[j].lunch_full)
                                 {
-                                    wd_time += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
-                                    if (_wd[i].workings[j].lunch_full)
+                                    if (wd_time != default(TimeSpan))
                                     {
-                                        if (wd_time != default(TimeSpan))
-                                        {
-                                            wd_time -= new TimeSpan(1, 0, 0);
-                                        }
+                                        wd_time -= new TimeSpan(1, 0, 0);
                                     }
-                                    if (_wd[i].workings[j].lunch_half)
+                                }
+                                if (_wd[i].workings[j].lunch_half)
+                                {
+                                    if (wd_time != default(TimeSpan))
                                     {
-                                        if (wd_time != default(TimeSpan))
-                                        {
-                                            wd_time -= new TimeSpan(0, 30, 0);
-                                        }
+                                        wd_time -= new TimeSpan(0, 30, 0);
                                     }
-                                    if (_wd[i].workings[j].dinner_full)
+                                }
+                                if (_wd[i].workings[j].dinner_full)
+                                {
+                                    if (wd_time != default(TimeSpan))
                                     {
-                                        if (wd_time != default(TimeSpan))
-                                        {
-                                            wd_time -= new TimeSpan(1, 0, 0);
-                                        }
+                                        wd_time -= new TimeSpan(1, 0, 0);
                                     }
-                                    if (_wd[i].workings[j].dinner_half)
+                                }
+                                if (_wd[i].workings[j].dinner_half)
+                                {
+                                    if (wd_time != default(TimeSpan))
                                     {
-                                        if (wd_time != default(TimeSpan))
-                                        {
-                                            wd_time -= new TimeSpan(0, 30, 0);
-                                        }
+                                        wd_time -= new TimeSpan(0, 30, 0);
                                     }
                                 }
                             }
-                            ///
-                            for (int j = 0; j < _wd[i].workings.Count; j++)
+                        }
+                        ///
+                        for (int j = 0; j < _wd[i].workings.Count; j++)
+                        {
+                            regular = new TimeSpan(0, 0, 0);
+                            ot15 = new TimeSpan(0, 0, 0);
+                            ot3 = new TimeSpan(0, 0, 0);
+                            leave = new TimeSpan(0, 0, 0);
+                            // Check Holiday and Get day
+                            if (isHoliday || isWeekend)
                             {
-                                regular = new TimeSpan(0, 0, 0);
-                                ot15 = new TimeSpan(0, 0, 0);
-                                ot3 = new TimeSpan(0, 0, 0);
-                                leave = new TimeSpan(0, 0, 0);
-                                // Check Holiday and Get day
-                                if (isHoliday || isWeekend)
+                                if (_wd[i].workings[j].task_name == "Traveling")
                                 {
-                                    if (_wd[i].workings[j].task_name == "Traveling")
-                                    {
-                                        ot15 = default(TimeSpan);
-                                        ot3 = default(TimeSpan);
+                                    ot15 = default(TimeSpan);
+                                    ot3 = default(TimeSpan);
 
-                                        if (_wd[i].workings[j].lunch_full)
-                                        {
-                                            if (ot15 != default(TimeSpan))
-                                            {
-                                                ot15 -= new TimeSpan(1, 0, 0);
-                                            }
-                                        }
-                                        if (_wd[i].workings[j].lunch_half)
-                                        {
-                                            if (ot15 != default(TimeSpan))
-                                            {
-                                                ot15 -= new TimeSpan(0, 30, 0);
-                                            }
-                                        }
-
-                                        if (_wd[i].workings[j].dinner_full)
-                                        {
-                                            if (ot15 != default(TimeSpan))
-                                            {
-                                                ot15 -= new TimeSpan(1, 0, 0);
-                                            }
-                                        }
-                                        if (_wd[i].workings[j].dinner_half)
-                                        {
-                                            if (ot15 != default(TimeSpan))
-                                            {
-                                                ot15 -= new TimeSpan(0, 30, 0);
-                                            }
-                                        }
-
-                                        wh = new WorkingHoursModel()
-                                        {
-                                            working_date = _wd[i].date,
-                                            emp_id = _wd[i].workings[j].emp_id,
-                                            job_id = _wd[i].workings[j].job_id,
-                                            job_name = _wd[i].workings[j].job_name,
-                                            task_id = _wd[i].workings[j].task_id,
-                                            task_name = _wd[i].workings[j].task_name,
-                                            start_time = _wd[i].workings[j].start_time,
-                                            stop_time = _wd[i].workings[j].stop_time,
-                                            lunch_full = _wd[i].workings[j].lunch_full,
-                                            lunch_half = _wd[i].workings[j].lunch_half,
-                                            dinner_full = _wd[i].workings[j].dinner_full,
-                                            dinner_half = _wd[i].workings[j].dinner_half,
-                                            department = _wd[i].workings[j].department,
-                                            day = day,
-                                            normal = regular,
-                                            ot1_5 = ot15,
-                                            ot3_0 = ot3,
-                                            leave = leave
-                                        };
-                                        monthly.Add(wh);
-                                        regular = new TimeSpan(0, 0, 0);
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        if (_wd[i].workings[j].stop_time == new TimeSpan(23, 59, 0))
-                                        {
-                                            ot15 += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time).Add(new TimeSpan(0, 1, 0));
-                                        }
-                                        else
-                                        {
-                                            ot15 += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
-                                        }
-
-                                    }
                                     if (_wd[i].workings[j].lunch_full)
                                     {
                                         if (ot15 != default(TimeSpan))
@@ -2480,33 +2411,6 @@ namespace WebENG.Service
                                         {
                                             ot15 -= new TimeSpan(0, 30, 0);
                                         }
-                                    }
-
-
-                                    if (ot15 >= new TimeSpan(8, 0, 0))
-                                    {
-                                        ot3 = ot15 - new TimeSpan(8, 0, 0);
-                                    }
-
-                                    if (ot3 > new TimeSpan(0, 0, 0))
-                                    {
-                                        if (j == 0)
-                                        {
-                                            ot15 = new TimeSpan(8, 0, 0);
-                                        }
-                                        else
-                                        {
-                                            ot15 = default(TimeSpan);
-                                        }
-                                    }
-
-                                    //Check Sum OT 1.5
-                                    TimeSpan sum_ot15 = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Traveling").ToList().Aggregate(
-                                        TimeSpan.Zero, (sum_ot, next_ot) => sum_ot + next_ot.ot1_5) + ot15;
-                                    if (sum_ot15 > new TimeSpan(8, 0, 0))
-                                    {
-                                        ot15 = new TimeSpan(8, 0, 0) - (sum_ot15 - ot15);
-                                        ot3 = sum_ot15 - new TimeSpan(8, 0, 0);
                                     }
 
                                     wh = new WorkingHoursModel()
@@ -2525,23 +2429,240 @@ namespace WebENG.Service
                                         dinner_half = _wd[i].workings[j].dinner_half,
                                         department = _wd[i].workings[j].department,
                                         day = day,
-                                        normal = default(TimeSpan),
+                                        normal = regular,
                                         ot1_5 = ot15,
                                         ot3_0 = ot3,
-                                        leave = default(TimeSpan)
+                                        leave = leave
                                     };
                                     monthly.Add(wh);
+                                    regular = new TimeSpan(0, 0, 0);
+                                    continue;
                                 }
-                                else  // Regular day
+                                else
                                 {
-                                    day = _wd[i].workings[j].working_date.DayOfWeek.ToString();
-
-                                    if (_wd[i].workings[j].task_name == "Traveling")
+                                    if (_wd[i].workings[j].stop_time == new TimeSpan(23, 59, 0))
                                     {
-                                        regular = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
-                                        ot15 = default(TimeSpan);
-                                        ot3 = default(TimeSpan);
+                                        ot15 += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time).Add(new TimeSpan(0, 1, 0));
+                                    }
+                                    else
+                                    {
+                                        ot15 += (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                    }
 
+                                }
+                                if (_wd[i].workings[j].lunch_full)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(1, 0, 0);
+                                    }
+                                }
+                                if (_wd[i].workings[j].lunch_half)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(0, 30, 0);
+                                    }
+                                }
+
+                                if (_wd[i].workings[j].dinner_full)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(1, 0, 0);
+                                    }
+                                }
+                                if (_wd[i].workings[j].dinner_half)
+                                {
+                                    if (ot15 != default(TimeSpan))
+                                    {
+                                        ot15 -= new TimeSpan(0, 30, 0);
+                                    }
+                                }
+
+
+                                if (ot15 >= new TimeSpan(8, 0, 0))
+                                {
+                                    ot3 = ot15 - new TimeSpan(8, 0, 0);
+                                }
+
+                                if (ot3 > new TimeSpan(0, 0, 0))
+                                {
+                                    if (j == 0)
+                                    {
+                                        ot15 = new TimeSpan(8, 0, 0);
+                                    }
+                                    else
+                                    {
+                                        ot15 = default(TimeSpan);
+                                    }
+                                }
+
+                                //Check Sum OT 1.5
+                                TimeSpan sum_ot15 = monthly.Where(w => w.working_date.Date == date.Date && w.task_name != "Traveling").ToList().Aggregate(
+                                    TimeSpan.Zero, (sum_ot, next_ot) => sum_ot + next_ot.ot1_5) + ot15;
+                                if (sum_ot15 > new TimeSpan(8, 0, 0))
+                                {
+                                    ot15 = new TimeSpan(8, 0, 0) - (sum_ot15 - ot15);
+                                    ot3 = sum_ot15 - new TimeSpan(8, 0, 0);
+                                }
+
+                                wh = new WorkingHoursModel()
+                                {
+                                    working_date = _wd[i].date,
+                                    emp_id = _wd[i].workings[j].emp_id,
+                                    job_id = _wd[i].workings[j].job_id,
+                                    job_name = _wd[i].workings[j].job_name,
+                                    task_id = _wd[i].workings[j].task_id,
+                                    task_name = _wd[i].workings[j].task_name,
+                                    start_time = _wd[i].workings[j].start_time,
+                                    stop_time = _wd[i].workings[j].stop_time,
+                                    lunch_full = _wd[i].workings[j].lunch_full,
+                                    lunch_half = _wd[i].workings[j].lunch_half,
+                                    dinner_full = _wd[i].workings[j].dinner_full,
+                                    dinner_half = _wd[i].workings[j].dinner_half,
+                                    department = _wd[i].workings[j].department,
+                                    day = day,
+                                    normal = default(TimeSpan),
+                                    ot1_5 = ot15,
+                                    ot3_0 = ot3,
+                                    leave = default(TimeSpan)
+                                };
+                                monthly.Add(wh);
+                            }
+                            else  // Regular day
+                            {
+                                day = _wd[i].workings[j].working_date.DayOfWeek.ToString();
+
+                                if (_wd[i].workings[j].task_name == "Traveling")
+                                {
+                                    regular = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                    ot15 = default(TimeSpan);
+                                    ot3 = default(TimeSpan);
+
+                                    if (_wd[i].workings[j].lunch_full)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(1, 0, 0);
+                                        }
+                                    }
+                                    if (_wd[i].workings[j].lunch_half)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(0, 30, 0);
+                                        }
+                                    }
+                                    if (_wd[i].workings[j].dinner_full)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(1, 0, 0);
+                                        }
+                                    }
+                                    if (_wd[i].workings[j].dinner_half)
+                                    {
+                                        if (regular != default(TimeSpan))
+                                        {
+                                            regular -= new TimeSpan(0, 30, 0);
+                                        }
+                                    }
+
+                                    wh = new WorkingHoursModel()
+                                    {
+                                        working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
+                                        job_id = _wd[i].workings[j].job_id,
+                                        job_name = _wd[i].workings[j].job_name,
+                                        task_id = _wd[i].workings[j].task_id,
+                                        task_name = _wd[i].workings[j].task_name,
+                                        start_time = _wd[i].workings[j].start_time,
+                                        stop_time = _wd[i].workings[j].stop_time,
+                                        lunch_full = _wd[i].workings[j].lunch_full,
+                                        lunch_half = _wd[i].workings[j].lunch_half,
+                                        dinner_full = _wd[i].workings[j].dinner_full,
+                                        dinner_half = _wd[i].workings[j].dinner_half,
+                                        department = _wd[i].workings[j].department,
+                                        day = day,
+                                        normal = regular,
+                                        ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
+                                        ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
+                                        leave = leave
+                                    };
+                                    monthly.Add(wh);
+                                    regular = new TimeSpan(0, 0, 0);
+                                    continue;
+                                }
+                                else if (_wd[i].workings[j].task_name == "Leave")
+                                {
+                                    regular = default(TimeSpan);
+                                    ot15 = default(TimeSpan);
+                                    ot3 = default(TimeSpan);
+                                    leave = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
+                                    if (leave > new TimeSpan(8, 0, 0))
+                                    {
+                                        leave = new TimeSpan(8, 0, 0);
+                                    }
+
+                                    wh = new WorkingHoursModel()
+                                    {
+                                        working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
+                                        job_id = _wd[i].workings[j].job_id,
+                                        job_name = _wd[i].workings[j].job_name,
+                                        task_id = _wd[i].workings[j].task_id,
+                                        task_name = _wd[i].workings[j].task_name,
+                                        start_time = _wd[i].workings[j].start_time,
+                                        stop_time = _wd[i].workings[j].stop_time,
+                                        lunch_full = _wd[i].workings[j].lunch_full,
+                                        lunch_half = _wd[i].workings[j].lunch_half,
+                                        dinner_full = _wd[i].workings[j].dinner_full,
+                                        dinner_half = _wd[i].workings[j].dinner_half,
+                                        department = _wd[i].workings[j].department,
+                                        day = day,
+                                        normal = regular,
+                                        ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
+                                        ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
+                                        leave = leave
+                                    };
+                                    monthly.Add(wh);
+                                    regular = new TimeSpan(0, 0, 0);
+                                    continue;
+                                }
+                                else
+                                {
+                                    if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time < new TimeSpan(8, 30, 0))
+                                    {
+                                        ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
+                                        regular = default(TimeSpan);
+                                        ot3 = default(TimeSpan);
+                                    }
+                                    else if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time <= new TimeSpan(17, 30, 0))
+                                    {
+                                        ot15 += new TimeSpan(8, 30, 0) - _wd[i].workings[j].start_time;
+                                        regular = _wd[i].workings[j].stop_time - new TimeSpan(8, 30, 0);
+                                        ot3 = default(TimeSpan);
+                                        if (_wd[i].workings[j].lunch_full)
+                                        {
+                                            if (regular != default(TimeSpan))
+                                            {
+                                                regular -= new TimeSpan(1, 0, 0);
+                                            }
+                                        }
+                                        if (_wd[i].workings[j].lunch_half)
+                                        {
+                                            if (regular != default(TimeSpan))
+                                            {
+                                                regular -= new TimeSpan(0, 30, 0);
+                                            }
+                                        }
+                                    }
+                                    else if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
+                                    {
+                                        ot15 += (new TimeSpan(8, 30, 0) - _wd[i].workings[j].start_time) + (_wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0));
+                                        regular = new TimeSpan(17, 30, 0) - new TimeSpan(8, 30, 0);
+                                        ot3 = default(TimeSpan);
                                         if (_wd[i].workings[j].lunch_full)
                                         {
                                             if (regular != default(TimeSpan))
@@ -2558,6 +2679,81 @@ namespace WebENG.Service
                                         }
                                         if (_wd[i].workings[j].dinner_full)
                                         {
+                                            if (ot15 != default(TimeSpan))
+                                            {
+                                                ot15 -= new TimeSpan(1, 0, 0);
+                                            }
+                                        }
+                                        if (_wd[i].workings[j].dinner_half)
+                                        {
+                                            if (ot15 != default(TimeSpan))
+                                            {
+                                                ot15 -= new TimeSpan(0, 30, 0);
+                                            }
+                                        }
+                                    }
+                                    else if (_wd[i].workings[j].start_time >= new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time <= new TimeSpan(17, 30, 0))
+                                    {
+                                        ot15 += default(TimeSpan);
+                                        regular = _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
+                                        ot3 = default(TimeSpan);
+                                        if (_wd[i].workings[j].lunch_full)
+                                        {
+                                            if (regular != default(TimeSpan))
+                                            {
+                                                regular -= new TimeSpan(1, 0, 0);
+                                            }
+                                        }
+                                        if (_wd[i].workings[j].lunch_half)
+                                        {
+                                            if (regular != default(TimeSpan))
+                                            {
+                                                regular -= new TimeSpan(0, 30, 0);
+                                            }
+                                        }
+                                    }
+                                    else if (_wd[i].workings[j].start_time >= new TimeSpan(8, 30, 0) && _wd[i].workings[j].start_time <= new TimeSpan(17, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
+                                    {
+                                        ot15 += _wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0);
+                                        regular = new TimeSpan(17, 30, 0) - _wd[i].workings[j].start_time;
+                                        ot3 = default(TimeSpan);
+                                        if (_wd[i].workings[j].lunch_full)
+                                        {
+                                            if (regular != default(TimeSpan))
+                                            {
+                                                regular -= new TimeSpan(1, 0, 0);
+                                            }
+                                        }
+                                        if (_wd[i].workings[j].lunch_half)
+                                        {
+                                            if (regular != default(TimeSpan))
+                                            {
+                                                regular -= new TimeSpan(0, 30, 0);
+                                            }
+                                        }
+                                        if (_wd[i].workings[j].dinner_full)
+                                        {
+                                            if (ot15 != default(TimeSpan))
+                                            {
+                                                ot15 -= new TimeSpan(1, 0, 0);
+                                            }
+                                        }
+                                        if (_wd[i].workings[j].dinner_half)
+                                        {
+                                            if (ot15 != default(TimeSpan))
+                                            {
+                                                ot15 -= new TimeSpan(0, 30, 0);
+                                            }
+                                        }
+                                    }
+                                    else if (_wd[i].workings[j].start_time >= new TimeSpan(17, 30, 0))
+                                    {
+                                        ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
+                                        regular = _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
+                                        //regular = default(TimeSpan);
+                                        ot3 = default(TimeSpan);
+                                        if (_wd[i].workings[j].dinner_full)
+                                        {
                                             if (regular != default(TimeSpan))
                                             {
                                                 regular -= new TimeSpan(1, 0, 0);
@@ -2565,261 +2761,62 @@ namespace WebENG.Service
                                         }
                                         if (_wd[i].workings[j].dinner_half)
                                         {
-                                            if (regular != default(TimeSpan))
+                                            if (ot15 != default(TimeSpan))
                                             {
-                                                regular -= new TimeSpan(0, 30, 0);
+                                                ot15 -= new TimeSpan(0, 30, 0);
                                             }
                                         }
-
-                                        wh = new WorkingHoursModel()
-                                        {
-                                            working_date = _wd[i].date,
-                                            emp_id = _wd[i].workings[j].emp_id,
-                                            job_id = _wd[i].workings[j].job_id,
-                                            job_name = _wd[i].workings[j].job_name,
-                                            task_id = _wd[i].workings[j].task_id,
-                                            task_name = _wd[i].workings[j].task_name,
-                                            start_time = _wd[i].workings[j].start_time,
-                                            stop_time = _wd[i].workings[j].stop_time,
-                                            lunch_full = _wd[i].workings[j].lunch_full,
-                                            lunch_half = _wd[i].workings[j].lunch_half,
-                                            dinner_full = _wd[i].workings[j].dinner_full,
-                                            dinner_half = _wd[i].workings[j].dinner_half,
-                                            department = _wd[i].workings[j].department,
-                                            day = day,
-                                            normal = regular,
-                                            ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
-                                            ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
-                                            leave = leave
-                                        };
-                                        monthly.Add(wh);
-                                        regular = new TimeSpan(0, 0, 0);
-                                        continue;
                                     }
-                                    else if (_wd[i].workings[j].task_name == "Leave")
+
+                                    wh = new WorkingHoursModel()
                                     {
-                                        regular = default(TimeSpan);
-                                        ot15 = default(TimeSpan);
-                                        ot3 = default(TimeSpan);
-                                        leave = (_wd[i].workings[j].stop_time - _wd[i].workings[j].start_time);
-                                        if (leave > new TimeSpan(8, 0, 0))
-                                        {
-                                            leave = new TimeSpan(8, 0, 0);
-                                        }
-
-                                        wh = new WorkingHoursModel()
-                                        {
-                                            working_date = _wd[i].date,
-                                            emp_id = _wd[i].workings[j].emp_id,
-                                            job_id = _wd[i].workings[j].job_id,
-                                            job_name = _wd[i].workings[j].job_name,
-                                            task_id = _wd[i].workings[j].task_id,
-                                            task_name = _wd[i].workings[j].task_name,
-                                            start_time = _wd[i].workings[j].start_time,
-                                            stop_time = _wd[i].workings[j].stop_time,
-                                            lunch_full = _wd[i].workings[j].lunch_full,
-                                            lunch_half = _wd[i].workings[j].lunch_half,
-                                            dinner_full = _wd[i].workings[j].dinner_full,
-                                            dinner_half = _wd[i].workings[j].dinner_half,
-                                            department = _wd[i].workings[j].department,
-                                            day = day,
-                                            normal = regular,
-                                            ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
-                                            ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
-                                            leave = leave
-                                        };
-                                        monthly.Add(wh);
-                                        regular = new TimeSpan(0, 0, 0);
-                                        continue;
-                                    }
-                                    else
-                                    {
-                                        if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time < new TimeSpan(8, 30, 0))
-                                        {
-                                            ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
-                                            regular = default(TimeSpan);
-                                            ot3 = default(TimeSpan);
-                                        }
-                                        else if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time <= new TimeSpan(17, 30, 0))
-                                        {
-                                            ot15 += new TimeSpan(8, 30, 0) - _wd[i].workings[j].start_time;
-                                            regular = _wd[i].workings[j].stop_time - new TimeSpan(8, 30, 0);
-                                            ot3 = default(TimeSpan);
-                                            if (_wd[i].workings[j].lunch_full)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].lunch_half)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                        }
-                                        else if (_wd[i].workings[j].start_time < new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
-                                        {
-                                            ot15 += (new TimeSpan(8, 30, 0) - _wd[i].workings[j].start_time) + (_wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0));
-                                            regular = new TimeSpan(17, 30, 0) - new TimeSpan(8, 30, 0);
-                                            ot3 = default(TimeSpan);
-                                            if (_wd[i].workings[j].lunch_full)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].lunch_half)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].dinner_full)
-                                            {
-                                                if (ot15 != default(TimeSpan))
-                                                {
-                                                    ot15 -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].dinner_half)
-                                            {
-                                                if (ot15 != default(TimeSpan))
-                                                {
-                                                    ot15 -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                        }
-                                        else if (_wd[i].workings[j].start_time >= new TimeSpan(8, 30, 0) && _wd[i].workings[j].stop_time <= new TimeSpan(17, 30, 0))
-                                        {
-                                            ot15 += default(TimeSpan);
-                                            regular = _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
-                                            ot3 = default(TimeSpan);
-                                            if (_wd[i].workings[j].lunch_full)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].lunch_half)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                        }
-                                        else if (_wd[i].workings[j].start_time >= new TimeSpan(8, 30, 0) && _wd[i].workings[j].start_time <= new TimeSpan(17, 30, 0) && _wd[i].workings[j].stop_time > new TimeSpan(17, 30, 0))
-                                        {
-                                            ot15 += _wd[i].workings[j].stop_time - new TimeSpan(17, 30, 0);
-                                            regular = new TimeSpan(17, 30, 0) - _wd[i].workings[j].start_time;
-                                            ot3 = default(TimeSpan);
-                                            if (_wd[i].workings[j].lunch_full)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].lunch_half)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].dinner_full)
-                                            {
-                                                if (ot15 != default(TimeSpan))
-                                                {
-                                                    ot15 -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].dinner_half)
-                                            {
-                                                if (ot15 != default(TimeSpan))
-                                                {
-                                                    ot15 -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                        }
-                                        else if (_wd[i].workings[j].start_time >= new TimeSpan(17, 30, 0))
-                                        {
-                                            ot15 += _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
-                                            regular = _wd[i].workings[j].stop_time - _wd[i].workings[j].start_time;
-                                            //regular = default(TimeSpan);
-                                            ot3 = default(TimeSpan);
-                                            if (_wd[i].workings[j].dinner_full)
-                                            {
-                                                if (regular != default(TimeSpan))
-                                                {
-                                                    regular -= new TimeSpan(1, 0, 0);
-                                                }
-                                            }
-                                            if (_wd[i].workings[j].dinner_half)
-                                            {
-                                                if (ot15 != default(TimeSpan))
-                                                {
-                                                    ot15 -= new TimeSpan(0, 30, 0);
-                                                }
-                                            }
-                                        }
-
-                                        wh = new WorkingHoursModel()
-                                        {
-                                            working_date = _wd[i].date,
-                                            emp_id = _wd[i].workings[j].emp_id,
-                                            job_id = _wd[i].workings[j].job_id,
-                                            job_name = _wd[i].workings[j].job_name,
-                                            task_id = _wd[i].workings[j].task_id,
-                                            task_name = _wd[i].workings[j].task_name,
-                                            start_time = _wd[i].workings[j].start_time,
-                                            stop_time = _wd[i].workings[j].stop_time,
-                                            lunch_full = _wd[i].workings[j].lunch_full,
-                                            lunch_half = _wd[i].workings[j].lunch_half,
-                                            dinner_full = _wd[i].workings[j].dinner_full,
-                                            dinner_half = _wd[i].workings[j].dinner_half,
-                                            department = _wd[i].workings[j].department,
-                                            day = day,
-                                            normal = regular,
-                                            ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
-                                            ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
-                                            leave = leave
-                                        };
-                                        monthly.Add(wh);
-                                    }
+                                        working_date = _wd[i].date,
+                                        emp_id = _wd[i].workings[j].emp_id,
+                                        job_id = _wd[i].workings[j].job_id,
+                                        job_name = _wd[i].workings[j].job_name,
+                                        task_id = _wd[i].workings[j].task_id,
+                                        task_name = _wd[i].workings[j].task_name,
+                                        start_time = _wd[i].workings[j].start_time,
+                                        stop_time = _wd[i].workings[j].stop_time,
+                                        lunch_full = _wd[i].workings[j].lunch_full,
+                                        lunch_half = _wd[i].workings[j].lunch_half,
+                                        dinner_full = _wd[i].workings[j].dinner_full,
+                                        dinner_half = _wd[i].workings[j].dinner_half,
+                                        department = _wd[i].workings[j].department,
+                                        day = day,
+                                        normal = regular,
+                                        ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
+                                        ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
+                                        leave = leave
+                                    };
+                                    monthly.Add(wh);
                                 }
                             }
                         }
                     }
-                    else
+                }
+                else
+                {
+                    wh = new WorkingHoursModel()
                     {
-                        wh = new WorkingHoursModel()
-                        {
-                            working_date = date,
-                            day = day,
-                            job_id = "",
-                            job_name = "",
-                            task_id = "",
-                            task_name = "",
-                            start_time = default(TimeSpan),
-                            stop_time = default(TimeSpan),
-                            lunch_full = false,
-                            lunch_half = false,
-                            dinner_full = false,
-                            dinner_half = false,
-                            normal = default(TimeSpan),
-                            ot1_5 = default(TimeSpan),
-                            ot3_0 = default(TimeSpan),
-                            leave = default(TimeSpan)
-                        };
-                        monthly.Add(wh);
-                    }
+                        working_date = date,
+                        day = day,
+                        job_id = "",
+                        job_name = "",
+                        task_id = "",
+                        task_name = "",
+                        start_time = default(TimeSpan),
+                        stop_time = default(TimeSpan),
+                        lunch_full = false,
+                        lunch_half = false,
+                        dinner_full = false,
+                        dinner_half = false,
+                        normal = default(TimeSpan),
+                        ot1_5 = default(TimeSpan),
+                        ot3_0 = default(TimeSpan),
+                        leave = default(TimeSpan)
+                    };
+                    monthly.Add(wh);
                 }
             }
             return monthly;

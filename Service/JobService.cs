@@ -318,6 +318,7 @@ namespace WebENG.Service
                     SELECT
 						T1.emp_id,
 						emp.name_en as name,
+                        emp.department,
 						case when JobResponsible.levels is null then 1 else JobResponsible.levels end levels,
                         Jobs.job_id,
                         Jobs.job_name,
@@ -373,6 +374,7 @@ namespace WebENG.Service
                         {
                             emp_id = dr["emp_id"] != DBNull.Value ? dr["emp_id"].ToString() : "",
                             name = dr["name"].ToString(),
+                            department = dr["department"].ToString(),
                             levels = dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"]) : 1,
                             jobId = dr["job_id"] != DBNull.Value ? dr["job_id"].ToString() : "",
                             jobName = dr["job_name"] != DBNull.Value ? dr["job_name"].ToString() : "",
@@ -381,7 +383,7 @@ namespace WebENG.Service
                             cis_cost = dr["cis_cost"] != DBNull.Value ? Convert.ToInt32(dr["cis_cost"]) : 0,
                             ais_cost = dr["ais_cost"] != DBNull.Value ? Convert.ToInt32(dr["ais_cost"]) : 0,
                             factor = dr["factor"] != DBNull.Value ? Convert.ToDouble(dr["factor"]) : 1,
-                            totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"].ToString()) * (dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"]) : 1 ) : 0,
+                            totalManhour = dr["total_manpower"] != DBNull.Value ? Convert.ToDouble(dr["total_manpower"].ToString()) : 0, // * (dr["levels"] != DBNull.Value ? Convert.ToInt32(dr["levels"]) : 1 ) : 0,
                             status = dr["status"] != DBNull.Value ? dr["status"].ToString() : "1",
                             process = dr["process"] != DBNull.Value ? dr["process"].ToString() : "",
                             system = dr["system"] != DBNull.Value ? dr["system"].ToString() : "",
@@ -389,7 +391,13 @@ namespace WebENG.Service
 
                         };
                         jobSummary.term_payments = terms.Where(w => w.job_id == jobSummary.jobId).OrderBy(o => o.forecast_month).ThenBy(t => t.payment_id).ToList();
-                        jobSummary.totalCost = (int)((double)(jobSummary.totalManhour / 8.0) * (3200 * jobSummary.levels));
+                        int amount = 3200;
+                        if (jobSummary.department == "CES-CIS" || jobSummary.department == "AES")
+                        {
+                            amount = 2400;
+                        }
+                        
+                        jobSummary.totalCost = (int)((double)(jobSummary.totalManhour / 8.0) * (amount * jobSummary.levels));
                         jobSummary.remainingCost = (jobSummary.eng_cost + jobSummary.cis_cost + jobSummary.ais_cost) - jobSummary.totalCost;
                         jobsSummaries.Add(jobSummary);
                     }
