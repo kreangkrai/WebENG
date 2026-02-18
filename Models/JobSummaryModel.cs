@@ -22,6 +22,8 @@ namespace WebENG.Models
         public double totalManhour { get; set; }
         public double totalOTManhour { get; set; }
         public double totalCost { get; set; }
+        public double totalAmount { get; set; }
+        public double totalOTAmount { get; set; }
         public string status { get; set; }
         public string process { get; set; }
         public string system { get; set; }

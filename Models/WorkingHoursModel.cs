@@ -54,5 +54,6 @@ namespace WebENG.Models
         public double ot3_0 { get; set; }
         public double total { get; set; }
         public double total_amount { get; set; }
+        public double total_ot_amount { get; set; }
     }
 }
