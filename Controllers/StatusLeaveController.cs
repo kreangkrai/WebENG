@@ -750,9 +750,13 @@ namespace WebENG.Controllers
         [HttpDelete]
         public IActionResult DeleteRequest(string request_id, string emp_id)
         {
+            string user = HttpContext.Session.GetString("userId");
+            List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
+            CTLModels.EmployeeModel approver = employees.Where(w => w.name_en.ToLower() == user.ToLower()).FirstOrDefault();
+
             List<LevelModel> level = Level.GetLevelByEmpID(emp_id);
             level = level.Where(w => w.emp_id == emp_id).ToList();
-
+            
             RequestModel request = Requests.GetRequestByID(request_id);
             request.status_request = "Canceled";
             request.comment = "";
@@ -799,6 +803,53 @@ namespace WebENG.Controllers
 
                         RemoveTempFiles(request.request_id);
                         RemoveUploadsFiles(request.leave_type_id, year, request.request_id);
+
+                        // Notification
+
+                        NotificationModel notification = new NotificationModel()
+                        {
+                            emp_id = request.emp_id,
+                            notification_date = DateTime.Now,
+                            notification_description = "ยกเลิกการลา",
+                            notification_path = "Status",
+                            notification_type = "Leave",
+                            notification_issue = "ยกเลิกการลา",
+                            status = "Pending"
+                        };
+
+                        Notification.Insert(notification);
+
+                        // Send Mail
+
+                        LeaveTypeModel leaveType = LeaveType.GetLeaveTypeByID(request.leave_type_id);
+                        string leave_type_th = leaveType.leave_name_th;
+
+                        string email_request = employees.Where(w => w.emp_id == request.emp_id).Select(s => s.email).FirstOrDefault();
+                        string email_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.email).FirstOrDefault();
+                        string name_approver = employees.Where(w => w.emp_id == approver.emp_id).Select(s => s.name_th).FirstOrDefault();
+                        string status = "ใบลาถูกยกเลิก";
+                        string leave_type = leave_type_th;
+                        string leave_date = "";
+                        string leave_time = "";
+                        if (request.is_full_day)
+                        {
+                            if (request.amount_leave_day > 1)
+                            {
+                                leave_date = $"{request.start_request_date.ToString("dd/MM/yyyy")} - {request.end_request_date.ToString("dd/MM/yyyy")}";
+                            }
+                            else
+                            {
+                                leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            }
+                            leave_time = "08:30-17:30";
+                        }
+                        else
+                        {
+                            leave_date = request.start_request_date.ToString("dd/MM/yyyy");
+                            leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
+                        }
+                        Mail.Approver(email_request, email_approver, status, leave_type, leave_date, leave_time, name_approver, request.comment);
+                        return Json("Success");
                     }
                     catch (Exception ex)
                     {

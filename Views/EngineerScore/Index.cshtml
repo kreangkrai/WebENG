@@ -356,16 +356,16 @@
                 scores[i].job_name,
                 scores[i].customer,
                 scores[i].job_status,
-                scores[i].cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                scores[i].cost.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 scores[i].md_rate,
                 scores[i].pd_rate,
                 scores[i].factor,
-                scores[i].total_manpower,
-                (scores[i].cost_per_tmp * 8).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                scores[i].manpower,
-                parseInt(scores[i].manpower_per_tmp * 100),
+                scores[i].total_manpower.toFixed(2),
+                (scores[i].cost_per_tmp * 8).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                scores[i].manpower.toFixed(2),
+                (scores[i].manpower_per_tmp * 100).toFixed(2),
                 scores[i].score.toFixed(2),
-                scores[i].remaining_cost.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                scores[i].remaining_cost.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
             ]);
         }
 

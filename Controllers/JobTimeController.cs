@@ -104,33 +104,19 @@ namespace WebENG.Controllers
         {
             DateTime start = new DateTime(2022, 1, 1);
             DateTime stop = DateTime.Now;
-            List<string> deps = new List<string>();
-            if (department == "ALL")
-            {
-                deps = new List<string>()
-                {
-                    "CES-CIS",
-                    "CES-System",
-                    "CES-QIR",
-                    "CES-PMD",
-                    "CES-Exp",
-                    "CES-ENG",
-                    "AES"
-                };
-            }
-            else
-            {
-                deps = new List<string>()
-                {
-                    department
-                };
-            }
 
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<JobResponsibleModel> jr = JobResponsible.GetJobsResponsible();
             List<WorkingHoursModel> whs = WorkingHours.CalculateWorkingHours(responsible, start,stop);
-            whs = whs.Where(w => deps.Contains(w.department) && w.job_id != "" && w.job_id != "J999999").ToList();
-            //whs = whs.Where(w => w.job_id == "J250585").ToList();
+            if (department == "ALL")
+            {
+                whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
+            }
+            else
+            {
+                whs = whs.Where(w => w.department == department && w.job_id != "" && w.job_id != "J999999").ToList();
+            }
+
             List<string> jobs = whs.GroupBy(g => g.job_id).Select(s => s.FirstOrDefault().job_id).OrderBy(o => o).ToList();
 
             for (int i = 0; i < jobs.Count; i++)
@@ -144,12 +130,6 @@ namespace WebENG.Controllers
                     {
                         level = jr.Where(w => w.job_id == jobs[i] && w.emp_id == emps[j]).FirstOrDefault().level;
                     }
-                    //List<WorkingHoursModel> workings_ = whs.Where(w => w.job_id == jobs[i] && w.emp_id == emps[j]).ToList();
-                    //List<WorkingDayModel> wd = workings_.GroupBy(g => g.working_date).Select(s => new WorkingDayModel()
-                    //{
-                    //    date = s.Key,
-                    //    workings = workings_.Where(w => w.working_date == s.Key).ToList()
-                    //}).ToList();
 
                     var _whs = whs.Where(w => w.job_id == jobs[i] && w.emp_id == emps[j]).ToList();
                     List<EngineerJobTimeModel> wh = _whs.GroupBy(g => g.job_id).Select(s => new EngineerJobTimeModel()
@@ -161,7 +141,6 @@ namespace WebENG.Controllers
                         job_name = s.FirstOrDefault().job_name
                     }).ToList();
 
-                    //List<WorkingHoursModel> wh = CalculateWorkingHours(wd, holidays);
                     JobsWorkingHoursModel jwh_ = new JobsWorkingHoursModel()
                     {
                         job_id = jobs[i],

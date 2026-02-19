@@ -12,7 +12,7 @@ namespace WebENG.Models
         public string job_name { get; set; }
         public string job_status { get; set; }
         public string customer { get; set; }
-        public int cost { get; set; }
+        public double cost { get; set; }
         public double md_rate { get; set; }
         public double pd_rate { get; set; }
         public double factor { get; set; }

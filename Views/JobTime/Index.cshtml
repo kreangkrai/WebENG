@@ -52,6 +52,7 @@
                             <th style="width:150px">OT 1.5 (Hours)</th>
                             <th style="width:150px">OT 3.0 (Hours)</th>
                             <th style="width:150px">Total (Hours)</th>
+                            <th style="width:150px">Total With OT (Hours)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -298,6 +299,7 @@
                         <td>${datas[i].ot1_5.toFixed(2)}</td>
                         <td>${datas[i].ot3_0.toFixed(2)}</td>
                         <td>${(datas[i].normal + datas[i].ot1_5 + datas[i].ot3_0).toFixed(2)}</td>
+                        <td>${(datas[i].normal + datas[i].ot1_5 * 1.5 + datas[i].ot3_0 * 3.0).toFixed(2)}</td>
                     </tr>
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);

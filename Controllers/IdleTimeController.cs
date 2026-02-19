@@ -150,7 +150,6 @@ namespace WebENG.Controllers
 
             var users_ = Accessory.getWorkingUser(start,stop);
             users_ = users_.Where(w => deps.Contains(w.department)).ToList();
-            //string[] emps = users_.Select(s => s.emp_id).Distinct().ToArray();
 
             double working_hours = 0;
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
@@ -172,13 +171,15 @@ namespace WebENG.Controllers
                 double idleTime = 0.0;
                 for (DateTime month = start; month <= stop; month = month.AddMonths(1))
                 {
-                    List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users_[i].emp_id, start,stop);
+                    DateTime _start = new DateTime(month.Year, month.Month, 1);
+                    DateTime _stop = _start.AddMonths(1).AddDays(-1);
+                    List<WorkingHoursModel> monthly = WorkingHours.CalculateWorkingHours(users_[i].emp_id, _start,_stop);
                     List<WorkingHoursSummaryModel> summaries = WorkingHours.CalculateMonthlySummary(monthly);
 
                     normal += summaries.Select(s => s.normal).Sum() / 60;
                     ot1_5 += summaries.Select(s => s.ot1_5).Sum() / 60;
                     ot3_0 += summaries.Select(s => s.ot3_0).Sum() / 60;
-                    leave += summaries.Select(s => s.leave).Sum() / 60;                    
+                    leave += summaries.Select(s => s.leave).Sum() / 60;               
                 }
                 idleTime = (working_hours * 8) - (normal + leave);
                 if (idleTime < 0)
@@ -189,7 +190,7 @@ namespace WebENG.Controllers
                 {
                     emp_id = users_[i].emp_id,
                     userName = users_[i].name,
-                    workingHours = (working_hours * 8),
+                    workingHours = working_hours * 8,
                     idle = idleTime,
                     normal = normal,
                     ot1_5 = ot1_5,

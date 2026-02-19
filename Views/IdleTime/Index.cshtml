@@ -59,8 +59,9 @@
                             <th>OT 1.5 (Hours)</th>
                             <th>OT 3.0 (Hours)</th>
                             <th>Leave (Hours)</th>
-                            <th>Working Hours</th>                                                      
+                            <th>Working Hours</th>
                             <th>Total (Hours)</th>
+                            <th>Total With OT (Hours)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -326,6 +327,7 @@
                         <td>${datas[i].leave}</td>
                         <td>${datas[i].workingHours}</td>                        
                         <td>${datas[i].normal + datas[i].leave + datas[i].ot1_5 + datas[i].ot3_0}</td>
+                        <td>${datas[i].normal + datas[i].leave + datas[i].ot1_5 * 1.5 + datas[i].ot3_0 * 3}</td>
                     </tr>
                 `;
                 $('#tableIdleHrs tbody').append(rowStr);

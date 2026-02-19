@@ -177,27 +177,13 @@ namespace WebENG.Controllers
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<WorkingHoursModel> workings = WorkingHours.GetWorkingHours();
             List<string> jobs = workings.GroupBy(g => g.job_id).Select(s => s.FirstOrDefault().job_id).OrderBy(o => o).ToList();
-            //jobs = jobs.Where(w => w == "J250585").ToList();
             List<HolidayModel> holidays = Holiday.GetAllHolidays();
 
             DateTime start = new DateTime(2022, 1, 1);
             DateTime stop = DateTime.Now;
 
-            List<string> deps = new List<string>();
-
-            deps = new List<string>()
-                {
-                    "CES-CIS",
-                    "CES-System",
-                    "CES-QIR",
-                    "CES-PMD",
-                    "CES-Exp",
-                    "CES-ENG",
-                    "AES"
-                };
-
             List<WorkingHoursModel> whs = WorkingHours.CalculateWorkingHours("ALL", start, stop);
-            whs = whs.Where(w => deps.Contains(w.department) && w.job_id != "" && w.job_id != "J999999").ToList();
+            whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
 
             for (int i = 0; i < jobs.Count; i++)
             {
@@ -267,33 +253,7 @@ namespace WebENG.Controllers
             }
 
             List<JobSummaryModel> jobsSummary = JobService.GetJobsSummary();
-            //List<JobSummaryModel> sum = jobsSummary.GroupBy(g => g.jobId).Select(s => new JobSummaryModel()
-            //{
-            //    jobId = s.Key,
-            //    jobName = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().jobName,
-            //    customer = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().customer,
-            //    responsible = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().responsible,
-            //    eng_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost,
-            //    cis_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost,
-            //    ais_cost = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost,
-            //    factor = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().factor,
-            //    totalManhour = s.Sum(k => k.totalManhour),
-            //    totalOTManhour = jwh.Where(w => w.job_id == s.Key).Select(x => x.total).FirstOrDefault(),
-            //    status = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().status,
-            //    process = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().process,
-            //    system = jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().system,
-            //    remainingCost = (jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
-            //    + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
-            //    + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost) - s.Sum(k => k.totalCost),
-            //    remainingOTCost = Math.Round(((jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().eng_cost
-            //    + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().cis_cost
-            //    + jobsSummary.Where(w => w.jobId == s.Key).FirstOrDefault().ais_cost)) -
-            //    (jwh.Where(x => x.job_id == s.Key).Select(f => f.total).FirstOrDefault() / 8.0), 0),
-            //    term_payments = s.FirstOrDefault().term_payments
 
-            //}).ToList();
-
-            //jobsSummary = jobsSummary.Where(w => w.jobId == "J250585").ToList();
             var summaryByJob = jobsSummary
                 .GroupBy(j => j.jobId)
                 .ToDictionary(

@@ -8,7 +8,7 @@ namespace WebENG.Interface
 {
     interface IJobResponsible
     {
-        List<JobResponsibleModel> GetJobResponsible(string user_name);
+        List<JobResponsibleModel> GetJobResponsible(string emp_id);
         List<JobResponsibleModel> GetJobsResponsible();
         List<JobResponsibleModel> GetJobLists();
         List<QuotationResponsibleModel> GetQuotationResponsible(string user_name);
