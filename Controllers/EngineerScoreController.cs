@@ -203,9 +203,9 @@ namespace WebENG.Controllers
 
                     double totalDirectCost = job.eng_cost + job.cis_cost + job.ais_cost;
 
-                    double totalManpowerHours = sum_department_jwh.total;
+                    double totalManpowerHours = sum_department_jwh.normal;
 
-                    double workingHours = sum_individual_jwh.total;
+                    double workingHours = sum_individual_jwh.normal;
                     double factor = job.md_rate * job.pd_rate;
 
                     double sc =
@@ -231,7 +231,7 @@ namespace WebENG.Controllers
                         manpower_per_tmp = workingHours / totalManpowerHours,
                         score = sc,
                         total_manpower = totalManpowerHours,
-                        remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_ot_amount).FirstOrDefault()
+                        remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_amount).FirstOrDefault()
 
                     };
 

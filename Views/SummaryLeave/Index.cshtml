@@ -971,7 +971,6 @@
         }
 
         function GenerateSummaryLeave(requests) {
-            console.log(requests);
             let amount_emp = requests.reduce((accumulator, currentValue) => accumulator + currentValue.amount_emp, 0);
             var html = `<div class="col-xl-2 col-md-2 col-sm-6">
                 <div class="card kanit-regular" style="align-items: center; padding:10px; background-color:#2178BE;">
@@ -1159,7 +1158,9 @@
                             const currentDate = new Date(start);
                             currentDate.setDate(currentDate.getDate() + (currentDay - 1));
                             const dayOfWeek = currentDate.getDay();
-                            currentDate.setDate(currentDate.getDate() + 1);
+                            if (currentDate.getMonth() < 10) {
+                                currentDate.setDate(currentDate.getDate() + 1);
+                            }
                             const dateStr = currentDate.toISOString().split('T')[0];
 
                             $(this).removeClass('today-highlight weekend-holiday public-holiday');
