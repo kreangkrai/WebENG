@@ -107,14 +107,38 @@ namespace WebENG.Controllers
 
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<JobResponsibleModel> jr = JobResponsible.GetJobsResponsible();
-            List<WorkingHoursModel> whs = WorkingHours.CalculateWorkingHours(responsible, start,stop);
+
+            List<string> _emps = jr.GroupBy(g => g.emp_id).Select(s => s.Key).ToList();
+            List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+            for (int i = 0; i < _emps.Count; i++)
+            {
+                List<WorkingHoursModel> _whs = WorkingHours.CalculateWorkingHours(_emps[i], start, stop);
+                whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
+                whs.AddRange(_whs);
+            }
+
             if (department == "ALL")
             {
-                whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
+                if (responsible == "ALL")
+                {
+                    whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
+                }
+                else
+                {
+                    whs = whs.Where(w => w.emp_id == responsible && w.job_id != "" && w.job_id != "J999999").ToList();
+                }               
             }
             else
             {
-                whs = whs.Where(w => w.department == department && w.job_id != "" && w.job_id != "J999999").ToList();
+                if (responsible == "ALL")
+                {
+                    whs = whs.Where(w => w.department == department && w.job_id != "" && w.job_id != "J999999").ToList();
+                }
+                else
+                {
+                    whs = whs.Where(w => w.emp_id == responsible && w.job_id != "" && w.job_id != "J999999").ToList();
+                }
+                
             }
 
             List<string> jobs = whs.GroupBy(g => g.job_id).Select(s => s.FirstOrDefault().job_id).OrderBy(o => o).ToList();

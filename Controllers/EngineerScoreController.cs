@@ -70,12 +70,13 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetScores(string emp_id, string department)
         {
-
             List<EngineerScoreModel> scores = new List<EngineerScoreModel>();
 
             List<JobModel> jobs_ = Job.GetAllJobs();
             List<JobResponsibleModel> jr = JobResponsible.GetJobsResponsible();
             jr = jr.Where(w => w.department == department).ToList();
+
+            List<string> _emps = jr.GroupBy(g => g.emp_id).Select(s => s.Key).ToList();
 
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<WorkingHoursModel> workings = WorkingHours.GetWorkingHours();
@@ -88,11 +89,16 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(2022, 1, 1);
             DateTime stop = DateTime.Now;
 
-            List<WorkingHoursModel> whs = WorkingHours.CalculateWorkingHours("ALL", start, stop);
-            whs = whs.Where(w => w.department == department && w.job_id != "" && w.job_id != "J999999").ToList();
+            List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+            for (int i = 0; i < _emps.Count; i++)
+            {
+                List<WorkingHoursModel> _whs = WorkingHours.CalculateWorkingHours(_emps[i], start, stop);
+                whs = whs.Where(w => w.department == department && w.job_id != "" && w.job_id != "J999999").ToList();
+                whs.AddRange(_whs);
+            }
+
             for (int i = 0; i < jobs.Count; i++)
             {
-
                 List<CTLModels.EmployeeModel> emps = workings.Where(w => w.job_id == jobs[i]).GroupBy(g => g.emp_id).Select(s => new CTLModels.EmployeeModel()
                 {
                     emp_id = s.Key,
@@ -103,7 +109,7 @@ namespace WebENG.Controllers
                 JobsWorkingHoursModel sum_individual_jwh = new JobsWorkingHoursModel();
 
                 for (int j = 0; j < emps.Count; j++)
-                {
+                {                
                     int level = 1;
                     if (jr.Any(w => w.job_id == jobs[i] && w.emp_id == emps[j].emp_id))
                     {
@@ -203,17 +209,36 @@ namespace WebENG.Controllers
 
                     double totalDirectCost = job.eng_cost + job.cis_cost + job.ais_cost;
 
-                    double totalManpowerHours = sum_department_jwh.normal;
+                    double totalManpowerHours = sum_department_jwh.total;
 
-                    double workingHours = sum_individual_jwh.normal;
+                    double workingHours = sum_individual_jwh.total;
                     double factor = job.md_rate * job.pd_rate;
 
-                    double sc =
-                        totalDirectCost
-                        * (job.md_rate + job.pd_rate)
-                        * (totalDirectCost / totalManpowerHours)
-                        * (workingHours / totalManpowerHours);
+                    double sc = 0;
+                    double manpower_per_tmp = 0;
+                    double cost_per_tmp = 0;
+
+                    sc =
+                       totalDirectCost
+                       * (job.md_rate + job.pd_rate)
+                       * (totalDirectCost / totalManpowerHours)
+                       * (workingHours / totalManpowerHours);
                     sc = Math.Round(sc, 1);
+
+                    manpower_per_tmp = workingHours / totalManpowerHours;
+                    cost_per_tmp = (job.eng_cost + job.cis_cost + job.ais_cost) / totalManpowerHours;
+
+                    sc = double.IsNaN(sc) || double.IsInfinity(sc)
+                     ? 0
+                     : Math.Round(sc, 1);
+
+                    manpower_per_tmp = double.IsNaN(manpower_per_tmp) || double.IsInfinity(manpower_per_tmp)
+                     ? 0
+                     : Math.Round(manpower_per_tmp, 1);
+
+                    cost_per_tmp = double.IsNaN(cost_per_tmp) || double.IsInfinity(cost_per_tmp)
+                     ? 0
+                     : Math.Round(cost_per_tmp, 1);
 
                     EngineerScoreModel score = new EngineerScoreModel()
                     {
@@ -225,13 +250,13 @@ namespace WebENG.Controllers
                         factor = factor,
                         pd_rate = job.pd_rate,
                         cost = cost,
-                        cost_per_tmp = (job.eng_cost + job.cis_cost + job.ais_cost) / totalManpowerHours,
+                        cost_per_tmp = cost_per_tmp,
                         customer = job.customer,
                         manpower = workingHours,
-                        manpower_per_tmp = workingHours / totalManpowerHours,
+                        manpower_per_tmp = manpower_per_tmp,
                         score = sc,
                         total_manpower = totalManpowerHours,
-                        remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_amount).FirstOrDefault()
+                        remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_ot_amount).FirstOrDefault()
 
                     };
 

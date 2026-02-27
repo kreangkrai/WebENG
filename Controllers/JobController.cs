@@ -182,8 +182,14 @@ namespace WebENG.Controllers
             DateTime start = new DateTime(2022, 1, 1);
             DateTime stop = DateTime.Now;
 
-            List<WorkingHoursModel> whs = WorkingHours.CalculateWorkingHours("ALL", start, stop);
-            whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
+            List<string> _emps = jr.GroupBy(g => g.emp_id).Select(s => s.Key).ToList();
+            List<WorkingHoursModel> whs = new List<WorkingHoursModel>();
+            for (int i = 0; i < _emps.Count; i++)
+            {
+                List<WorkingHoursModel> _whs = WorkingHours.CalculateWorkingHours(_emps[i], start, stop);
+                whs = whs.Where(w => w.job_id != "" && w.job_id != "J999999").ToList();
+                whs.AddRange(_whs);
+            }
 
             for (int i = 0; i < jobs.Count; i++)
             {
