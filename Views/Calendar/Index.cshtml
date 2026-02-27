@@ -2456,12 +2456,11 @@
                 const current = new Date(start);
 
                 const holidaySet = new Set(
-                    holidays.map(date => {
-                        const d = new Date(date);
-                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    holidays.map(d => {                       
+                        return `${d.date.split('T')[0]}`;
                     })
                 );
-
+                
                 while (current <= end) {
                     const dayOfWeek = current.getDay(); // 0 = Sun, 6 = Sat
                     const dateStr = current.toISOString().split('T')[0]; // YYYY-MM-DD

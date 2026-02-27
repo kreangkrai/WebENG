@@ -1380,9 +1380,8 @@
                 const current = new Date(start);
 
                 const holidaySet = new Set(
-                    holidays.map(date => {
-                        const d = new Date(date);
-                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    holidays.map(d => {
+                        return `${d.date.split('T')[0]}`;
                     })
                 );
 
@@ -1394,6 +1393,7 @@
                     }
                     current.setDate(current.getDate() + 1);
                 }
+                
                 return count;
             }
             function calculateTime() {
@@ -3186,9 +3186,8 @@
                 const current = new Date(start);
 
                 const holidaySet = new Set(
-                    holidays.map(date => {
-                        const d = new Date(date);
-                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    holidays.map(d => {
+                        return `${d.date.split('T')[0]}`;
                     })
                 );
 
