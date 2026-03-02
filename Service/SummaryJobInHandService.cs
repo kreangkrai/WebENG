@@ -44,7 +44,8 @@ namespace WebENG.Service
 				        Jobs.finished_date
 				from Jobs
 				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
+                WHERE SUBSTRING(Jobs.job_id,1,1) = 'J'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -109,7 +110,7 @@ namespace WebENG.Service
 				        Jobs.finished_date
 				from Jobs
 				LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id");
+                LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id AND SUBSTRING(Jobs.job_id,1,1) = 'J'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -344,7 +345,7 @@ namespace WebENG.Service
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                
-                where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null
+                where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null AND SUBSTRING(Jobs.job_id,1,1) = 'J'
 ) main
 					where main.remaining_amount > 0");
 
@@ -420,7 +421,7 @@ namespace WebENG.Service
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
-                    where FORMAT(job_date,'yyyy') = '{year}' AND job_ais_in_hand > 0 AND Jobs.job_id NOT LIKE '%Q%'");
+                    where FORMAT(job_date,'yyyy') = '{year}' AND job_ais_in_hand > 0 AND SUBSTRING(Jobs.job_id,1,1) = 'J'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -494,7 +495,7 @@ namespace WebENG.Service
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                
-                where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null
+                where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null AND SUBSTRING(Jobs.job_id,1,1) = 'J'
             ) main
 					where main.remaining_amount > 0");
 
@@ -570,7 +571,7 @@ namespace WebENG.Service
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
-                    where FORMAT(job_date,'yyyy') = '{year}' AND job_cis_in_hand > 0 AND Jobs.job_id NOT LIKE '%Q%' ");
+                    where FORMAT(job_date,'yyyy') = '{year}' AND job_cis_in_hand > 0 AND SUBSTRING(Jobs.job_id,1,1) = 'J' ");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -644,7 +645,7 @@ namespace WebENG.Service
                 from Jobs
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                
-                where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null
+                where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null AND SUBSTRING(Jobs.job_id,1,1) = 'J'
 ) main
 					where main.remaining_amount > 0");
 
@@ -720,7 +721,7 @@ namespace WebENG.Service
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
-                    where FORMAT(job_date,'yyyy') = '{year}' AND job_eng_in_hand > 0 AND Jobs.job_id NOT LIKE '%Q%'");
+                    where FORMAT(job_date,'yyyy') = '{year}' AND job_eng_in_hand > 0 AND SUBSTRING(Jobs.job_id,1,1) = 'J'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -924,7 +925,7 @@ namespace WebENG.Service
                     from 
 	                    (
 		                    select job_ais_in_hand,FORMAT(job_date,'MMM') as Month 
-		                    from jobs where FORMAT(job_date,'yyyy') = '{year}'
+		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND SUBSTRING(Jobs.job_id,1,1) = 'J'
 	                    ) as t1
                     group by t1.Month");
                 }
@@ -936,7 +937,7 @@ namespace WebENG.Service
                     from 
 	                    (
 		                    select job_ais_in_hand,FORMAT(job_date,'MMM') as Month 
-		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND job_type = '{type}'
+		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND job_type = '{type}' AND SUBSTRING(Jobs.job_id,1,1) = 'J'
 	                    ) as t1
                     group by t1.Month");
                 }
@@ -1010,7 +1011,7 @@ namespace WebENG.Service
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'AIS') > 0");
+                 WHERE job_type <> 'Department' AND SUBSTRING(Jobs.job_id,1,1) = 'J' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'AIS') > 0");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1064,7 +1065,7 @@ namespace WebENG.Service
                     from 
 	                    (
 		                    select job_cis_in_hand,FORMAT(job_date,'MMM') as Month 
-		                    from jobs where FORMAT(job_date,'yyyy') = '{year}'
+		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND SUBSTRING(job_id,1,1) = 'J'
 	                    ) as t1
                     group by t1.Month");
                 }
@@ -1076,7 +1077,7 @@ namespace WebENG.Service
                     from 
 	                    (
 		                    select job_cis_in_hand,FORMAT(job_date,'MMM') as Month 
-		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND job_type = '{type}'
+		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND job_type = '{type}' AND SUBSTRING(job_id,1,1) = 'J'
 	                    ) as t1
                     group by t1.Month");
                 }
@@ -1150,7 +1151,7 @@ namespace WebENG.Service
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'CIS') > 0");
+                 WHERE job_type <> 'Department' AND SUBSTRING(Jobs.job_id,1,1) = 'J' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'CIS') > 0");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1230,7 +1231,7 @@ namespace WebENG.Service
 				 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = {year} GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                  LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') < {year} GROUP BY job_id) as backlog_invoice ON backlog_invoice.job_id = Jobs.job_id
 				 LEFT JOIN Eng_Status ON Eng_Status.status_id = Jobs.status
-                 WHERE job_type <> 'Department' and SUBSTRING(Jobs.job_id,1,1) <> 'Q' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'ENG') > 0");
+                 WHERE job_type <> 'Department' AND SUBSTRING(Jobs.job_id,1,1) = 'J' AND (SELECT COUNT(*) FROM JobOwner WHERE job_id = Jobs.job_id AND job_department = 'ENG') > 0");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -1283,8 +1284,8 @@ namespace WebENG.Service
 	                    SUM(case when t1.job_eng_in_hand is null then 0.00 else CAST((t1.job_eng_in_hand / 1000000) as decimal(10,3)) end) as job_eng_in_hand
                     from 
 	                    (
-		                    select job_eng_in_hand,FORMAT(job_date,'MMM') as Month 
-		                    from jobs where FORMAT(job_date,'yyyy') = '{year}'
+		                    select job_eng_in_hand,FORMAT(job_date,'MMM') as Month
+		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND SUBSTRING(job_id,1,1) = 'J'
 	                    ) as t1
                     group by t1.Month");
                 }
@@ -1296,7 +1297,7 @@ namespace WebENG.Service
                     from 
 	                    (
 		                    select job_eng_in_hand,FORMAT(job_date,'MMM') as Month 
-		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND job_type = '{type}'
+		                    from jobs where FORMAT(job_date,'yyyy') = '{year}' AND job_type = '{type}' AND SUBSTRING(job_id,1,1) = 'J'
 	                    ) as t1
                     group by t1.Month");
                 }
@@ -1352,7 +1353,7 @@ namespace WebENG.Service
                 LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') <= '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                 LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en
 				where FORMAT(job_date ,'yyyy') < '{year}' OR job_date is null ) main
-            where main.remaining_amount > 0
+            where main.remaining_amount > 0 AND SUBSTRING(main.job_id,1,1) = 'J'
             ");
 
 
@@ -1424,7 +1425,7 @@ namespace WebENG.Service
                     from Jobs 
                     LEFT JOIN (select job_id,SUM(invoice) as invoice from Invoice where FORMAT(actual_date,'yyyy') = '{year}' GROUP BY job_id) as invoice ON invoice.job_id = Jobs.job_id
                     LEFT JOIN CTL.dbo.Employees emp ON Jobs.responsible = emp.name_en                    
-                    where FORMAT(job_date,'yyyy') = '{year}' AND job_in_hand > 0 AND Jobs.job_id NOT LIKE '%Q%'");
+                    where FORMAT(job_date,'yyyy') = '{year}' AND job_in_hand > 0 AND SUBSTRING(Jobs.job_id,1,1) = 'J'");
 
                 SqlCommand cmd = new SqlCommand(stringCommand, con);
                 SqlDataReader dr = cmd.ExecuteReader();

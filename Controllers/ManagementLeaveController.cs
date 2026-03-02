@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WebENG.CTLInterfaces;
 using WebENG.CTLModels;
@@ -106,6 +107,7 @@ namespace WebENG.Controllers
             for (int i = 0; i < selects.Length; i++)
             {
                 message = Approver(selects[i], "", approver);
+                Thread.Sleep(50);
             }
 
             return Json(message);
@@ -125,7 +127,7 @@ namespace WebENG.Controllers
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
-            
+
             //List<LevelModel> levels_approve = Level.GetLevelByEmpID(emp_id);
             List<LevelModel> levels_approve = Level.GetHierarchyByEmpID(emp_id);
             List<string> departments = levels_approve.Where(w => w.emp_id == emp_id).Select(s => s.department).ToList();
@@ -170,6 +172,7 @@ namespace WebENG.Controllers
                 request_id = s.request_id,
                 leave_type_id = s.leave_type_id,
                 emp_id = s.emp_id,
+                department = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.department).FirstOrDefault(),
                 emp_name_en = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
                 emp_name_th = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_th).FirstOrDefault(),
                 request_date = s.request_date,
@@ -208,6 +211,7 @@ namespace WebENG.Controllers
                 request_id = s.request_id,
                 leave_type_id = s.leave_type_id,
                 emp_id = s.emp_id,
+                department = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.department).FirstOrDefault(),
                 emp_name_en = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_en).FirstOrDefault(),
                 emp_name_th = employees.Where(w => w.emp_id == s.emp_id).Select(x => x.name_th).FirstOrDefault(),
                 request_date = s.request_date,

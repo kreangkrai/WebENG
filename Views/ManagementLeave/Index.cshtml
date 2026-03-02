@@ -599,8 +599,9 @@
                 <table id="table_approve" class="table table-sm table-hover text-center mb-0 w-100">
                     <thead style="font-size:18px; color:#555">
                         <tr class="kanit-light align-middle" style="vertical-align:middle">
-                            <th style="width:80px;"> ลำดับ</th>
+                            <th style="width:60px;"> ลำดับ</th>
                             <th style="width:80px;">รหัสพนักงาน</th>
+                            <th style="width:100px;">แผนก</th>
                             <th style="width:180px;">ชื่อ-สกุล</th>
                             <th>วันที่ยื่นลา</th>
                             <th>วันที่ลา</th>
@@ -659,8 +660,9 @@
                 <table id="table_complete" class="table table-sm table-hover text-center mb-0 w-100">
                     <thead style="font-size:18px; color:#555">
                         <tr class="kanit-light align-middle">
-                            <th style="width:80px;"> ลำดับ</th>
+                            <th style="width:60px;"> ลำดับ</th>
                             <th style="width:80px;">รหัสพนักงาน</th>
+                            <th style="width:100px;">แผนก</th>
                             <th style="width:180px;">ชื่อ-สกุล</th>
                             <th>วันที่ยื่นลา</th>
                             <th>วันที่ลา</th>
@@ -1103,7 +1105,7 @@
                 let class_path_file = `<td></td>`;
                 let class_check = `<td></td>`;
                 if (row.attachment_required) {
-                    if (row.is_full_day) { /*hidden*/
+                    if (row.is_full_day) {
                         if (parseFloat(row.amount_leave_day) >= parseFloat(row.attachment_threshold_days)) {
                             if (row.path_file === "" || row.path_file === null) {
                                 class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
@@ -1134,7 +1136,7 @@
                     } else {
 
                         if (parseFloat(row.amount_leave_hour) / 8.0 >= parseFloat(row.attachment_threshold_days)) {
-                            if (row.path_file === "" || row.path_file === null) {/*hidden*/
+                            if (row.path_file === "" || row.path_file === null) {
                                 class_path_file = `<td class="clickable-col"><i class="fas fa-minus-circle" style="color: red; font-size:22px"></i></td>`;
                                 class_check = `<td>
                             <div class="form-check form-check-inline mb-1">
@@ -1204,11 +1206,13 @@
                     <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
                         data-toggle="modal" data-target="#modal_leave"
                         data-id="${row.request_id}" data-emp-id="${row.emp_id}"
+                        data-department="${row.department}" data-emp-department="${row.department}"
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"
                         data-time="${row.start_request_time}" data-duration="${duration}"
                         data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
                         <td class="clickable-col">${index + 1}</td>
                         <td class="clickable-col">${row.emp_id}</td>
+                        <td class="clickable-col">${row.department}</td>
                         <td class="clickable-col">${row.emp_name_th}</td>
                         <td class="clickable-col">${request_date}</td>
                         <td class="clickable-col">${start_request_date}</td>
@@ -1231,17 +1235,20 @@
                     if (request.is_full_day) {
                         if (request.amount_leave_day > 1) {
                             description = `ชื่อ : ${request.emp_name_th}
+                                         แผนก : ${request.department}
                                          ประเภทการลา : ${request.leave_name_th}
                                          ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} -  ${new Date(request.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.end_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
                                          รายละเอียด : ${request.description}`;
                         } else {
                             description = `ชื่อ : ${request.emp_name_th}
+                                         แผนก : ${request.department}
                                          ประเภทการลา : ${request.leave_name_th}
                                          ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
                                          รายละเอียด : ${request.description}`;
                         }
                     } else {
                         description = `ชื่อ : ${request.emp_name_th}
+                                         แผนก : ${request.department}
                                          ประเภทการลา : ${request.leave_name_th}
                                          ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')}
                                          เวลา : ${request.start_request_time.split('.')[1].substring(0, 5)} - ${request.end_request_time.split('.')[1].substring(0, 5)}
@@ -1496,6 +1503,7 @@
                 return {
                     no: index + 1,
                     emp_id: row.emp_id,
+                    department: row.department,
                     name: row.emp_name_th || "-",
                     request_date,
                     start_request_date,
@@ -1534,6 +1542,7 @@
                 columns: [
                     { data: 'no' },
                     { data: 'emp_id' },
+                    { data: 'department' },
                     { data: 'name' },
                     { data: 'request_date' },
                     { data: 'start_request_date' },
@@ -1553,6 +1562,7 @@
                             'data-target': '#modal_leave_history',
                             'data-id': data.raw.request_id,
                             'data-emp-id': data.raw.emp_id,
+                            'data-emp-department': data.raw.department,
                             'data-request-date': data.request_date,
                             'data-leave-date': data.leave_date,
                             'data-time': data.raw.start_request_time,
@@ -1572,19 +1582,22 @@
                         if (request.is_full_day) {
                             if (request.amount_leave_day > 1) {
                                 description = `ชื่อ : ${request.emp_name_th}
+                                แผนก : ${request.department}
                                 ประเภทการลา : ${request.leave_name_th}
                                 ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} - ${new Date(request.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.end_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
                                 รายละเอียด : ${request.description || '-'}`;
-                                                            } else {
-                                                                description = `ชื่อ : ${request.emp_name_th}
+                            } else {
+                                description = `ชื่อ : ${request.emp_name_th}
+                                แผนก : ${request.department}
                                 ประเภทการลา : ${request.leave_name_th}
                                 ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
                                 รายละเอียด : ${request.description || '-'}`;
-                                                            }
-                                                        } else {
-                                                            const st = request.start_request_time.split('.')[1]?.substring(0, 5);
-                                                            const et = request.end_request_time.split('.')[1]?.substring(0, 5);
-                                                            description = `ชื่อ : ${request.emp_name_th}
+                            }
+                        } else {
+                            const st = request.start_request_time.split('.')[1]?.substring(0, 5);
+                            const et = request.end_request_time.split('.')[1]?.substring(0, 5);
+                            description = `ชื่อ : ${request.emp_name_th}
+                                แผนก : ${request.department}
                                 ประเภทการลา : ${request.leave_name_th}
                                 ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')}
                                 เวลา : ${st} - ${et}
@@ -1672,11 +1685,13 @@
                     <tr class="clickable-row kanit-regular" style="color:#555; font-size: 16px;"
                         data-toggle="modal" data-target="#modal_leave_history"
                         data-id="${row.request_id}" data-emp-id="${row.emp_id}"
+                        data-department="${row.department}" data-emp-department="${row.department}"
                         data-request-date="${request_date}" data-leave-date="${start_request_date}"
                         data-time="${row.start_request_time}" data-duration="${duration}"
                         data-type="${row.leave_name_th}" data-note="${row.description}" data-status="${row.status_request}">
                         <td class="clickable-col">${index + 1}</td>
                         <td class="clickable-col">${row.emp_id}</td>
+                        <td class="clickable-col">${row.department}</td>
                         <td class="clickable-col">${row.emp_name_th}</td>
                         <td class="clickable-col">${request_date}</td>
                         <td class="clickable-col">${start_request_date}</td>
@@ -1699,17 +1714,20 @@
                     if (request.is_full_day) {
                         if (request.amount_leave_day > 1) {
                             description = `ชื่อ : ${request.emp_name_th}
+                                         แผนก : ${request.department}
                                          ประเภทการลา : ${request.leave_name_th}
                                          ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} -  ${new Date(request.end_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.end_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
                                          รายละเอียด : ${request.description}`;
                         } else {
                             description = `ชื่อ : ${request.emp_name_th}
+                                         แผนก : ${request.department}
                                          ประเภทการลา : ${request.leave_name_th}
                                          ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')} (${request.amount_leave_day} วัน)
                                          รายละเอียด : ${request.description}`;
                         }
                     } else {
                         description = `ชื่อ : ${request.emp_name_th}
+                                         แผนก : ${request.department}
                                          ประเภทการลา : ${request.leave_name_th}
                                          ลาวันที่ : ${new Date(request.start_request_date).toLocaleDateString('th-TH', { weekday: 'short' })} ${new Date(request.start_request_date).toLocaleDateString('en-GB')}
                                          เวลา : ${request.start_request_time.split('.')[1].substring(0, 5)} - ${request.end_request_time.split('.')[1].substring(0, 5)}
@@ -1888,11 +1906,12 @@
                 const rowData = {
                     request_id: $row.data('id'),
                     emp_id: $row.data('emp-id'),
+                    department: $row.data('emp-department'),
                     emp_name_th: $row.find('td.freeze-left-3').text().trim(),
                     request_date: $row.data('request-date'),
                     leave_date: $row.data('leave-date'),
-                    leave_time: $row.find('td:eq(5)').text().trim(),
-                    duration_days: parseFloat($row.find('td:eq(6)').text()),
+                    leave_time: $row.find('td:eq(6)').text().trim(),
+                    duration_days: parseFloat($row.find('td:eq(7)').text()),
                     leave_type: $row.data('type'),
                     description: $row.data('note'),
                     status: $row.data('status'),
