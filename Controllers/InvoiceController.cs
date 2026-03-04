@@ -18,6 +18,7 @@ namespace WebENG.Controllers
         readonly ISummaryInvoice SummaryInvoice;
         readonly ISummaryJobInHand SummaryJobInHand;
         readonly IExport Export;
+        readonly IJob Job;
         protected readonly IHostingEnvironment _hostingEnvironment;
         readonly CTLInterfaces.IEmployee Employees;
         public InvoiceController(IHostingEnvironment hostingEnvironment)
@@ -28,6 +29,7 @@ namespace WebENG.Controllers
             SummaryJobInHand = new SummaryJobInHandService();
             Export = new ExportService();
             Employees = new CTLServices.EmployeeService();
+            Job = new JobService();
         }
         public IActionResult Index()
         {
@@ -71,7 +73,78 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetInvoice(string department ,int year)
         {
-            if (department == "ENG")
+            //List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            //jobInHands = jobInHands.Where(w => w.department == department).ToList();
+
+            //var monthlyGroups = jobInHands
+            //.Where(j => j.job_date != default)
+            //.GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            //.Select(g => new
+            //{
+            //    Year = g.Key.Year,
+            //    Month = g.Key.Month,
+            //    TotalCES = g.Sum(j => j.eng_invoice),
+            //    TotalCIS = g.Sum(j => j.cis_invoice),
+            //    TotalAES = g.Sum(j => j.ais_invoice),
+            //})
+            //.OrderBy(g => g.Year)
+            //.ThenBy(g => g.Month)
+            //.ToList();
+
+            //List<SummaryInvoiceModel> invoices = new List<SummaryInvoiceModel>();
+            //if (department == "CES")
+            //{
+            //    double runningTotal = 0;
+
+            //    foreach (var group in monthlyGroups)
+            //    {
+            //        runningTotal = group.TotalCES;
+
+            //        invoices.Add(new SummaryInvoiceModel
+            //        {
+            //            month = $"{group.Year}-{group.Month:D2}",
+            //            invoice = Math.Round(runningTotal, 2),
+            //            target_month = 0
+            //        });
+            //    }
+            //}
+
+            //if (department == "CIS")
+            //{
+            //    double runningTotal = 0;
+
+            //    foreach (var group in monthlyGroups)
+            //    {
+            //        runningTotal = group.TotalCIS;
+
+            //        invoices.Add(new SummaryInvoiceModel
+            //        {
+            //            month = $"{group.Year}-{group.Month:D2}",
+            //            invoice = Math.Round(runningTotal, 2),
+            //            target_month = 0
+            //        });
+            //    }
+            //}
+
+            //if (department == "AES")
+            //{
+            //    double runningTotal = 0;
+
+            //    foreach (var group in monthlyGroups)
+            //    {
+            //        runningTotal = group.TotalAES;
+
+            //        invoices.Add(new SummaryInvoiceModel
+            //        {
+            //            month = $"{group.Year}-{group.Month:D2}",
+            //            invoice = Math.Round(runningTotal, 2),
+            //            target_month = 0
+            //        });
+            //    }
+            //}
+
+
+            if (department == "CES")
             {
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
                 return Json(invoices);
@@ -81,7 +154,7 @@ namespace WebENG.Controllers
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryCISInvoice(year);
                 return Json(invoices);
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAISInvoice(year);
                 return Json(invoices);
@@ -92,7 +165,77 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetAccInvoice(string department,int year)
         {
-            if (department == "ENG")
+            //List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            //jobInHands = jobInHands.Where(w => w.department == department).ToList();
+
+            //var monthlyGroups = jobInHands
+            //.Where(j => j.job_date != default)
+            //.GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            //.Select(g => new
+            //{
+            //    Year = g.Key.Year,
+            //    Month = g.Key.Month,
+            //    TotalCES = g.Sum(j => j.eng_invoice),
+            //    TotalCIS = g.Sum(j => j.cis_invoice),
+            //    TotalAES = g.Sum(j => j.ais_invoice),
+            //})
+            //.OrderBy(g => g.Year)
+            //.ThenBy(g => g.Month)
+            //.ToList();
+
+            //List<SummaryInvoiceModel> invoices = new List<SummaryInvoiceModel>();
+            //if (department == "CES")
+            //{
+            //    double runningTotal = 0;
+
+            //    foreach (var group in monthlyGroups)
+            //    {
+            //        runningTotal += group.TotalCES;
+
+            //        invoices.Add(new SummaryInvoiceModel
+            //        {
+            //            month = $"{group.Year}-{group.Month:D2}",
+            //            invoice = Math.Round(runningTotal, 2),
+            //            target_month = 0
+            //        });
+            //    }
+            //}
+
+            //if (department == "CIS")
+            //{
+            //    double runningTotal = 0;
+
+            //    foreach (var group in monthlyGroups)
+            //    {
+            //        runningTotal += group.TotalCIS;
+
+            //        invoices.Add(new SummaryInvoiceModel
+            //        {
+            //            month = $"{group.Year}-{group.Month:D2}",
+            //            invoice = Math.Round(runningTotal, 2),
+            //            target_month = 0
+            //        });
+            //    }
+            //}
+
+            //if (department == "AES")
+            //{
+            //    double runningTotal = 0;
+
+            //    foreach (var group in monthlyGroups)
+            //    {
+            //        runningTotal += group.TotalAES;
+
+            //        invoices.Add(new SummaryInvoiceModel
+            //        {
+            //            month = $"{group.Year}-{group.Month:D2}",
+            //            invoice = Math.Round(runningTotal, 2),
+            //            target_month = 0
+            //        });
+            //    }
+            //}
+
+            if (department == "CES")
             {
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAccENGInvoice(year);
                 return Json(invoices);
@@ -102,7 +245,7 @@ namespace WebENG.Controllers
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAccCISInvoice(year);
                 return Json(invoices);
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
                 List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAccAISInvoice(year);
                 return Json(invoices);
@@ -113,7 +256,13 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetSummaryQuarter(string department,int year)
         {
-            if (department == "ENG")
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department).ToList();
+
+            List<BackLogModel> backLogs = Job.GetBackLogs(year);
+            backLogs = backLogs.Where(w => w.department == department).ToList();
+
+            if (department == "CES")
             {
                 List<QuarterENGModel> datas = SummaryJobInHand.GetsSummaryENGQuarter(year);
                 datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_eng_in_hand > 0).ToList();

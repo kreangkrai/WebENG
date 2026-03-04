@@ -358,7 +358,7 @@ namespace WebENG.Controllers
 
             //if (department == "ENG")
             //{
-                List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
+                //List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
             //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
             //    return Json(jobs);
             //}

@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model WebENG.Models.UserModel;
 @{
-    ViewData["Title"] = "Summary Invoice ENG";
+    ViewData["Title"] = "Summary Invoice CES";
 }
 
 <div class="row p-4" style="row-gap:5px">
@@ -14,9 +14,9 @@
                     <div class="col-xl-2">
                         <select id="departments" class="form-control">
                             <option value="" selected disabled>Please Select Department</option>
-                            <option value="ENG">ENG</option>
+                            <option value="CES">CES</option>
                             <option value="CIS">CIS</option>
-                            <option value="AIS">AIS</option>
+                            <option value="AES">AES</option>
                         </select>
                     </div>
                     <div class="col-xl-2">
@@ -49,7 +49,7 @@
         </div>
         <div class="card card-dark">
             <div class="card-header">
-                <span id="label_job" class="card-title">JOB IN HAND & SALES TURNOVER ENG FOR</span>
+                <span id="label_job" class="card-title">JOB IN HAND & SALES TURNOVER CES FOR</span>
             </div>
             <div class="card-body" style="overflow-x:auto">
                 <table id="table" class="table table-sm table-bordered table-hover text-center table-striped nowrap" style="width:100%">
@@ -155,13 +155,13 @@
     $('#btnUpdate').on('click', async function () {
         let year = $('#year').val();
         let department = $('#departments :selected').text();
-        $('#label_job').html(`JOB IN HAND & SALES TURNOVER ENG FOR ${year}`);
+        $('#label_job').html(`JOB IN HAND & SALES TURNOVER CES FOR ${year}`);
         await GetInvoice(department, year);
         await GetAccInvoice(department, year);
         await GetSummaryQuarter(department, year);
         await GetOrderInTake(department, year);
 
-        if (department === "ENG") {          
+        if (department === "CES") {          
             GenerateENGChartInvoice(year, invoices);
             GenerateENGChartAccInvoice(year, acc_invoices);
             GenerateENGTable(summary_quarters);
@@ -174,7 +174,7 @@
             GenerateCISOrderInTake(year, orders_in_take);
             GenerateCISChartInvoice(year, invoices);
         }
-        if (department === "AIS") {
+        if (department === "AES") {
             GenerateAISChartInvoice(year, invoices);
             GenerateAISChartAccInvoice(year, acc_invoices);
             GenerateAISTable(summary_quarters);
@@ -232,7 +232,7 @@
                 },
                 plugins: {
                     title: {
-                        text: `SUMMARY SALE TURNOVER OF JOB ENG OF ${year}`,
+                        text: `SUMMARY SALE TURNOVER OF JOB CES OF ${year}`,
                         font: {
                             size: 16
                         },
@@ -357,7 +357,7 @@
                 },
                 plugins: {
                     title: {
-                        text: `SUMMARY SALE TURNOVER OF JOB AIS OF ${year}`,
+                        text: `SUMMARY SALE TURNOVER OF JOB AES OF ${year}`,
                         font: {
                             size: 16
                         },
@@ -420,7 +420,7 @@
                 },
                 plugins: {
                     title: {
-                        text: `ACCUMULATE SALE TURNOVER OF JOB ENG OF ${year}`,
+                        text: `ACCUMULATE SALE TURNOVER OF JOB CES OF ${year}`,
                         font: {
                               size: 16
                         },
@@ -544,7 +544,7 @@
                 },
                 plugins: {
                     title: {
-                        text: `ACCUMULATE SALE TURNOVER OF JOB AIS OF ${year}`,
+                        text: `ACCUMULATE SALE TURNOVER OF JOB AES OF ${year}`,
                         font: {
                             size: 16
                         },
@@ -701,7 +701,7 @@
                               labels: labels,
                               datasets: [                               
                                 {
-                                  label: 'ENG Job In Hand',
+                                  label: 'CES Job In Hand',
                                   data: jobs_eng_in_hand,
                                   backgroundColor: '#203864',
                                   stack: 'Stack 0',
@@ -736,7 +736,7 @@
                             },
                             plugins: {
                                 title: {
-                                    text: `TREND ORDER IN TAKE ENG JOB OF Y2019 - Y${year}`,
+                                    text: `TREND ORDER IN TAKE CES JOB OF Y2019 - Y${year}`,
                                     font: {
                                             size: 16
                                     },
@@ -849,7 +849,7 @@
             labels: labels,
             datasets: [
                 {
-                    label: 'AIS Job In Hand',
+                    label: 'AES Job In Hand',
                     data: jobs_ais_in_hand,
                     backgroundColor: '#203864',
                     stack: 'Stack 0',
@@ -884,7 +884,7 @@
             },
             plugins: {
                 title: {
-                    text: `TREND ORDER IN TAKE AIS JOB OF Y2019 - Y${year}`,
+                    text: `TREND ORDER IN TAKE AES JOB OF Y2019 - Y${year}`,
                     font: {
                         size: 16
                     },
