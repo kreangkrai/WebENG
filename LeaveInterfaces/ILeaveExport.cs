@@ -10,6 +10,7 @@ namespace WebENG.LeaveInterfaces
 {
     public interface ILeaveExport
     {
-        Stream ExportData(FileInfo path, List<TimeAttendanceModel> datas, List<TimeInOutModel> calLatetimes,List<LeaveTypeModel> leaves,int year);
+        Stream ExportDataAcc(FileInfo path, List<TimeAttendanceModel> datas, List<TimeInOutModel> calLatetimes,List<LeaveTypeModel> leaves,int year);
+        Stream ExportData(FileInfo path, List<TimeAttendanceModel> datas, List<TimeInOutModel> calLatetimes, List<LeaveTypeModel> leaves, int year);
     }
 }

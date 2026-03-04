@@ -275,24 +275,31 @@
                             สถิติการลา
                         </h4>
                     </div>
-                    <div class="col-md-5 col-xl-5 col-12">
+                    <div class="col-md-6 col-xl-6 col-12">
                         <div class="row align-items-center g-2 g-md-3">
-                            <div class="col-4">
+                            <div class="col-3">
                                 <select id="select_department" class="form-control kanit-regular w-100"
                                         style="font-size: 16px;">
                                 </select>
                             </div>
 
-                            <div class="col-4">
+                            <div class="col-3">
                                 <select id="select_year" class="form-control kanit-regular w-100"
                                         style="font-size: 16px;">
                                 </select>
                             </div>
-                            <div class="col-4">
+                            <div class="col-3">
                                 <button class="btn btn-success kanit-regular w-100 w-md-auto px-3" onclick="ExportTimeAttendance()"
                                         style="border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap; font-size: 14px;"
                                         type="button">
                                     <i class="fas fa-file-excel"></i> Export
+                                </button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-success kanit-regular w-100 w-md-auto px-3" onclick="ExportAccTimeAttendance()"
+                                        style="border-radius:5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); white-space: nowrap; font-size: 14px;"
+                                        type="button">
+                                    <i class="fas fa-file-excel"></i> Export Acc
                                 </button>
                             </div>
                         </div>
@@ -417,10 +424,16 @@
             });
             $('#SpinModal').modal('hide');
         }
+
         function ExportTimeAttendance() {
             const department = $('#select_department').val();
             const year = $('#select_year').val();
             location.href = '@Url.Action("ExportTimeAttendance", "TimeAttendance")?department=' + department + '&year=' + year;
+        }
+        function ExportAccTimeAttendance() {
+            const department = $('#select_department').val();
+            const year = $('#select_year').val();
+            location.href = '@Url.Action("ExportAccTimeAttendance", "TimeAttendance")?department=' + department + '&year=' + year;
         }
 
         $('#select_department').on('change', async function () {
@@ -430,7 +443,7 @@
             await GetTimeAttendance();
         });
 
-        
+
         function renderTimeAttendance(data, late_times) {
             if (table_time) {
                 table_time.destroy();
@@ -455,10 +468,10 @@
                         }, 0);
                     }
 
-                    
+
                     for (let k = 0; k < leaves_type.length; k++) {
                         let leave_type = data[i].leaves.filter(f => f.leave_type_code === leaves_type[k].leave_type_code).map(m => m)[0];
-                        
+
                         if (leave_type !== undefined) {
                             const used_leave = leave_type.monthlyAccumulated.reduce((accumulator, currentValue) => {
                                 return accumulator + parseFloat(currentValue.monthlyAmount);
@@ -467,7 +480,7 @@
                         }
                     }
                 }
-                
+
                 const balance_al = parseFloat(data[i].entitlement_al) - parseFloat(used_al);
                 const late_time = late_times.filter(f => f.emp_id === data[i].emp_id).map(m => m)[0];
                 let count_late = 0;
@@ -530,7 +543,7 @@
                         }
                     }
                 },
-                
+
             });
         };
     </script>

@@ -211,6 +211,19 @@ namespace WebENG.Controllers
             var stream = LeaveExport.ExportData(templateFileInfo, objs, calLatetimes,leaves, year);
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TimeAttendance_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx");
         }
+        public IActionResult ExportAccTimeAttendance(string department, int year)
+        {
+            List<TimeAttendanceModel> objs = CalculateTimeAttendance(department, year);
+            objs = objs.OrderBy(o => o.department).ThenBy(t => t.position).ToList();
+            List<TimeInOutModel> calLatetimes = CalLateTime(year);
+
+            List<LeaveTypeModel> leaves = LeaveType.GetLeaveTypes();
+            leaves = leaves.OrderBy(o => o.priority).ToList();
+
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/Template", "TimeAttendance.xlsx"));
+            var stream = LeaveExport.ExportDataAcc(templateFileInfo, objs, calLatetimes, leaves, year);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "TimeAttendance_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx");
+        }
 
         public List<TimeInOutModel> CalLateTime(int year)
         {
