@@ -1409,5 +1409,422 @@ namespace WebENG.Service
             }
             return "Success";
         }
+
+        public List<JobInHandModel> GetJobInHands(int year)
+        {
+            double mb = 1_000_000;
+            List<JobInHandModel> jobs = new List<JobInHandModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string string_command = string.Format($@"WITH BaseData AS (
+                                                        SELECT
+                                                            j.job_id,
+                                                            j.job_type,
+                                                            CASE 
+                                                                WHEN YEAR(j.job_date) = @year THEN
+                                                                    CASE 
+                                                                        WHEN MONTH(j.job_date) BETWEEN 1 AND 3  THEN 1
+                                                                        WHEN MONTH(j.job_date) BETWEEN 4 AND 6  THEN 2
+                                                                        WHEN MONTH(j.job_date) BETWEEN 7 AND 9  THEN 3
+                                                                        WHEN MONTH(j.job_date) BETWEEN 10 AND 12 THEN 4
+                                                                        ELSE 0
+                                                                    END
+                                                                ELSE 0
+                                                            END AS quarter,
+                                                            j.job_name,
+                                                            j.job_date,
+                                                            j.customer_name,
+                                                            j.sale_department,
+                                                            j.sale,
+                                                            j.status,
+                                                            status.Status_Name AS status_name,
+                                                            j.job_in_hand,
+                                                            j.job_eng_in_hand,
+                                                            j.job_cis_in_hand,
+                                                            j.job_ais_in_hand,
+                                                            ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN (j.job_eng_in_hand * 100.0 / j.job_in_hand) 
+                                                                       ELSE 0 END, 2) AS eng_percent,
+    
+                                                            ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN (j.job_cis_in_hand * 100.0 / j.job_in_hand) 
+                                                                       ELSE 0 END, 2) AS cis_percent,
+    
+                                                            ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN (j.job_ais_in_hand * 100.0 / j.job_in_hand) 
+                                                                       ELSE 0 END, 2) AS ais_percent,
+
+	                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_eng_in_hand) 
+                                                                       ELSE 0 END, 2) AS eng_invoice,
+    
+                                                            ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_cis_in_hand) 
+                                                                       ELSE 0 END, 2) AS cis_invoice,
+    
+                                                            ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_ais_in_hand) 
+                                                                       ELSE 0 END, 2) AS ais_invoice,
+
+	                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_eng_in_hand) 
+                                                                       ELSE 0 END / NULLIF(j.job_in_hand,0) * 100 ,2) AS eng_percent_invoice,
+
+	                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_cis_in_hand) 
+                                                                       ELSE 0 END / NULLIF(j.job_in_hand,0) * 100 ,2) AS cis_percent_invoice,
+
+	                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                       THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_ais_in_hand)
+                                                                       ELSE 0 END / NULLIF(j.job_in_hand,0) * 100 ,2) AS ais_percent_invoice,
+                                                            COALESCE(inv.Total_Invoice, 0) AS total_invoice,
+                                                            (j.job_in_hand - COALESCE(inv.Total_Invoice, 0)) AS remaining_in_hand,
+                                                            j.finished_date,
+                                                            j.responsible,
+                                                            emp.department AS responsible_department
+                                                        FROM [dbo].[Jobs] j
+                                                        LEFT JOIN (
+                                                            SELECT 
+                                                                job_id, 
+                                                                SUM(invoice) AS Total_Invoice
+                                                            FROM [dbo].[Invoice]
+                                                            WHERE YEAR(actual_date) = @year 
+                                                              AND invoice > 0
+                                                            GROUP BY job_id
+                                                        ) inv ON inv.job_id = j.job_id
+                                                        LEFT JOIN CTL.dbo.Employees emp ON j.responsible = emp.name_en
+                                                        LEFT JOIN [MES].[dbo].[Eng_Status] status ON j.status = status.Status_ID
+                                                        WHERE YEAR(j.job_date) = @year
+                                                          AND j.job_in_hand > 0
+                                                          AND SUBSTRING(j.job_id, 1, 1) = 'J'
+                                                    ),
+
+                                                    Unpivoted AS (
+                                                        SELECT 
+                                                            *,
+                                                            'CES' AS department,
+                                                            job_eng_in_hand AS amount_in_hand,
+                                                            ROUND(CASE WHEN job_in_hand > 0 THEN (job_eng_in_hand * 100.0 / job_in_hand) ELSE 0 END, 2) AS dept_percent
+                                                        FROM BaseData
+                                                        WHERE job_eng_in_hand > 0
+
+                                                        UNION ALL
+
+                                                        SELECT 
+                                                            *,
+                                                            'CIS' AS department,
+                                                            job_cis_in_hand AS amount_in_hand,
+                                                            ROUND(CASE WHEN job_in_hand > 0 THEN (job_cis_in_hand * 100.0 / job_in_hand) ELSE 0 END, 2) AS dept_percent
+                                                        FROM BaseData
+                                                        WHERE job_cis_in_hand > 0
+
+                                                        UNION ALL
+
+                                                        SELECT 
+                                                            *,
+                                                            'AES' AS department,
+                                                            job_ais_in_hand AS amount_in_hand,
+                                                            ROUND(CASE WHEN job_in_hand > 0 THEN (job_ais_in_hand * 100.0 / job_in_hand) ELSE 0 END, 2) AS dept_percent
+                                                        FROM BaseData
+                                                        WHERE job_ais_in_hand > 0
+                                                    )
+
+                                                    SELECT 
+                                                        job_id,
+                                                        job_type,
+                                                        quarter,
+                                                        job_name,
+                                                        job_date,
+                                                        customer_name,
+                                                        sale_department,
+                                                        sale,
+                                                        status,
+                                                        status_name,
+                                                        job_in_hand,
+                                                        job_eng_in_hand,
+                                                        job_cis_in_hand,
+                                                        job_ais_in_hand,
+                                                        eng_percent,
+                                                        cis_percent,
+                                                        ais_percent,
+                                                        eng_invoice,
+	                                                    cis_invoice,
+	                                                    ais_invoice,
+	                                                    eng_percent_invoice,
+	                                                    cis_percent_invoice,
+	                                                    ais_percent_invoice,
+                                                        total_invoice,
+                                                        remaining_in_hand,
+                                                        finished_date,
+                                                        responsible,
+                                                        responsible_department,
+                                                        department
+                                                    FROM Unpivoted
+                                                    ORDER BY 
+                                                    job_id,
+                                                        remaining_in_hand DESC,
+                                                        job_in_hand DESC,
+                                                        job_date DESC");
+                SqlCommand cmd = new SqlCommand(string_command, con);
+                cmd.Parameters.AddWithValue("@year", year);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        JobInHandModel job = new JobInHandModel()
+                        {
+                            job_id = dr["job_id"].ToString(),
+                            job_type = dr["job_type"].ToString(),
+                            quarter = Int32.Parse(dr["quarter"].ToString()),
+                            job_name = dr["job_name"].ToString(),
+                            job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
+                            customer_name = dr["customer_name"].ToString(),
+                            sale_department = dr["sale_department"].ToString(),
+                            sale = dr["sale"].ToString(),
+                            status = dr["status"].ToString(),
+                            status_name = dr["status_name"].ToString(),
+                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) / mb : 0,
+                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) / mb : 0,
+                            job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"].ToString()) / mb : 0,
+                            job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"].ToString()) / mb : 0,
+                            eng_percent = dr["eng_percent"] != DBNull.Value ? Convert.ToDouble(dr["eng_percent"].ToString()) : 0,
+                            cis_percent = dr["cis_percent"] != DBNull.Value ? Convert.ToDouble(dr["cis_percent"].ToString()) : 0,
+                            ais_percent = dr["ais_percent"] != DBNull.Value ? Convert.ToDouble(dr["ais_percent"].ToString()) : 0,
+                            eng_invoice = dr["eng_invoice"] != DBNull.Value ? Convert.ToDouble(dr["eng_invoice"].ToString()) / mb : 0,
+                            cis_invoice = dr["cis_invoice"] != DBNull.Value ? Convert.ToDouble(dr["cis_invoice"].ToString()) / mb : 0,
+                            ais_invoice = dr["ais_invoice"] != DBNull.Value ? Convert.ToDouble(dr["ais_invoice"].ToString()) / mb : 0,
+                            eng_percent_invoice = dr["eng_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["eng_percent_invoice"].ToString()) : 0,
+                            cis_percent_invoice = dr["cis_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["cis_percent_invoice"].ToString()) : 0,
+                            ais_percent_invoice = dr["ais_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["ais_percent_invoice"].ToString()) : 0,
+                            total_invoice = dr["total_invoice"] != DBNull.Value ? Convert.ToDouble(dr["total_invoice"].ToString()) / mb : 0,
+                            remaining_in_hand = dr["remaining_in_hand"] != DBNull.Value ? Math.Round(Convert.ToDouble(dr["remaining_in_hand"].ToString()) / mb ,2) : 0,
+                            responsible = dr["responsible"].ToString(),
+                            responsible_department = dr["responsible_department"].ToString(),
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                            department = dr["department"].ToString(),
+                        };
+                        jobs.Add(job);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return jobs;
+        }
+
+        public List<BackLogModel> GetBackLogs(int year)
+        {
+            double mb = 1_000_000;
+            List<BackLogModel> jobs = new List<BackLogModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string string_command = string.Format($@"WITH BaseData AS (
+                                                        SELECT
+                                                            j.job_id,
+                                                            j.job_type,
+                                                            j.job_name,
+                                                            j.job_date,
+                                                            j.customer_name,
+                                                            j.sale_department,
+                                                            j.sale,
+                                                            j.status,
+                                                            status.Status_Name AS status_name,
+                                                            j.job_in_hand,
+                                                            j.job_eng_in_hand,
+                                                            j.job_cis_in_hand,
+                                                            j.job_ais_in_hand,
+        
+                                                            ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN (j.job_eng_in_hand * 100.0 / j.job_in_hand) 
+                                                                   ELSE 0 END, 2) AS eng_percent,
+    
+                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN (j.job_cis_in_hand * 100.0 / j.job_in_hand) 
+                                                                   ELSE 0 END, 2) AS cis_percent,
+    
+                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN (j.job_ais_in_hand * 100.0 / j.job_in_hand) 
+                                                                   ELSE 0 END, 2) AS ais_percent,
+
+	                                                    ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_eng_in_hand) 
+                                                                   ELSE 0 END, 2) AS eng_invoice,
+    
+                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_cis_in_hand) 
+                                                                   ELSE 0 END, 2) AS cis_invoice,
+    
+                                                        ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_ais_in_hand) 
+                                                                   ELSE 0 END, 2) AS ais_invoice,
+
+	                                                    ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_eng_in_hand) 
+                                                                   ELSE 0 END / NULLIF(j.job_in_hand,0) * 100 ,2) AS eng_percent_invoice,
+
+	                                                    ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_cis_in_hand) 
+                                                                   ELSE 0 END / NULLIF(j.job_in_hand,0) * 100 ,2) AS cis_percent_invoice,
+
+	                                                    ROUND(CASE WHEN j.job_in_hand > 0 
+                                                                   THEN ( COALESCE(inv.Total_Invoice, 0) / j.job_in_hand * j.job_ais_in_hand)
+                                                                   ELSE 0 END / NULLIF(j.job_in_hand,0) * 100 ,2) AS ais_percent_invoice,
+        
+                                                            COALESCE(inv.Total_Invoice, 0) AS total_invoice,
+                                                            (j.job_in_hand - COALESCE(inv.Total_Invoice, 0)) AS remaining_in_hand,
+                                                            j.finished_date,
+                                                            j.responsible,
+                                                            emp.department AS responsible_department
+                                                        FROM [dbo].[Jobs] j
+                                                        LEFT JOIN (
+                                                            SELECT 
+                                                                job_id, 
+                                                                SUM(invoice) AS Total_Invoice
+                                                            FROM [dbo].[Invoice]
+                                                            WHERE YEAR(actual_date) <= @year 
+                                                              AND invoice > 0
+                                                            GROUP BY job_id
+                                                        ) inv ON inv.job_id = j.job_id
+                                                        LEFT JOIN CTL.dbo.Employees emp ON j.responsible = emp.name_en
+                                                        LEFT JOIN [MES].[dbo].[Eng_Status] status ON j.status = status.Status_ID
+                                                        WHERE YEAR(j.job_date) < @year
+                                                          AND j.job_in_hand > 0
+                                                          AND (j.job_in_hand - COALESCE(inv.Total_Invoice, 0)) > 0
+                                                          AND SUBSTRING(j.job_id, 1, 1) = 'J'
+                                                    ),
+
+                                                    Unpivoted AS (
+                                                        SELECT 
+                                                            *,
+                                                            'CES' AS department,
+                                                            job_eng_in_hand AS amount_in_hand,
+                                                            ROUND(CASE WHEN job_in_hand > 0 THEN (job_eng_in_hand * 100.0 / job_in_hand) ELSE 0 END, 2) AS dept_percent
+                                                        FROM BaseData
+                                                        WHERE job_eng_in_hand > 0
+
+                                                        UNION ALL
+
+                                                        SELECT 
+                                                            *,
+                                                            'CIS' AS department,
+                                                            job_cis_in_hand AS amount_in_hand,
+                                                            ROUND(CASE WHEN job_in_hand > 0 THEN (job_cis_in_hand * 100.0 / job_in_hand) ELSE 0 END, 2) AS dept_percent
+                                                        FROM BaseData
+                                                        WHERE job_cis_in_hand > 0
+
+                                                        UNION ALL
+
+                                                        -- AIS
+                                                        SELECT 
+                                                            *,
+                                                            'AES' AS department,
+                                                            job_ais_in_hand AS amount_in_hand,
+                                                            ROUND(CASE WHEN job_in_hand > 0 THEN (job_ais_in_hand * 100.0 / job_in_hand) ELSE 0 END, 2) AS dept_percent
+                                                        FROM BaseData
+                                                        WHERE job_ais_in_hand > 0
+                                                    )
+
+                                                    SELECT 
+                                                        job_id,
+                                                        job_type,
+                                                        job_name,
+                                                        job_date,
+                                                        customer_name,
+                                                        sale_department,
+                                                        sale,
+                                                        status,
+                                                        status_name,
+                                                        job_in_hand,
+                                                        job_eng_in_hand,
+                                                        job_cis_in_hand,
+                                                        job_ais_in_hand,
+                                                        eng_percent,
+                                                        cis_percent,
+                                                        ais_percent,
+	                                                    eng_invoice,
+	                                                    cis_invoice,
+	                                                    ais_invoice,
+	                                                    eng_percent_invoice,
+	                                                    cis_percent_invoice,
+	                                                    ais_percent_invoice,
+                                                        total_invoice,
+                                                        remaining_in_hand,
+                                                        finished_date,
+                                                        responsible,
+                                                        responsible_department,
+                                                        department
+                                                    FROM Unpivoted
+                                                    ORDER BY
+	                                                    job_id,
+                                                        remaining_in_hand DESC,     
+                                                        job_in_hand DESC,
+                                                        job_date DESC");
+                SqlCommand cmd = new SqlCommand(string_command, con);
+                cmd.Parameters.AddWithValue("@year", year);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        BackLogModel job = new BackLogModel()
+                        {
+                            job_id = dr["job_id"].ToString(),
+                            job_type = dr["job_type"].ToString(),
+                            job_name = dr["job_name"].ToString(),
+                            job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
+                            customer_name = dr["customer_name"].ToString(),
+                            sale_department = dr["sale_department"].ToString(),
+                            sale = dr["sale"].ToString(),
+                            status = dr["status"].ToString(),
+                            status_name = dr["status_name"].ToString(),
+                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) / mb : 0,
+                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) / mb : 0,
+                            job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"].ToString()) / mb : 0,
+                            job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"].ToString()) / mb : 0,
+                            eng_percent = dr["eng_percent"] != DBNull.Value ? Convert.ToDouble(dr["eng_percent"].ToString()) : 0,
+                            cis_percent = dr["cis_percent"] != DBNull.Value ? Convert.ToDouble(dr["cis_percent"].ToString()) : 0,
+                            ais_percent = dr["ais_percent"] != DBNull.Value ? Convert.ToDouble(dr["ais_percent"].ToString()) : 0,
+                            eng_invoice = dr["eng_invoice"] != DBNull.Value ? Convert.ToDouble(dr["eng_invoice"].ToString()) / mb : 0,
+                            cis_invoice = dr["cis_invoice"] != DBNull.Value ? Convert.ToDouble(dr["cis_invoice"].ToString()) / mb : 0,
+                            ais_invoice = dr["ais_invoice"] != DBNull.Value ? Convert.ToDouble(dr["ais_invoice"].ToString()) / mb : 0,
+                            eng_percent_invoice = dr["eng_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["eng_percent_invoice"].ToString()) : 0,
+                            cis_percent_invoice = dr["cis_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["cis_percent_invoice"].ToString()) : 0,
+                            ais_percent_invoice = dr["ais_percent_invoice"] != DBNull.Value ? Convert.ToDouble(dr["ais_percent_invoice"].ToString()) : 0,
+                            total_invoice = dr["total_invoice"] != DBNull.Value ? Convert.ToDouble(dr["total_invoice"].ToString()) / mb : 0,
+                            remaining_in_hand = dr["remaining_in_hand"] != DBNull.Value ? Math.Round(Convert.ToDouble(dr["remaining_in_hand"].ToString()) / mb, 2) : 0,
+                            responsible = dr["responsible"].ToString(),
+                            responsible_department = dr["responsible_department"].ToString(),
+                            finished_date = dr["finished_date"] != DBNull.Value ? Convert.ToDateTime(dr["finished_date"].ToString()) : DateTime.MinValue,
+                            department = dr["department"].ToString()
+                        };
+                        jobs.Add(job);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return jobs;
+        }
     }
 }

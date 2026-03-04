@@ -18,6 +18,7 @@ namespace WebENG.Controllers
         readonly ISummaryJobInHand SummaryJobInHand;
         readonly IExport Export;
         readonly CTLInterfaces.IEmployee Employees;
+        readonly IJob Job;
         protected readonly IHostingEnvironment _hostingEnvironment;
         public JobInHandController(IHostingEnvironment hostingEnvironment)
         {
@@ -26,6 +27,7 @@ namespace WebENG.Controllers
             SummaryJobInHand = new SummaryJobInHandService();
             Export = new ExportService();
             Employees = new CTLServices.EmployeeService();
+            Job = new JobService();
         }
         public IActionResult Index()
         {
@@ -67,114 +69,345 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetAccJobInHand(string department, int year,string type)
+        public IActionResult GetAccJobInHand(string department, int year)
         {
-            if (department == "ENG")
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department).ToList();
+
+
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
             {
-                List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsAccENGJobInHand(year, type);
-                return Json(jobs);
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.job_eng_in_hand),
+                TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                TotalAIS = g.Sum(j => j.job_ais_in_hand),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            if (department == "CES")
+            {
+                var result = new List<SummaryENGJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalCES;
+
+                    result.Add(new SummaryENGJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_eng_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
             if (department == "CIS")
             {
-                List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsAccCISJobInHand(year, type);
-                return Json(jobs);
+                var result = new List<SummaryCISJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalCIS;
+
+                    result.Add(new SummaryCISJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_cis_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
-                List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsAccAISJobInHand(year, type);
-                return Json(jobs);
+                var result = new List<SummaryAISJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalAIS;
+
+                    result.Add(new SummaryAISJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_ais_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
+
+            //if (department == "ENG")
+            //{
+            //    List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsAccENGJobInHand(year, type);
+            //    return Json(jobs);
+            //}
+            //if (department == "CIS")
+            //{
+            //    List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsAccCISJobInHand(year, type);
+            //    return Json(jobs);
+            //}
+            //if (department == "AIS")
+            //{
+            //    List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsAccAISJobInHand(year, type);
+            //    return Json(jobs);
+            //}
             return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetJobInHandProject(string department, int year, string type)
+        public JsonResult GetJobInHandProject(string department, int year)
         {
-            if (department == "ENG")
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department && w.job_type == "Project").ToList();
+
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
             {
-                List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsProjectENGJobInHand(year, type);
-                return Json(jobs);
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.job_eng_in_hand),
+                TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                TotalAIS = g.Sum(j => j.job_ais_in_hand),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            if (department == "CES")
+            {
+                var result = new List<SummaryENGJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCES;
+
+                    result.Add(new SummaryENGJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_eng_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
             if (department == "CIS")
             {
-                List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsProjectCISJobInHand(year, type);
-                return Json(jobs);
+                var result = new List<SummaryCISJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCIS;
+
+                    result.Add(new SummaryCISJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_cis_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
-                List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsProjectAISJobInHand(year, type);
-                return Json(jobs);
+                var result = new List<SummaryAISJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalAIS;
+
+                    result.Add(new SummaryAISJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_ais_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
+
+            //if (department == "ENG")
+            //{
+            //    List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsProjectENGJobInHand(year, type);
+            //    return Json(jobs);
+            //}
+            //if (department == "CIS")
+            //{
+            //    List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsProjectCISJobInHand(year, type);
+            //    return Json(jobs);
+            //}
+            //if (department == "AIS")
+            //{
+            //    List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsProjectAISJobInHand(year, type);
+            //    return Json(jobs);
+            //}
             return Json(null);
         }
 
         [HttpGet]
-        public JsonResult GetJobInHandService(string department,int year, string type)
+        public JsonResult GetJobInHandService(string department, int year)
         {
-            if (department == "ENG")
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department && w.job_type == "Service").ToList();
+
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
             {
-                List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsServiceENGJobInHand(year, type);
-                return Json(jobs);
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.job_eng_in_hand),
+                TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                TotalAIS = g.Sum(j => j.job_ais_in_hand),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            if (department == "CES")
+            {
+                var result = new List<SummaryENGJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCES;
+
+                    result.Add(new SummaryENGJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_eng_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
             if (department == "CIS")
             {
-                List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsServiceCISJobInHand(year, type);
-                return Json(jobs);
+                var result = new List<SummaryCISJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCIS;
+
+                    result.Add(new SummaryCISJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_cis_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
-                List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsServiceAISJobInHand(year, type);
-                return Json(jobs);
+                var result = new List<SummaryAISJobInHandModel>();
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalAIS;
+
+                    result.Add(new SummaryAISJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_ais_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+                return Json(result);
             }
+            //if (department == "ENG")
+            //{
+            //    List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsServiceENGJobInHand(year, type);
+            //    return Json(jobs);
+            //}
+            //if (department == "CIS")
+            //{
+            //    List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsServiceCISJobInHand(year, type);
+            //    return Json(jobs);
+            //}
+            //if (department == "AIS")
+            //{
+            //    List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsServiceAISJobInHand(year, type);
+            //    return Json(jobs);
+
             return Json(null);
         }
 
         [HttpGet]
         public JsonResult GetProjectInHand(string department,int year)
         {
-            if (department == "ENG")
-            {
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department && w.job_type == "Project").ToList();
+
+            //if (department == "ENG")
+            //{
                 List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
-                jobs = jobs.Where(w => w.job_type == "Project").ToList();
-                return Json(jobs);
-            }
-            if (department == "CIS")
-            {
-                List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
-                jobs = jobs.Where(w => w.job_type == "Project").ToList();
-                return Json(jobs);
-            }
-            if (department == "AIS")
-            {
-                List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
-                jobs = jobs.Where(w => w.job_type == "Project").ToList();
-                return Json(jobs);
-            }
-            return Json(null);
+            //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
+            //    return Json(jobs);
+            //}
+            //if (department == "CIS")
+            //{
+            //    List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
+            //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
+            //    return Json(jobs);
+            //}
+            //if (department == "AES")
+            //{
+            //    List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
+            //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
+            //    return Json(jobs);
+            //}
+            return Json(jobInHands);
         }
 
         [HttpGet]
         public JsonResult GetServiceInHand(string department,int year)
         {
-            if (department == "ENG")
-            {
-                List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
-                jobs = jobs.Where(w => w.job_type == "Service").ToList();
-                return Json(jobs);
-            }
-            if (department == "CIS")
-            {
-                List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
-                jobs = jobs.Where(w => w.job_type == "Service").ToList();
-                return Json(jobs);
-            }
-            if (department == "AIS")
-            {
-                List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
-                jobs = jobs.Where(w => w.job_type == "Service").ToList();
-                return Json(jobs);
-            }
-            return Json(null);
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department && w.job_type == "Service").ToList();
+            //jobInHands = jobInHands.GroupBy(g => g.job_id).Select(s => new JobInHandModel()
+            //{
+            //    job_id = s.Key,
+
+            //}).ToList();
+
+
+            //if (department == "ENG")
+            //{
+            //    List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
+            //    jobs = jobs.Where(w => w.job_type == "Service").ToList();
+            //    return Json(jobs);
+            //}
+            //if (department == "CIS")
+            //{
+            //    List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
+            //    jobs = jobs.Where(w => w.job_type == "Service").ToList();
+            //    return Json(jobs);
+            //}
+            //if (department == "AIS")
+            //{
+            //    List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
+            //    jobs = jobs.Where(w => w.job_type == "Service").ToList();
+            //    return Json(jobs);
+            //}
+            return Json(jobInHands);
         }
         public IActionResult ExportSummaryJobInHand(string department,int year)
         {

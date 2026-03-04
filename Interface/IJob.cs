@@ -27,5 +27,8 @@ namespace WebENG.Interface
         List<EngSystemModel> GetSystemByUser(string emp_id);
         string UpdateFinish(string job);
         List<string> GetDueWarranty();
+
+        List<JobInHandModel> GetJobInHands(int year);
+        List<BackLogModel> GetBackLogs(int year);
     }
 }

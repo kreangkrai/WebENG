@@ -15,9 +15,9 @@
                     <div class="col-xl-2">
                         <select id="departments" class="form-control">
                             <option value="" selected disabled>Please Select Department</option>
-                            <option value="ENG">ENG</option>
+                            <option value="CES">CES</option>
                             <option value="CIS">CIS</option>
-                            <option value="AIS">AIS</option>
+                            <option value="AES">AES</option>
                         </select>
                     </div>
                     <div class="col-xl-2">
@@ -177,19 +177,19 @@
             let sum = 0;
             let sum_project = 0;
             let sum_service = 0;
-            if (department === "ENG") {
-                sum_project = (projects_in_hand.map(m => m.job_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
-                sum_service = (services_in_hand.map(m => m.job_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+            if (department === "CES") {
+                sum_project = (projects_in_hand.map(m => m.job_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(2);
+                sum_service = (services_in_hand.map(m => m.job_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(2);
                 sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
             }
             if (department === "CIS") {
-                sum_project = (projects_in_hand.map(m => m.job_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
-                sum_service = (services_in_hand.map(m => m.job_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+                sum_project = (projects_in_hand.map(m => m.job_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(2);
+                sum_service = (services_in_hand.map(m => m.job_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(2);
                 sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
             }
-            if (department === "AIS") {
-                sum_project = (projects_in_hand.map(m => m.job_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
-                sum_service = (services_in_hand.map(m => m.job_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0) / 1000000).toFixed(2);
+            if (department === "AES") {
+                sum_project = (projects_in_hand.map(m => m.job_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(2);
+                sum_service = (services_in_hand.map(m => m.job_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(2);
                 sum = (Number(sum_project) + Number(sum_service)).toFixed(2);
             }
             $('#jobinhand_project').val(sum_project);
@@ -264,7 +264,7 @@
             await GetProjectInHand(department,year);
             await GetServiceInHand(department, year);
 
-            if (department === "ENG") {
+            if (department === "CES") {
                 GenerateENGChartAcc(year, acc_jobs_in_hand);
                 GenerateENGChartProject(year, jobs_in_hand_project);
                 GenerateENGChartService(year, jobs_in_hand_service);
@@ -278,7 +278,7 @@
                 GenerateCISTableProject(projects_in_hand);
                 GenerateCISTableService(services_in_hand);
             }
-            if (department === "AIS") {
+            if (department === "AES") {
                 GenerateAISChartAcc(year, acc_jobs_in_hand);
                 GenerateAISChartProject(year, jobs_in_hand_project);
                 GenerateAISChartService(year, jobs_in_hand_service);
@@ -336,7 +336,7 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND ENG ${year}`,
+                            text: `SUMMARY OF JOB IN HAND CES ${year}`,
                             display: true
                         },
                         legend: {
@@ -454,7 +454,7 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND AIS ${year}`,
+                            text: `SUMMARY OF JOB IN HAND AES ${year}`,
                             display: true
                         },
                         legend: {
@@ -515,7 +515,7 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND ENG PROJECT FOR ${year}`,
+                            text: `SUMMARY OF JOB IN HAND CES PROJECT FOR ${year}`,
                             display: true
                         },
                         legend: {
@@ -635,7 +635,7 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND AIS PROJECT FOR ${year}`,
+                            text: `SUMMARY OF JOB IN HAND AES PROJECT FOR ${year}`,
                             display: true
                         },
                         legend: {
@@ -696,7 +696,7 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND ENG SERVICE FOR ${year}`,
+                            text: `SUMMARY OF JOB IN HAND CES SERVICE FOR ${year}`,
                             display: true
                         },
                         legend: {
@@ -816,7 +816,7 @@
                     },
                     plugins: {
                         title: {
-                            text: `SUMMARY OF JOB IN HAND AIS SERVICE FOR ${year}`,
+                            text: `SUMMARY OF JOB IN HAND AES SERVICE FOR ${year}`,
                             display: true
                         },
                         legend: {
@@ -831,17 +831,16 @@
         function GenerateENGTableProject(projects) {
             let datas = [];
             if (table_project !== null)
-                $('#table_project').DataTable().destroy();
-
-            for (let i = 0; i < projects.length; i++) {              
+                $('#table_project').DataTable().destroy();           
+            for (let i = 0; i < projects.length; i++) {
                 datas.push([
                     (i+1),
                     projects[i].job_id,
                     projects[i].customer_name,
                     projects[i].job_name,
-                    projects[i].percent_eng_cost,
-                    projects[i].percent_invoice,
-                    parseInt(projects[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    projects[i].eng_percent,
+                    projects[i].eng_percent_invoice,
+                    parseFloat(projects[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -859,7 +858,7 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = projects.filter(f=>f.job_id == job_id).map(m=>m)[0];
-                    let remaining_amount = data.remaining_amount;
+                    let remaining_amount = data.remaining_in_hand;
                     if (remaining_amount == 0){
                         $(`td`,row).css({ "text-decoration": 'line-through'});
                         $(`td`,row).css({ "color": 'blue'});
@@ -877,16 +876,16 @@
             let datas = [];
             if (table_project !== null)
                 $('#table_project').DataTable().destroy();
-
+           
             for (let i = 0; i < projects.length; i++) {
                 datas.push([
                     (i + 1),
                     projects[i].job_id,
                     projects[i].customer_name,
                     projects[i].job_name,
-                    projects[i].percent_cis_cost,
-                    projects[i].percent_invoice,
-                    parseInt(projects[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    projects[i].cis_percent,
+                    projects[i].cis_percent_invoice,
+                    parseFloat(projects[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -904,7 +903,7 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = projects.filter(f => f.job_id == job_id).map(m => m)[0];
-                    let remaining_amount = data.remaining_amount;
+                    let remaining_amount = data.remaining_in_hand;
                     if (remaining_amount == 0) {
                         $(`td`, row).css({ "text-decoration": 'line-through' });
                         $(`td`, row).css({ "color": 'blue' });
@@ -922,16 +921,16 @@
             let datas = [];
             if (table_project !== null)
                 $('#table_project').DataTable().destroy();
-
+            
             for (let i = 0; i < projects.length; i++) {
                 datas.push([
                     (i + 1),
                     projects[i].job_id,
                     projects[i].customer_name,
                     projects[i].job_name,
-                    projects[i].percent_ais_cost,
-                    projects[i].percent_invoice,
-                    parseInt(projects[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    projects[i].ais_percent,
+                    projects[i].ais_percent_invoice,
+                    parseFloat(projects[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -949,7 +948,7 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = projects.filter(f => f.job_id == job_id).map(m => m)[0];
-                    let remaining_amount = data.remaining_amount;
+                    let remaining_amount = data.remaining_in_hand;
                     if (remaining_amount == 0) {
                         $(`td`, row).css({ "text-decoration": 'line-through' });
                         $(`td`, row).css({ "color": 'blue' });
@@ -969,15 +968,15 @@
             if (table_service !== null)
                 $('#table_service').DataTable().destroy();
 
-            for (let i = 0; i < services.length; i++) {              
+            for (let i = 0; i < services.length; i++) {
                 datas.push([
                     (i+1),
                     services[i].job_id,
                     services[i].customer_name,
                     services[i].job_name,
-                    services[i].percent_eng_cost,
-                    services[i].percent_invoice,
-                    parseInt(services[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    services[i].eng_percent,
+                    services[i].eng_percent_invoice,
+                    parseFloat(services[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -995,7 +994,7 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = services.filter(f=>f.job_id == job_id).map(m=>m)[0];
-                    let remaining_amount = data.remaining_amount;
+                    let remaining_amount = data.remaining_in_hand;
                     if (remaining_amount == 0){
                         $(`td`,row).css({ "text-decoration": 'line-through'});
                         $(`td`,row).css({ "color": 'blue'});
@@ -1020,9 +1019,9 @@
                     services[i].job_id,
                     services[i].customer_name,
                     services[i].job_name,
-                    services[i].percent_cis_cost,
-                    services[i].percent_invoice,
-                    parseInt(services[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    services[i].cis_percent,
+                    services[i].cis_percent_invoice,
+                    parseFloat(services[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -1040,7 +1039,7 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = services.filter(f => f.job_id == job_id).map(m => m)[0];
-                    let remaining_amount = data.remaining_amount;
+                    let remaining_amount = data.remaining_in_hand;
                     if (remaining_amount == 0) {
                         $(`td`, row).css({ "text-decoration": 'line-through' });
                         $(`td`, row).css({ "color": 'blue' });
@@ -1065,9 +1064,9 @@
                     services[i].job_id,
                     services[i].customer_name,
                     services[i].job_name,
-                    services[i].percent_ais_cost,
-                    services[i].percent_invoice,
-                    parseInt(services[i].remaining_amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    services[i].ais_percent,
+                    services[i].ais_percent_invoice,
+                    parseFloat(services[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -1085,7 +1084,7 @@
                 rowCallback: function (row, _data) {
                     let job_id = _data[1];
                     let data = services.filter(f => f.job_id == job_id).map(m => m)[0];
-                    let remaining_amount = data.remaining_amount;
+                    let remaining_amount = data.remaining_in_hand;
                     if (remaining_amount == 0) {
                         $(`td`, row).css({ "text-decoration": 'line-through' });
                         $(`td`, row).css({ "color": 'blue' });
