@@ -147,12 +147,23 @@
             $('#year').append(year_string);
         };
 
-        function backlog(){
+        function backlog(department){
             let sum = 0;
             let sum_project = 0;
             let sum_service = 0;
-            sum_project = (projects_backlog.map(m=> m.remaining_in_hand).reduce((acc,x)=> Number(acc) + Number(x),0)).toFixed(3);
-            sum_service = (services_backlog.map(m => m.remaining_in_hand).reduce((acc,x)=> Number(acc) + Number(x),0)).toFixed(3);
+
+            if (department === "CES") {
+                sum_project = (projects_backlog.map(m => m.remaining_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(3);
+                sum_service = (services_backlog.map(m => m.remaining_eng_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(3);
+            }
+            if (department === "CIS") {
+                sum_project = (projects_backlog.map(m => m.remaining_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(3);
+                sum_service = (services_backlog.map(m => m.remaining_cis_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(3);
+            }
+            if (department === "AES") {
+                sum_project = (projects_backlog.map(m => m.remaining_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(3);
+                sum_service = (services_backlog.map(m => m.remaining_ais_in_hand).reduce((acc, x) => Number(acc) + Number(x), 0)).toFixed(3);
+            }
             sum = (Number(sum_project) + Number(sum_service)).toFixed(3);
 
             $('#backlog_project').val(sum_project);
@@ -200,7 +211,7 @@
                 GenerateAISTableProject(projects_backlog);
                 GenerateAISTableService(services_backlog);
             }
-            backlog();
+            backlog(department);
         });
      
         function GenerateENGTableProject(projects) {
@@ -216,7 +227,7 @@
                     projects[i].job_name,
                     projects[i].eng_percent,
                     projects[i].eng_percent_invoice,
-                    parseFloat(projects[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    parseFloat(projects[i].remaining_eng_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -260,7 +271,7 @@
                     projects[i].job_name,
                     projects[i].cis_percent,
                     projects[i].cis_percent_invoice,
-                    parseFloat(projects[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    parseFloat(projects[i].remaining_cis_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -304,7 +315,7 @@
                     projects[i].job_name,
                     projects[i].ais_percent,
                     projects[i].ais_percent_invoice,
-                    parseFloat(projects[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    parseFloat(projects[i].remaining_ais_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -349,7 +360,7 @@
                     services[i].job_name,
                     services[i].eng_percent,
                     services[i].eng_percent_invoice,
-                    parseFloat(services[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    parseFloat(services[i].remaining_eng_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 
@@ -393,7 +404,7 @@
                         services[i].job_name,
                         services[i].cis_percent,
                         services[i].cis_percent_invoice,
-                        parseFloat(services[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                        parseFloat(services[i].remaining_cis_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     ]);
                 }
 
@@ -437,7 +448,7 @@
                     services[i].job_name,
                     services[i].ais_percent,
                     services[i].ais_percent_invoice,
-                    parseFloat(services[i].remaining_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+                    parseFloat(services[i].remaining_ais_in_hand).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                 ]);
             }
 

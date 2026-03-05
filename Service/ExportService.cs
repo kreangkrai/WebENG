@@ -260,7 +260,7 @@ namespace WebENG.Service
             return stream;
         }
 
-        public Stream ExportSummaryAISJobInHand(FileInfo path, List<SummaryAISJobInHandModel> all, List<SummaryAISJobInHandModel> projects, List<SummaryAISJobInHandModel> services)
+        public Stream ExportSummaryJobInHand(FileInfo path, List<SummaryJobInHandModel> all, List<SummaryJobInHandModel> projects, List<SummaryJobInHandModel> services)
         {
             Stream stream = new MemoryStream();
             if (path.Exists)
@@ -273,21 +273,21 @@ namespace WebENG.Service
                     for (int i = 0; i < all.Count; i++)
                     {
                         worksheet.Cells["E" + (i + startRows)].Value = all[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = all[i].job_ais_in_hand;
+                        worksheet.Cells["F" + (i + startRows)].Value = all[i].job_in_hand;
                     }
 
                     startRows = 20;
                     for (int i = 0; i < projects.Count; i++)
                     {
                         worksheet.Cells["E" + (i + startRows)].Value = projects[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = projects[i].job_ais_in_hand;
+                        worksheet.Cells["F" + (i + startRows)].Value = projects[i].job_in_hand;
                     }
 
                     startRows = 35;
                     for (int i = 0; i < services.Count; i++)
                     {
                         worksheet.Cells["E" + (i + startRows)].Value = services[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = services[i].job_ais_in_hand;
+                        worksheet.Cells["F" + (i + startRows)].Value = services[i].job_in_hand;
                     }
 
                     p.SaveAs(stream);
@@ -297,81 +297,7 @@ namespace WebENG.Service
             return stream;
         }
 
-        public Stream ExportSummaryCISJobInHand(FileInfo path, List<SummaryCISJobInHandModel> all, List<SummaryCISJobInHandModel> projects, List<SummaryCISJobInHandModel> services)
-        {
-            Stream stream = new MemoryStream();
-            if (path.Exists)
-            {
-                using (ExcelPackage p = new ExcelPackage(path))
-                {
-                    ExcelWorksheet worksheet = p.Workbook.Worksheets["data"];
-
-                    int startRows = 5;
-                    for (int i = 0; i < all.Count; i++)
-                    {
-                        worksheet.Cells["E" + (i + startRows)].Value = all[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = all[i].job_cis_in_hand;
-                    }
-
-                    startRows = 20;
-                    for (int i = 0; i < projects.Count; i++)
-                    {
-                        worksheet.Cells["E" + (i + startRows)].Value = projects[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = projects[i].job_cis_in_hand;
-                    }
-
-                    startRows = 35;
-                    for (int i = 0; i < services.Count; i++)
-                    {
-                        worksheet.Cells["E" + (i + startRows)].Value = services[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = services[i].job_cis_in_hand;
-                    }
-
-                    p.SaveAs(stream);
-                    stream.Position = 0;
-                }
-            }
-            return stream;
-        }
-
-        public Stream ExportSummaryENGJobInHand(FileInfo path, List<SummaryENGJobInHandModel> all, List<SummaryENGJobInHandModel> projects, List<SummaryENGJobInHandModel> services)
-        {
-            Stream stream = new MemoryStream();
-            if (path.Exists)
-            {
-                using (ExcelPackage p = new ExcelPackage(path))
-                {
-                    ExcelWorksheet worksheet = p.Workbook.Worksheets["data"];
-
-                    int startRows = 5;
-                    for (int i = 0; i < all.Count; i++)
-                    {
-                        worksheet.Cells["E" + (i + startRows)].Value = all[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = all[i].job_eng_in_hand;
-                    }
-
-                    startRows = 20;
-                    for (int i = 0; i < projects.Count; i++)
-                    {
-                        worksheet.Cells["E" + (i + startRows)].Value = projects[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = projects[i].job_eng_in_hand;
-                    }
-
-                    startRows = 35;
-                    for (int i = 0; i < services.Count; i++)
-                    {
-                        worksheet.Cells["E" + (i + startRows)].Value = services[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = services[i].job_eng_in_hand;
-                    }
-
-                    p.SaveAs(stream);
-                    stream.Position = 0;
-                }
-            }
-            return stream;
-        }
-
-        public Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> acc_invoices,List<SummaryInvoiceModel> invoices)
+        public Stream ExportSummarySaleTurnOver(FileInfo path, List<SummaryInvoiceModel> invoices)
         {
             Stream stream = new MemoryStream();
             if (path.Exists)
@@ -388,10 +314,10 @@ namespace WebENG.Service
                     }
 
                     startRows = 20;
-                    for (int i = 0; i < acc_invoices.Count; i++)
+                    for (int i = 0; i < invoices.Count; i++)
                     {
-                        worksheet.Cells["E" + (i + startRows)].Value = acc_invoices[i].target_month;
-                        worksheet.Cells["F" + (i + startRows)].Value = acc_invoices[i].invoice;
+                        worksheet.Cells["E" + (i + startRows)].Value = invoices[i].target_month;
+                        worksheet.Cells["F" + (i + startRows)].Value = invoices[i].invoice_acc;
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;

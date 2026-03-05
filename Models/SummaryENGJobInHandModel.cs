@@ -5,6 +5,12 @@ using System.Threading.Tasks;
 
 namespace WebENG.Models
 {
+    public class SummaryJobInHandModel
+    {
+        public string month { get; set; }
+        public double job_in_hand { get; set; }
+        public double target_month { get; set; }
+    }
     public class SummaryENGJobInHandModel
     {
         public string month { get; set; }

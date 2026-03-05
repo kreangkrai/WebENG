@@ -73,184 +73,147 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetInvoice(string department ,int year)
         {
-            //List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
-            //jobInHands = jobInHands.Where(w => w.department == department).ToList();
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department).ToList();
 
-            //var monthlyGroups = jobInHands
-            //.Where(j => j.job_date != default)
-            //.GroupBy(j => new { j.job_date.Year, j.job_date.Month })
-            //.Select(g => new
-            //{
-            //    Year = g.Key.Year,
-            //    Month = g.Key.Month,
-            //    TotalCES = g.Sum(j => j.eng_invoice),
-            //    TotalCIS = g.Sum(j => j.cis_invoice),
-            //    TotalAES = g.Sum(j => j.ais_invoice),
-            //})
-            //.OrderBy(g => g.Year)
-            //.ThenBy(g => g.Month)
-            //.ToList();
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.eng_invoice),
+                TotalCIS = g.Sum(j => j.cis_invoice),
+                TotalAES = g.Sum(j => j.ais_invoice),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
 
-            //List<SummaryInvoiceModel> invoices = new List<SummaryInvoiceModel>();
-            //if (department == "CES")
-            //{
-            //    double runningTotal = 0;
-
-            //    foreach (var group in monthlyGroups)
-            //    {
-            //        runningTotal = group.TotalCES;
-
-            //        invoices.Add(new SummaryInvoiceModel
-            //        {
-            //            month = $"{group.Year}-{group.Month:D2}",
-            //            invoice = Math.Round(runningTotal, 2),
-            //            target_month = 0
-            //        });
-            //    }
-            //}
-
-            //if (department == "CIS")
-            //{
-            //    double runningTotal = 0;
-
-            //    foreach (var group in monthlyGroups)
-            //    {
-            //        runningTotal = group.TotalCIS;
-
-            //        invoices.Add(new SummaryInvoiceModel
-            //        {
-            //            month = $"{group.Year}-{group.Month:D2}",
-            //            invoice = Math.Round(runningTotal, 2),
-            //            target_month = 0
-            //        });
-            //    }
-            //}
-
-            //if (department == "AES")
-            //{
-            //    double runningTotal = 0;
-
-            //    foreach (var group in monthlyGroups)
-            //    {
-            //        runningTotal = group.TotalAES;
-
-            //        invoices.Add(new SummaryInvoiceModel
-            //        {
-            //            month = $"{group.Year}-{group.Month:D2}",
-            //            invoice = Math.Round(runningTotal, 2),
-            //            target_month = 0
-            //        });
-            //    }
-            //}
-
-
+            var result = new List<SummaryInvoiceModel>();
             if (department == "CES")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
-                return Json(invoices);
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCES;
+
+                    result.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
             if (department == "CIS")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryCISInvoice(year);
-                return Json(invoices);
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCIS;
+
+                    result.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
             if (department == "AES")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAISInvoice(year);
-                return Json(invoices);
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalAES;
+
+                    result.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
-            return Json(null);
+            return Json(result);
         }
 
         [HttpGet]
         public JsonResult GetAccInvoice(string department,int year)
         {
-            //List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
-            //jobInHands = jobInHands.Where(w => w.department == department).ToList();
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department).ToList();
 
-            //var monthlyGroups = jobInHands
-            //.Where(j => j.job_date != default)
-            //.GroupBy(j => new { j.job_date.Year, j.job_date.Month })
-            //.Select(g => new
-            //{
-            //    Year = g.Key.Year,
-            //    Month = g.Key.Month,
-            //    TotalCES = g.Sum(j => j.eng_invoice),
-            //    TotalCIS = g.Sum(j => j.cis_invoice),
-            //    TotalAES = g.Sum(j => j.ais_invoice),
-            //})
-            //.OrderBy(g => g.Year)
-            //.ThenBy(g => g.Month)
-            //.ToList();
-
-            //List<SummaryInvoiceModel> invoices = new List<SummaryInvoiceModel>();
-            //if (department == "CES")
-            //{
-            //    double runningTotal = 0;
-
-            //    foreach (var group in monthlyGroups)
-            //    {
-            //        runningTotal += group.TotalCES;
-
-            //        invoices.Add(new SummaryInvoiceModel
-            //        {
-            //            month = $"{group.Year}-{group.Month:D2}",
-            //            invoice = Math.Round(runningTotal, 2),
-            //            target_month = 0
-            //        });
-            //    }
-            //}
-
-            //if (department == "CIS")
-            //{
-            //    double runningTotal = 0;
-
-            //    foreach (var group in monthlyGroups)
-            //    {
-            //        runningTotal += group.TotalCIS;
-
-            //        invoices.Add(new SummaryInvoiceModel
-            //        {
-            //            month = $"{group.Year}-{group.Month:D2}",
-            //            invoice = Math.Round(runningTotal, 2),
-            //            target_month = 0
-            //        });
-            //    }
-            //}
-
-            //if (department == "AES")
-            //{
-            //    double runningTotal = 0;
-
-            //    foreach (var group in monthlyGroups)
-            //    {
-            //        runningTotal += group.TotalAES;
-
-            //        invoices.Add(new SummaryInvoiceModel
-            //        {
-            //            month = $"{group.Year}-{group.Month:D2}",
-            //            invoice = Math.Round(runningTotal, 2),
-            //            target_month = 0
-            //        });
-            //    }
-            //}
-
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.eng_invoice),
+                TotalCIS = g.Sum(j => j.cis_invoice),
+                TotalAES = g.Sum(j => j.ais_invoice),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+           
+            var result = new List<SummaryInvoiceModel>();
             if (department == "CES")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAccENGInvoice(year);
-                return Json(invoices);
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalCES;
+
+                    result.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
             if (department == "CIS")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAccCISInvoice(year);
-                return Json(invoices);
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalCIS;
+
+                    result.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
             if (department == "AES")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAccAISInvoice(year);
-                return Json(invoices);
+                double runningTotal = 0;
+
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalAES;
+
+                    result.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
-            return Json(null);
+            return Json(result);
         }
 
         [HttpGet]
@@ -262,20 +225,19 @@ namespace WebENG.Controllers
             List<BackLogModel> backLogs = Job.GetBackLogs(year);
             backLogs = backLogs.Where(w => w.department == department).ToList();
 
+            List<BackLogModel> remainingBackLog = Job.GetRemainingBackLogs(year);
+            remainingBackLog = remainingBackLog.Where(w => w.department == department).ToList();
+
             if (department == "CES")
             {
-                List<QuarterENGModel> datas = SummaryJobInHand.GetsSummaryENGQuarter(year);
-                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_eng_in_hand > 0).ToList();
+                double backlog_volume = backLogs.Select(s => s.remaining_eng_in_hand).Sum();
+                int backlog = backLogs.Select(s => s.job_id).Count();
+                double backlog_pending_volume = remainingBackLog.Select(s => s.remaining_eng_in_hand).Sum();
+                int backlog_incomplete = remainingBackLog.Select(s => s.job_id).Count();
+                double backlog_invoice_volume = backlog_volume - backlog_pending_volume;
+                int backlog_complete = backlog - backlog_incomplete;
 
                 List<SummaryENGQuarterModel> quarters = new List<SummaryENGQuarterModel>();
-
-                double backlog_volume = datas.Where(w => w.type == "backlog" && w.quarter == 0 && w.job_date.Year < year).Select(s => s.job_eng_in_hand).Sum() - datas.Where(w => w.type == "backlog" && w.quarter == 0).Select(s => s.backlog_invoice_eng).Sum();
-                int backlog = datas.Where(w => w.type == "backlog" && w.job_type != "").Select(s => s.job_id).Count();
-                double backlog_invoice_volume = datas.Where(w => w.type == "backlog").Select(s => s.invoice_eng).Sum();
-                int backlog_complete = datas.Where(w => w.type == "backlog" && (w.status == "Warranty" || w.status == "Finished")).Select(s => s.job_id).Count();
-                double backlog_pending_volume = backlog_volume - backlog_invoice_volume;
-                int backlog_incomplete = backlog - backlog_complete;
-
                 quarters.Add(new SummaryENGQuarterModel()
                 {
                     quarter = "Backlog",
@@ -287,10 +249,11 @@ namespace WebENG.Controllers
                     pending = backlog_incomplete
                 });
 
-                double q1_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.job_eng_in_hand).Sum();
-                int q1 = datas.Where(w => w.type == "now" && w.quarter == 1 && w.job_type != "").Select(s => s.job_id).Count();
-                double q1_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.invoice_eng).Sum();
-                int q1_complete = datas.Where(w => w.type == "now" && w.quarter == 1 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                var job = jobInHands.Where(w => w.quarter == 1).ToList();
+                double q1_volume = job.Select(s => s.job_eng_in_hand).Sum();
+                int q1 = job.Select(s => s.job_id).Count();
+                double q1_invoice_volume = job.Select(s => s.eng_invoice).Sum();
+                int q1_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q1_pending_volume = q1_volume - q1_invoice_volume;
                 int q1_incomplete = q1 - q1_complete;
 
@@ -305,10 +268,11 @@ namespace WebENG.Controllers
                     pending = q1_incomplete
                 });
 
-                double q2_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.job_eng_in_hand).Sum();
-                int q2 = datas.Where(w => w.type == "now" && w.quarter == 2 && w.job_type != "").Select(s => s.job_id).Count();
-                double q2_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.invoice_eng).Sum();
-                int q2_complete = datas.Where(w => w.type == "now" && w.quarter == 2 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 2).ToList();
+                double q2_volume = job.Select(s => s.job_eng_in_hand).Sum();
+                int q2 = job.Select(s => s.job_id).Count();
+                double q2_invoice_volume = job.Select(s => s.eng_invoice).Sum();
+                int q2_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" ||  w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q2_pending_volume = q2_volume - q2_invoice_volume;
                 int q2_incomplete = q2 - q2_complete;
 
@@ -323,10 +287,11 @@ namespace WebENG.Controllers
                     pending = q2_incomplete
                 });
 
-                double q3_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.job_eng_in_hand).Sum();
-                int q3 = datas.Where(w => w.type == "now" && w.quarter == 3 && w.job_type != "").Select(s => s.job_id).Count();
-                double q3_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.invoice_eng).Sum();
-                int q3_complete = datas.Where(w => w.type == "now" && w.quarter == 3 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 3).ToList();
+                double q3_volume = job.Select(s => s.job_eng_in_hand).Sum();
+                int q3 = job.Select(s => s.job_id).Count();
+                double q3_invoice_volume = job.Select(s => s.eng_invoice).Sum();
+                int q3_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q3_pending_volume = q3_volume - q3_invoice_volume;
                 int q3_incomplete = q3 - q3_complete;
 
@@ -341,10 +306,11 @@ namespace WebENG.Controllers
                     pending = q3_incomplete
                 });
 
-                double q4_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.job_eng_in_hand).Sum();
-                int q4 = datas.Where(w => w.type == "now" && w.quarter == 4 && w.job_type != "").Select(s => s.job_id).Count();
-                double q4_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.invoice_eng).Sum();
-                int q4_complete = datas.Where(w => w.type == "now" && w.quarter == 4 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 4).ToList();
+                double q4_volume = job.Select(s => s.job_eng_in_hand).Sum();
+                int q4 = job.Select(s => s.job_id).Count();
+                double q4_invoice_volume = job.Select(s => s.eng_invoice).Sum();
+                int q4_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" ||w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q4_pending_volume = q4_volume - q4_invoice_volume;
                 int q4_incomplete = q4 - q4_complete;
 
@@ -373,17 +339,15 @@ namespace WebENG.Controllers
             }
             if (department == "CIS")
             {
-                List<QuarterCISModel> datas = SummaryJobInHand.GetsSummaryCISQuarter(year);
-                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_cis_in_hand > 0).ToList();
 
                 List<SummaryCISQuarterModel> quarters = new List<SummaryCISQuarterModel>();
 
-                double backlog_volume = datas.Where(w => w.type == "backlog" && w.quarter == 0 && w.job_date.Year < year).Select(s => s.job_cis_in_hand).Sum() - datas.Where(w => w.type == "backlog" && w.quarter == 0).Select(s => s.backlog_invoice_cis).Sum();
-                int backlog = datas.Where(w => w.type == "backlog" && w.job_type != "").Select(s => s.job_id).Count();
-                double backlog_invoice_volume = datas.Where(w => w.type == "backlog").Select(s => s.invoice_cis).Sum();
-                int backlog_complete = datas.Where(w => w.type == "backlog" && (w.status == "Warranty" || w.status == "Finished")).Select(s => s.job_id).Count();
-                double backlog_pending_volume = backlog_volume - backlog_invoice_volume;
-                int backlog_incomplete = backlog - backlog_complete;
+                double backlog_volume = backLogs.Select(s => s.remaining_cis_in_hand).Sum();
+                int backlog = backLogs.Select(s => s.job_id).Count();
+                double backlog_pending_volume = remainingBackLog.Select(s => s.remaining_cis_in_hand).Sum();
+                int backlog_incomplete = remainingBackLog.Select(s => s.job_id).Count();
+                double backlog_invoice_volume = backlog_volume - backlog_pending_volume;
+                int backlog_complete = backlog - backlog_incomplete;
 
                 quarters.Add(new SummaryCISQuarterModel()
                 {
@@ -396,10 +360,11 @@ namespace WebENG.Controllers
                     pending = backlog_incomplete
                 });
 
-                double q1_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.job_cis_in_hand).Sum();
-                int q1 = datas.Where(w => w.type == "now" && w.quarter == 1 && w.job_type != "").Select(s => s.job_id).Count();
-                double q1_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.invoice_cis).Sum();
-                int q1_complete = datas.Where(w => w.type == "now" && w.quarter == 1 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                var job = jobInHands.Where(w => w.quarter == 1).ToList();
+                double q1_volume = job.Select(s => s.job_cis_in_hand).Sum();
+                int q1 = job.Select(s => s.job_id).Count();
+                double q1_invoice_volume = job.Select(s => s.cis_invoice).Sum();
+                int q1_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q1_pending_volume = q1_volume - q1_invoice_volume;
                 int q1_incomplete = q1 - q1_complete;
 
@@ -414,10 +379,11 @@ namespace WebENG.Controllers
                     pending = q1_incomplete
                 });
 
-                double q2_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.job_cis_in_hand).Sum();
-                int q2 = datas.Where(w => w.type == "now" && w.quarter == 2 && w.job_type != "").Select(s => s.job_id).Count();
-                double q2_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.invoice_cis).Sum();
-                int q2_complete = datas.Where(w => w.type == "now" && w.quarter == 2 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 2).ToList();
+                double q2_volume = job.Select(s => s.job_cis_in_hand).Sum();
+                int q2 = job.Select(s => s.job_id).Count();
+                double q2_invoice_volume = job.Select(s => s.cis_invoice).Sum();
+                int q2_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q2_pending_volume = q2_volume - q2_invoice_volume;
                 int q2_incomplete = q2 - q2_complete;
 
@@ -432,10 +398,11 @@ namespace WebENG.Controllers
                     pending = q2_incomplete
                 });
 
-                double q3_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.job_cis_in_hand).Sum();
-                int q3 = datas.Where(w => w.type == "now" && w.quarter == 3 && w.job_type != "").Select(s => s.job_id).Count();
-                double q3_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.invoice_cis).Sum();
-                int q3_complete = datas.Where(w => w.type == "now" && w.quarter == 3 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 3).ToList();
+                double q3_volume = job.Select(s => s.job_cis_in_hand).Sum();
+                int q3 = job.Select(s => s.job_id).Count();
+                double q3_invoice_volume = job.Select(s => s.cis_invoice).Sum();
+                int q3_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q3_pending_volume = q3_volume - q3_invoice_volume;
                 int q3_incomplete = q3 - q3_complete;
 
@@ -450,10 +417,11 @@ namespace WebENG.Controllers
                     pending = q3_incomplete
                 });
 
-                double q4_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.job_cis_in_hand).Sum();
-                int q4 = datas.Where(w => w.type == "now" && w.quarter == 4 && w.job_type != "").Select(s => s.job_id).Count();
-                double q4_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.invoice_cis).Sum();
-                int q4_complete = datas.Where(w => w.type == "now" && w.quarter == 4 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 4).ToList();
+                double q4_volume = job.Select(s => s.job_cis_in_hand).Sum();
+                int q4 = job.Select(s => s.job_id).Count();
+                double q4_invoice_volume = job.Select(s => s.cis_invoice).Sum();
+                int q4_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" ||w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q4_pending_volume = q4_volume - q4_invoice_volume;
                 int q4_incomplete = q4 - q4_complete;
 
@@ -480,19 +448,16 @@ namespace WebENG.Controllers
                 });
                 return Json(quarters);
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
-                List<QuarterAISModel> datas = SummaryJobInHand.GetsSummaryAISQuarter(year);
-                datas = datas.Where(w => w.job_id.Substring(0, 1).ToUpper() == "J" && w.job_ais_in_hand > 0).ToList();
-
                 List<SummaryAISQuarterModel> quarters = new List<SummaryAISQuarterModel>();
 
-                double backlog_volume = datas.Where(w => w.type == "backlog" && w.quarter == 0 && w.job_date.Year < year).Select(s => s.job_ais_in_hand).Sum() - datas.Where(w => w.type == "backlog" && w.quarter == 0).Select(s => s.backlog_invoice_ais).Sum();
-                int backlog = datas.Where(w => w.type == "backlog" && w.job_type != "").Select(s => s.job_id).Count();
-                double backlog_invoice_volume = datas.Where(w => w.type == "backlog").Select(s => s.invoice_ais).Sum();
-                int backlog_complete = datas.Where(w => w.type == "backlog" && (w.status == "Warranty" || w.status == "Finished")).Select(s => s.job_id).Count();
-                double backlog_pending_volume = backlog_volume - backlog_invoice_volume;
-                int backlog_incomplete = backlog - backlog_complete;
+                double backlog_volume = backLogs.Select(s => s.remaining_ais_in_hand).Sum();
+                int backlog = backLogs.Select(s => s.job_id).Count();
+                double backlog_pending_volume = remainingBackLog.Select(s => s.remaining_ais_in_hand).Sum();
+                int backlog_incomplete = remainingBackLog.Select(s => s.job_id).Count();
+                double backlog_invoice_volume = backlog_volume - backlog_pending_volume;
+                int backlog_complete = backlog - backlog_incomplete;
 
                 quarters.Add(new SummaryAISQuarterModel()
                 {
@@ -505,10 +470,11 @@ namespace WebENG.Controllers
                     pending = backlog_incomplete
                 });
 
-                double q1_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.job_ais_in_hand).Sum();
-                int q1 = datas.Where(w => w.type == "now" && w.quarter == 1 && w.job_type != "").Select(s => s.job_id).Count();
-                double q1_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 1).Select(s => s.invoice_ais).Sum();
-                int q1_complete = datas.Where(w => w.type == "now" && w.quarter == 1 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                var job = jobInHands.Where(w => w.quarter == 1).ToList();
+                double q1_volume = job.Select(s => s.job_ais_in_hand).Sum();
+                int q1 = job.Select(s => s.job_id).Count();
+                double q1_invoice_volume = job.Select(s => s.ais_invoice).Sum();
+                int q1_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q1_pending_volume = q1_volume - q1_invoice_volume;
                 int q1_incomplete = q1 - q1_complete;
 
@@ -523,10 +489,11 @@ namespace WebENG.Controllers
                     pending = q1_incomplete
                 });
 
-                double q2_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.job_ais_in_hand).Sum();
-                int q2 = datas.Where(w => w.type == "now" && w.quarter == 2 && w.job_type != "").Select(s => s.job_id).Count();
-                double q2_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 2).Select(s => s.invoice_ais).Sum();
-                int q2_complete = datas.Where(w => w.type == "now" && w.quarter == 2 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 2).ToList();
+                double q2_volume = job.Select(s => s.job_ais_in_hand).Sum();
+                int q2 = job.Select(s => s.job_id).Count();
+                double q2_invoice_volume = job.Select(s => s.ais_invoice).Sum();
+                int q2_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q2_pending_volume = q2_volume - q2_invoice_volume;
                 int q2_incomplete = q2 - q2_complete;
 
@@ -541,10 +508,11 @@ namespace WebENG.Controllers
                     pending = q2_incomplete
                 });
 
-                double q3_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.job_ais_in_hand).Sum();
-                int q3 = datas.Where(w => w.type == "now" && w.quarter == 3 && w.job_type != "").Select(s => s.job_id).Count();
-                double q3_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 3).Select(s => s.invoice_ais).Sum();
-                int q3_complete = datas.Where(w => w.type == "now" && w.quarter == 3 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 3).ToList();
+                double q3_volume = job.Select(s => s.job_ais_in_hand).Sum();
+                int q3 = job.Select(s => s.job_id).Count();
+                double q3_invoice_volume = job.Select(s => s.ais_invoice).Sum();
+                int q3_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q3_pending_volume = q3_volume - q3_invoice_volume;
                 int q3_incomplete = q3 - q3_complete;
 
@@ -559,10 +527,11 @@ namespace WebENG.Controllers
                     pending = q3_incomplete
                 });
 
-                double q4_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.job_ais_in_hand).Sum();
-                int q4 = datas.Where(w => w.type == "now" && w.quarter == 4 && w.job_type != "").Select(s => s.job_id).Count();
-                double q4_invoice_volume = datas.Where(w => w.type == "now" && w.quarter == 4).Select(s => s.invoice_ais).Sum();
-                int q4_complete = datas.Where(w => w.type == "now" && w.quarter == 4 && ((w.status == "Warranty" && w.finished_date.Year == year) || (w.finished_date.Year == year && w.status == "Finished"))).Select(s => s.job_id).Count();
+                job = jobInHands.Where(w => w.quarter == 4).ToList();
+                double q4_volume = job.Select(s => s.job_ais_in_hand).Sum();
+                int q4 = job.Select(s => s.job_id).Count();
+                double q4_invoice_volume = job.Select(s => s.ais_invoice).Sum();
+                int q4_complete = job.Where(w => w.finished_date.Year == year && (w.status_name == "Warranty" || w.status_name == "Finished")).Select(s => s.job_id).Count();
                 double q4_pending_volume = q4_volume - q4_invoice_volume;
                 int q4_incomplete = q4 - q4_complete;
 
@@ -593,70 +562,155 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetOrderInTake(string department,int year)
+        public JsonResult GetOrderInTake(string department, int year)
         {
-            if (department == "ENG")
+            List<OrderInTakeModel> orderInTakes = new List<OrderInTakeModel>();
+            for (int y = 2019; y <= year; y++)
             {
-                List<OrderInTakeENGModel> orderInTakes = new List<OrderInTakeENGModel>();
-                for (int y = 2019; y <= year; y++)
+                List<JobInHandModel> jobInHands = Job.GetJobInHands(y);
+                jobInHands = jobInHands.Where(w => w.department == department).ToList();
+
+                var yearInHandGroups = jobInHands
+                .Where(j => j.job_date != default)
+                .GroupBy(j => new { j.job_date.Year })
+                .Select(g => new
                 {
-                    OrderInTakeENGModel orderInTake = SummaryJobInHand.GetOrderENGInTake(y);
-                    orderInTakes.Add(orderInTake);
-                }
-                return Json(orderInTakes);
-            }
-            if (department == "CIS")
-            {
-                List<OrderInTakeCISModel> orderInTakes = new List<OrderInTakeCISModel>();
-                for (int y = 2019; y <= year; y++)
+                    Year = g.Key.Year,
+                    TotalCES = g.Sum(j => j.job_eng_in_hand),
+                    TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                    TotalAES = g.Sum(j => j.job_ais_in_hand),
+                })
+                .OrderBy(g => g.Year)
+                .ToList();
+
+                List<BackLogModel> backLogs = Job.GetRemainingBackLogs(y);
+                backLogs = backLogs.Where(w => w.department == department).ToList();
+
+                var yearBackLogGroups = backLogs
+               .Where(j => j.job_date != default)
+               .GroupBy(j => new { j.job_date.Year })
+               .Select(g => new
+               {
+                   Year = g.Key.Year,
+                   TotalCES = g.Sum(j => j.remaining_eng_in_hand),
+                   TotalCIS = g.Sum(j => j.remaining_cis_in_hand),
+                   TotalAES = g.Sum(j => j.remaining_ais_in_hand),
+               })
+               .OrderBy(g => g.Year)
+               .ToList();
+
+                OrderInTakeModel orderInTake = new OrderInTakeModel();
+                if (department == "CES")
                 {
-                    OrderInTakeCISModel orderInTake = SummaryJobInHand.GetOrderCISInTake(y);
-                    orderInTakes.Add(orderInTake);
+                    orderInTake = new OrderInTakeModel()
+                    {
+                        year = y,
+                        target = 200,
+                        backlog = yearBackLogGroups.Select(s => s.TotalCES).Sum(),
+                        job_in_hand = yearInHandGroups.Select(s => s.TotalCES).Sum(),
+                    };
                 }
-                return Json(orderInTakes);
-            }
-            if (department == "AIS")
-            {
-                List<OrderInTakeAISModel> orderInTakes = new List<OrderInTakeAISModel>();
-                for (int y = 2019; y <= year; y++)
+                if (department == "CIS")
                 {
-                    OrderInTakeAISModel orderInTake = SummaryJobInHand.GetOrderAISInTake(y);
-                    orderInTakes.Add(orderInTake);
+                    orderInTake = new OrderInTakeModel()
+                    {
+                        year = y,
+                        target = 200,
+                        backlog = yearBackLogGroups.Select(s => s.TotalCIS).Sum(),
+                        job_in_hand = yearInHandGroups.Select(s => s.TotalCIS).Sum(),
+                    };
                 }
-                return Json(orderInTakes);
+                if (department == "AES")
+                {
+                    orderInTake = new OrderInTakeModel()
+                    {
+                        year = y,
+                        target = 200,
+                        backlog = yearBackLogGroups.Select(s => s.TotalAES).Sum(),
+                        job_in_hand = yearInHandGroups.Select(s => s.TotalAES).Sum(),
+                    };
+                }
+                orderInTakes.Add(orderInTake);
             }
-            return Json(null);
+
+            return Json(orderInTakes);
         }
-        public IActionResult ExportSummarySaleTurnOver(string department,int year)
+        public IActionResult ExportSummarySaleTurnOver(string department, int year)
         {
-            if (department == "ENG")
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department).ToList();
+
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryENGInvoice(year);
-                List<SummaryInvoiceModel> acc_invoices = SummaryInvoice.GetsSummaryAccENGInvoice(year);
-                //Download Excel
-                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_sale_turnover.xlsx"));
-                var stream = Export.ExportSummarySaleTurnOver(templateFileInfo, acc_invoices, invoices);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_sale_turnover_" + year + ".xlsx");
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.eng_invoice),
+                TotalCIS = g.Sum(j => j.cis_invoice),
+                TotalAES = g.Sum(j => j.ais_invoice),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            var invoices = new List<SummaryInvoiceModel>();
+            if (department == "CES")
+            {
+                double runningTotal = 0;
+                double runningAccTotal = 0;
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCES;
+                    runningAccTotal += group.TotalCES;
+                    invoices.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        invoice_acc = Math.Round(runningAccTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
             if (department == "CIS")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryCISInvoice(year);
-                List<SummaryInvoiceModel> acc_invoices = SummaryInvoice.GetsSummaryAccCISInvoice(year);
-                //Download Excel
-                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_sale_turnover.xlsx"));
-                var stream = Export.ExportSummarySaleTurnOver(templateFileInfo, acc_invoices, invoices);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_sale_turnover_" + year + ".xlsx");
+                double runningTotal = 0;
+                double runningAccTotal = 0;
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalCIS;
+                    runningAccTotal += group.TotalCIS;
+                    invoices.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        invoice_acc = Math.Round(runningAccTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
-                List<SummaryInvoiceModel> invoices = SummaryInvoice.GetsSummaryAISInvoice(year);
-                List<SummaryInvoiceModel> acc_invoices = SummaryInvoice.GetsSummaryAccAISInvoice(year);
-                //Download Excel
-                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_sale_turnover.xlsx"));
-                var stream = Export.ExportSummarySaleTurnOver(templateFileInfo, acc_invoices, invoices);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_sale_turnover_" + year + ".xlsx");
+                double runningTotal = 0;
+                double runningAccTotal = 0;
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal = group.TotalAES;
+                    runningAccTotal += group.TotalAES;
+                    invoices.Add(new SummaryInvoiceModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        invoice = Math.Round(runningTotal, 2),
+                        invoice_acc = Math.Round(runningAccTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
-            return null;
+
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_sale_turnover.xlsx"));
+            var stream = Export.ExportSummarySaleTurnOver(templateFileInfo, invoices);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_sale_turnover_" + year + ".xlsx");
         }
     }
 }

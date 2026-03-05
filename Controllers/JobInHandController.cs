@@ -72,7 +72,7 @@ namespace WebENG.Controllers
         public IActionResult GetAccJobInHand(string department, int year)
         {
             List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
-            jobInHands = jobInHands.Where(w => w.department == department).ToList();
+            jobInHands = jobInHands.Where(w => w.department == department && ( w.job_type == "Project" || w.job_type == "Service")).ToList();
 
 
             var monthlyGroups = jobInHands
@@ -144,22 +144,6 @@ namespace WebENG.Controllers
                 }
                 return Json(result);
             }
-
-            //if (department == "ENG")
-            //{
-            //    List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsAccENGJobInHand(year, type);
-            //    return Json(jobs);
-            //}
-            //if (department == "CIS")
-            //{
-            //    List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsAccCISJobInHand(year, type);
-            //    return Json(jobs);
-            //}
-            //if (department == "AIS")
-            //{
-            //    List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsAccAISJobInHand(year, type);
-            //    return Json(jobs);
-            //}
             return Json(null);
         }
 
@@ -238,22 +222,6 @@ namespace WebENG.Controllers
                 }
                 return Json(result);
             }
-
-            //if (department == "ENG")
-            //{
-            //    List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsProjectENGJobInHand(year, type);
-            //    return Json(jobs);
-            //}
-            //if (department == "CIS")
-            //{
-            //    List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsProjectCISJobInHand(year, type);
-            //    return Json(jobs);
-            //}
-            //if (department == "AIS")
-            //{
-            //    List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsProjectAISJobInHand(year, type);
-            //    return Json(jobs);
-            //}
             return Json(null);
         }
 
@@ -332,20 +300,6 @@ namespace WebENG.Controllers
                 }
                 return Json(result);
             }
-            //if (department == "ENG")
-            //{
-            //    List<SummaryENGJobInHandModel> jobs = SummaryJobInHand.GetsServiceENGJobInHand(year, type);
-            //    return Json(jobs);
-            //}
-            //if (department == "CIS")
-            //{
-            //    List<SummaryCISJobInHandModel> jobs = SummaryJobInHand.GetsServiceCISJobInHand(year, type);
-            //    return Json(jobs);
-            //}
-            //if (department == "AIS")
-            //{
-            //    List<SummaryAISJobInHandModel> jobs = SummaryJobInHand.GetsServiceAISJobInHand(year, type);
-            //    return Json(jobs);
 
             return Json(null);
         }
@@ -356,24 +310,6 @@ namespace WebENG.Controllers
             List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
             jobInHands = jobInHands.Where(w => w.department == department && w.job_type == "Project").ToList();
 
-            //if (department == "ENG")
-            //{
-                //List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
-            //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
-            //    return Json(jobs);
-            //}
-            //if (department == "CIS")
-            //{
-            //    List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
-            //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
-            //    return Json(jobs);
-            //}
-            //if (department == "AES")
-            //{
-            //    List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
-            //    jobs = jobs.Where(w => w.job_type == "Project").ToList();
-            //    return Json(jobs);
-            //}
             return Json(jobInHands);
         }
 
@@ -382,69 +318,200 @@ namespace WebENG.Controllers
         {
             List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
             jobInHands = jobInHands.Where(w => w.department == department && w.job_type == "Service").ToList();
-            //jobInHands = jobInHands.GroupBy(g => g.job_id).Select(s => new JobInHandModel()
-            //{
-            //    job_id = s.Key,
-
-            //}).ToList();
-
-
-            //if (department == "ENG")
-            //{
-            //    List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobInhand(year);
-            //    jobs = jobs.Where(w => w.job_type == "Service").ToList();
-            //    return Json(jobs);
-            //}
-            //if (department == "CIS")
-            //{
-            //    List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobInhand(year);
-            //    jobs = jobs.Where(w => w.job_type == "Service").ToList();
-            //    return Json(jobs);
-            //}
-            //if (department == "AIS")
-            //{
-            //    List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobInhand(year);
-            //    jobs = jobs.Where(w => w.job_type == "Service").ToList();
-            //    return Json(jobs);
-            //}
             return Json(jobInHands);
         }
-        public IActionResult ExportSummaryJobInHand(string department,int year)
+        public IActionResult ExportSummaryJobInHand(string department, int year)
         {
-            if (department == "ENG")
-            {
-                List<SummaryENGJobInHandModel> all = SummaryJobInHand.GetsAccENGJobInHand(year, "ALL");
-                List<SummaryENGJobInHandModel> projects = SummaryJobInHand.GetsProjectENGJobInHand(year, "Project");
-                List<SummaryENGJobInHandModel> services = SummaryJobInHand.GetsServiceENGJobInHand(year, "Service");
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            jobInHands = jobInHands.Where(w => w.department == department && (w.job_type == "Project" || w.job_type == "Service")).ToList();
 
-                //Download Excel
-                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
-                var stream = Export.ExportSummaryENGJobInHand(templateFileInfo, all, projects, services);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_ENG_" + year + ".xlsx");
+            var monthlyGroups = jobInHands
+            .Where(j => j.job_date != default)
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.job_eng_in_hand),
+                TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                TotalAIS = g.Sum(j => j.job_ais_in_hand),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            var all = new List<SummaryJobInHandModel>();
+            var projects = new List<SummaryJobInHandModel>();
+            var services = new List<SummaryJobInHandModel>();
+
+            var projectGroups = jobInHands
+            .Where(j => j.job_date != default && j.job_type == "Project")
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.job_eng_in_hand),
+                TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                TotalAIS = g.Sum(j => j.job_ais_in_hand),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            var serviceGroups = jobInHands
+            .Where(j => j.job_date != default && j.job_type == "Service")
+            .GroupBy(j => new { j.job_date.Year, j.job_date.Month })
+            .Select(g => new
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalCES = g.Sum(j => j.job_eng_in_hand),
+                TotalCIS = g.Sum(j => j.job_cis_in_hand),
+                TotalAIS = g.Sum(j => j.job_ais_in_hand),
+            })
+            .OrderBy(g => g.Year)
+            .ThenBy(g => g.Month)
+            .ToList();
+
+            if (department == "CES")
+            {
+                all = new List<SummaryJobInHandModel>();
+                double runningTotal = 0;
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalCES;
+
+                    all.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+
+                projects = new List<SummaryJobInHandModel>();
+                runningTotal = 0;
+                foreach (var group in projectGroups)
+                {
+                    runningTotal = group.TotalCES;
+
+                    projects.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+
+                services = new List<SummaryJobInHandModel>();
+                runningTotal = 0;
+                foreach (var group in serviceGroups)
+                {
+                    runningTotal = group.TotalCES;
+
+                    services.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
             if (department == "CIS")
             {
-                List<SummaryCISJobInHandModel> all = SummaryJobInHand.GetsAccCISJobInHand(year, "ALL");
-                List<SummaryCISJobInHandModel> projects = SummaryJobInHand.GetsProjectCISJobInHand(year, "Project");
-                List<SummaryCISJobInHandModel> services = SummaryJobInHand.GetsServiceCISJobInHand(year, "Service");
+                all = new List<SummaryJobInHandModel>();
+                double runningTotal = 0;
 
-                //Download Excel
-                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
-                var stream = Export.ExportSummaryCISJobInHand(templateFileInfo, all, projects, services);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_CIS_" + year + ".xlsx");
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalCIS;
+
+                    all.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+
+                projects = new List<SummaryJobInHandModel>();
+                runningTotal = 0;
+                foreach (var group in projectGroups)
+                {
+                    runningTotal = group.TotalCIS;
+
+                    projects.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+
+                services = new List<SummaryJobInHandModel>();
+                runningTotal = 0;
+                foreach (var group in serviceGroups)
+                {
+                    runningTotal = group.TotalCIS;
+
+                    services.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
-            if (department == "AIS")
+            if (department == "AES")
             {
-                List<SummaryAISJobInHandModel> all = SummaryJobInHand.GetsAccAISJobInHand(year, "ALL");
-                List<SummaryAISJobInHandModel> projects = SummaryJobInHand.GetsProjectAISJobInHand(year, "Project");
-                List<SummaryAISJobInHandModel> services = SummaryJobInHand.GetsServiceAISJobInHand(year, "Service");
+                all = new List<SummaryJobInHandModel>();
+                double runningTotal = 0;
 
-                //Download Excel
-                var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
-                var stream = Export.ExportSummaryAISJobInHand(templateFileInfo, all, projects, services);
-                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_AIS_" + year + ".xlsx");
+                foreach (var group in monthlyGroups)
+                {
+                    runningTotal += group.TotalAIS;
+
+                    all.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+
+                projects = new List<SummaryJobInHandModel>();
+                runningTotal = 0;
+                foreach (var group in projectGroups)
+                {
+                    runningTotal = group.TotalAIS;
+
+                    projects.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
+
+                services = new List<SummaryJobInHandModel>();
+                runningTotal = 0;
+                foreach (var group in serviceGroups)
+                {
+                    runningTotal = group.TotalAIS;
+
+                    services.Add(new SummaryJobInHandModel
+                    {
+                        month = $"{group.Year}-{group.Month:D2}",
+                        job_in_hand = Math.Round(runningTotal, 2),
+                        target_month = 0
+                    });
+                }
             }
-            return null;
+
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "summary_job_in_hand.xlsx"));
+            var stream = Export.ExportSummaryJobInHand(templateFileInfo, all, projects, services);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "summary_job_in_hand_ENG_" + year + ".xlsx");
         }
     }
 }

@@ -36,7 +36,7 @@ namespace WebENG.Service
 		                       Jobs.job_in_hand,
 		                       Jobs.job_ais_in_hand,
 		                       Invoice.invoice,
-		                       CAST(((Invoice.invoice / Jobs.job_in_hand) * Jobs.job_ais_in_hand / 1000000) as DECIMAL(18,3)) as invoice_ais,
+		                       (Invoice.invoice / Jobs.job_in_hand * Jobs.job_ais_in_hand) as invoice_ais,
 		                       FORMAT(actual_date,'MMM') as month
 	                    FROM Invoice
 	                    LEFT JOIN Jobs ON Jobs.job_id = Invoice.job_id
@@ -53,7 +53,7 @@ namespace WebENG.Service
                         SummaryInvoiceModel jobSummary = new SummaryInvoiceModel()
                         {
                             month = dr["month"] != DBNull.Value ? dr["month"].ToString() : "",
-                            invoice = dr["invoice_ais"] != DBNull.Value ? Convert.ToDouble(dr["invoice_ais"]) : 0
+                            invoice = dr["invoice_ais"] != DBNull.Value ? Convert.ToDouble(dr["invoice_ais"].ToString()) / 1_000_000 : 0
                         };
                         jobsSummaries.Add(jobSummary);
                     }
@@ -85,7 +85,7 @@ namespace WebENG.Service
 		                       Jobs.job_in_hand,
 		                       Jobs.job_cis_in_hand,
 		                       Invoice.invoice,
-		                       CAST(((Invoice.invoice / Jobs.job_in_hand) * Jobs.job_cis_in_hand / 1000000) as DECIMAL(18,3)) as invoice_cis,
+		                       (Invoice.invoice / Jobs.job_in_hand * Jobs.job_cis_in_hand) as invoice_cis,
 		                       FORMAT(actual_date,'MMM') as month
 	                    FROM Invoice
 	                    LEFT JOIN Jobs ON Jobs.job_id = Invoice.job_id
@@ -102,7 +102,7 @@ namespace WebENG.Service
                         SummaryInvoiceModel jobSummary = new SummaryInvoiceModel()
                         {
                             month = dr["month"] != DBNull.Value ? dr["month"].ToString() : "",
-                            invoice = dr["invoice_cis"] != DBNull.Value ? Convert.ToDouble(dr["invoice_cis"]) : 0
+                            invoice = dr["invoice_cis"] != DBNull.Value ? Convert.ToDouble(dr["invoice_cis"].ToString()) / 1_000_000 : 0
                         };
                         jobsSummaries.Add(jobSummary);
                     }
@@ -134,7 +134,7 @@ namespace WebENG.Service
 		                       Jobs.job_in_hand,
 		                       Jobs.job_eng_in_hand,
 		                       Invoice.invoice,
-		                       CAST(((Invoice.invoice / Jobs.job_in_hand) * Jobs.job_eng_in_hand / 1000000) as DECIMAL(18,3)) as invoice_eng,
+		                       (Invoice.invoice / Jobs.job_in_hand * Jobs.job_eng_in_hand) as invoice_eng,
 		                       FORMAT(actual_date,'MMM') as month
 	                    FROM Invoice
 	                    LEFT JOIN Jobs ON Jobs.job_id = Invoice.job_id
@@ -151,7 +151,7 @@ namespace WebENG.Service
                         SummaryInvoiceModel jobSummary = new SummaryInvoiceModel()
                         {
                             month = dr["month"] != DBNull.Value ? dr["month"].ToString() : "",
-                            invoice = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"]) : 0
+                            invoice = dr["invoice_eng"] != DBNull.Value ? Convert.ToDouble(dr["invoice_eng"].ToString()) / 1_000_000 : 0
                         };
                         jobsSummaries.Add(jobSummary);
                     }

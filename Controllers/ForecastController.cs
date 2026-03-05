@@ -16,12 +16,14 @@ namespace WebENG.Controllers
         readonly CTLInterfaces.IEmployee Employees;
         readonly IForecast Forecast;
         readonly ISummaryJobInHand SummaryJobInHand;
+        readonly IJob Job;
         public ForecastController()
         {
             Accessory = new AccessoryService();
             Employees = new CTLServices.EmployeeService();
             Forecast = new ForecastService();
             SummaryJobInHand = new SummaryJobInHandService();
+            Job = new JobService();
         }
         public IActionResult Index()
         {
@@ -95,6 +97,10 @@ namespace WebENG.Controllers
             List<ForecastModel> forecasts = Forecast.GetForecasts(year);
 
             ForecastPaymentModel forecast = new ForecastPaymentModel();
+
+            List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
+            List<BackLogModel> backlogs = Job.GetBackLogs(year);
+
             List<string> deps = new List<string>();
             if (department == "ALL")
             {
@@ -135,108 +141,77 @@ namespace WebENG.Controllers
             }
 
             double job_in_hand = 0;
+            string dep = employees.Where(w => w.name_en.ToLower() == responsible.ToLower()).Select(s => s.department).FirstOrDefault();
 
-            List<InvoicesModel> invoices = Forecast.GetInvoice(year);
+            List<InvoicesModel> invoices = Job.GetInvoices(year);
             if (mode == "Department")
             {
                 if (department == "ALL")
                 {
                     forecasts = forecasts.Where(w => deps.Contains(w.department)).ToList();
-
-                    invoices = invoices.Where(w => w.job_in_hand > 0).ToList();
-
-                    List<JobInhandModel> j = SummaryJobInHand.GetsJobInhand(year);
-                    job_in_hand = j.Sum(s => s.job_in_hand);
-
-                    List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
-                    backlog = jobs.Sum(s => s.remaining_amount);
-
-                    //List<JobInhandModel> jobs_next = SummaryJobInHand.GetsJobBackLog(year + 1);
-                    //backlog_next_year = jobs_next.Sum(s => s.remaining_amount);
+                    invoices = invoices.Where(w => w.job_in_hand > 0).ToList();                 
+                    job_in_hand = jobInHands.Sum(s => s.job_in_hand);
+                    backlog = backlogs.Sum(s => s.remaining_in_hand);
                 }
                 else
                 {
                     forecasts = forecasts.Where(w => deps.Contains(w.department)).ToList();
                     if (department == "CES")
                     {
-                        invoices = invoices.Where(w => w.job_eng_in_hand > 0 && deps.Contains(w.department)).ToList();
-                        List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobBackLog(year);
-                        //List<JobENGInhandModel> jobs_next = SummaryJobInHand.GetsENGJobBackLog(year + 1);
-                        List<JobENGInhandModel> j = SummaryJobInHand.GetsENGJobInhand(year);
-                        job_in_hand = j.Sum(s => s.job_eng_in_hand);
-                        backlog = jobs.Where(w => w.job_eng_in_hand > 0).Sum(s => s.remaining_amount);
-                        //backlog_next_year = jobs_next.Where(w => w.job_eng_in_hand > 0).Sum(s => s.remaining_amount);
+                        invoices = invoices.Where(w => w.department == "CES").ToList();
+                        job_in_hand = jobInHands.Where(w=>w.department == "CES").Sum(s => s.job_eng_in_hand);
+                        backlog = backlogs.Where(w => w.department == "CES").Sum(s => s.remaining_eng_in_hand);
                     }
                     if (department == "CIS")
                     {
-                        invoices = invoices.Where(w => w.job_cis_in_hand > 0 && deps.Contains(w.department)).ToList();
-                        List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobBackLog(year);
-                        //List<JobCISInhandModel> jobs_next = SummaryJobInHand.GetsCISJobBackLog(year + 1);
-                        List<JobCISInhandModel> j = SummaryJobInHand.GetsCISJobInhand(year);
-                        job_in_hand = j.Sum(s => s.job_cis_in_hand);
-                        backlog = jobs.Where(w => w.job_cis_in_hand > 0).Sum(s => s.remaining_amount);
-                        //backlog_next_year = jobs_next.Where(w => w.job_cis_in_hand > 0).Sum(s => s.remaining_amount);
+                        invoices = invoices.Where( w => w.department == "CIS").ToList();
+                        job_in_hand = jobInHands.Where(w => w.department == "CIS").Sum(s => s.job_cis_in_hand);
+                        backlog = backlogs.Where(w => w.department == "CIS").Sum(s => s.remaining_cis_in_hand);
                     }
                     if (department == "AES")
                     {
-                        invoices = invoices.Where(w => w.job_ais_in_hand > 0 && deps.Contains(w.department)).ToList();
-                        List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobBackLog(year);
-                        //List<JobAISInhandModel> jobs_next = SummaryJobInHand.GetsAISJobBackLog(year + 1);
-                        List<JobAISInhandModel> j = SummaryJobInHand.GetsAISJobInhand(year);
-                        job_in_hand = j.Sum(s => s.job_ais_in_hand);
-                        backlog = jobs.Where(w => w.job_ais_in_hand > 0).Sum(s => s.remaining_amount);
-                        //backlog_next_year = jobs_next.Where(w => w.job_ais_in_hand > 0).Sum(s => s.remaining_amount);
+                        invoices = invoices.Where(w => w.department == "AES").ToList();
+                        job_in_hand = jobInHands.Where(w => w.department == "AES").Sum(s => s.job_ais_in_hand);
+                        backlog = backlogs.Where(w => w.department == "AES").Sum(s => s.remaining_ais_in_hand);
                     }
                 }
             }
             else
-            {
-                string dep = employees.Where(w => w.name_en.ToLower() == responsible.ToLower()).Select(s => s.department).FirstOrDefault();
+            {               
                 if (dep.Contains("PMD"))
                 {
-                    invoices = invoices.Where(w => w.job_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).ToList();
+                    invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
 
                     forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
 
-                    List<JobInhandModel> j = SummaryJobInHand.GetsJobInhand(year);
-                    job_in_hand = j.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_in_hand);
-
-                    List<JobInhandModel> jobs = SummaryJobInHand.GetsJobBackLog(year);
-                    backlog = jobs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
+                    job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_in_hand);
+                    backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_in_hand);
 
                 }
                 else
                 {
                     if (dep == "CES-System" || dep == "CES-Exp" || dep == "CES-QIR")
                     {
-                        invoices = invoices.Where(w => w.job_eng_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).ToList();
+                        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
                         forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        List<JobENGInhandModel> jobs = SummaryJobInHand.GetsENGJobBackLog(year);
-                        List<JobENGInhandModel> j = SummaryJobInHand.GetsENGJobInhand(year);
-                        job_in_hand = j.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_eng_in_hand);
-                        backlog = jobs.Where(w => w.job_eng_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
+                        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_eng_in_hand);
+                        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_eng_in_hand);
                     }
                     if (dep == "CES-CIS")
                     {
-                        invoices = invoices.Where(w => w.job_cis_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).ToList();
+                        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
                         forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        List<JobCISInhandModel> jobs = SummaryJobInHand.GetsCISJobBackLog(year);
-                        List<JobCISInhandModel> j = SummaryJobInHand.GetsCISJobInhand(year);
-                        job_in_hand = j.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_cis_in_hand);
-                        backlog = jobs.Where(w => w.job_cis_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
+                        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_cis_in_hand);
+                        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_cis_in_hand);
                     }
                     if (dep == "AES")
                     {
-                        invoices = invoices.Where(w => w.job_ais_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).ToList();
+                        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
                         forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        List<JobAISInhandModel> jobs = SummaryJobInHand.GetsAISJobBackLog(year);
-                        List<JobAISInhandModel> j = SummaryJobInHand.GetsAISJobInhand(year);
-                        job_in_hand = j.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_ais_in_hand);
-                        backlog = jobs.Where(w => w.job_ais_in_hand > 0 && w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
+                        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_ais_in_hand);
+                        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_ais_in_hand);
                     }
                 }
-                //List<JobInhandModel> jobs_next = SummaryJobInHand.GetsJobBackLog(year + 1);
-                //backlog_next_year = jobs_next.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_amount);
             }
          
             forecast.month_label = new string[14]
@@ -267,7 +242,7 @@ namespace WebENG.Controllers
                 {
                     responsible = s.FirstOrDefault().responsible,
                     department = s.FirstOrDefault().department,
-                    invoice = s.Sum(x=>x.invoice),
+                    invoice = dep.Contains("PMD") ? s.Sum(x=>x.invoice) : s.Sum(x => x.portion_invoice),
                     month = s.FirstOrDefault().invoice_date.ToString("yyyy-MM")
                 }).ToList();
             inv = inv.OrderBy(o => o.month).ToList();
@@ -279,7 +254,7 @@ namespace WebENG.Controllers
                 {
                     if (invoice.invoice > 0)
                     {
-                        tempActual[monthIndex + 1] += invoice.invoice / 1_000_000;
+                        tempActual[monthIndex + 1] += invoice.invoice;
                     }
                 }
             }
@@ -300,14 +275,7 @@ namespace WebENG.Controllers
 
             }
             double sum_invoice = forecast.acc_actual_amount[forecast.acc_actual_amount.Length - 2];
-
-            job_in_hand = job_in_hand / 1_000_000;
-
-
-            backlog = backlog / 1_000_000;
-
             backlog_next_year = (job_in_hand + backlog) - sum_invoice;
-            //backlog_next_year = backlog_next_year / 1_100_000;
 
             var data = new
             {

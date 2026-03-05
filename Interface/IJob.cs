@@ -30,5 +30,8 @@ namespace WebENG.Interface
 
         List<JobInHandModel> GetJobInHands(int year);
         List<BackLogModel> GetBackLogs(int year);
+        List<BackLogModel> GetRemainingBackLogs(int year);
+
+        List<InvoicesModel> GetInvoices(int year);
     }
 }

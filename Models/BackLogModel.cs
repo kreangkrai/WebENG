@@ -30,6 +30,9 @@ namespace WebENG.Models
         public double cis_percent_invoice { get; set; }
         public double ais_percent_invoice { get; set; }
         public double total_invoice { get; set; }
+        public double remaining_eng_in_hand { get; set; }
+        public double remaining_cis_in_hand { get; set; }
+        public double remaining_ais_in_hand { get; set; }
         public double remaining_in_hand { get; set; }
         public DateTime finished_date { get; set; }
         public string responsible { get; set; }

@@ -65,7 +65,7 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetJobBackLogProject(string department,int year)
         {
-            List<BackLogModel> backLogs = Job.GetBackLogs(year);
+            List<BackLogModel> backLogs = Job.GetRemainingBackLogs(year);
             backLogs = backLogs.Where(w => w.department == department && w.job_type == "Project").ToList();
            
             //if (department == "ENG")
@@ -92,7 +92,7 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetJobBackLogService(string department,int year)
         {
-            List<BackLogModel> backLogs = Job.GetBackLogs(year);
+            List<BackLogModel> backLogs = Job.GetRemainingBackLogs(year);
             backLogs = backLogs.Where(w => w.department == department && w.job_type == "Service").ToList();
           
             //if (department == "ENG")
