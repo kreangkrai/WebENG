@@ -52,5 +52,41 @@ namespace WebENG.CTLServices
             }
             return holidays;
         }
+
+        public List<HolidayModel> GetHolidays()
+        {
+            List<HolidayModel> holidays = new List<HolidayModel>();
+            try
+            {
+                if (con.State == ConnectionState.Closed)
+                {
+                    con.Open();
+                }
+                string strCmd = string.Format($@"SELECT date,detail FROM Holiday");
+                SqlCommand command = new SqlCommand(strCmd, con);
+                SqlDataReader dr = command.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    while (dr.Read())
+                    {
+                        HolidayModel holiday = new HolidayModel()
+                        {
+                            date = dr["date"] != DBNull.Value ? Convert.ToDateTime(dr["date"].ToString()) : DateTime.MinValue,
+                            detail = dr["detail"].ToString()
+                        };
+                        holidays.Add(holiday);
+                    }
+                    dr.Close();
+                }
+            }
+            finally
+            {
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            }
+            return holidays;
+        }
     }
 }

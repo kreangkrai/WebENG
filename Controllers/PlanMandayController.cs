@@ -16,14 +16,14 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         IPlanManday PlanManday;
         IJobMilestone JobMilestone;
-        IHoliday Holiday;
+        CTLInterfaces.IHoliday Holiday;
         readonly CTLInterfaces.IEmployee Employees;
         public PlanMandayController()
         {
             this.Accessory = new AccessoryService();
             PlanManday = new PlanMandayService();
             JobMilestone = new JobMilestoneService();
-            Holiday = new HolidayService();
+            Holiday = new CTLServices.HolidayService();
             Employees = new CTLServices.EmployeeService();
         }
 
@@ -194,7 +194,7 @@ namespace WebENG.Controllers
         public string PlanAll(string plansStr, bool overtime, bool saturday, bool sunday, bool holiday)
         {
             List<PlanMandayModel> plans = JsonConvert.DeserializeObject<List<PlanMandayModel>>(plansStr);
-            List<HolidayModel> holidays = new List<HolidayModel>();
+            List<CTLModels.HolidayModel> holidays = new List<CTLModels.HolidayModel>();
 
             string[] years = plans.Select(s => s.date.ToString("yyyy")).Distinct().ToArray();
             for(int i = 0;i<years.Count();i++)

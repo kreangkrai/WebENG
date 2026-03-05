@@ -25,7 +25,7 @@ namespace WebENG.Controllers
         readonly IExport Export;
         readonly IEngUser EngUserService;
         readonly IWorkingHours WorkingHours;
-        readonly IHoliday Holiday;
+        readonly CTLInterfaces.IHoliday Holiday;
         readonly IJobResponsible JobResponsible;
         protected readonly IHostingEnvironment _hostingEnvironment;
         readonly CTLInterfaces.IEmployee Employees;
@@ -42,7 +42,7 @@ namespace WebENG.Controllers
             EngUserService = new EngUserService();
             JobOwner = new JobOwnerService();
             WorkingHours = new WorkingHoursService();
-            Holiday = new HolidayService();
+            Holiday = new CTLServices.HolidayService();
             JobResponsible = new JobResponsibleService();
             _hostingEnvironment = hostingEnvironment;
             Employees = new CTLServices.EmployeeService();
@@ -177,7 +177,7 @@ namespace WebENG.Controllers
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<WorkingHoursModel> workings = WorkingHours.GetWorkingHours();
             List<string> jobs = workings.GroupBy(g => g.job_id).Select(s => s.FirstOrDefault().job_id).OrderBy(o => o).ToList();
-            List<HolidayModel> holidays = Holiday.GetAllHolidays();
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays();
 
             DateTime start = new DateTime(2022, 1, 1);
             DateTime stop = DateTime.Now;
@@ -356,7 +356,7 @@ namespace WebENG.Controllers
             List<JobsWorkingHoursModel> jwh = new List<JobsWorkingHoursModel>();
             List<WorkingHoursModel> workings = WorkingHours.GetWorkingHours();
 
-            List<HolidayModel> holidays = Holiday.GetAllHolidays();
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays();
 
             List<string> emps = workings.Where(w => w.job_id == job_id).GroupBy(g => g.emp_id).Select(s => s.FirstOrDefault().emp_id).ToList();
             for (int j = 0; j < emps.Count; j++)
@@ -552,11 +552,11 @@ namespace WebENG.Controllers
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "jobs_" + DateTime.Now.ToString("ddMMyyyyHHmmss") + ".xlsx");
         }
 
-        public List<WorkingHoursModel> CalculateWorkingHours(List<WorkingDayModel> workings, List<HolidayModel> _holidays)
+        public List<WorkingHoursModel> CalculateWorkingHours(List<WorkingDayModel> workings, List<CTLModels.HolidayModel> _holidays)
         {
             List<WorkingHoursModel> monthly = new List<WorkingHoursModel>();
 
-            List<HolidayModel> holidays = _holidays;
+            List<CTLModels.HolidayModel> holidays = _holidays;
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
             List<WorkingDayModel> _wd = workings;

@@ -15,7 +15,7 @@ namespace WebENG.Controllers
         private IJobResponsible JobResponsible;
         private IWorkingHours WorkingHours;
         readonly IAccessory Accessory;
-        private IHoliday Holiday;
+        private CTLInterfaces.IHoliday Holiday;
         private IJob Job;
         readonly CTLInterfaces.IEmployee Employees;
         public EngineerScoreController()
@@ -24,7 +24,7 @@ namespace WebENG.Controllers
             Employees = new CTLServices.EmployeeService();
             JobResponsible = new JobResponsibleService();
             WorkingHours = new WorkingHoursService();
-            Holiday = new HolidayService();
+            Holiday = new CTLServices.HolidayService();
             Job = new JobService();
         }
 
@@ -84,7 +84,7 @@ namespace WebENG.Controllers
             workings = workings.Where(w => w.department == department).ToList();
 
             List<string> jobs = workings.GroupBy(g => g.job_id).Select(s => s.FirstOrDefault().job_id).OrderBy(o => o).ToList();
-            List<HolidayModel> holidays = Holiday.GetAllHolidays();
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays();
 
             DateTime start = new DateTime(2022, 1, 1);
             DateTime stop = DateTime.Now;

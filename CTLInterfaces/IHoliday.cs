@@ -6,5 +6,6 @@ namespace WebENG.CTLInterfaces
     public interface IHoliday
     {
         List<HolidayModel> GetHolidays(string year);
+        List<HolidayModel> GetHolidays();
     }
 }

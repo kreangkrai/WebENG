@@ -12,12 +12,12 @@ namespace WebENG.Service
 {
     public class WorkingHoursService : IWorkingHours
     {
-        IHoliday Holiday;
+        CTLInterfaces.IHoliday Holiday;
         ConnectSQL connect = null;
         SqlConnection con = null;
         public WorkingHoursService()
         {
-            Holiday = new HolidayService();
+            Holiday = new CTLServices.HolidayService();
             connect = new ConnectSQL();
             con = connect.OpenConnect();
         }
@@ -1318,7 +1318,7 @@ namespace WebENG.Service
             string day = "";
 
             List<WorkingDayModel> whs = GetWorkingHours(start, stop, user_name);
-            List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
@@ -1828,7 +1828,7 @@ namespace WebENG.Service
             string day = "";
 
             List<WorkingDayModel> whs = GetWorkingHours(start,stop, user_name);
-            List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
             for (DateTime date = start; date <= stop; date = date.AddDays(1))
@@ -2304,7 +2304,7 @@ namespace WebENG.Service
             string day = "";
 
             List<WorkingDayModel> whs = GetWorkingHours(start, stop, emp_id);
-            List<HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
+            List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(start.Year.ToString());
             WorkingHoursModel wh = new WorkingHoursModel();
             TimeSpan working_date = new TimeSpan(0, 0, 0);
             for (DateTime date = start; date <= stop; date = date.AddDays(1))

@@ -16,7 +16,7 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly IWorkingHours WorkingHours;
-        readonly IHoliday Holiday;
+        readonly CTLInterfaces.IHoliday Holiday;
         readonly IExport Export;
         protected readonly IHostingEnvironment _hostingEnvironment;
         readonly CTLInterfaces.IEmployee Employees;
@@ -24,7 +24,7 @@ namespace WebENG.Controllers
         {
             Accessory = new AccessoryService();
             WorkingHours = new WorkingHoursService();
-            Holiday = new HolidayService();
+            Holiday = new CTLServices.HolidayService();
             Export = new ExportService();
             _hostingEnvironment = hostingEnvironment;
             Employees = new CTLServices.EmployeeService();
@@ -143,7 +143,7 @@ namespace WebENG.Controllers
                 };
             }
 
-            List<HolidayModel> holidays = new List<HolidayModel>();
+            List<CTLModels.HolidayModel> holidays = new List<CTLModels.HolidayModel>();
             holidays = Holiday.GetHolidays(start.Year.ToString());
 
             List<EngineerIdleTimeModel> idles = new List<EngineerIdleTimeModel>();

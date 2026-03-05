@@ -15,14 +15,12 @@ namespace WebENG.Controllers
         readonly IAccessory Accessory;
         readonly CTLInterfaces.IEmployee Employees;
         readonly IForecast Forecast;
-        readonly ISummaryJobInHand SummaryJobInHand;
         readonly IJob Job;
         public ForecastController()
         {
             Accessory = new AccessoryService();
             Employees = new CTLServices.EmployeeService();
             Forecast = new ForecastService();
-            SummaryJobInHand = new SummaryJobInHandService();
             Job = new JobService();
         }
         public IActionResult Index()

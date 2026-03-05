@@ -16,13 +16,13 @@ namespace WebENG.Controllers
     {
         readonly IAccessory Accessory;
         readonly IWorkingHours WorkingHoursService;
-        readonly IHoliday HolidayService;
+        readonly CTLInterfaces.IHoliday HolidayService;
         readonly CTLInterfaces.IEmployee Employees;
         public WorkingHoursController()
         {
             Accessory = new AccessoryService();
             WorkingHoursService = new WorkingHoursService();
-            HolidayService = new HolidayService();
+            HolidayService = new CTLServices.HolidayService();
             Employees = new CTLServices.EmployeeService();
         }
 
@@ -129,7 +129,7 @@ namespace WebENG.Controllers
             List<WorkingHoursModel> monthly = WorkingHoursService.CalculateWorkingHours(emp_id, start,stop);
 
             List<Form_OvertimeDataModel> datas = new List<Form_OvertimeDataModel>();
-            List<HolidayModel> holidays = HolidayService.GetHolidays(monthly[0].working_date.Year.ToString());
+            List<CTLModels.HolidayModel> holidays = HolidayService.GetHolidays(monthly[0].working_date.Year.ToString());
             TimeSpan sum_normal = default(TimeSpan);
             TimeSpan sum_ot1_5 = default(TimeSpan);
             TimeSpan sum_ot3_0 = default(TimeSpan);

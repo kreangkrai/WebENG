@@ -15,7 +15,6 @@ namespace WebENG.Controllers
     public class JobInHandController : Controller
     {
         readonly IAccessory Accessory;
-        readonly ISummaryJobInHand SummaryJobInHand;
         readonly IExport Export;
         readonly CTLInterfaces.IEmployee Employees;
         readonly IJob Job;
@@ -24,7 +23,6 @@ namespace WebENG.Controllers
         {
             _hostingEnvironment = hostingEnvironment;
             Accessory = new AccessoryService();
-            SummaryJobInHand = new SummaryJobInHandService();
             Export = new ExportService();
             Employees = new CTLServices.EmployeeService();
             Job = new JobService();

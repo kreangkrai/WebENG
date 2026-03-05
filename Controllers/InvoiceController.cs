@@ -15,8 +15,6 @@ namespace WebENG.Controllers
     public class InvoiceController : Controller
     {
         readonly IAccessory Accessory;
-        readonly ISummaryInvoice SummaryInvoice;
-        readonly ISummaryJobInHand SummaryJobInHand;
         readonly IExport Export;
         readonly IJob Job;
         protected readonly IHostingEnvironment _hostingEnvironment;
@@ -25,8 +23,6 @@ namespace WebENG.Controllers
         {
             _hostingEnvironment = hostingEnvironment;
             Accessory = new AccessoryService();
-            SummaryInvoice = new SummayInvoiceService();
-            SummaryJobInHand = new SummaryJobInHandService();
             Export = new ExportService();
             Employees = new CTLServices.EmployeeService();
             Job = new JobService();

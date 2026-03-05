@@ -13,13 +13,11 @@ namespace WebENG.Controllers
     public class JobBackLogController : Controller
     {
         readonly IAccessory Accessory;
-        readonly ISummaryJobInHand SummaryJobInHand;
         readonly CTLInterfaces.IEmployee Employees;
         readonly IJob Job;
         public JobBackLogController()
         {
             Accessory = new AccessoryService();
-            SummaryJobInHand = new SummaryJobInHandService();
             Employees = new CTLServices.EmployeeService();
             Job = new JobService();
         }

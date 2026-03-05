@@ -18,67 +18,66 @@ namespace WebENG.Service
             connect = new ConnectSQL();
             con = connect.OpenConnect();
         }
+        //public List<InvoicesModel> GetInvoice(int year)
+        //{
+        //    List<InvoicesModel> invoices = new List<InvoicesModel>();
+        //    try
+        //    {
+        //        if (con.State == ConnectionState.Closed)
+        //        {
+        //            con.Open();
+        //        }
 
-        public List<InvoicesModel> GetInvoice(int year)
-        {
-            List<InvoicesModel> invoices = new List<InvoicesModel>();
-            try
-            {
-                if (con.State == ConnectionState.Closed)
-                {
-                    con.Open();
-                }
+        //        string string_command = string.Format($@"SELECT
+        //                                                j.job_id,
+		      //                                          j.job_in_hand,
+		      //                                          j.job_eng_in_hand,
+		      //                                          j.job_ais_in_hand,
+		      //                                          j.job_cis_in_hand,
+		      //                                          j.responsible,
+		      //                                          j.job_date,
+		      //                                          e.department,
+        //                                                i.invoice,
+		      //                                          i.actual_date as invoice_date
+        //                                            FROM [dbo].[Jobs] j
+        //                                            LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+        //                                            LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+        //                                            WHERE FORMAT(i.actual_date, 'yyyy') = @year and j.responsible IS NOT NULL");
 
-                string string_command = string.Format($@"SELECT
-                                                        j.job_id,
-		                                                j.job_in_hand,
-		                                                j.job_eng_in_hand,
-		                                                j.job_ais_in_hand,
-		                                                j.job_cis_in_hand,
-		                                                j.responsible,
-		                                                j.job_date,
-		                                                e.department,
-                                                        i.invoice,
-		                                                i.actual_date as invoice_date
-                                                    FROM [dbo].[Jobs] j
-                                                    LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
-                                                    LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
-                                                    WHERE FORMAT(i.actual_date, 'yyyy') = @year and j.responsible IS NOT NULL");
-
-                SqlCommand cmd = new SqlCommand(string_command, con);
-                cmd.Parameters.AddWithValue("@year", year);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        InvoicesModel inv = new InvoicesModel()
-                        {
-                            job_id = dr["job_id"].ToString(),
-                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) : 0,
-                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) : 0,
-                            job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"].ToString()) : 0,
-                            job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"].ToString()) : 0,
-                            responsible = dr["responsible"].ToString(),
-                            job_date = Convert.ToDateTime(dr["job_date"].ToString()),
-                            department = dr["department"].ToString(),
-                            invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"].ToString()) : 0,
-                            invoice_date = Convert.ToDateTime(dr["invoice_date"].ToString()),
-                        };
-                        invoices.Add(inv);
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            return invoices;
-        }
+        //        SqlCommand cmd = new SqlCommand(string_command, con);
+        //        cmd.Parameters.AddWithValue("@year", year);
+        //        SqlDataReader dr = cmd.ExecuteReader();
+        //        if (dr.HasRows)
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                InvoicesModel inv = new InvoicesModel()
+        //                {
+        //                    job_id = dr["job_id"].ToString(),
+        //                    job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) : 0,
+        //                    job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) : 0,
+        //                    job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"].ToString()) : 0,
+        //                    job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"].ToString()) : 0,
+        //                    responsible = dr["responsible"].ToString(),
+        //                    job_date = Convert.ToDateTime(dr["job_date"].ToString()),
+        //                    department = dr["department"].ToString(),
+        //                    invoice = dr["invoice"] != DBNull.Value ? Convert.ToDouble(dr["invoice"].ToString()) : 0,
+        //                    invoice_date = Convert.ToDateTime(dr["invoice_date"].ToString()),
+        //                };
+        //                invoices.Add(inv);
+        //            }
+        //            dr.Close();
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        if (con.State == ConnectionState.Open)
+        //        {
+        //            con.Close();
+        //        }
+        //    }
+        //    return invoices;
+        //}
 
         public List<ForecastModel> GetForecasts(int year)
         {
@@ -413,76 +412,76 @@ namespace WebENG.Service
         //    return total_invoice;
         //}
 
-        public double GetJonInHand(int year , string department, string responsible)
-        {
-            double job_in_hand = 0;
-            try
-            {
-                if (con.State == ConnectionState.Closed)
-                {
-                    con.Open();
-                }
-                string string_command = "";
-                if (department == "ALL" && responsible == "ALL")
-                {
-                    string_command = string.Format($@"select 
-	                                                          Sum(job_in_hand) as job_in_hand
-                                                        from jobs where FORMAT(job_date,'yyyy') = @year");
-                }
+        //public double GetJonInHand(int year , string department, string responsible)
+        //{
+        //    double job_in_hand = 0;
+        //    try
+        //    {
+        //        if (con.State == ConnectionState.Closed)
+        //        {
+        //            con.Open();
+        //        }
+        //        string string_command = "";
+        //        if (department == "ALL" && responsible == "ALL")
+        //        {
+        //            string_command = string.Format($@"select 
+	       //                                                   Sum(job_in_hand) as job_in_hand
+        //                                                from jobs where FORMAT(job_date,'yyyy') = @year");
+        //        }
 
-                else if(responsible != "ALL")
-                {
-                    string_command = string.Format($@"select 
-	                                                          Sum(job_in_hand) as job_in_hand
-                                                        from jobs where FORMAT(job_date,'yyyy') = @year AND LOWER(responsible) = @responsible");
-                }
-                else if (department != "ALL" && responsible == "ALL")
-                {
-                    if (department == "CES")
-                    {
-                        string_command = string.Format($@"select 
-	                                                          Sum(job_eng_in_hand) as job_in_hand
-                                                        from jobs 
-														where FORMAT(job_date,'yyyy') = @year");
-                    }
-                    if (department == "CIS")
-                    {
-                        string_command = string.Format($@"select 
-	                                                          Sum(job_cis_in_hand) as job_in_hand
-                                                        from jobs 
-														where FORMAT(job_date,'yyyy') = @year");
-                    }
-                    if (department == "AES")
-                    {
-                        string_command = string.Format($@"select 
-	                                                          Sum(job_ais_in_hand) as job_in_hand
-                                                        from jobs 
-														where FORMAT(job_date,'yyyy') = @year");
-                    }                   
-                }
+        //        else if(responsible != "ALL")
+        //        {
+        //            string_command = string.Format($@"select 
+	       //                                                   Sum(job_in_hand) as job_in_hand
+        //                                                from jobs where FORMAT(job_date,'yyyy') = @year AND LOWER(responsible) = @responsible");
+        //        }
+        //        else if (department != "ALL" && responsible == "ALL")
+        //        {
+        //            if (department == "CES")
+        //            {
+        //                string_command = string.Format($@"select 
+	       //                                                   Sum(job_eng_in_hand) as job_in_hand
+        //                                                from jobs 
+								//						where FORMAT(job_date,'yyyy') = @year");
+        //            }
+        //            if (department == "CIS")
+        //            {
+        //                string_command = string.Format($@"select 
+	       //                                                   Sum(job_cis_in_hand) as job_in_hand
+        //                                                from jobs 
+								//						where FORMAT(job_date,'yyyy') = @year");
+        //            }
+        //            if (department == "AES")
+        //            {
+        //                string_command = string.Format($@"select 
+	       //                                                   Sum(job_ais_in_hand) as job_in_hand
+        //                                                from jobs 
+								//						where FORMAT(job_date,'yyyy') = @year");
+        //            }                   
+        //        }
                 
 
-                SqlCommand cmd = new SqlCommand(string_command, con);
-                cmd.Parameters.AddWithValue("@year", year);
-                cmd.Parameters.AddWithValue("@responsible", responsible);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.HasRows)
-                {
-                    while (dr.Read())
-                    {
-                        job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) : 0;
-                    }
-                    dr.Close();
-                }
-            }
-            finally
-            {
-                if (con.State == ConnectionState.Open)
-                {
-                    con.Close();
-                }
-            }
-            return job_in_hand;
-        }
+        //        SqlCommand cmd = new SqlCommand(string_command, con);
+        //        cmd.Parameters.AddWithValue("@year", year);
+        //        cmd.Parameters.AddWithValue("@responsible", responsible);
+        //        SqlDataReader dr = cmd.ExecuteReader();
+        //        if (dr.HasRows)
+        //        {
+        //            while (dr.Read())
+        //            {
+        //                job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) : 0;
+        //            }
+        //            dr.Close();
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        if (con.State == ConnectionState.Open)
+        //        {
+        //            con.Close();
+        //        }
+        //    }
+        //    return job_in_hand;
+        //}
     }
 }
