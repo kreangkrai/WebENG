@@ -65,6 +65,7 @@ namespace WebENG.Service
                         worksheet.Cells["AE" + (i + startRows)].Value = total_invoice;
                         worksheet.Cells["AF" + (i + startRows)].Value = (total_invoice / jobs[i].job_in_hand);
                         worksheet.Cells["AG" + (i + startRows)].Value = jobs[i].job_date.ToString("dd/MM/yyyy");
+                        worksheet.Cells["AH" + (i + startRows)].Value = jobs[i].note;
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;

@@ -7,28 +7,25 @@ namespace WebENG.Models
 {
     public class ForecastModel
     {
-        public string month { get; set; }
         public string job_id { get; set; }
         public string job_name { get; set; }
         public string responsible { get; set; }
-        public string responsible_id { get; set; }
-        public string department { get; set; }
+        public string responsible_department { get; set; }
         public double job_in_hand { get; set; }
-        public double job_ais_in_hand { get; set; }
-        public double job_cis_in_hand { get; set; }
-        public double job_eng_in_hand { get; set; }
+        public double department_in_hand { get; set; }
         public string job_type { get; set; }
+        public string department { get; set; }
         public string payment_id { get; set; }
-        public string payment_name { get; set; }
+        public string milestone { get; set; }
         public string forecast_month { get; set; }
         public int percent { get; set; }
-        public double forecast_amount { get; set; }
+        public double forecast_portion_amount { get; set; }
+        public double forecast_portion_department_amount { get; set; }
         public string forecast_remark { get; set; }
-        public string actual_month { get; set; }
-        public double actual_amount { get; set; }
-        public DateTime actual_date { get; set; }
-        public string status { get; set; }
-        public string actual_remark { get; set; }
+        public double invoice_department_portion { get; set; }
+        public double total_invoice { get; set; }
+        public DateTime actual_invoice_date { get; set; }
+
     }
     public class ForecastPaymentModel
     {

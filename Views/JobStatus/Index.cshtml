@@ -199,6 +199,7 @@
                                     <th>Job Total In Hand</th>
                                     <th>Total Invoice</th>
                                     <th>Due Date</th>
+                                    <th style="width:150px">Note</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -223,13 +224,13 @@
                     <div class="form-row">
                         <div class="col-4">
                             <label for="job_id">Job Number</label>
-                            <input id="job_id" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="job_id" type="text" class="form-control" placeholder="" disabled />
                         </div>
                         <div class="col-8">
                             <label for="job_name">Job Name</label>
-                            <input id="job_name" type="text" class="form-control" placeholder="" disabled/>
+                            <input id="job_name" type="text" class="form-control" placeholder="" disabled />
                         </div>
-                    </div>                                     
+                    </div>
                     <div class="form-row pt-2">
                         <div class="col-12">
                             <div class="card">
@@ -247,19 +248,19 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                </tbody>                                           
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>                       
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="col-4">
                             <label for="cost">Job In Hand</label>
                             <div class="input-group">
-                                <input id="job_in_hand" type="number" class="form-control" placeholder="0" value="0" disabled/>
+                                <input id="job_in_hand" type="number" class="form-control" placeholder="0" value="0" disabled />
                                 <div class="input-group-append">
                                     <span class="input-group-text">THB</span>
                                 </div>
@@ -276,7 +277,7 @@
                         </div>
                         <div class="col-4">
                             <label for="due_date">Due Date</label>
-                            <input id="due_date"type="date"  class="form-control" value="1900-01-01" disabled/>
+                            <input id="due_date" type="date" class="form-control" value="1900-01-01" disabled />
                         </div>
                     </div>
                     <div class="form-row" id="form_status">
@@ -289,6 +290,12 @@
                             <select id="status" class="form-control">
                             </select>
                         </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <label for="note">Note</label>
+                            <textarea id="note" class="form-control" rows="2"></textarea>
+                        </div>                       
                     </div>
                 </form>
             </div>
@@ -584,7 +591,7 @@
                 let due_date = jobs[i].due_date.split('T')[0];
                 let total_invoice = jobs[i].invoices.map(m => m.invoice).reduce((acc, b) => acc + b, 0);
                 let remaining = (parseFloat(jobs[i].job_in_hand) - parseFloat(total_invoice)).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                
+                let note = jobs[i].note;
                 datas.push([
                     jobs[i].job_id,
                     jobs[i].job_name,
@@ -616,7 +623,8 @@
                     job_ais_in_hand,
                     job_in_hand,
                     total_invoice,
-                    due_date
+                    due_date,
+                    note
                 ]);
             }
 
@@ -806,7 +814,7 @@
                 let job_name = data_job.job_name;
                 let job_in_hand = data_job.job_in_hand;
                 let responsible = data_job.responsible;
-
+                let note = data_job.note;
                 let invoice = 0;
                 if (data_job.invoices.length > 0){
                     invoice = data_job.invoices.map(m=>m.invoice).reduce((acc,curr)=> acc+curr);
@@ -867,7 +875,7 @@
                 $('#due_date').val(due_date.split('T')[0]);
                 $('#responsible').val(responsible);
                 $('#status').val(status);
-
+                $('#note').val(note);
                 if (status === undefined){
                     $('#form_status').attr('hidden',true);
                 }else{
@@ -1301,18 +1309,18 @@
         $('#btn_save').on('click',async function(){
            let job = $('#job_id').val();
            let status = $('#status').val();
-
-           await UpdateJobStatus(job,status);
+            let note = $('#note').val();
+           await UpdateJobStatus(job,status,note);
 
         });
 
-        async function UpdateJobStatus(job,status) {
+        async function UpdateJobStatus(job,status,note) {
             await $.ajax({
                 type: "PATCH",
                 url: '@Url.Action("UpdateJobStatus", "JobStatus")',
 	            contentType: 'application/x-www-form-urlencoded',
                 data: {
-                    job,status
+                    job, status, note
                 },
                 success: async function (response) {
                     if (response === "Success") {

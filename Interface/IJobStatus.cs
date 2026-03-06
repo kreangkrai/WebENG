@@ -10,7 +10,7 @@ namespace WebENG.Interface
     {
         List<JobModel> GetJobStatusByUser(string emp_id);
         List<JobModel> GetJobStatusALL();
-        string UpdateJobStatus(string job,string status);
+        string UpdateJobStatus(string job,string status,string note);
         string UpdateJobByProcessSystem(JobModel job);
     }
 }

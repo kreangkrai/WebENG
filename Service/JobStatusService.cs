@@ -116,7 +116,8 @@ namespace WebENG.Service
 						Jobs.bg_start,
 						Jobs.bg_finish,
 						Jobs.retention,
-                        Jobs.responsible
+                        Jobs.responsible,
+                        Jobs.note
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
@@ -198,6 +199,7 @@ namespace WebENG.Service
                             bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
                             retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0,
                             responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
+                            note = dr["note"].ToString()
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -315,7 +317,8 @@ namespace WebENG.Service
 						Jobs.bg_start,
 						Jobs.bg_finish,
 						Jobs.retention,
-                        Jobs.responsible
+                        Jobs.responsible,
+                        Jobs.note
                     FROM Jobs
                     LEFT JOIN Eng_Status ON Jobs.status = Eng_Status.Status_ID
 					LEFT JOIN Term_Payment ON Term_Payment.job_id = Jobs.job_id
@@ -397,6 +400,7 @@ namespace WebENG.Service
                             bg_finish = dr["bg_finish"] != DBNull.Value ? Convert.ToDateTime(dr["bg_finish"].ToString()) : DateTime.MinValue,
                             retention = dr["retention"] != DBNull.Value ? Convert.ToInt32(dr["retention"]) : 0,
                             responsible = dr["responsible"] != DBNull.Value ? dr["responsible"].ToString() : "",
+                            note = dr["note"].ToString()
                         };
                         job.factor = job.md_rate + job.pd_rate;
                         job.term_payment = term_Payment;
@@ -452,7 +456,7 @@ namespace WebENG.Service
             return "Success";
         }
 
-        public string UpdateJobStatus(string job, string status)
+        public string UpdateJobStatus(string job, string status,string note)
         {
             try
             {
@@ -463,13 +467,15 @@ namespace WebENG.Service
                 string string_command = string.Format($@"
                     UPDATE Jobs 
                     SET
-                        status = @status
+                        status = @status,
+                        note = @note
                     WHERE job_id = @job_id");
                 using (SqlCommand cmd = new SqlCommand(string_command, con))
                 {
                     cmd.CommandType = CommandType.Text;
                     cmd.Parameters.AddWithValue("@job_id", job.Replace("-", String.Empty));
                     cmd.Parameters.AddWithValue("@status", status);
+                    cmd.Parameters.AddWithValue("@note", note);
                     cmd.ExecuteNonQuery();
                 }
             }

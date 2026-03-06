@@ -99,45 +99,6 @@ namespace WebENG.Controllers
             List<JobInHandModel> jobInHands = Job.GetJobInHands(year);
             List<BackLogModel> backlogs = Job.GetBackLogs(year);
 
-            List<string> deps = new List<string>();
-            if (department == "ALL")
-            {
-                deps = new List<string>()
-                {
-                    "CES-System",
-                    "CES-Exp",
-                    "CES-PMD",
-                    "CES-QIR",
-                    "CES-CIS",
-                    "AES"
-                };
-            }
-            if (department == "CES")
-            {
-                deps = new List<string>()
-                {
-                    "CES-System",
-                    "CES-Exp",
-                    "CES-PMD",
-                    "CES-QIR"
-                };
-            }
-
-            if (department == "CIS")
-            {
-                deps = new List<string>()
-                {
-                    "CES-CIS"
-                };
-            }
-            if (department == "AES")
-            {
-                deps = new List<string>()
-                {
-                    "AES"
-                };
-            }
-
             double job_in_hand = 0;
             string dep = employees.Where(w => w.name_en.ToLower() == responsible.ToLower()).Select(s => s.department).FirstOrDefault();
 
@@ -146,14 +107,14 @@ namespace WebENG.Controllers
             {
                 if (department == "ALL")
                 {
-                    forecasts = forecasts.Where(w => deps.Contains(w.department)).ToList();
+                    forecasts = forecasts.ToList();
                     invoices = invoices.Where(w => w.job_in_hand > 0).ToList();                 
                     job_in_hand = jobInHands.Sum(s => s.job_in_hand);
                     backlog = backlogs.Sum(s => s.remaining_in_hand);
                 }
                 else
                 {
-                    forecasts = forecasts.Where(w => deps.Contains(w.department)).ToList();
+                    forecasts = forecasts.Where(w => w.department == department).ToList();
                     if (department == "CES")
                     {
                         invoices = invoices.Where(w => w.department == "CES").ToList();
@@ -222,17 +183,38 @@ namespace WebENG.Controllers
             double[] tempActual = new double[14];
             tempActual[0] = 0;
             tempForecast[0] = 0;
+
+            //portion except PMD
+
+            List<ForecastModel> result = new List<ForecastModel>();
+
             foreach (var f in forecasts)
             {
-                int monthIndex = GetMonthIndex(f.forecast_month ?? f.month);
-
+                int monthIndex = GetMonthIndex(f.forecast_month);
+                ForecastModel fore = f; 
                 if (monthIndex >= 0 && monthIndex <= 12)
                 {
-                    if (f.forecast_amount > 0)
+                    if (f.forecast_portion_amount > 0)
                     {
-                        tempForecast[monthIndex + 1] += f.forecast_amount / 1_000_000;
+                        if (dep.Contains("PMD"))
+                        {
+                            tempForecast[monthIndex + 1] += f.forecast_portion_amount;
+                        }
+                        else
+                        {
+                            tempForecast[monthIndex + 1] += f.forecast_portion_department_amount;
+                        }
                     }
                 }
+
+                var invoice = invoices.Where(w => w.job_id == f.job_id && w.invoice_month == f.forecast_month && w.milestone == f.milestone).FirstOrDefault();
+                if (invoice != null)
+                {
+                    fore.actual_invoice_date = invoice.invoice_date;
+                    fore.total_invoice = invoice.invoice;
+                    fore.invoice_department_portion = invoice.portion_invoice;
+                }
+                result.Add(fore);
             }
 
             var inv = invoices.GroupBy(g => new { month = g.invoice_date.Month })
@@ -281,9 +263,10 @@ namespace WebENG.Controllers
                 job_in_hand = job_in_hand,
                 backlog = backlog,
                 sum_invoice = sum_invoice,
-                backlog_next_year = backlog_next_year
+                backlog_next_year = backlog_next_year,
+                result = result
             };
-
+           
             return Json(data);
         }
         private static int GetMonthIndex(string monthStr)

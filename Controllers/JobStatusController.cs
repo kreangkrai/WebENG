@@ -102,9 +102,13 @@ namespace WebENG.Controllers
         }
 
         [HttpPatch]
-        public JsonResult UpdateJobStatus(string job,string status)
+        public JsonResult UpdateJobStatus(string job,string status,string note)
         {
-            var result = JobStatus.UpdateJobStatus(job, status);
+            if (note == null)
+            {
+                note = "";
+            }
+            var result = JobStatus.UpdateJobStatus(job, status,note);
             return Json(result);
         }
 

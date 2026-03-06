@@ -48,6 +48,34 @@
                 <canvas id="chart_forecast" style="height:400px" />
             </div>
         </div>
+        <div class="card card-dark" style="position: relative; width: 100%;">
+            <div class="card-body">
+                <div class="form-group">
+                    <table id="table" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:14px">
+                        <thead class="display compact" style="background-color:#429DD8;text-align:center">
+                            <tr>
+                                <th>Job</th>
+                                <th style="width:300px">Project Name</th>
+                                <th style="width:250px">Responsible</th>
+                                <th>Responsible Department</th>
+                                <th>Job In Hand (MB)</th>
+                                <th>Department Job In Hand (MB)</th>
+                                <th>Department</th>
+                                <th>Payment Name</th>
+                                <th>Forecast Month</th>
+                                <th>Percent</th>
+                                <th>Forecast Portion Amount (MB)</th>
+                                <th>Forecast Portion Department Amount (MB)</th>
+                                <th>Department Invoice (MB)</th>
+                                <th>Total Invoice (MB)</th>
+                                <th>Actual Invoice Date</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -55,6 +83,8 @@
 {
     <script type="text/javascript">
         let chart_forecast;
+        var table;
+        let forecasts = [];
         $(document).ready(async function () {
             getYear();
             let responsibles = await GetResponsibles();
@@ -129,6 +159,9 @@
             const backlog = forecast.backlog;
             const backlog_next_year = forecast.backlog_next_year;
             GenerateChart(forecast.forecast, job_in_hand, backlog, sum_invoice, backlog_next_year);
+
+            forecasts = forecast.result;
+            GenerateTable(forecasts);
         });
 
         function GenerateChart(forecast, job_in_hand, backlog, sum_invoice,backlog_next_year) {
@@ -268,10 +301,48 @@
             });
         }
 
-        @*$('#btnExport').on('click', function () {
-            let year = $('#select_year :selected').text();
-            let department = $('#departments :selected').text();
-            location.href = '@Url.Action("ExportSummaryJobInHand", "JobInHand")?department=' + department + '&year=' + year;
-        });*@
+        function GenerateTable(forecasts) {
+            let datas = [];
+            if (table !== null)
+                $('#table').DataTable().destroy();
+
+            for (let i = 0; i < forecasts.length; i++) {
+                datas.push([
+                    forecasts[i].job_id,
+                    forecasts[i].job_name,
+                    forecasts[i].responsible,
+                    forecasts[i].responsible_department,
+                    forecasts[i].job_in_hand.toFixed(3),
+                    forecasts[i].department_in_hand.toFixed(3),
+                    forecasts[i].department,
+                    forecasts[i].milestone,
+                    forecasts[i].forecast_month,
+                    forecasts[i].percent,
+                    forecasts[i].forecast_portion_amount.toFixed(3),
+                    forecasts[i].forecast_portion_department_amount.toFixed(3),
+                    forecasts[i].invoice_department_portion.toFixed(3),
+                    forecasts[i].total_invoice.toFixed(3),
+                    forecasts[i].actual_invoice_date.toString().split('T')[0]
+                ]);
+            }
+
+            table = $('#table').DataTable({
+                data: datas,
+                lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
+                fixedHeader: true,
+                fixedColumns: {
+                    //left: 2
+                },
+                columnDefs: [
+                    { "className": "dt-center", "targets": "_all" }
+                ],
+                rowCallback: function (row, data) {
+                },
+                searching: true,
+                ordering: true,
+                paging: true,
+                info: false
+            });
+        };
     </script>
 }

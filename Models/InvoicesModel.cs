@@ -20,5 +20,6 @@ namespace WebENG.Models
         public double invoice { get; set; }
         public double portion_invoice { get; set; }
         public DateTime invoice_date { get; set; }
+        public string milestone { get; set; }
     }
 }

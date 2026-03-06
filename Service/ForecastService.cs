@@ -81,6 +81,7 @@ namespace WebENG.Service
 
         public List<ForecastModel> GetForecasts(int year)
         {
+            double mb = 1_000_000;
             List<ForecastModel> forecasts = new List<ForecastModel>();
             try
             {
@@ -93,134 +94,142 @@ namespace WebENG.Service
                                                         UNION ALL SELECT '{year}-05' UNION ALL SELECT '{year}-06' UNION ALL SELECT '{year}-07' UNION ALL SELECT '{year}-08'
                                                         UNION ALL SELECT '{year}-09' UNION ALL SELECT '{year}-10' UNION ALL SELECT '{year}-11' UNION ALL SELECT '{year}-12'
                                                     ),
-                                                    Forecast AS (
-                                                        SELECT 
-                                                            j.job_id,
-                                                            j.job_name,
-															j.responsible,
-		                                                    j.job_in_hand,
-															j.job_ais_in_hand,
-															j.job_cis_in_hand,
-															j.job_eng_in_hand,
-															j.job_type,
-                                                            tp.payment_id,
-                                                            tp.payment_name,
-                                                            tp.[percent],
-                                                            tp.forecast_month,
-                                                            CONVERT(varchar(7), tp.forecast_month, 126) AS forecast_month_str,
-                                                            (tp.[percent] / 100.0 * ISNULL(j.job_in_hand, 0)) AS forecast_amount,
-                                                            tp.remark AS forecast_remark
-                                                        FROM [dbo].[Term_Payments] tp
-                                                        INNER JOIN [dbo].[Jobs] j ON tp.job_id = j.job_id
-                                                        WHERE tp.forecast_month >= '{year}-01-01' 
-                                                          AND tp.forecast_month < '{year+1}-01'
-                                                    ),
-                                                    Actual AS (
-                                                        SELECT 
-                                                            j.job_id,
-		                                                    j.job_name,
-															j.responsible,
-															j.job_in_hand,
-															j.job_ais_in_hand,
-															j.job_cis_in_hand,
-															j.job_eng_in_hand,
-															j.job_type,
-                                                            i.milestone,
-                                                            i.invoice AS actual_amount,
-                                                            CONVERT(varchar(7), i.actual_date, 126) AS actual_month,
-                                                            i.actual_date,
-                                                            i.status,
-                                                            i.remark AS actual_remark
-                                                        FROM [dbo].[Invoice] i
-                                                        INNER JOIN [dbo].[Jobs] j ON i.job_id = j.job_id
-                                                        WHERE i.actual_date >= '{year}-01-01' AND i.actual_date < '{year+1}-01-01'
-                                                    ),
-                                                    Combined AS (
-                                                        SELECT 
-                                                            m.month,
-                                                            f.job_id,
-                                                            f.job_name,
-															f.responsible,
-		                                                    f.job_in_hand,
-															f.job_ais_in_hand,
-															f.job_cis_in_hand,
-															f.job_eng_in_hand,
-															f.job_type,
-                                                            f.payment_id,
-                                                            f.payment_name,
-                                                            f.forecast_month_str AS forecast_month,
-                                                            f.[percent],
-                                                            f.forecast_amount,
-                                                            f.forecast_remark,
-                                                            a.actual_month,
-                                                            a.actual_amount,
-                                                            a.actual_date,
-                                                            a.status,
-                                                            a.actual_remark
-                                                        FROM Months m
-                                                        LEFT JOIN Forecast f ON m.month = f.forecast_month_str
-                                                        LEFT JOIN Actual a ON f.job_id = a.job_id 
-                                                                          AND f.payment_name = a.milestone 
+                                                       ForecastSplit AS (
+                                                            SELECT
+                                                                tp.job_id,
+                                                                j.job_name,
+                                                                j.responsible,
+                                                                j.job_in_hand,
+                                                                j.job_eng_in_hand,
+                                                                j.job_cis_in_hand,
+                                                                j.job_ais_in_hand,
+                                                                j.job_type,
+                                                                tp.payment_id,
+                                                                tp.payment_name,
+                                                                tp.[percent],
+                                                                CONVERT(varchar(7), tp.forecast_month, 126) AS forecast_month,
+                                                                tp.remark AS forecast_remark,
+       
+                                                                CASE WHEN ISNULL(j.job_in_hand, 0) > 0 THEN j.job_eng_in_hand / j.job_in_hand ELSE 0 END AS prop_CES,
+                                                                CASE WHEN ISNULL(j.job_in_hand, 0) > 0 THEN j.job_cis_in_hand / j.job_in_hand ELSE 0 END AS prop_CIS,
+                                                                CASE WHEN ISNULL(j.job_in_hand, 0) > 0 THEN j.job_ais_in_hand / j.job_in_hand ELSE 0 END AS prop_AES,
 
-                                                        UNION ALL
+                                                                (tp.[percent] / 100.0 * ISNULL(j.job_in_hand, 0)) * 
+                                                                 CASE WHEN ISNULL(j.job_in_hand, 0) > 0 THEN j.job_eng_in_hand / j.job_in_hand ELSE 0 END AS forecast_CES,
+        
+                                                                (tp.[percent] / 100.0 * ISNULL(j.job_in_hand, 0)) * 
+                                                                 CASE WHEN ISNULL(j.job_in_hand, 0) > 0 THEN j.job_cis_in_hand / j.job_in_hand ELSE 0 END AS forecast_CIS,
+        
+                                                                (tp.[percent] / 100.0 * ISNULL(j.job_in_hand, 0)) * 
+                                                                 CASE WHEN ISNULL(j.job_in_hand, 0) > 0 THEN j.job_ais_in_hand / j.job_in_hand ELSE 0 END AS forecast_AES
+                                                            FROM [dbo].[Term_Payments] tp
+                                                            INNER JOIN [dbo].[Jobs] j ON tp.job_id = j.job_id
+                                                            WHERE tp.forecast_month >= '{year}-01-01'
+                                                              AND tp.forecast_month < '{year+1}-01-01'
+                                                        ),
 
-                                                        SELECT 
-                                                            m.month,
-                                                            a.job_id,
-                                                            j.job_name,
-															j.responsible,
-		                                                    a.job_in_hand AS JobInHand,
-															a.job_ais_in_hand,
-															a.job_cis_in_hand,
-															a.job_eng_in_hand,
-															a.job_type,
-                                                            t.payment_id AS payment_id,
-                                                            a.milestone AS payment_name,
-                                                            NULL AS forecast_month,
-                                                            NULL AS [percent],
-                                                            NULL AS forecast_amount,
-                                                            NULL AS forecast_remark,
-                                                            a.actual_month,
-                                                            a.actual_amount,
-                                                            a.actual_date,
-                                                            a.status,
-                                                            a.actual_remark
-                                                        FROM Months m
-                                                        INNER JOIN Actual a ON m.month = a.actual_month
-                                                        INNER JOIN [dbo].[Jobs] j ON a.job_id = j.job_id
-                                                        LEFT JOIN Forecast f ON a.job_id = f.job_id 
-                                                                            AND a.milestone = f.payment_name 
-	                                                    LEFT JOIN Term_Payments t 
-                                                        ON t.job_id = a.job_id 
-                                                       AND t.payment_name = a.milestone
-                                                        WHERE f.job_id IS NULL
-                                                    )
-                                                    SELECT 
-                                                        month,
-                                                        job_id,
-                                                        job_name,
-														responsible,
-														emp.department,
-	                                                    job_in_hand,
-														job_ais_in_hand,
-														job_cis_in_hand,
-														job_eng_in_hand,
-														job_type,
-                                                        payment_id,
-                                                        payment_name,
-                                                        forecast_month, 
-                                                        [percent],
-                                                        forecast_amount,
-                                                        forecast_remark,
-                                                        actual_month,
-                                                        actual_amount,
-                                                        actual_date,
-                                                        status,
-                                                        actual_remark
-                                                    FROM Combined
-													LEFT JOIN [CTL].dbo.Employees emp ON Combined.responsible = emp.name_en
-                                                    WHERE job_id IS NOT NULL
-                                                    ORDER BY month, job_id, payment_id; ");
+                                                        ForecastUnpivot AS (
+                                                            SELECT
+                                                                job_id,
+                                                                job_name,
+                                                                responsible,
+                                                                job_in_hand,
+                                                                job_eng_in_hand AS in_hand,
+                                                                job_type,
+                                                                payment_id,
+                                                                payment_name,
+                                                                forecast_month,
+                                                                [percent],
+                                                                forecast_remark,
+                                                                'CES' AS department,
+                                                                forecast_CES AS forecast_amount,
+                                                                NULL AS actual_amount
+                                                            FROM ForecastSplit
+                                                            WHERE prop_CES > 0
+
+                                                            UNION ALL
+
+                                                            SELECT
+                                                                job_id,
+                                                                job_name,
+                                                                responsible,
+                                                                job_in_hand,
+                                                                job_cis_in_hand AS in_hand,
+                                                                job_type,
+                                                                payment_id,
+                                                                payment_name,
+                                                                forecast_month,
+                                                                [percent],
+                                                                forecast_remark,
+                                                                'CIS' AS department,
+                                                                forecast_CIS AS forecast_amount,
+                                                                NULL AS actual_amount
+                                                            FROM ForecastSplit
+                                                            WHERE prop_CIS > 0
+
+                                                            UNION ALL
+
+                                                            SELECT
+                                                                job_id,
+                                                                job_name,
+                                                                responsible,
+                                                                job_in_hand,
+                                                                job_ais_in_hand AS in_hand,
+                                                                job_type,
+                                                                payment_id,
+                                                                payment_name,
+                                                                forecast_month,
+                                                                [percent],
+                                                                forecast_remark,
+                                                                'AES' AS department,
+                                                                forecast_AES AS forecast_amount,
+                                                                NULL AS actual_amount
+                                                            FROM ForecastSplit
+                                                            WHERE prop_AES > 0
+                                                        ),
+
+
+                                                        Combined AS (
+                                                            SELECT
+                                                                f.job_id,
+                                                                f.job_name,
+                                                                f.responsible,
+                                                                f.job_in_hand,
+                                                                f.in_hand,
+                                                                f.job_type,
+                                                                f.department,
+                                                                f.payment_id,
+                                                                f.payment_name,
+                                                                f.forecast_month,
+                                                                f.[percent],
+                                                                f.forecast_remark,
+                                                                f.forecast_amount,
+                                                                f.actual_amount
+                                                            FROM Months m
+                                                            LEFT JOIN ForecastUnpivot f ON m.month = f.forecast_month
+                                                        )
+
+                                                        SELECT
+                                                            c.job_id,
+                                                            c.job_name,
+                                                            c.responsible,
+                                                            emp.department AS responsible_department,
+                                                            c.job_in_hand,
+                                                            c.in_hand AS department_in_hand,
+                                                            c.job_type,
+                                                            c.department,
+                                                            c.payment_id,
+                                                            c.payment_name as milestone,
+                                                            c.forecast_month,
+                                                            c.[percent],
+	                                                        c.[percent] / 100.0 * c.job_in_hand as forecast_portion_amount,
+                                                            c.[percent] / 100.0 * c.in_hand as forecast_portion_department_amount,
+                                                            c.forecast_remark
+                                                        FROM Combined c
+                                                        LEFT JOIN [CTL].dbo.Employees emp
+                                                            ON c.responsible = emp.name_en
+                                                        WHERE c.job_id IS NOT NULL
+                                                        ORDER BY c.job_id, c.department, c.payment_id, c.payment_name;");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.HasRows)
@@ -229,27 +238,21 @@ namespace WebENG.Service
                     {
                         ForecastModel forecast = new ForecastModel()
                         {
-                            month = dr["month"].ToString(),
                             job_id = dr["job_id"].ToString(),
                             job_name = dr["job_name"].ToString(),
                             responsible = dr["responsible"].ToString(),
+                            responsible_department = dr["responsible_department"].ToString(),
                             department = dr["department"].ToString(),
-                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) : 0,
-                            job_ais_in_hand = dr["job_ais_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_ais_in_hand"].ToString()) : 0,
-                            job_cis_in_hand = dr["job_cis_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_cis_in_hand"].ToString()) : 0,
-                            job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) : 0,
+                            job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) / mb : 0,
+                            department_in_hand = dr["department_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["department_in_hand"].ToString()) / mb : 0,
                             job_type = dr["job_type"].ToString(),
                             payment_id = dr["payment_id"].ToString(),
-                            payment_name = dr["payment_name"].ToString(),
+                            milestone = dr["milestone"].ToString(),
                             forecast_month = dr["forecast_month"].ToString(),
                             percent = dr["percent"] != DBNull.Value ? Convert.ToInt32(dr["percent"].ToString()) : 0,
-                            forecast_amount = dr["forecast_amount"] != DBNull.Value ? Convert.ToDouble(dr["forecast_amount"].ToString()) : 0,
+                            forecast_portion_amount = dr["forecast_portion_amount"] != DBNull.Value ? Convert.ToDouble(dr["forecast_portion_amount"].ToString()) / mb : 0,
+                            forecast_portion_department_amount = dr["forecast_portion_department_amount"] != DBNull.Value ? Convert.ToDouble(dr["forecast_portion_department_amount"].ToString()) / mb : 0,
                             forecast_remark = dr["forecast_remark"].ToString(),
-                            actual_month = dr["actual_month"].ToString(),
-                            actual_amount = dr["actual_amount"] != DBNull.Value ? Convert.ToDouble(dr["actual_amount"].ToString()) : 0,
-                            actual_date = dr["actual_date"] != DBNull.Value ? Convert.ToDateTime(dr["actual_date"].ToString()) : DateTime.MinValue,
-                            actual_remark = dr["actual_remark"].ToString(),
-                            status = dr["status"].ToString()
                         };
                         forecasts.Add(forecast);
                     }

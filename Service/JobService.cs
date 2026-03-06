@@ -2086,98 +2086,102 @@ namespace WebENG.Service
                     con.Open();
                 }
                 string string_command = string.Format($@"WITH Base AS (
-                                                        SELECT 
-                                                            j.job_id,
-                                                            j.job_in_hand,
-		                                                    j.job_eng_in_hand,
-		                                                    j.job_cis_in_hand,
-		                                                    j.job_ais_in_hand,
-                                                            j.job_date,
-                                                            j.responsible,
-                                                            e.department AS responsible_department,
-                                                            i.invoice,
-                                                            i.actual_date AS invoice_date,
-                                                            FORMAT(i.actual_date, 'yyyy-MM') AS invoice_month,
+                                                            SELECT 
+                                                                j.job_id,
+                                                                j.job_in_hand,
+		                                                        j.job_eng_in_hand,
+		                                                        j.job_cis_in_hand,
+		                                                        j.job_ais_in_hand,
+                                                                j.job_date,
+                                                                j.responsible,
+                                                                e.department AS responsible_department,
+                                                                i.invoice,
+		                                                        i.milestone,
+                                                                i.actual_date AS invoice_date,
+                                                                FORMAT(i.actual_date, 'yyyy-MM') AS invoice_month,
 
-                                                            CASE WHEN j.job_in_hand = 0 OR j.job_in_hand IS NULL THEN 0 ELSE j.job_eng_in_hand / j.job_in_hand END AS eng_ratio,
-                                                            CASE WHEN j.job_in_hand = 0 OR j.job_in_hand IS NULL THEN 0 ELSE j.job_cis_in_hand / j.job_in_hand END AS cis_ratio,
-                                                            CASE WHEN j.job_in_hand = 0 OR j.job_in_hand IS NULL THEN 0 ELSE j.job_ais_in_hand / j.job_in_hand END AS ais_ratio
+                                                                CASE WHEN j.job_in_hand = 0 OR j.job_in_hand IS NULL THEN 0 ELSE j.job_eng_in_hand / j.job_in_hand END AS eng_ratio,
+                                                                CASE WHEN j.job_in_hand = 0 OR j.job_in_hand IS NULL THEN 0 ELSE j.job_cis_in_hand / j.job_in_hand END AS cis_ratio,
+                                                                CASE WHEN j.job_in_hand = 0 OR j.job_in_hand IS NULL THEN 0 ELSE j.job_ais_in_hand / j.job_in_hand END AS ais_ratio
         
-                                                        FROM [dbo].[Jobs] j
-                                                        LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
-                                                        LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
+                                                            FROM [dbo].[Jobs] j
+                                                            LEFT JOIN CTL.[dbo].[Employees] e ON j.responsible = e.name_en
+                                                            LEFT JOIN [dbo].[Invoice] i ON j.job_id = i.job_id
     
-                                                        WHERE 
-                                                            i.actual_date IS NOT NULL
-                                                            AND FORMAT(i.actual_date, 'yyyy') = @year
-                                                            AND j.responsible IS NOT NULL
-                                                    )
+                                                            WHERE 
+                                                                i.actual_date IS NOT NULL
+                                                                AND FORMAT(i.actual_date, 'yyyy') = @year
+                                                                AND j.responsible IS NOT NULL
+                                                        )
 
-                                                    SELECT 
-                                                        job_id,
-                                                        job_in_hand,
-	                                                    job_eng_in_hand,
-	                                                    job_cis_in_hand,
-	                                                    job_ais_in_hand,
-                                                        job_date,
-                                                        responsible,
-                                                        responsible_department,
-                                                        invoice,
-                                                        invoice_date,
-                                                        invoice_month,
+                                                        SELECT 
+                                                            job_id,
+                                                            job_in_hand,
+	                                                        job_eng_in_hand,
+	                                                        job_cis_in_hand,
+	                                                        job_ais_in_hand,
+                                                            job_date,
+                                                            responsible,
+                                                            responsible_department,
+	                                                        milestone,
+                                                            invoice,
+                                                            invoice_date,
+                                                            invoice_month,
     
-                                                        'CES' AS department,
-                                                        ROUND(invoice * eng_ratio, 2) AS portion_invoice
+                                                            'CES' AS department,
+                                                            ROUND(invoice * eng_ratio, 2) AS portion_invoice
     
-                                                    FROM Base
-                                                    WHERE eng_ratio > 0
+                                                        FROM Base
+                                                        WHERE eng_ratio > 0
 
-                                                    UNION ALL
+                                                        UNION ALL
 
-                                                    SELECT 
-                                                        job_id,
-                                                        job_in_hand,
-	                                                    job_eng_in_hand,
-	                                                    job_cis_in_hand,
-	                                                    job_ais_in_hand,
-                                                        job_date,
-                                                        responsible,
-                                                        responsible_department,
-                                                        invoice,
-                                                        invoice_date,
-                                                        invoice_month,
+                                                        SELECT 
+                                                            job_id,
+                                                            job_in_hand,
+	                                                        job_eng_in_hand,
+	                                                        job_cis_in_hand,
+	                                                        job_ais_in_hand,
+                                                            job_date,
+                                                            responsible,
+                                                            responsible_department,
+	                                                        milestone,
+                                                            invoice,
+                                                            invoice_date,
+                                                            invoice_month,
     
-                                                        'CIS' AS department,
-                                                        ROUND(invoice * cis_ratio, 2) AS portion_invoice
+                                                            'CIS' AS department,
+                                                            ROUND(invoice * cis_ratio, 2) AS portion_invoice
     
-                                                    FROM Base
-                                                    WHERE cis_ratio > 0 
+                                                        FROM Base
+                                                        WHERE cis_ratio > 0 
 
-                                                    UNION ALL
+                                                        UNION ALL
 
-                                                    SELECT 
-                                                        job_id,
-                                                        job_in_hand,
-	                                                    job_eng_in_hand,
-	                                                    job_cis_in_hand,
-	                                                    job_ais_in_hand,
-                                                        job_date,
-                                                        responsible,
-                                                        responsible_department,
-                                                        invoice,
-                                                        invoice_date,
-                                                        invoice_month,
+                                                        SELECT 
+                                                            job_id,
+                                                            job_in_hand,
+	                                                        job_eng_in_hand,
+	                                                        job_cis_in_hand,
+	                                                        job_ais_in_hand,
+                                                            job_date,
+                                                            responsible,
+                                                            responsible_department,
+	                                                        milestone,
+                                                            invoice,
+                                                            invoice_date,
+                                                            invoice_month,
     
-                                                        'AES' AS department,
-                                                        ROUND(invoice * ais_ratio, 2) AS portion_invoice
+                                                            'AES' AS department,
+                                                            ROUND(invoice * ais_ratio, 2) AS portion_invoice
     
-                                                    FROM Base
-                                                    WHERE ais_ratio > 0
+                                                        FROM Base
+                                                        WHERE ais_ratio > 0
 
-                                                    ORDER BY 
-                                                        job_id, 
-                                                        invoice_date, 
-                                                        department;");
+                                                        ORDER BY 
+                                                            job_id, 
+                                                            invoice_date, 
+                                                            department;");
                 SqlCommand cmd = new SqlCommand(string_command, con);
                 cmd.Parameters.AddWithValue("@year", year);
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -2199,7 +2203,8 @@ namespace WebENG.Service
                             invoice_month = dr["invoice_month"].ToString(),
                             responsible_department = dr["responsible_department"].ToString(),
                             responsible = dr["responsible"].ToString(),
-                            department = dr["department"].ToString()
+                            department = dr["department"].ToString(),
+                            milestone = dr["milestone"].ToString()
                         };
                         invoices.Add(invoice);
                     }
