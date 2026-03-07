@@ -3,6 +3,28 @@
 @{
     ViewData["Title"] = "Forecast";
 }
+<style>
+    tr.group-row.level-0 {
+        background: #e0f7fa;
+        font-weight: bold;
+    }
+
+    tr.group-row.level-1 {
+        background: #f0f8ff;
+        padding-left: 20px;
+    }
+
+    tr.group-row.level-2 {
+        background: #f5faff;
+        padding-left: 40px;
+    }
+
+    tr.group-row.level-3 {
+        background: #fafcff;
+        padding-left: 60px;
+    }
+</style>
+
 
 <div class="row p-4" style="row-gap:5px">
     <div class="col-xl-12">
@@ -50,9 +72,9 @@
         </div>
         <div class="card card-dark" style="position: relative; width: 100%;">
             <div class="card-body">
-                <div class="form-group">
-                    <table id="table" class="table-bordered display compact stripe table-striped row-border order-column responsive" style="width:100%;font-size:14px">
-                        <thead class="display compact" style="background-color:#429DD8;text-align:center">
+                <div class="table-responsive-lg" style="height: 700px; overflow-y: auto; border: 1px solid #dee2e6;">
+                    <table id="table" class="table table-bordered table-hover table-sm compact">
+                        <thead class="text-white text-center sticky-top" style="position: sticky; top: 0; z-index: 10; background-color: #005A9C">
                             <tr>
                                 <th>Job</th>
                                 <th style="width:300px">Project Name</th>
@@ -178,7 +200,7 @@
                 type: 'bar',
                 data: {
                     labels: forecast.month_label,
-                    datasets: [                       
+                    datasets: [
                         {
                             label: 'Backlog',
                             data: [backlog, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -215,7 +237,7 @@
                             borderDash: [5, 3],
                             stack: 'forecast',
                             barThickness: 15,
-                        },                       
+                        },
                         {
                             label: 'Total Invoice',
                             data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, sum_invoice],
@@ -338,10 +360,12 @@
                 ],
                 rowCallback: function (row, data) {
                 },
+                destroy: true,
                 searching: true,
-                ordering: true,
+                ordering: false,
+                order: [[0, 'asc']],
                 paging: true,
-                info: false
+                info: false,
             });
         };
     </script>
