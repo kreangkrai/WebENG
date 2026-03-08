@@ -2311,7 +2311,7 @@ namespace WebENG.Service
             {
                 day = date.DayOfWeek.ToString();
                 List<WorkingDayModel> _wd = whs.Where(w => w.date.Date == date.Date).ToList();
-                //_wd = _wd.Where(w => w.date == new DateTime(2025, 10, 15)).ToList();
+                //_wd = _wd.Where(w => w.date == new DateTime(2026, 2, 18))).ToList();
                 bool isHoliday = holidays.Where(w => w.date.Date == date.Date).Count() > 0 ? true : false;
                 bool isWeekend = (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) ? true : false;
                 if (isHoliday)
@@ -2413,6 +2413,13 @@ namespace WebENG.Service
                                         }
                                     }
 
+                                    //Check Regular Day
+                                    TimeSpan reg = monthly.Where(w => w.working_date.Date == _wd[i].date.Date).Select(s => s.normal).Aggregate(TimeSpan.Zero, (currentSum, timeSpan) => currentSum + timeSpan);
+                                    TimeSpan new_regular = default(TimeSpan);
+                                    if (reg < new TimeSpan(8, 0, 0))
+                                    {
+                                        new_regular = regular;
+                                    }
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
@@ -2429,7 +2436,7 @@ namespace WebENG.Service
                                         dinner_half = _wd[i].workings[j].dinner_half,
                                         department = _wd[i].workings[j].department,
                                         day = day,
-                                        normal = regular,
+                                        normal = new_regular,
                                         ot1_5 = ot15,
                                         ot3_0 = ot3,
                                         leave = leave
@@ -2569,6 +2576,14 @@ namespace WebENG.Service
                                         }
                                     }
 
+                                    //Check Regular Day
+                                    TimeSpan reg = monthly.Where(w => w.working_date.Date == _wd[i].date.Date).Select(s => s.normal).Aggregate(TimeSpan.Zero, (currentSum, timeSpan) => currentSum + timeSpan);
+                                    TimeSpan new_regular = default(TimeSpan);
+                                    if (reg < new TimeSpan(8, 0, 0))
+                                    {
+                                        new_regular = regular;
+                                    }
+
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
@@ -2585,7 +2600,7 @@ namespace WebENG.Service
                                         dinner_half = _wd[i].workings[j].dinner_half,
                                         department = _wd[i].workings[j].department,
                                         day = day,
-                                        normal = regular,
+                                        normal = new_regular,
                                         ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
                                         ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
                                         leave = leave
@@ -2605,6 +2620,13 @@ namespace WebENG.Service
                                         leave = new TimeSpan(8, 0, 0);
                                     }
 
+                                    //Check Regular Day
+                                    TimeSpan reg = monthly.Where(w => w.working_date.Date == _wd[i].date.Date).Select(s => s.normal).Aggregate(TimeSpan.Zero, (currentSum, timeSpan) => currentSum + timeSpan);
+                                    TimeSpan new_regular = default(TimeSpan);
+                                    if (reg < new TimeSpan(8, 0, 0))
+                                    {
+                                        new_regular = regular;
+                                    }
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
@@ -2621,7 +2643,7 @@ namespace WebENG.Service
                                         dinner_half = _wd[i].workings[j].dinner_half,
                                         department = _wd[i].workings[j].department,
                                         day = day,
-                                        normal = regular,
+                                        normal = new_regular,
                                         ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
                                         ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
                                         leave = leave
@@ -2768,6 +2790,14 @@ namespace WebENG.Service
                                         }
                                     }
 
+                                    //Check Regular Day
+                                    TimeSpan reg = monthly.Where(w => w.working_date.Date == _wd[i].date.Date).Select(s => s.normal).Aggregate(TimeSpan.Zero, (currentSum, timeSpan) => currentSum + timeSpan);
+                                    TimeSpan new_regular = default(TimeSpan);
+                                    if (reg < new TimeSpan(8, 0, 0))
+                                    {
+                                        new_regular = regular;
+                                    }
+
                                     wh = new WorkingHoursModel()
                                     {
                                         working_date = _wd[i].date,
@@ -2784,7 +2814,7 @@ namespace WebENG.Service
                                         dinner_half = _wd[i].workings[j].dinner_half,
                                         department = _wd[i].workings[j].department,
                                         day = day,
-                                        normal = regular,
+                                        normal = new_regular,
                                         ot1_5 = wd_time >= new TimeSpan(8, 0, 0) ? ot15 : default(TimeSpan),
                                         ot3_0 = wd_time >= new TimeSpan(8, 0, 0) ? ot3 : default(TimeSpan),
                                         leave = leave
