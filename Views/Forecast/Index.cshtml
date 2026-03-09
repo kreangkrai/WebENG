@@ -344,7 +344,9 @@
                     forecasts[i].forecast_portion_department_amount.toFixed(3),
                     forecasts[i].invoice_department_portion.toFixed(3),
                     forecasts[i].total_invoice.toFixed(3),
-                    forecasts[i].actual_invoice_date.toString().split('T')[0]
+                    forecasts[i].actual_invoice_date.toString().split('T')[0] === "0001-01-01"
+                        ? ""
+                        : forecasts[i].actual_invoice_date.toString().split('T')[0]
                 ]);
             }
 

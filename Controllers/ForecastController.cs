@@ -184,14 +184,14 @@ namespace WebENG.Controllers
             tempActual[0] = 0;
             tempForecast[0] = 0;
 
-            //portion except PMD
+            //Forecast
 
             List<ForecastModel> result = new List<ForecastModel>();
 
             foreach (var f in forecasts)
             {
                 int monthIndex = GetMonthIndex(f.forecast_month);
-                ForecastModel fore = f; 
+                ForecastModel fore = f;
                 if (monthIndex >= 0 && monthIndex <= 12)
                 {
                     if (f.forecast_portion_amount > 0)
@@ -216,6 +216,87 @@ namespace WebENG.Controllers
                 }
                 result.Add(fore);
             }
+
+            // Invoice 
+            foreach (var invoice in invoices)
+            {
+                var fore = forecasts
+                    .FirstOrDefault(f =>
+                        f.job_id == invoice.job_id &&
+                        f.forecast_month == invoice.invoice_month &&
+                        f.milestone == invoice.milestone);
+
+                if (fore != null)
+                {
+                    var model = new ForecastModel
+                    {
+                        job_id = invoice.job_id,
+                        forecast_month = invoice.invoice_month,
+                        milestone = invoice.milestone,
+                        job_name = fore.job_name,
+                        responsible = fore.responsible,
+                        responsible_department = fore.responsible_department,
+                        department = fore.department,
+                        department_in_hand = fore?.department_in_hand ?? 0,
+                        job_in_hand = fore?.job_in_hand ?? 0,
+                        forecast_remark = fore.forecast_remark,
+                        job_type = fore.job_type,
+                        payment_id = fore.payment_id,
+                        percent = fore?.percent ?? 0,
+                        forecast_portion_amount = fore?.forecast_portion_amount ?? 0,
+                        forecast_portion_department_amount = fore?.forecast_portion_department_amount ?? 0,
+                        actual_invoice_date = invoice.invoice_date,
+                        total_invoice = invoice.invoice,
+                        invoice_department_portion = invoice.portion_invoice,
+                    };
+
+                    result.Add(model);
+                }
+                else
+                {
+                    var model = new ForecastModel
+                    {
+                        job_id = invoice.job_id,
+                        forecast_month = invoice.invoice_month,
+                        milestone = invoice.milestone,
+                        
+                        forecast_portion_amount = fore?.forecast_portion_amount ?? 0,
+                        forecast_portion_department_amount = fore?.forecast_portion_department_amount ?? 0,
+                        actual_invoice_date = invoice.invoice_date,
+                        total_invoice = invoice.invoice,
+                        invoice_department_portion = invoice.portion_invoice,
+                    };
+                    result.Add(model);
+                }
+                
+            }
+
+            result = result.GroupBy(g => new { g.job_id, g.milestone, g.forecast_month, g.total_invoice, g.actual_invoice_date }).Select(s => new ForecastModel()
+            {
+                job_id = s.Key.job_id,
+                job_name = s.FirstOrDefault().job_name,
+                responsible= s.FirstOrDefault().responsible,
+                responsible_department = s.FirstOrDefault().responsible_department,
+                job_in_hand = s.FirstOrDefault().job_in_hand,
+                department_in_hand = s.FirstOrDefault().department_in_hand,
+                department = s.FirstOrDefault().department,
+                milestone = s.Key.milestone,
+                forecast_month = s.Key.forecast_month,
+                percent = s.FirstOrDefault().percent,
+                forecast_portion_amount = s.FirstOrDefault().forecast_portion_amount,
+                forecast_portion_department_amount = s.FirstOrDefault().forecast_portion_department_amount,
+                invoice_department_portion = s.FirstOrDefault().invoice_department_portion,
+                job_type = s.FirstOrDefault().job_type,
+                payment_id = s.FirstOrDefault().payment_id,
+                total_invoice = s.Key.total_invoice,
+                forecast_remark = s.FirstOrDefault().forecast_remark,
+                actual_invoice_date = s.Key.actual_invoice_date
+
+            }).ToList();
+
+
+            result = result.OrderBy(o => o.job_id).ToList();
+
 
             var inv = invoices.GroupBy(g => new { month = g.invoice_date.Month })
                 .Select(s => new
