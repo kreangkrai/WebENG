@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using WebENG.LeaveInterfaces;
+using MailKit.Net.Smtp;
+using MimeKit;
 
 namespace WebENG.LeaveServices
 {
@@ -14,25 +16,25 @@ namespace WebENG.LeaveServices
         {
             try
             {
-                MailMessage mail = new MailMessage();
-                SmtpClient SmtpServer = new SmtpClient();
-
+                var mail = new MimeMessage();
                 string password = "P@ssw0rd";
                 string sender = "e-leave@contrologic.co.th";
-                mail.From = new MailAddress(sender);
+
+                mail.From.Add(new MailboxAddress("E-Leave", sender));
+
                 for (int i = 0; i < to.Count; i++)
                 {
-                    mail.To.Add(to[i]);
+                    mail.To.Add(new MailboxAddress("Receiver", to[i]));
                 }
 
                 if (status == "Rejected" || status == "Returned")
                 {
-                    mail.CC.Add("hrs@contrologic.co.th");
-                    mail.CC.Add(name.email);
+                    mail.Cc.Add(new MailboxAddress("hrs","hrs@contrologic.co.th"));
+                    mail.Cc.Add(new MailboxAddress(name.name_en, name.email));
                 }
                 else
                 {
-                    mail.CC.Add(name.email);
+                    mail.Cc.Add(new MailboxAddress(name.name_en, name.email));
                 }
 
                 mail.Subject = $"มีคำขออนุมัติใบลา จาก {name.name_th}";
@@ -100,19 +102,37 @@ namespace WebENG.LeaveServices
                     </div>
                 </body>
                 </html>";
+                var bodyHtml = new BodyBuilder();
+                bodyHtml.HtmlBody = body;
+                
 
-                mail.IsBodyHtml = true;
-                string html = body;
 
-                mail.Body = html;
-                mail.IsBodyHtml = true;
-                SmtpServer.EnableSsl = false;
-                SmtpServer.Host = "192.168.15.3";
-                SmtpServer.Port = 25;
-                SmtpServer.UseDefaultCredentials = false;
-                SmtpServer.Credentials = new NetworkCredential(sender, password);
-                SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
-                SmtpServer.Send(mail);
+                mail.Body = bodyHtml.ToMessageBody();
+                //mail.IsBodyHtml = true;
+
+                //using (var smtp = new SmtpClient("smtp.office365.com", 587, MailKit.Security.SecureSocketOptions.StartTls))
+                //{
+                //    smtp.Credentials = new NetworkCredential(sender, password);
+                //    smtp.EnableSsl = false;
+                //    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                //    smtp.UseDefaultCredentials = false;
+
+                //    smtp.Send(mail);
+                //}
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
+                {
+                    client.Connect("smtp.office365.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                    client.Authenticate(sender, password);
+                    client.Send(mail);
+                    client.Disconnect(true);
+                }
+
+                //SmtpClient smtp = new SmtpClient("smtp.office365.com",587);
+                //smtp.Credentials = new NetworkCredential(sender, password);
+                //smtp.EnableSsl = true;
+                //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                //smtp.UseDefaultCredentials = false;
+                //smtp.Send(mail);
             }
             catch (Exception ex)
             {
@@ -125,17 +145,16 @@ namespace WebENG.LeaveServices
         {
             try
             {
-                MailMessage mail = new MailMessage();
-                SmtpClient SmtpServer = new SmtpClient();
+                var mail = new MimeMessage();
 
                 string password = "P@ssw0rd";
                 string sender = "e-leave@contrologic.co.th";
-                mail.From = new MailAddress(sender);
-                mail.To.Add(to);
-                mail.CC.Add(from);
+                mail.From.Add(new MailboxAddress("E-Leave", sender));
+                mail.To.Add(new MailboxAddress("Receive", to));
+                mail.Cc.Add(new MailboxAddress("Send", from));
                 if (status == "Rejected" || status == "Returned")
                 {
-                    mail.CC.Add("hrs@contrologic.co.th");
+                    mail.Cc.Add(new MailboxAddress("hrs", "hrs@contrologic.co.th"));
                 }
 
                 mail.Subject = $"ใบลาได้รับการพิจารณา โดย {approver}";
@@ -208,18 +227,27 @@ namespace WebENG.LeaveServices
                 </body>
                 </html>";
 
-                mail.IsBodyHtml = true;
-                string html = body;
+                var bodyHtml = new BodyBuilder();
+                bodyHtml.HtmlBody = body;
 
-                mail.Body = html;
-                mail.IsBodyHtml = true;
-                SmtpServer.EnableSsl = false;
-                SmtpServer.Host = "192.168.15.3";
-                SmtpServer.Port = 25;
-                SmtpServer.UseDefaultCredentials = false;
-                SmtpServer.Credentials = new NetworkCredential(sender, password);
-                SmtpServer.DeliveryMethod = SmtpDeliveryMethod.Network;
-                SmtpServer.Send(mail);
+                mail.Body = bodyHtml.ToMessageBody();
+
+                using (var client = new MailKit.Net.Smtp.SmtpClient())
+                {
+                    client.Connect("smtp.office365.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                    client.Authenticate(sender, password);
+                    client.Send(mail);
+                    client.Disconnect(true);
+                }
+
+                //SmtpClient smtp = new SmtpClient("smtp.office365.com");
+                //smtp.Port = 587;
+                //smtp.Credentials = new NetworkCredential(sender, password);
+                //smtp.EnableSsl = true;
+                //smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                //smtp.UseDefaultCredentials = false;
+                //smtp.Send(mail);
+
             }
             catch (Exception ex)
             {
