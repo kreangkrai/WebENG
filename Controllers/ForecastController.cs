@@ -113,64 +113,81 @@ namespace WebENG.Controllers
                     backlog = backlogs.Sum(s => s.remaining_in_hand);
                 }
                 else
-                {
-                    forecasts = forecasts.Where(w => w.department == department).ToList();
+                {                   
                     if (department == "CES")
                     {
                         invoices = invoices.Where(w => w.department == "CES").ToList();
                         job_in_hand = jobInHands.Where(w=>w.department == "CES").Sum(s => s.job_eng_in_hand);
                         backlog = backlogs.Where(w => w.department == "CES").Sum(s => s.remaining_eng_in_hand);
+                        forecasts = forecasts.Where(w => w.department == department).ToList();
                     }
                     if (department == "CIS")
                     {
                         invoices = invoices.Where( w => w.department == "CIS").ToList();
                         job_in_hand = jobInHands.Where(w => w.department == "CIS").Sum(s => s.job_cis_in_hand);
                         backlog = backlogs.Where(w => w.department == "CIS").Sum(s => s.remaining_cis_in_hand);
+                        forecasts = forecasts.Where(w => w.department == department).ToList();
                     }
                     if (department == "AES")
                     {
                         invoices = invoices.Where(w => w.department == "AES").ToList();
                         job_in_hand = jobInHands.Where(w => w.department == "AES").Sum(s => s.job_ais_in_hand);
                         backlog = backlogs.Where(w => w.department == "AES").Sum(s => s.remaining_ais_in_hand);
+                        forecasts = forecasts.Where(w => w.department == department).ToList();
+                    }
+
+                    if (department == "PMD")
+                    {
+                        invoices = invoices.Where(w => w.responsible_department.Contains("PMD")).ToList();
+                        job_in_hand = jobInHands.Where(w => w.responsible_department.Contains("PMD")).Sum(s => s.job_in_hand);
+                        backlog = backlogs.Where(w => w.responsible_department.Contains("PMD")).Sum(s => s.remaining_in_hand);
+                        forecasts = forecasts.Where(w => w.responsible_department.Contains("PMD")).ToList();
                     }
                 }
             }
             else
-            {               
-                if (dep.Contains("PMD"))
-                {
-                    invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+            {
 
-                    forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
 
-                    job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_in_hand);
-                    backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_in_hand);
+                forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
 
-                }
-                else
-                {
-                    if (dep == "CES-System" || dep == "CES-Exp" || dep == "CES-QIR")
-                    {
-                        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_eng_in_hand);
-                        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_eng_in_hand);
-                    }
-                    if (dep == "CES-CIS")
-                    {
-                        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_cis_in_hand);
-                        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_cis_in_hand);
-                    }
-                    if (dep == "AES")
-                    {
-                        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-                        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_ais_in_hand);
-                        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_ais_in_hand);
-                    }
-                }
+                job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_in_hand);
+                backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_in_hand);
+                //if (dep.Contains("PMD"))
+                //{
+                //    invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+
+                //    forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+
+                //    job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_in_hand);
+                //    backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_in_hand);
+
+                //}
+                //else
+                //{
+                //    if (dep == "CES-System" || dep == "CES-Exp" || dep == "CES-QIR")
+                //    {
+                //        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                //        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                //        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_eng_in_hand);
+                //        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_eng_in_hand);
+                //    }
+                //    if (dep == "CES-CIS")
+                //    {
+                //        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                //        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                //        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_cis_in_hand);
+                //        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_cis_in_hand);
+                //    }
+                //    if (dep == "AES")
+                //    {
+                //        invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                //        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
+                //        job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_ais_in_hand);
+                //        backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_ais_in_hand);
+                //    }
+                //}
             }
          
             forecast.month_label = new string[14]
