@@ -100,14 +100,18 @@ namespace WebENG.Controllers
             List<BackLogModel> backlogs = Job.GetBackLogs(year);
 
             double job_in_hand = 0;
-            string dep = employees.Where(w => w.name_en.ToLower() == responsible.ToLower()).Select(s => s.department).FirstOrDefault();
+            string dep = department;
+            if (mode != "Department")
+            {
+                dep = employees.Where(w => w.name_en.ToLower() == responsible.ToLower()).Select(s => s.department).FirstOrDefault();
+            }
 
             List<InvoicesModel> invoices = Job.GetInvoices(year);
             if (mode == "Department")
             {
                 if (department == "ALL")
                 {
-                    forecasts = forecasts.ToList();
+                    forecasts = forecasts.Where(w=>w.department == "PMD").ToList();
                     invoices = invoices.Where(w => w.job_in_hand > 0).ToList();                 
                     job_in_hand = jobInHands.Sum(s => s.job_in_hand);
                     backlog = backlogs.Sum(s => s.remaining_in_hand);
@@ -136,24 +140,42 @@ namespace WebENG.Controllers
                         forecasts = forecasts.Where(w => w.department == department).ToList();
                     }
 
-                    if (department == "PMD")
+                    if (department.Contains("PMD"))
                     {
                         invoices = invoices.Where(w => w.responsible_department.Contains("PMD")).ToList();
                         job_in_hand = jobInHands.Where(w => w.responsible_department.Contains("PMD")).Sum(s => s.job_in_hand);
                         backlog = backlogs.Where(w => w.responsible_department.Contains("PMD")).Sum(s => s.remaining_in_hand);
-                        forecasts = forecasts.Where(w => w.responsible_department.Contains("PMD")).ToList();
-                    }
+                        forecasts = forecasts.Where(w => w.responsible_department.Contains("PMD") && w.department.Contains(department)).ToList();
+                    }                    
                 }
             }
             else
             {
-
                 invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-
-                forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
-
                 job_in_hand = jobInHands.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.job_in_hand);
                 backlog = backlogs.Where(w => w.responsible.ToLower() == responsible.ToLower()).Sum(s => s.remaining_in_hand);
+
+                if (dep.Contains("PMD"))
+                {                  
+                    forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower() && w.department == "PMD").ToList();
+                }
+                else
+                {
+
+                    if (!dep.Contains("CIS") && !dep.Contains("AES"))
+                    {
+                        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower() && w.department == "CES").ToList();
+                    }
+                    if (!dep.Contains("CIS") && dep.Contains("AES"))
+                    {
+                        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower() && w.department == "AES").ToList();
+                    }
+                    if (dep.Contains("CIS") && !dep.Contains("AES"))
+                    {
+                        forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower() && w.department == "CIS").ToList();
+                    }
+
+                }
                 //if (dep.Contains("PMD"))
                 //{
                 //    invoices = invoices.Where(w => w.responsible.ToLower() == responsible.ToLower()).ToList();
@@ -211,7 +233,7 @@ namespace WebENG.Controllers
                 ForecastModel fore = f;
                 if (monthIndex >= 0 && monthIndex <= 12)
                 {
-                    if (f.forecast_portion_amount > 0)
+                    if (mode == "Department")
                     {
                         if (dep.Contains("PMD"))
                         {
@@ -221,6 +243,10 @@ namespace WebENG.Controllers
                         {
                             tempForecast[monthIndex + 1] += f.forecast_portion_department_amount;
                         }
+                    }
+                    else
+                    {
+                        tempForecast[monthIndex + 1] += f.forecast_portion_amount;
                     }
                 }
 
@@ -274,6 +300,7 @@ namespace WebENG.Controllers
                     var model = new ForecastModel
                     {
                         job_id = invoice.job_id,
+                        job_name = invoice.job_name,
                         forecast_month = invoice.invoice_month,
                         milestone = invoice.milestone,
                         
@@ -296,7 +323,9 @@ namespace WebENG.Controllers
                 responsible_department = s.FirstOrDefault().responsible_department,
                 job_in_hand = s.FirstOrDefault().job_in_hand,
                 department_in_hand = s.FirstOrDefault().department_in_hand,
-                department = s.FirstOrDefault().department,
+                department =  mode == "Department" ? 
+                              department != "ALL" ? s.FirstOrDefault().department : "ALL"
+                              : s.FirstOrDefault().department,
                 milestone = s.Key.milestone,
                 forecast_month = s.Key.forecast_month,
                 percent = s.FirstOrDefault().percent,
@@ -320,7 +349,9 @@ namespace WebENG.Controllers
                 {
                     responsible = s.FirstOrDefault().responsible,
                     department = s.FirstOrDefault().department,
-                    invoice = dep.Contains("PMD") ? s.Sum(x=>x.invoice) : s.Sum(x => x.portion_invoice),
+                    invoice = mode == "Department" ?
+                                    dep.Contains("PMD") ? s.Sum(x=>x.invoice) : s.Sum(x => x.portion_invoice)
+                                    : s.Sum(x => x.invoice),
                     month = s.FirstOrDefault().invoice_date.ToString("yyyy-MM")
                 }).ToList();
             inv = inv.OrderBy(o => o.month).ToList();

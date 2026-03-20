@@ -126,9 +126,9 @@
                             <th>Department</th>
                             <th>Process</th>
                             <th>System</th>
-                            <th>ENG Cost</th>
+                            <th>CES Cost</th>
                             <th>CIS Cost</th>
-                            <th>AIS Cost</th>
+                            <th>AES Cost</th>
                             <th>MD</th>
                             <th>PD</th>
                             <th>FT</th>
@@ -285,7 +285,7 @@
                                     <div class="input-group">
                                         <input id="chk_eng" type="checkbox" style="transform:scale(1.5)" />
                                         <div class="input-group-append">
-                                            <span class="pl-3">ENG</span>
+                                            <span class="pl-3">CES</span>
                                         </div>
                                     </div>
                                 </div>
@@ -301,7 +301,7 @@
                                     <div class="input-group">
                                         <input id="chk_ais" type="checkbox" style="transform:scale(1.5)" />
                                         <div class="input-group-append">
-                                            <span class="pl-3">AIS</span>
+                                            <span class="pl-3">AES</span>
                                         </div>
                                     </div>
                                 </div>
@@ -333,7 +333,7 @@
                                     <input id="due_date" type="date" class="form-control" value="1900-01-01" />
                                 </div>
                                 <div class="col-sm-6 col-md-4 col-xl-4">
-                                    <label for="cost">ENG Job In Hand</label>
+                                    <label for="cost">CES Job In Hand</label>
                                     <div class="input-group">
                                         <input id="job_eng_in_hand" type="number" class="form-control" placeholder="0" value="0" />
                                         <div class="input-group-append">
@@ -351,7 +351,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 col-md-4 col-xl-4">
-                                    <label for="cost">AIS Job In Hand</label>
+                                    <label for="cost">AES Job In Hand</label>
                                     <div class="input-group">
                                         <input id="job_ais_in_hand" type="number" class="form-control" placeholder="0" value="0" />
                                         <div class="input-group-append">
@@ -392,7 +392,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 col-md-4 col-xl-4">
-                                    <label for="cost">ENG Cost</label>
+                                    <label for="cost">CES Cost</label>
                                     <div class="input-group">
                                         <input id="eng_cost" type="number" class="form-control" placeholder="0" value="0" />
                                         <div class="input-group-append">
@@ -410,7 +410,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-6 col-md-4 col-xl-4">
-                                    <label for="cost">AIS Cost</label>
+                                    <label for="cost">AES Cost</label>
                                     <div class="input-group">
                                         <input id="ais_cost" type="number" class="form-control" placeholder="0" value="0" />
                                         <div class="input-group-append">
@@ -1006,7 +1006,7 @@
         let set_systems = [];
         let set_invoice = [];
         let job_files = [];
-        let set_select = ["ENG","CIS","AIS"];
+        let set_select = ["CES","CIS","AES"];
         let status_invoices = ['', 'วางบิลแล้ว', 'คาดว่าจะวางบิลได้ภายในเดือน', 'อยู่ระหว่างรอลูกค้าตรวจรับงาน', 'ยังไม่เริ่มงาน', 'เลื่อน', 'งานยกเลิก'];
         //Change these parameters to true to show result
 
@@ -1723,7 +1723,7 @@
                 $('#cis_cost').attr('disabled', true);
                 $('#ais_cost').attr('disabled', true);
             } else {
-                let chk_eng = job_owner.filter(f => f.job_department === "ENG");
+                let chk_eng = job_owner.filter(f => f.job_department === "CES");
                 if (chk_eng.length > 0) {
                     document.getElementById('chk_eng').checked = true;
                     $('#job_eng_in_hand').attr('disabled', false);
@@ -1743,7 +1743,7 @@
                     $('#job_cis_in_hand').attr('disabled', true);
                     $('#cis_cost').attr('disabled', true);
                 }
-                let chk_ais = job_owner.filter(f => f.job_department === "AIS");
+                let chk_ais = job_owner.filter(f => f.job_department === "AES");
                 if (chk_ais.length > 0) {
                     document.getElementById('chk_ais').checked = true;
                     $('#job_ais_in_hand').attr('disabled', false);
@@ -2532,7 +2532,7 @@
         $('#chk_eng').on('change', async function () {
             let chk = document.getElementById("chk_eng").checked;
             let job_id = $('#job_id').val();
-            let job_department = "ENG";
+            let job_department = "CES";
             if (job_id !== "") {
                 if (chk === true) {
                     await $.ajax({
@@ -2606,7 +2606,7 @@
         $('#chk_ais').on('change', async function () {
             let chk = document.getElementById("chk_ais").checked;
             let job_id = $('#job_id').val();
-            let job_department = "AIS";
+            let job_department = "AES";
             if (job_id !== "") {
                 if (chk === true) {
                     await $.ajax({
@@ -2657,7 +2657,7 @@
             $('#checkcolumnboxes').empty();
             let str = `<div class="row">
                            <label for="SELECT_ENG" class="form-check-label pl-3">
-                               <input type="checkbox" id="SELECT_ENG" value="ENG" onchange="SelectCheckChange('SELECT_ENG')" checked/>ENG</label>
+                               <input type="checkbox" id="SELECT_ENG" value="CES" onchange="SelectCheckChange('SELECT_ENG')" checked/>CES</label>
                        </div>
                        <div class="row">
                            <label for="SELECT_CIS" class="form-check-label pl-3">
@@ -2665,7 +2665,7 @@
                        </div>
                         <div class="row">
                         <label for="SELECT_AIS" class="form-check-label pl-3">
-                           <input type="checkbox" id="SELECT_AIS" value="AIS" onchange="SelectCheckChange('SELECT_AIS')" checked/>AIS</label>
+                           <input type="checkbox" id="SELECT_AIS" value="AES" onchange="SelectCheckChange('SELECT_AIS')" checked/>AES</label>
                        </div>`;
             $('#checkcolumnboxes').append(str);
         }

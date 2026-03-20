@@ -145,7 +145,7 @@ namespace WebENG.Service
                                                                 forecast_CES AS forecast_amount,
                                                                 NULL AS actual_amount
                                                             FROM ForecastSplit
-                                                            WHERE prop_CES > 0
+                                                            --WHERE prop_CES > 0
 
                                                             UNION ALL
 
@@ -165,7 +165,7 @@ namespace WebENG.Service
                                                                 forecast_CIS AS forecast_amount,
                                                                 NULL AS actual_amount
                                                             FROM ForecastSplit
-                                                            WHERE prop_CIS > 0
+                                                            --WHERE prop_CIS > 0
 
                                                             UNION ALL
 
@@ -185,9 +185,26 @@ namespace WebENG.Service
                                                                 forecast_AES AS forecast_amount,
                                                                 NULL AS actual_amount
                                                             FROM ForecastSplit
-                                                            WHERE prop_AES > 0
-                                                        ),
+                                                            --WHERE prop_AES > 0
+                                                            UNION ALL
 
+                                                            SELECT
+                                                                job_id,
+                                                                job_name,
+                                                                responsible,
+                                                                job_in_hand,
+                                                                job_in_hand AS in_hand,
+                                                                job_type,
+                                                                payment_id,
+                                                                payment_name,
+                                                                forecast_month,
+                                                                [percent],
+                                                                forecast_remark,
+                                                                'PMD' AS department,
+                                                                forecast_AES AS forecast_amount,
+                                                                NULL AS actual_amount
+                                                            FROM ForecastSplit
+                                                        ),
 
                                                         Combined AS (
                                                             SELECT

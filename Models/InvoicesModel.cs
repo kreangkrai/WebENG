@@ -8,6 +8,7 @@ namespace WebENG.Models
     public class InvoicesModel
     {
         public string job_id { get; set; }
+        public string job_name { get; set; }
         public double job_in_hand { get; set; }
         public double job_eng_in_hand { get; set; }
         public double job_cis_in_hand { get; set; }

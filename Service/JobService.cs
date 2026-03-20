@@ -2088,6 +2088,7 @@ namespace WebENG.Service
                 string string_command = string.Format($@"WITH Base AS (
                                                             SELECT 
                                                                 j.job_id,
+                                                                j.job_name,
                                                                 j.job_in_hand,
 		                                                        j.job_eng_in_hand,
 		                                                        j.job_cis_in_hand,
@@ -2116,6 +2117,7 @@ namespace WebENG.Service
 
                                                         SELECT 
                                                             job_id,
+                                                            job_name,
                                                             job_in_hand,
 	                                                        job_eng_in_hand,
 	                                                        job_cis_in_hand,
@@ -2138,6 +2140,7 @@ namespace WebENG.Service
 
                                                         SELECT 
                                                             job_id,
+                                                            job_name,
                                                             job_in_hand,
 	                                                        job_eng_in_hand,
 	                                                        job_cis_in_hand,
@@ -2160,6 +2163,7 @@ namespace WebENG.Service
 
                                                         SELECT 
                                                             job_id,
+                                                            job_name,
                                                             job_in_hand,
 	                                                        job_eng_in_hand,
 	                                                        job_cis_in_hand,
@@ -2192,6 +2196,7 @@ namespace WebENG.Service
                         InvoicesModel invoice = new InvoicesModel()
                         {
                             job_id = dr["job_id"].ToString(),
+                            job_name = dr["job_name"].ToString(),
                             job_date = dr["job_date"] != DBNull.Value ? Convert.ToDateTime(dr["job_date"].ToString()) : DateTime.MinValue,
                             job_in_hand = dr["job_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_in_hand"].ToString()) / mb : 0,
                             job_eng_in_hand = dr["job_eng_in_hand"] != DBNull.Value ? Convert.ToDouble(dr["job_eng_in_hand"].ToString()) / mb : 0,

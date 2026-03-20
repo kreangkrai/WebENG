@@ -209,7 +209,7 @@
                             borderColor: '#3679D1',
                             borderWidth: 2,
                             stack: 'job',
-                            barThickness: 15,
+                            barThickness: 18,
                         },
                         {
                             label: 'Job In Hand',
@@ -218,7 +218,7 @@
                             borderColor: '#D1A836',
                             borderWidth: 2,
                             stack: 'job',
-                            barThickness: 15,
+                            barThickness: 18,
                         },
                         {
                             label: 'Payment (Actual)',
@@ -227,7 +227,7 @@
                             borderColor: '#66BB6A',
                             borderWidth: 2,
                             stack: 'actual',
-                            barThickness: 15,
+                            barThickness: 18,
                         },
                         {
                             label: 'Payment (Forecast)',
@@ -237,7 +237,7 @@
                             borderWidth: 2,
                             borderDash: [5, 3],
                             stack: 'forecast',
-                            barThickness: 15,
+                            barThickness: 18,
                         },
                         {
                             label: 'Total Invoice',
@@ -246,7 +246,7 @@
                             borderColor: '#A5C910',
                             borderWidth: 2,
                             stack: 'next year',
-                            barThickness: 15,
+                            barThickness: 18,
                         },
                         {
                             label: 'Backlog Next Year',
@@ -255,7 +255,7 @@
                             borderColor: '#CE36D1',
                             borderWidth: 2,
                             stack: 'next year',
-                            barThickness: 15,
+                            barThickness: 18,
                         },
                         {
                             label: 'Acc Payment (Actual)',
@@ -335,16 +335,16 @@
                     forecasts[i].job_name,
                     forecasts[i].responsible,
                     forecasts[i].responsible_department,
-                    forecasts[i].job_in_hand.toFixed(3),
-                    forecasts[i].department_in_hand.toFixed(3),
+                    forecasts[i].job_in_hand > 0 ? forecasts[i].job_in_hand.toFixed(3) : "",
+                    forecasts[i].department_in_hand > 0 ? forecasts[i].department_in_hand.toFixed(3) : "",
                     forecasts[i].department,
                     forecasts[i].milestone,
                     forecasts[i].forecast_month,
                     forecasts[i].percent,
-                    forecasts[i].forecast_portion_amount.toFixed(3),
-                    forecasts[i].forecast_portion_department_amount.toFixed(3),
-                    forecasts[i].invoice_department_portion.toFixed(3),
-                    forecasts[i].total_invoice.toFixed(3),
+                    forecasts[i].forecast_portion_amount > 0 ? forecasts[i].forecast_portion_amount.toFixed(3) : "",
+                    forecasts[i].forecast_portion_department_amount > 0 ? forecasts[i].forecast_portion_department_amount.toFixed(3) : "",
+                    forecasts[i].invoice_department_portion > 0 ? forecasts[i].invoice_department_portion.toFixed(3) : "",
+                    forecasts[i].total_invoice > 0 ? forecasts[i].total_invoice.toFixed(3) : "",
                     forecasts[i].actual_invoice_date.toString().split('T')[0] === "0001-01-01"
                         ? ""
                         : forecasts[i].actual_invoice_date.toString().split('T')[0]
