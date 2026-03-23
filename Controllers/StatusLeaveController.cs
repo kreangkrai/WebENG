@@ -155,12 +155,32 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetEmployee(string start, string stop)
+        public IActionResult GetEmployee(string month_start, string month_stop)
         {
+            var parts = month_start.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int start_year)
+                || !int.TryParse(parts[1], out int start_mon))
+            {
+                return BadRequest("รูปแบบเดือนไม่ถูกต้อง");
+            }
+
+            parts = month_stop.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int stop_year)
+                || !int.TryParse(parts[1], out int stop_mon))
+            {
+                return BadRequest("รูปแบบเดือนไม่ถูกต้อง");
+            }
+
+            DateTime start = new DateTime(start_year, start_mon, 1);
+            DateTime stop = new DateTime(stop_year, stop_mon, DateTime.DaysInMonth(stop_year, stop_mon));
+
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
-            List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
+            //List<LevelModel> levels = Level.GetLevelByEmpID(emp_id);
+            List<LevelModel> levels = Level.GetHierarchyByEmpID(emp_id);
             int max_level = levels.Where(w => w.emp_id == emp_id).Max(m => m.level);
             List<string> departments = new List<string>();
             if (max_level == 0)
@@ -178,7 +198,7 @@ namespace WebENG.Controllers
 
             departments = departments.OrderBy(o => o).ToList();
 
-            List<RequestModel> requests = Requests.GetRequestByDurationDay(start, stop);
+            List<RequestModel> requests = Requests.GetRequestByDurationDay(start.ToString("yyyy-MM-dd"), stop.ToString("yyyy-MM-dd"));
             List<string> emps = new List<string>();
             if (max_level == 0)
             {
@@ -273,14 +293,31 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetDepartmentRequestHistory(string department, string start, string stop)
+        public IActionResult GetDepartmentRequestHistory(string department, string month_start, string month_stop)
         {
-            DateTime _start = DateTime.Parse(start);
-            DateTime _stop = DateTime.Parse(stop);
+            var parts = month_start.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int start_year)
+                || !int.TryParse(parts[1], out int start_mon))
+            {
+                return BadRequest("รูปแบบเดือนไม่ถูกต้อง");
+            }
+
+            parts = month_stop.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int stop_year)
+                || !int.TryParse(parts[1], out int stop_mon))
+            {
+                return BadRequest("รูปแบบเดือนไม่ถูกต้อง");
+            }
+
+            DateTime start = new DateTime(start_year, start_mon, 1);
+            DateTime stop = new DateTime(stop_year, stop_mon, DateTime.DaysInMonth(stop_year, stop_mon));
+
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
 
             List<RequestModel> requests = Requests.GetRequestByDepartment(department);
-            requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
+            requests = requests.Where(w => w.start_request_date.Date >= start.Date && w.start_request_date.Date <= stop.Date).ToList();
             requests = requests.OrderBy(o => o.start_request_date).ToList();
 
             var data = requests.Select(s => new
@@ -314,14 +351,31 @@ namespace WebENG.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetRequestHistory(string emp_id, string start, string stop)
+        public IActionResult GetRequestHistory(string emp_id, string month_start, string month_stop)
         {
-            DateTime _start = DateTime.Parse(start);
-            DateTime _stop = DateTime.Parse(stop);
+            var parts = month_start.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int start_year)
+                || !int.TryParse(parts[1], out int start_mon))
+            {
+                return BadRequest("รูปแบบเดือนไม่ถูกต้อง");
+            }
+
+            parts = month_stop.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int stop_year)
+                || !int.TryParse(parts[1], out int stop_mon))
+            {
+                return BadRequest("รูปแบบเดือนไม่ถูกต้อง");
+            }
+
+            DateTime start = new DateTime(start_year, start_mon, 1);
+            DateTime stop = new DateTime(stop_year, stop_mon, DateTime.DaysInMonth(stop_year, stop_mon));
+
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
 
             List<RequestModel> requests = Requests.GetRequestByEmpID(emp_id);
-            requests = requests.Where(w => w.start_request_date.Date >= _start.Date && w.start_request_date.Date <= _stop).ToList();
+            requests = requests.Where(w => w.start_request_date.Date >= start.Date && w.start_request_date.Date <= stop.Date).ToList();
             requests = requests.OrderBy(o => o.start_request_date).ToList();
 
             var data = requests.Select(s => new
@@ -1297,10 +1351,29 @@ namespace WebENG.Controllers
             }
         }
 
-        public async Task ExportToText(string start, string stop)
+        public async Task ExportToText(string month_start, string month_stop)
         {
+            var parts = month_start.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int start_year)
+                || !int.TryParse(parts[1], out int start_mon))
+            {
+                return;
+            }
+
+            parts = month_stop.Split('-');
+            if (parts.Length != 2
+                || !int.TryParse(parts[0], out int stop_year)
+                || !int.TryParse(parts[1], out int stop_mon))
+            {
+                return;
+            }
+
+            DateTime start = new DateTime(start_year, start_mon, 1);
+            DateTime stop = new DateTime(stop_year, stop_mon, DateTime.DaysInMonth(stop_year, stop_mon));
+
             List<CTLModels.HolidayModel> holidays = Holiday.GetHolidays(Convert.ToDateTime(start).Year.ToString());
-            List<RequestModel> requests = Requests.GetRequestByDurationDay(start, stop);
+            List<RequestModel> requests = Requests.GetRequestByDurationDay(start.ToString("yyyy-MM-dd"), stop.ToString("yyyy-MM-dd"));
             requests = requests.Where(w => w.status_request == "Completed").OrderBy(o => o.emp_id).ToList();
             StringBuilder sb = new StringBuilder();
             string headers = string.Empty;

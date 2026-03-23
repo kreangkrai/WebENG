@@ -127,7 +127,6 @@ namespace WebENG.Controllers
             string user = HttpContext.Session.GetString("userId");
             List<CTLModels.EmployeeModel> employees = Employee.GetEmployees();
             string emp_id = employees.Where(w => w.name_en.ToLower() == user.ToLower()).Select(s => s.emp_id).FirstOrDefault();
-
             //List<LevelModel> levels_approve = Level.GetLevelByEmpID(emp_id);
             List<LevelModel> levels_approve = Level.GetHierarchyByEmpID(emp_id);
             List<string> departments = levels_approve.Where(w => w.emp_id == emp_id).Select(s => s.department).ToList();

@@ -514,12 +514,12 @@
                         </div>
                         <div class="card-body p-3">
                             <div class="form-group row">
-                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันเริ่มต้น</label>
-                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_start">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">เดือนเริ่มต้น</label>
+                                <input type="month" class="col-8 form-control kanit-regular" style="border-radius:20px" id="month_start">
                             </div>
                             <div class="form-group row">
-                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">วันสิ้นสุด</label>
-                                <input type="date" class="col-8 form-control kanit-regular" style="border-radius:20px" id="date_stop">
+                                <label class="col-4 kanit-regular text-muted" style="font-size: 18px;">เดือนสิ้นสุด</label>
+                                <input type="month" class="col-8 form-control kanit-regular" style="border-radius:20px" id="month_stop">
                             </div>
                             <input type="hidden" id="hidden_emp_id" value="@Model.emp_id" />
                         </div>
@@ -1856,17 +1856,19 @@
 
         $(document).ready(async function () {
             const today = new Date();
-            let start = new Date(today);
-            start.setDate(1);
-            start = start.toISOString().split('T')[0];
+            //let start = new Date(today);
+            //start.setDate(1);
+            //start = start.toISOString().split('T')[0];
 
-            today.setMonth(today.getMonth() + 1);
-            const to_day = today.toISOString().split('T')[0];
+            //today.setMonth(today.getMonth() + 1);
+            //const to_day = today.toISOString().split('T')[0];
 
-            document.getElementById('date_start').value = start;
-            document.getElementById('date_stop').value = to_day;
+            const month = today.toISOString().slice(0, 7);
 
-            employees = await GetEmployee(start, to_day);
+            document.getElementById('month_start').value = month;
+            document.getElementById('month_stop').value = month;
+
+            employees = await GetEmployee(month, month);
             initSearchEvents();
             loadInitialLeaveHistory();
 
@@ -1874,17 +1876,17 @@
             const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
             selectEmployee(emp);
 
-            let year = new Date(start).getFullYear();
+            let year = new Date(month).getFullYear();
             $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
         });
 
-        async function GetEmployee(start, stop) {
+        async function GetEmployee(month_start, month_stop) {
             let emps = [];
             await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetEmployee", "StatusLeave")',
                 contentType: 'application/x-www-form-urlencoded',
-                data: { start, stop },
+                data: { month_start, month_stop },
                 success: function (response) {
                     departments = response.departments;
                     emps = response.employees;
@@ -1898,21 +1900,21 @@
             return emps;
         }
 
-        async function GetDepartmentRequestHistory(department, start, stop) {
+        async function GetDepartmentRequestHistory(department, month_start, month_stop) {
             const response = await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetDepartmentRequestHistory", "StatusLeave")',
-                data: { department, start, stop },
+                data: { department, month_start, month_stop },
                 dataType: 'json'
             });
             return response;
         }
 
-        async function GetRequestHistory(emp_id, start, stop) {
+        async function GetRequestHistory(emp_id, month_start, month_stop) {
             const response = await $.ajax({
                 type: "GET",
                 url: '@Url.Action("GetRequestHistory", "StatusLeave")',
-                data: { emp_id, start, stop },
+                data: { emp_id, month_start, month_stop },
                 dataType: 'json'
             });
             return response;
@@ -1985,17 +1987,17 @@
             $('#emp_th_used_leave').text(emp_th);
         }
 
-        $('#date_stop').on('change', async function () {
+        $('#month_stop').on('change', async function () {
 
             $('#emp_th_used_leave').text("");
             $('#div_leaves_used').empty();
             $('#employeeInfo').hide();
             clearLeaveHistory();
 
-            let start = $('#date_start').val();
-            let stop = $('#date_stop').val();
-            let year = new Date(start).getFullYear();
-            employees = await GetEmployee(start, stop);
+            let month_start = $('#month_start').val();
+            let month_stop = $('#month_stop').val();
+            let year = new Date(month_start).getFullYear();
+            employees = await GetEmployee(month_start, month_stop);
             const emp_id = '@Html.Raw(emp_id)';
             const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
 
@@ -2003,16 +2005,16 @@
             $('#label_entitlement').text("สิทธิ์การลาที่ใช้ปี " + year + " (วัน)");
         });
 
-         $('#date_start').on('change', async function () {
+         $('#month_start').on('change', async function () {
             $('#emp_th_used_leave').text("");
             $('#div_leaves_used').empty();
             $('#employeeInfo').hide();
             clearLeaveHistory();
 
-            let start = $('#date_start').val();
-            let stop = $('#date_stop').val();
-            let year = new Date(start).getFullYear();
-            employees = await GetEmployee(start, stop);
+             let month_start = $('#month_start').val();
+             let month_stop = $('#month_stop').val();
+             let year = new Date(month_start).getFullYear();
+             employees = await GetEmployee(month_start, month_stop);
             const emp_id = '@Html.Raw(emp_id)';
             const emp = employees.filter(f => f.emp_id === emp_id).map(m => m)[0];
 
@@ -2156,10 +2158,10 @@
         }
 
         async function loadLeaveDepartmentAndHistory(department) {
-            let start = $('#date_start').val();
-            let stop = $('#date_stop').val();
+            let month_start = $('#month_start').val();
+            let month_stop = $('#month_stop').val();
             try {
-                requestHistory = await GetDepartmentRequestHistory(department, start, stop);
+                requestHistory = await GetDepartmentRequestHistory(department, month_start, month_stop);
                 renderLeaveHistory();
             } catch (err) {
                 console.error("Error loading leave data:", err);
@@ -2167,11 +2169,11 @@
         }
 
         async function loadLeaveUsedAndHistory(emp_id, emp_th_name) {
-            let start = $('#date_start').val();
-            let stop = $('#date_stop').val();
-            let year = new Date(start).getFullYear();
+            let month_start = $('#month_start').val();
+            let month_stop = $('#month_stop').val();
+            let year = new Date(month_start).getFullYear();
             try {
-                requestHistory = await GetRequestHistory(emp_id, start, stop);
+                requestHistory = await GetRequestHistory(emp_id, month_start, month_stop);
                 const useds = await GetLeaveUsed(emp_id, year);
                 GenerateUsedLeave(emp_th_name, useds);
                 renderLeaveHistory();
@@ -3576,9 +3578,9 @@
 
 
         function ExportToText() {
-            const start = $('#date_start').val();
-            const stop = $('#date_stop').val();
-            location.href = '@Url.Action("ExportToText", "StatusLeave")?start='+ start + '&stop=' + stop;
+            const month_start = $('#month_start').val();
+            const month_stop = $('#month_stop').val();
+            location.href = '@Url.Action("ExportToText", "StatusLeave")?month_start=' + month_start + '&month_stop=' + month_stop;
         }
     </script>
    
