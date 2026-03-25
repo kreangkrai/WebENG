@@ -368,6 +368,7 @@ namespace WebENG.Controllers
                         leave_date = request.start_request_date.ToString("dd/MM/yyyy");
                         leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
                     }
+
                     Mail.Requester(email_approvers, status, name, leave_type, leave_date, leave_time);
 
                     //Insert Leave Working Hours
@@ -434,6 +435,40 @@ namespace WebENG.Controllers
                           /xxxx.csv
               /temp
          */
+
+        //[HttpPost]
+        //public async Task<IActionResult> UploadTempFile(IFormFile file, string request_id)
+        //{
+        //    if (file == null || file.Length == 0)
+        //        return BadRequest("No file");
+
+        //    var tempId = request_id;
+        //    var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", tempId);
+        //    Directory.CreateDirectory(tempPath);
+
+        //    var fileName = Path.GetFileName(file.FileName);
+        //    var filePath = Path.Combine(tempPath, fileName);
+
+        //    using (var stream = new FileStream(filePath, FileMode.Create))
+        //    {
+        //        await file.CopyToAsync(stream);
+        //    }
+
+        //    var previewUrl = Url.Action(
+        //        "PreviewTempFile",
+        //        "Leave",
+        //        new { tempId, fileName },
+        //        Request.Scheme
+        //    );
+
+        //    return Json(new
+        //    {
+        //        tempId,
+        //        fileName,
+        //        fileType = GetFileType(fileName),
+        //        previewUrl
+        //    });
+        //}
 
         [HttpPost]
         public async Task<IActionResult> UploadTempFile(IFormFile file)

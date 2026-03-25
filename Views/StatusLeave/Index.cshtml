@@ -2400,7 +2400,7 @@
                         $('#leave_stop_date').attr('disabled', false);
                         $('#btn_leave_send').text("แก้ไขวันลา");
                         $('#btn_leave_send').attr('hidden', false);
-                    } else if (data.status === "Approved") {
+                    } else if (data.status === "Approved" || data.status === "Completed") {
 
                         $('#btn_delete').attr('hidden', true);
                         $('#select_leave_type').attr('disabled', true);
@@ -3339,7 +3339,7 @@
         async function uploadCreateFileToTemp(file) {
             const formData = new FormData();
             formData.append('file', file);
-
+            //formData.append('request_id', request_id);
             try {
                 const response = await fetch('./Leave/UploadTempFile', {
                     method: 'POST',

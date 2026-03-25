@@ -689,6 +689,7 @@ namespace WebENG.Controllers
                         leave_date = request.start_request_date.ToString("dd/MM/yyyy");
                         leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
                     }
+                    
                     Mail.Requester(email_approvers, status, name, leave_type, leave_date, leave_time);
 
                     //Delete Working Hours
@@ -902,6 +903,7 @@ namespace WebENG.Controllers
                             leave_date = request.start_request_date.ToString("dd/MM/yyyy");
                             leave_time = $"{request.start_request_time.ToString(@"hh\:mm")} - {request.end_request_time.ToString(@"hh\:mm")}";
                         }
+
                         Mail.Approver(email_request, email_approver, status, leave_type, leave_date, leave_time, name_approver, request.comment);
                         return Json("Success");
                     }
@@ -1239,12 +1241,25 @@ namespace WebENG.Controllers
             var tempPath = Path.Combine(env.WebRootPath, "Uploads", "temp", request_id);
 
             if (!Directory.Exists(tempPath))
-                return NotFound("ไม่พบโฟลเดอร์ temp ของ request_id นี้");
+            {
+                return Json(new
+                {
+                    request_id,
+                    files = new List<object>()
+                });
+                //return NotFound("ไม่พบโฟลเดอร์ temp ของ request_id นี้");
+            }
 
             var files = Directory.GetFiles(tempPath);
 
             if (!files.Any())
-                return NotFound("ไม่พบไฟล์ในโฟลเดอร์ temp");
+            {
+                return Json(new
+                {
+                    request_id,
+                    files = new List<object>()
+                });
+            }
 
             var fileInfos = files.Select(file =>
             {
