@@ -1764,6 +1764,7 @@ namespace WebENG.Service
                                                     )
 
                                                     SELECT 
+                                                        distinct
                                                         job_id,
                                                         job_type,
                                                         job_name,
@@ -1981,7 +1982,8 @@ namespace WebENG.Service
                                                         WHERE job_ais_in_hand > 0
                                                     )
 
-                                                    SELECT 
+                                                    SELECT
+                                                        distinct
                                                         job_id,
                                                         job_type,
                                                         job_name,
@@ -2162,6 +2164,7 @@ namespace WebENG.Service
                                                         UNION ALL
 
                                                         SELECT 
+                                                            distinct
                                                             job_id,
                                                             job_name,
                                                             job_in_hand,

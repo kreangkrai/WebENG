@@ -227,6 +227,7 @@ namespace WebENG.Service
                                                         )
 
                                                         SELECT
+                                                            distinct
                                                             c.job_id,
                                                             c.job_name,
                                                             c.responsible,

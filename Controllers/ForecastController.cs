@@ -146,6 +146,26 @@ namespace WebENG.Controllers
                         job_in_hand = jobInHands.Where(w => w.responsible_department.Contains("PMD")).Sum(s => s.job_in_hand);
                         backlog = backlogs.Where(w => w.responsible_department.Contains("PMD")).Sum(s => s.remaining_in_hand);
                         forecasts = forecasts.Where(w => w.responsible_department.Contains("PMD") && w.department.Contains(department)).ToList();
+
+                        // Filter
+                        invoices = invoices.GroupBy(g => new { g.job_id, g.responsible, g.milestone, g.invoice_month }).Select(s => new InvoicesModel()
+                        {
+                            job_id = s.Key.job_id,
+                            responsible = s.Key.responsible,
+                            milestone = s.Key.milestone,
+                            invoice_month = s.Key.invoice_month,
+                            invoice = s.First().invoice,
+                            invoice_date = s.First().invoice_date,
+                            department = s.First().department,
+                            job_date = s.First().job_date,
+                            responsible_department = s.First().responsible_department,
+                            job_ais_in_hand = s.First().job_ais_in_hand,
+                            job_eng_in_hand = s.First().job_eng_in_hand,
+                            job_cis_in_hand = s.First().job_cis_in_hand,
+                            job_in_hand = s.First().job_in_hand,
+                            job_name = s.First().job_name,
+                            portion_invoice = s.First().portion_invoice
+                        }).ToList();
                     }                    
                 }
             }
@@ -158,6 +178,26 @@ namespace WebENG.Controllers
                 if (dep.Contains("PMD"))
                 {                  
                     forecasts = forecasts.Where(w => w.responsible.ToLower() == responsible.ToLower() && w.department == "PMD").ToList();
+
+                    // Filter
+                    invoices = invoices.GroupBy(g => new { g.job_id, g.responsible_department, g.milestone, g.invoice_month }).Select(s => new InvoicesModel()
+                    {
+                        job_id = s.Key.job_id,
+                        responsible = s.First().responsible,
+                        milestone = s.Key.milestone,
+                        invoice_month = s.Key.invoice_month,
+                        invoice = s.First().invoice,
+                        invoice_date = s.First().invoice_date,
+                        department = s.First().department,
+                        job_date = s.First().job_date,
+                        responsible_department = s.Key.responsible_department,
+                        job_ais_in_hand = s.First().job_ais_in_hand,
+                        job_eng_in_hand = s.First().job_eng_in_hand,
+                        job_cis_in_hand = s.First().job_cis_in_hand,
+                        job_in_hand = s.First().job_in_hand,
+                        job_name = s.First().job_name,
+                        portion_invoice = s.First().portion_invoice
+                    }).ToList();
                 }
                 else
                 {
@@ -211,7 +251,7 @@ namespace WebENG.Controllers
                 //    }
                 //}
             }
-         
+
             forecast.month_label = new string[14]
             { $"{year}",
     "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
