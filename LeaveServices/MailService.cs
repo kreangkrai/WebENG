@@ -17,7 +17,7 @@ namespace WebENG.LeaveServices
             try
             {
                 var mail = new MimeMessage();
-                string password = "P@ssw0rd";
+                string password = "$Contrologic1988$";
                 string sender = "e-leave@contrologic.co.th";
 
                 mail.From.Add(new MailboxAddress("E-Leave", sender));
@@ -147,7 +147,7 @@ namespace WebENG.LeaveServices
             {
                 var mail = new MimeMessage();
 
-                string password = "P@ssw0rd";
+                string password = "$Contrologic1988$";
                 string sender = "e-leave@contrologic.co.th";
                 mail.From.Add(new MailboxAddress("E-Leave", sender));
                 mail.To.Add(new MailboxAddress("Receive", to));
