@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebENG.Interface;
@@ -18,7 +20,9 @@ namespace WebENG.Controllers
         private CTLInterfaces.IHoliday Holiday;
         private IJob Job;
         readonly CTLInterfaces.IEmployee Employees;
-        public EngineerScoreController()
+        readonly IExport Export;
+        protected readonly IHostingEnvironment _hostingEnvironment;
+        public EngineerScoreController(IHostingEnvironment hostingEnvironment)
         {
             Accessory = new AccessoryService();
             Employees = new CTLServices.EmployeeService();
@@ -26,6 +30,8 @@ namespace WebENG.Controllers
             WorkingHours = new WorkingHoursService();
             Holiday = new CTLServices.HolidayService();
             Job = new JobService();
+            Export = new ExportService();
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IActionResult Index()
@@ -70,8 +76,13 @@ namespace WebENG.Controllers
         [HttpGet]
         public JsonResult GetScores(string emp_id, string department)
         {
-            List<EngineerScoreModel> scores = new List<EngineerScoreModel>();
+            List<EngineerScoreModel> scores = Scores(emp_id, department);
+            return Json(scores);
+        }
 
+        public List<EngineerScoreModel> Scores(string emp_id, string department)
+        {
+            List<EngineerScoreModel> scores = new List<EngineerScoreModel>();
             List<JobModel> jobs_ = Job.GetAllJobs();
             List<JobResponsibleModel> jr = JobResponsible.GetJobsResponsible();
             jr = jr.Where(w => w.department == department).ToList();
@@ -109,7 +120,7 @@ namespace WebENG.Controllers
                 JobsWorkingHoursModel sum_individual_jwh = new JobsWorkingHoursModel();
 
                 for (int j = 0; j < emps.Count; j++)
-                {                
+                {
                     int level = 1;
                     if (jr.Any(w => w.job_id == jobs[i] && w.emp_id == emps[j].emp_id))
                     {
@@ -259,12 +270,12 @@ namespace WebENG.Controllers
                         remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_ot_amount).FirstOrDefault()
 
                     };
-
                     scores.Add(score);
-                }
+                }              
             }
-            return Json(scores);
+            return scores;
         }
+         
 
         [HttpGet]
         public JsonResult GetWorkingUser()
@@ -272,6 +283,24 @@ namespace WebENG.Controllers
             List<UserModel> users = Accessory.getWorkingUser();
 
             return Json(users);
+        }
+
+        public IActionResult ExportDepartment(string emp_id,string department)
+        {
+            List<EngineerScoreModel> scores = Scores(emp_id, department);
+            //Download Excel
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "engineering_score.xlsx"));
+            var stream = Export.ExportScoreDepartment(templateFileInfo, scores, department);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "engineering_score_" + department+".xlsx");
+        }
+
+        public IActionResult ExportIndividual(string emp_id, string department)
+        {
+            List<EngineerScoreModel> scores = Scores(emp_id, department);
+            //Download Excel
+            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "engineering_score.xlsx"));
+            var stream = Export.ExportScoreIndividual(templateFileInfo, scores, department);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "engineering_score_" + emp_id + ".xlsx");
         }
     }
 }

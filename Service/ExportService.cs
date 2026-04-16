@@ -230,6 +230,72 @@ namespace WebENG.Service
             return stream;
         }
 
+        public Stream ExportScoreDepartment(FileInfo path, List<EngineerScoreModel> scores,string depatment)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["Sheet1"];
+
+                    int startRows = 2;
+                    for (int i = 0; i < scores.Count; i++)
+                    {
+                        worksheet.Cells["A" + (i + startRows)].Value = scores[i].emp_id;
+                        worksheet.Cells["B" + (i + startRows)].Value = depatment;
+                        worksheet.Cells["C" + (i + startRows)].Value = scores[i].job_id;
+                        worksheet.Cells["D" + (i + startRows)].Value = scores[i].job_name;
+                        worksheet.Cells["E" + (i + startRows)].Value = scores[i].customer;
+                        worksheet.Cells["F" + (i + startRows)].Value = scores[i].job_status;
+                        worksheet.Cells["G" + (i + startRows)].Value = scores[i].cost;
+                        worksheet.Cells["H" + (i + startRows)].Value = scores[i].factor;
+                        worksheet.Cells["I" + (i + startRows)].Value = scores[i].total_manpower;
+                        worksheet.Cells["J" + (i + startRows)].Value = scores[i].cost_per_tmp * 8;
+                        worksheet.Cells["K" + (i + startRows)].Value = scores[i].manpower;
+                        worksheet.Cells["L" + (i + startRows)].Value = scores[i].manpower_per_tmp * 100;
+                        worksheet.Cells["M" + (i + startRows)].Value = scores[i].remaining_cost;
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
+        public Stream ExportScoreIndividual(FileInfo path, List<EngineerScoreModel> scores,string depatment)
+        {
+            Stream stream = new MemoryStream();
+            if (path.Exists)
+            {
+                using (ExcelPackage p = new ExcelPackage(path))
+                {
+                    ExcelWorksheet worksheet = p.Workbook.Worksheets["Sheet1"];
+
+                    int startRows = 2;
+                    for (int i = 0; i < scores.Count; i++)
+                    {
+                        worksheet.Cells["A" + (i + startRows)].Value = scores[i].emp_id;
+                        worksheet.Cells["B" + (i + startRows)].Value = depatment;
+                        worksheet.Cells["C" + (i + startRows)].Value = scores[i].job_id;
+                        worksheet.Cells["D" + (i + startRows)].Value = scores[i].job_name;
+                        worksheet.Cells["E" + (i + startRows)].Value = scores[i].customer;
+                        worksheet.Cells["F" + (i + startRows)].Value = scores[i].job_status;
+                        worksheet.Cells["G" + (i + startRows)].Value = scores[i].cost;
+                        worksheet.Cells["H" + (i + startRows)].Value = scores[i].factor;
+                        worksheet.Cells["I" + (i + startRows)].Value = scores[i].total_manpower;
+                        worksheet.Cells["J" + (i + startRows)].Value = scores[i].cost_per_tmp * 8;
+                        worksheet.Cells["K" + (i + startRows)].Value = scores[i].manpower;
+                        worksheet.Cells["L" + (i + startRows)].Value = scores[i].manpower_per_tmp * 100;
+                        worksheet.Cells["M" + (i + startRows)].Value = scores[i].remaining_cost;
+                    }
+                    p.SaveAs(stream);
+                    stream.Position = 0;
+                }
+            }
+            return stream;
+        }
+
         public Stream ExportServiceReport(FileInfo path, List<DailyActivityModel> reports)
         {
             Stream stream = new MemoryStream();
