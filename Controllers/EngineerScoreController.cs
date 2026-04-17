@@ -236,22 +236,22 @@ namespace WebENG.Controllers
                        * (job.md_rate + job.pd_rate)
                        * (totalDirectCost / totalManpowerHours)
                        * (workingHours / totalManpowerHours);
-                    sc = Math.Round(sc, 1);
+                    sc = Math.Round(sc, 2);
 
                     manpower_per_tmp = workingHours / totalManpowerHours;
                     cost_per_tmp = (job.eng_cost + job.cis_cost + job.ais_cost) / totalManpowerHours;
 
                     sc = double.IsNaN(sc) || double.IsInfinity(sc)
                      ? 0
-                     : Math.Round(sc, 1);
+                     : Math.Round(sc, 2);
 
                     manpower_per_tmp = double.IsNaN(manpower_per_tmp) || double.IsInfinity(manpower_per_tmp)
                      ? 0
-                     : Math.Round(manpower_per_tmp, 1);
+                     : Math.Round(manpower_per_tmp, 2);
 
                     cost_per_tmp = double.IsNaN(cost_per_tmp) || double.IsInfinity(cost_per_tmp)
                      ? 0
-                     : Math.Round(cost_per_tmp, 1);
+                     : Math.Round(cost_per_tmp, 2);
 
                     EngineerScoreModel score = new EngineerScoreModel()
                     {
