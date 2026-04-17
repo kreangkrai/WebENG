@@ -16,7 +16,7 @@ namespace WebENG.Interface
         Stream ExportServiceReport(FileInfo path, List<DailyActivityModel> reports);
         Stream ExportJob(FileInfo path, List<JobModel> jobs);
         Stream ExportQuotationSummary(FileInfo path, List<QuotationSummaryModel> quotations);
-        Stream ExportScoreDepartment(FileInfo path, List<EngineerScoreModel> scores, string depatment);
-        Stream ExportScoreIndividual(FileInfo path, List<EngineerScoreModel> scores, string depatment);
+        Stream ExportScoreDepartment(FileInfo path, List<EngineerScoreModel> scores, string name,string depatment);
+        Stream ExportScoreIndividual(FileInfo path, List<EngineerScoreModel> scores, string name ,string depatment);
     }
 }

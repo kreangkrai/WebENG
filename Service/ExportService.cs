@@ -230,7 +230,7 @@ namespace WebENG.Service
             return stream;
         }
 
-        public Stream ExportScoreDepartment(FileInfo path, List<EngineerScoreModel> scores,string depatment)
+        public Stream ExportScoreDepartment(FileInfo path, List<EngineerScoreModel> scores,string name,string depatment)
         {
             Stream stream = new MemoryStream();
             if (path.Exists)
@@ -242,7 +242,7 @@ namespace WebENG.Service
                     int startRows = 2;
                     for (int i = 0; i < scores.Count; i++)
                     {
-                        worksheet.Cells["A" + (i + startRows)].Value = scores[i].emp_id;
+                        worksheet.Cells["A" + (i + startRows)].Value = name;
                         worksheet.Cells["B" + (i + startRows)].Value = depatment;
                         worksheet.Cells["C" + (i + startRows)].Value = scores[i].job_id;
                         worksheet.Cells["D" + (i + startRows)].Value = scores[i].job_name;
@@ -263,7 +263,7 @@ namespace WebENG.Service
             return stream;
         }
 
-        public Stream ExportScoreIndividual(FileInfo path, List<EngineerScoreModel> scores,string depatment)
+        public Stream ExportScoreIndividual(FileInfo path, List<EngineerScoreModel> scores,string name,string depatment)
         {
             Stream stream = new MemoryStream();
             if (path.Exists)
@@ -275,7 +275,7 @@ namespace WebENG.Service
                     int startRows = 2;
                     for (int i = 0; i < scores.Count; i++)
                     {
-                        worksheet.Cells["A" + (i + startRows)].Value = scores[i].emp_id;
+                        worksheet.Cells["A" + (i + startRows)].Value = name;
                         worksheet.Cells["B" + (i + startRows)].Value = depatment;
                         worksheet.Cells["C" + (i + startRows)].Value = scores[i].job_id;
                         worksheet.Cells["D" + (i + startRows)].Value = scores[i].job_name;

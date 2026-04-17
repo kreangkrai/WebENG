@@ -21,6 +21,7 @@ namespace WebENG.Controllers
         private IJob Job;
         readonly CTLInterfaces.IEmployee Employees;
         readonly IExport Export;
+        readonly IStatus Status;
         protected readonly IHostingEnvironment _hostingEnvironment;
         public EngineerScoreController(IHostingEnvironment hostingEnvironment)
         {
@@ -31,6 +32,7 @@ namespace WebENG.Controllers
             Holiday = new CTLServices.HolidayService();
             Job = new JobService();
             Export = new ExportService();
+            Status = new EngStatusService();
             _hostingEnvironment = hostingEnvironment;
         }
 
@@ -285,22 +287,30 @@ namespace WebENG.Controllers
             return Json(users);
         }
 
-        public IActionResult ExportDepartment(string emp_id,string department)
-        {
-            List<EngineerScoreModel> scores = Scores(emp_id, department);
-            //Download Excel
-            var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "engineering_score.xlsx"));
-            var stream = Export.ExportScoreDepartment(templateFileInfo, scores, department);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "engineering_score_" + department+".xlsx");
-        }
-
         public IActionResult ExportIndividual(string emp_id, string department)
         {
+            List<EngStatusModel> statuses = Status.GetStatuses();
+            List<CTLModels.EmployeeModel> emps = Employees.GetEmployees();
+            CTLModels.EmployeeModel employee = emps.Where(w => w.emp_id == emp_id).FirstOrDefault();
             List<EngineerScoreModel> scores = Scores(emp_id, department);
+
+            var statusDict = statuses.ToDictionary(
+                s => s.status_id,
+                s => s.status_name
+            );
+
+            foreach (var score in scores)
+            {
+                if (statusDict.TryGetValue(score.job_status, out var statusName))
+                {
+                    score.job_status = statusName;
+                }
+            }
+
             //Download Excel
             var templateFileInfo = new FileInfo(Path.Combine(_hostingEnvironment.ContentRootPath, "./wwwroot/files", "engineering_score.xlsx"));
-            var stream = Export.ExportScoreIndividual(templateFileInfo, scores, department);
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "engineering_score_" + emp_id + ".xlsx");
+            var stream = Export.ExportScoreIndividual(templateFileInfo, scores, employee.name_en, department);
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "engineering_score_" + employee.name_en + ".xlsx");
         }
     }
 }
