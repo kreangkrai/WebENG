@@ -288,6 +288,7 @@ namespace WebENG.Service
                         worksheet.Cells["K" + (i + startRows)].Value = scores[i].manpower;
                         worksheet.Cells["L" + (i + startRows)].Value = scores[i].manpower_per_tmp * 100;
                         worksheet.Cells["M" + (i + startRows)].Value = scores[i].remaining_cost;
+                        worksheet.Cells["N" + (i + startRows)].Value = scores[i].finish_date == DateTime.MinValue ? "" : scores[i].finish_date.ToString("dd/MM/yyyy");
                     }
                     p.SaveAs(stream);
                     stream.Position = 0;

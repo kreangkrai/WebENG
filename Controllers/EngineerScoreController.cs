@@ -269,7 +269,8 @@ namespace WebENG.Controllers
                         manpower_per_tmp = manpower_per_tmp,
                         score = sc,
                         total_manpower = totalManpowerHours,
-                        remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_ot_amount).FirstOrDefault()
+                        remaining_cost = cost - jwh.Where(w => w.job_id == job.job_id).Select(s => s.total_ot_amount).FirstOrDefault(),
+                        finish_date = job.finished_date
 
                     };
                     scores.Add(score);

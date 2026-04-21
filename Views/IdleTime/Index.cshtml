@@ -345,10 +345,11 @@
             });
         }
 
-        $('#btnExport').on('click',function(){
+        $('#btnExport').on('click', function () {
+            let department = $('#select_department').val();
             let start_year = $('#start_month').val();
             let stop_year = $('#stop_month').val();
-            location.href = '@Url.Action("ExportIdleTime", "IdleTime")?start_year='+ start_year + '&stop_year='+stop_year;
+            location.href = '@Url.Action("ExportIdleTime", "IdleTime")?department=' + department+'&start_year=' + start_year + '&stop_year=' + stop_year;
         });
     </script>
 }
