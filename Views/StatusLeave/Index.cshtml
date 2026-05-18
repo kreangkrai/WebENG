@@ -1413,7 +1413,7 @@
                     if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
                         const duration = $('#select_leave_hours_duration').val();
                         
-                        if (duration === 6) {
+                        if (duration === "6") {
                             if (parseInt(startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0) || (date.getHours() > 12)) {
                                 date.setHours(date.getHours() + 1);
                             }
@@ -3222,7 +3222,7 @@
                     if (timeToMinutes(date.toTimeString().split(' ')[0]) <= last) {
                         const duration = $('#create_select_leave_hours_duration').val();
 
-                        if (duration === 6) {
+                        if (duration === "6") {
                             if (parseInt(startDateInput.value) <= 12 || (date.getHours() === 12 && date.getMinutes() > 0) || (date.getHours() > 12)) {
                                 date.setHours(date.getHours() + 1);
                             }
